@@ -1,7 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import Image from "next/image"
+import { useTheme } from "next-themes"
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,10 +14,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Settings, LogOut, Home, PenTool, FileText, BarChart3, Feather, Bell } from "lucide-react"
+import {
+  User, Settings, LogOut, Home, PenTool,
+  FileText, BarChart3, Bell
+} from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LogoutModal } from "@/components/admin/logout-modal"
 import { Badge } from "@/components/ui/badge"
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface AdminHeaderProps {
   admin: {
@@ -24,10 +33,25 @@ interface AdminHeaderProps {
     full_name?: string
     avatar_url?: string
   }
+  onToggleMobileMenu: () => void
+  unreadCount: number
 }
 
-export function AdminHeader({ admin }: AdminHeaderProps) {
+export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHeaderProps) {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false)
+  const { theme } = useTheme()
+  const [hasMounted, setHasMounted] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  const logoSrc = hasMounted
+    ? theme === "dark"
+      ? "/lightlogo.png"
+      : "/darklogo.png"
+    : "/darklogo.png"
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: BarChart3 },
@@ -38,50 +62,82 @@ export function AdminHeader({ admin }: AdminHeaderProps) {
   ]
 
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-8">
+    <TooltipProvider>
+      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex items-center justify-between h-16 px-2 md:px-4">
+          {/* Logo */}
+          <div className="flex items-center space-x-4">
             <Link href="/admin/dashboard" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Feather className="h-4 w-4 text-primary-foreground" />
+              <div className="h-12 w-12 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
+                <Image src={logoSrc} alt="Whispr Logo" fill className="object-cover" priority />
               </div>
-              <span className="font-serif text-xl font-bold">Whispr Admin</span>
+              <span className="hidden sm:inline font-serif text-xl font-bold">Whispr Admin</span>
             </Link>
-
-            <nav className="hidden md:flex items-center space-x-6">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Link>
-              ))}
-            </nav>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/" className="flex items-center space-x-2">
-                <Home className="h-4 w-4" />
-                <span className="hidden sm:inline">View Site</span>
-              </Link>
-            </Button>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-4">
+            {navigation.map((item) => (
+              <Tooltip key={item.name}>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center space-x-1 px-2 py-1 text-sm font-medium ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="hidden lg:inline">{item.name}</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>{item.name}</TooltipContent>
+              </Tooltip>
+            ))}
+          </nav>
 
-            <Button asChild variant="ghost" size="sm" className="relative">
-              <Link href="/admin/notifications">
-                <Bell className="h-4 w-4" />
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                  3
-                </Badge>
-              </Link>
-            </Button>
+          {/* Right Controls */}
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild variant="ghost" size="icon">
+                  <Link href="/">
+                    <Home className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>View Site</TooltipContent>
+            </Tooltip>
 
-            <ThemeToggle />
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" onClick={onToggleMobileMenu}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </Button>
+            </div>
 
+            {/* Notifications */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild variant="ghost" size="icon" className="relative hidden md:flex">
+                  <Link href="/admin/notifications">
+                    <Bell className="h-4 w-4" />
+                    {unreadCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Notifications</TooltipContent>
+            </Tooltip>
+
+            {/* Theme Toggle */}
+            <div className="hidden md:flex">
+              <ThemeToggle />
+            </div>
+
+            {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -94,29 +150,26 @@ export function AdminHeader({ admin }: AdminHeaderProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
+                <div className="flex items-center gap-2 p-2">
+                  <div className="flex flex-col">
                     <p className="font-medium">{admin.full_name || admin.username}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">{admin.email}</p>
+                    <p className="text-sm text-muted-foreground truncate w-48">{admin.email}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/admin/profile" className="flex items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                    <User className="mr-2 h-4 w-4" /> <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/admin/settings" className="flex items-center">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <Settings className="mr-2 h-4 w-4" /> <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setLogoutModalOpen(true)} className="text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <LogOut className="mr-2 h-4 w-4" /> <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -125,6 +178,6 @@ export function AdminHeader({ admin }: AdminHeaderProps) {
       </header>
 
       <LogoutModal open={logoutModalOpen} onOpenChange={setLogoutModalOpen} />
-    </>
+    </TooltipProvider>
   )
 }

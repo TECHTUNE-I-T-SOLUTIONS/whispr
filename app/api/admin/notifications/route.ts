@@ -1,47 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
+import { createSupabaseServer } from "@/lib/supabase-server"
 
 export async function GET(request: NextRequest) {
   try {
     const { admin } = await requireAuthFromRequest(request)
+    const supabase = createSupabaseServer()
 
-    // Mock notifications data (in a real app, you'd have a notifications table)
-    const mockNotifications = [
-      {
-        id: "1",
-        type: "comment",
-        title: "New comment on your post",
-        message: "Someone commented on 'The Art of Silent Expression'",
-        read: false,
-        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      },
-      {
-        id: "2",
-        type: "reaction",
-        title: "Your poem received reactions",
-        message: "5 people loved 'Whispers in the Wind'",
-        read: false,
-        created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
-      },
-      {
-        id: "3",
-        type: "milestone",
-        title: "Milestone reached!",
-        message: "Your blog has reached 1,000 total views",
-        read: true,
-        created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-      },
-      {
-        id: "4",
-        type: "system",
-        title: "Welcome to Whispr Admin",
-        message: "Your admin account has been successfully set up",
-        read: true,
-        created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week ago
-      },
-    ]
+    // Fetch real notifications from Supabase
+    const { data: notifications, error } = await supabase
+      .from("notifications")
+      .select("id, type, title, message, read, created_at")
+      .eq("admin_id", admin.id)
+      .order("created_at", { ascending: false })
 
-    return NextResponse.json(mockNotifications)
+    if (error) {
+      console.error("Supabase error:", error)
+      return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 })
+    }
+
+    return NextResponse.json(notifications)
   } catch (error) {
     console.error("Error fetching notifications:", error)
     if (error instanceof Error && error.message === "Authentication required") {

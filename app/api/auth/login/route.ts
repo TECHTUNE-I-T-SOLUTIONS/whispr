@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import bcrypt from "bcryptjs"
-import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +12,6 @@ export async function POST(request: Request) {
 
     const supabase = createSupabaseServer()
 
-    // Find admin by username or email
     const { data: admin, error } = await supabase
       .from("admin")
       .select("*")
@@ -24,53 +22,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
-    // Check if account is active
     if (!admin.is_active) {
       return NextResponse.json({ error: "Account is deactivated. Please contact support." }, { status: 401 })
     }
 
-    // Check if account is locked
     if (admin.locked_until && new Date(admin.locked_until) > new Date()) {
-      return NextResponse.json(
-        {
-          error:
-            "Account is locked due to multiple failed login attempts. Please use the forgot password option to reset your password.",
-          accountLocked: true,
-        },
-        { status: 423 },
-      )
+      return NextResponse.json({
+        error: "Account is locked due to multiple failed login attempts.",
+        accountLocked: true,
+      }, { status: 423 })
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, admin.password_hash)
-
     if (!isValidPassword) {
-      // Increment failed login attempts
       const failedAttempts = (admin.failed_login_attempts || 0) + 1
       const updateData: any = { failed_login_attempts: failedAttempts }
 
-      // Lock account after 5 failed attempts
       if (failedAttempts >= 5) {
-        updateData.locked_until = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        updateData.locked_until = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       }
 
       await supabase.from("admin").update(updateData).eq("id", admin.id)
 
-      if (failedAttempts >= 5) {
-        return NextResponse.json(
-          {
-            error:
-              "Account has been locked due to multiple failed login attempts. Please use the forgot password option to reset your password.",
-            accountLocked: true,
-          },
-          { status: 423 },
-        )
-      }
-
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({
+        error: failedAttempts >= 5
+          ? "Account locked. Use forgot password to reset."
+          : "Invalid credentials",
+        accountLocked: failedAttempts >= 5,
+      }, { status: 423 })
     }
 
-    // Reset failed login attempts and update last login
     await supabase
       .from("admin")
       .update({
@@ -80,47 +61,39 @@ export async function POST(request: Request) {
       })
       .eq("id", admin.id)
 
-    // Prepare admin data for cookie (remove sensitive info)
     const adminData = {
       id: admin.id,
       username: admin.username,
       email: admin.email,
       full_name: admin.full_name,
-      bio: admin.bio,
       avatar_url: admin.avatar_url,
-      phone: admin.phone,
-      date_of_birth: admin.date_of_birth,
-      profile_image_url: admin.profile_image_url,
       is_active: admin.is_active,
       created_at: admin.created_at,
-      last_login: admin.last_login,
+      last_login: new Date().toISOString(),
     }
 
-    // Set admin data in secure cookie
-    const cookieStore = await cookies()
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
-    cookieStore.set("whispr-admin-data", JSON.stringify(adminData), {
+    // ✅ Correct way to set cookies in Next.js App Router
+    const response = NextResponse.json({ success: true, admin: adminData })
+
+    response.cookies.set("whispr-admin-auth", "true", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       expires: expiresAt,
       path: "/",
     })
 
-    // Also set a simple auth flag
-    cookieStore.set("whispr-admin-auth", "true", {
+    response.cookies.set("whispr-admin-data", JSON.stringify(adminData), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",
       expires: expiresAt,
       path: "/",
     })
 
-    return NextResponse.json({
-      success: true,
-      admin: adminData,
-    })
+    return response
   } catch (error) {
     console.error("Login error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

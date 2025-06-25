@@ -4,12 +4,21 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Image from "next/image"
+import { useTheme } from "next-themes"
+import { motion } from "framer-motion"
 
 export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { theme } = useTheme()
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -18,16 +27,39 @@ export function Header() {
     { name: "About", href: "/about" },
   ]
 
+  const logoSrc = hasMounted
+    ? theme === "dark"
+      ? "/lightlogo.png"
+      : "/darklogo.png"
+    : "/darklogo.png" // Default for SSR (safe fallback)
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">W</span>
-          </div>
-          <span className="font-serif text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className="h-12 w-12 relative md:h-14 md:w-14"
+          >
+            <Image
+              src={logoSrc}
+              alt="Whispr logo"
+              fill
+              className="rounded-full object-cover"
+              priority
+            />
+          </motion.div>
+
+          <motion.span
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            className="font-serif text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent"
+          >
             Whispr
-          </span>
+          </motion.span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -46,7 +78,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          {/* Theme Toggle */}
           <ThemeToggle />
 
           {/* Mobile Menu Button */}
@@ -64,7 +95,11 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-background/95 backdrop-blur">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="md:hidden border-t bg-background/95 backdrop-blur"
+        >
           <nav className="container py-4 space-y-2">
             {navigation.map((item) => (
               <Link
@@ -79,7 +114,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
-        </div>
+        </motion.div>
       )}
     </header>
   )

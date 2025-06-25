@@ -1,7 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -20,6 +22,20 @@ export function LoginForm() {
   const router = useRouter()
   const { toast } = useToast()
   const { refreshSession } = useSession()
+
+  const { theme } = useTheme()
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  const logoSrc = hasMounted
+    ? theme === "dark"
+      ? "/lightlogo.png"
+      : "/darklogo.png"
+    : "/darklogo.png"
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -90,9 +106,15 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
       <CardHeader className="text-center space-y-4">
-        <div className="animate-float mx-auto">
-          <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Feather className="h-8 w-8 text-primary-foreground" />
+        <div className="animate-float mx-auto mb-2">
+          <div className="h-40 w-40 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
+            <Image
+              src={logoSrc}
+              alt="Whispr Logo"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
         <div>

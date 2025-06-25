@@ -10,69 +10,98 @@ export async function GET(request: NextRequest) {
 
     const supabase = createSupabaseServer()
 
-    // Calculate date range
     const now = new Date()
     const daysBack = range === "7d" ? 7 : range === "30d" ? 30 : range === "90d" ? 90 : 365
     const startDate = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000)
 
-    // Get overview stats
-    const { data: posts } = await supabase.from("posts").select("view_count, reading_time").eq("status", "published")
+    // Posts
+    const { data: posts, error: postsError } = await supabase
+      .from("posts")
+      .select("view_count, reading_time, created_at")
+      .eq("status", "published")
 
+    if (postsError || !posts) throw new Error("Failed to fetch posts")
+
+    // Reactions
     const { count: totalReactions } = await supabase
       .from("reactions")
       .select("*", { count: "exact", head: true })
       .gte("created_at", startDate.toISOString())
 
+    // Comments
     const { count: totalComments } = await supabase
       .from("comments")
       .select("*", { count: "exact", head: true })
       .eq("status", "approved")
       .gte("created_at", startDate.toISOString())
 
-    const totalViews = posts?.reduce((sum, post) => sum + (post.view_count || 0), 0) || 0
-    const avgReadingTime = posts?.reduce((sum, post) => sum + (post.reading_time || 0), 0) / (posts?.length || 1) || 0
+    // Overview calculations
+    const totalViews = posts.reduce((sum, post) => sum + (post.view_count || 0), 0)
+    const avgReadingTime =
+      posts.reduce((sum, post) => sum + (post.reading_time || 0), 0) / (posts.length || 1)
 
-    // Mock data for charts (in a real app, you'd calculate this from actual data)
-    const viewsOverTime = Array.from({ length: daysBack }, (_, i) => {
-      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000)
-      return {
-        date: date.toISOString().split("T")[0],
-        views: Math.floor(Math.random() * 100) + 50,
-        reactions: Math.floor(Math.random() * 20) + 5,
+    // Views over time: group post view_counts by date
+    const viewsOverTimeMap: Record<string, { views: number; reactions: number }> = {}
+
+    posts.forEach((post) => {
+      const dateKey = new Date(post.created_at!).toISOString().split("T")[0]
+      if (!viewsOverTimeMap[dateKey]) {
+        viewsOverTimeMap[dateKey] = { views: 0, reactions: 0 }
       }
+      viewsOverTimeMap[dateKey].views += post.view_count || 0
+      // NOTE: If you have a separate table for reactions per post/date, map that too.
     })
 
-    // Get top posts
-    const { data: topPosts } = await supabase
+    const viewsOverTime = Object.entries(viewsOverTimeMap).map(([date, { views, reactions }]) => ({
+      date,
+      views,
+      reactions,
+    }))
+
+    // Top posts
+    const { data: topPosts, error: topPostsError } = await supabase
       .from("posts")
       .select("title, view_count, type")
       .eq("status", "published")
       .order("view_count", { ascending: false })
       .limit(5)
 
-    const topPostsFormatted =
-      topPosts?.map((post) => ({
-        title: post.title.length > 20 ? post.title.substring(0, 20) + "..." : post.title,
-        views: post.view_count || 0,
-        reactions: Math.floor(Math.random() * 50),
-        type: post.type,
-      })) || []
+    if (topPostsError || !topPosts) throw new Error("Failed to fetch top posts")
 
-    // Mock reaction breakdown
-    const reactionBreakdown = [
-      { name: "Like", value: 45, color: "#3b82f6" },
-      { name: "Love", value: 30, color: "#ef4444" },
-      { name: "Wow", value: 15, color: "#f59e0b" },
-      { name: "Haha", value: 10, color: "#10b981" },
-    ]
+    const topPostsFormatted = topPosts.map((post) => ({
+      title: post.title.length > 20 ? post.title.substring(0, 20) + "..." : post.title,
+      views: post.view_count || 0,
+      reactions: 0, // You can fetch real reaction counts per post if needed
+      type: post.type,
+    }))
 
-    // Mock traffic sources
-    const trafficSources = [
-      { source: "Direct", visits: 1250 },
-      { source: "Social Media", visits: 890 },
-      { source: "Search Engines", visits: 650 },
-      { source: "Referrals", visits: 320 },
-    ]
+    // Real reaction breakdown (optional: group by type)
+    const { data: reactionRows } = await supabase
+      .from("reactions")
+      .select("type")
+      .gte("created_at", startDate.toISOString())
+
+    const reactionBreakdownMap: Record<string, number> = {}
+    const colors: Record<string, string> = {
+      Like: "#3b82f6",
+      Love: "#ef4444",
+      Wow: "#f59e0b",
+      Haha: "#10b981",
+    }
+
+    reactionRows?.forEach((reaction) => {
+      const type = reaction.type || "Other"
+      reactionBreakdownMap[type] = (reactionBreakdownMap[type] || 0) + 1
+    })
+
+    const reactionBreakdown = Object.entries(reactionBreakdownMap).map(([name, value]) => ({
+      name,
+      value,
+      color: colors[name] || "#8884d8",
+    }))
+
+    // Traffic sources (you'd need a 'source' field in a 'visits' or 'analytics' table)
+    const trafficSources: { source: string; visits: number }[] = [] // populate when available
 
     const analyticsData = {
       overview: {
@@ -80,8 +109,8 @@ export async function GET(request: NextRequest) {
         totalReactions: totalReactions || 0,
         totalComments: totalComments || 0,
         avgReadingTime: Math.round(avgReadingTime),
-        viewsGrowth: Math.floor(Math.random() * 20) + 5, // Mock growth
-        reactionsGrowth: Math.floor(Math.random() * 15) + 3, // Mock growth
+        viewsGrowth: 0,
+        reactionsGrowth: 0,
       },
       viewsOverTime,
       topPosts: topPostsFormatted,
