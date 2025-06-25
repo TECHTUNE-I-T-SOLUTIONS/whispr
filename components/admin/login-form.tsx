@@ -50,19 +50,17 @@ export function LoginForm() {
       const data = await response.json()
 
       if (response.ok && data.success) {
-        // Refresh session to get the latest data
-        await refreshSession()
-
         toast({
           variant: "success",
           title: "Welcome back! 🎉",
           description: "You've successfully signed in to your dashboard.",
         })
 
-        // Small delay to ensure session is set
-        setTimeout(() => {
-          router.push("/admin/dashboard")
-        }, 100)
+        // Refresh session to get the latest data
+        await refreshSession()
+
+        // Navigate to dashboard
+        router.push("/admin/dashboard")
       } else {
         setError(data.error || "Login failed")
 

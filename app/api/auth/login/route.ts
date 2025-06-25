@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
-import crypto from "crypto"
 
 export async function POST(request: Request) {
   try {
@@ -81,25 +80,36 @@ export async function POST(request: Request) {
       })
       .eq("id", admin.id)
 
-    // Create session directly here
-    const sessionToken = crypto.randomUUID() + "-" + Date.now()
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-
-    // Insert session into database
-    const { error: sessionError } = await supabase.from("admin_sessions").insert({
-      admin_id: admin.id,
-      session_token: sessionToken,
-      expires_at: expiresAt.toISOString(),
-    })
-
-    if (sessionError) {
-      console.error("Session creation error:", sessionError)
-      return NextResponse.json({ error: "Failed to create session" }, { status: 500 })
+    // Prepare admin data for cookie (remove sensitive info)
+    const adminData = {
+      id: admin.id,
+      username: admin.username,
+      email: admin.email,
+      full_name: admin.full_name,
+      bio: admin.bio,
+      avatar_url: admin.avatar_url,
+      phone: admin.phone,
+      date_of_birth: admin.date_of_birth,
+      profile_image_url: admin.profile_image_url,
+      is_active: admin.is_active,
+      created_at: admin.created_at,
+      last_login: admin.last_login,
     }
 
-    // Set secure cookie
+    // Set admin data in secure cookie
     const cookieStore = await cookies()
-    cookieStore.set("whispr-admin-session", sessionToken, {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+    cookieStore.set("whispr-admin-data", JSON.stringify(adminData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: expiresAt,
+      path: "/",
+    })
+
+    // Also set a simple auth flag
+    cookieStore.set("whispr-admin-auth", "true", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -109,17 +119,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      admin: {
-        id: admin.id,
-        username: admin.username,
-        email: admin.email,
-        full_name: admin.full_name,
-        bio: admin.bio,
-        avatar_url: admin.avatar_url,
-        phone: admin.phone,
-        date_of_birth: admin.date_of_birth,
-        profile_image_url: admin.profile_image_url,
-      },
+      admin: adminData,
     })
   } catch (error) {
     console.error("Login error:", error)
