@@ -11,29 +11,46 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Save, Eye, Upload, X, Plus, Loader2, FileText, Sparkles, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react"
+import {
+  Save,
+  Eye,
+  Upload,
+  X,
+  Plus,
+  Loader2,
+  FileText,
+  Sparkles,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface PostEditorProps {
   type?: "blog" | "poem"
   postId?: string
+  initialData?: any
 }
 
-export function PostEditor({ type: initialType, postId }: PostEditorProps) {
+export function PostEditor({ type: initialType, postId, initialData }: PostEditorProps) {
   const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    excerpt: "",
-    type: initialType || "blog",
-    status: "draft",
-    featured: false,
-    tags: [] as string[],
-    seoTitle: "",
-    seoDescription: "",
+    title: initialData?.title || "",
+    content: initialData?.content || "",
+    excerpt: initialData?.excerpt || "",
+    type: initialData?.type || initialType || "blog",
+    status: initialData?.status || "draft",
+    featured: initialData?.featured || false,
+    tags: initialData?.tags || [],
+    seoTitle: initialData?.seo_title || "",
+    seoDescription: initialData?.seo_description || "",
   })
   const [newTag, setNewTag] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState<any[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>(initialData?.media_files || [])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const contentRef = useRef<HTMLTextAreaElement>(null)
   const router = useRouter()
@@ -77,8 +94,11 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
   const handleSubmit = async (status: "draft" | "published") => {
     setIsLoading(true)
     try {
-      const response = await fetch("/api/admin/posts", {
-        method: "POST",
+      const url = postId ? `/api/admin/posts/${postId}` : "/api/admin/posts"
+      const method = postId ? "PUT" : "POST"
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -93,18 +113,18 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
         const data = await response.json()
         toast({
           variant: "success",
-          title: `${formData.type === "poem" ? "Poem" : "Post"} ${status === "published" ? "published" : "saved"}!`,
-          description: `Your ${formData.type} has been successfully ${status === "published" ? "published" : "saved as draft"}.`,
+          title: `${formData.type === "poem" ? "Poem" : "Post"} ${postId ? "updated" : status === "published" ? "published" : "saved"}!`,
+          description: `Your ${formData.type} has been successfully ${postId ? "updated" : status === "published" ? "published" : "saved as draft"}.`,
         })
         router.push("/admin/posts")
       } else {
-        throw new Error("Failed to save post")
+        throw new Error(`Failed to ${postId ? "update" : "save"} post`)
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to save the post. Please try again.",
+        description: `Failed to ${postId ? "update" : "save"} the post. Please try again.`,
       })
     } finally {
       setIsLoading(false)
@@ -171,12 +191,14 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
             ) : (
               <FileText className="h-8 w-8 text-primary" />
             )}
-            Create New {formData.type === "poem" ? "Poem" : "Blog Post"}
+            {postId ? "Edit" : "Create New"} {formData.type === "poem" ? "Poem" : "Blog Post"}
           </h1>
           <p className="text-muted-foreground">
-            {formData.type === "poem"
-              ? "Compose a beautiful poem to share with your readers"
-              : "Write and publish a new blog post"}
+            {postId
+              ? `Update your ${formData.type === "poem" ? "poem" : "blog post"}`
+              : formData.type === "poem"
+                ? "Compose a beautiful poem to share with your readers"
+                : "Write and publish a new blog post"}
           </p>
         </div>
         <Select
@@ -213,13 +235,34 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
 
               {/* Formatting toolbar */}
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="ghost" onClick={() => formatText("**")}> <Bold className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => formatText("_")}> <Italic className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => formatText("<u>", "<u>", "</u>")}> <Underline className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => handleAlignment("left")}> <AlignLeft className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => handleAlignment("center")}> <AlignCenter className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => handleAlignment("right")}> <AlignRight className="h-4 w-4" /> </Button>
-                <Button type="button" variant="ghost" onClick={() => handleAlignment("justify")}> <AlignJustify className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("**")}>
+                  {" "}
+                  <Bold className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("_")}>
+                  {" "}
+                  <Italic className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("<u>", "<u>", "</u>")}>
+                  {" "}
+                  <Underline className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("left")}>
+                  {" "}
+                  <AlignLeft className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("center")}>
+                  {" "}
+                  <AlignCenter className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("right")}>
+                  {" "}
+                  <AlignRight className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("justify")}>
+                  {" "}
+                  <AlignJustify className="h-4 w-4" />{" "}
+                </Button>
               </div>
 
               <div>
@@ -229,7 +272,9 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                   id="content"
                   value={formData.content}
                   onChange={(e) => setFormData((prev) => ({ ...prev, content: e.target.value }))}
-                  placeholder={formData.type === "poem" ? "Write your poem here..." : "Write your blog post content here..."}
+                  placeholder={
+                    formData.type === "poem" ? "Write your poem here..." : "Write your blog post content here..."
+                  }
                   className={`min-h-[400px] resize-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                 />
               </div>
@@ -281,7 +326,7 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                   {uploadedFiles.map((file, index) => (
                     <div key={index} className="relative group">
                       <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                        {file.file_type.startsWith("image/") ? (
+                        {file.file_type?.startsWith("image/") ? (
                           <img
                             src={file.file_url || "/placeholder.svg"}
                             alt={file.original_name}
@@ -386,7 +431,7 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
               className="w-full"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
-              Publish {formData.type === "poem" ? "Poem" : "Post"}
+              {postId ? "Update" : "Publish"} {formData.type === "poem" ? "Poem" : "Post"}
             </Button>
             <Button
               variant="outline"

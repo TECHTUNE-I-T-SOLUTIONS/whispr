@@ -9,6 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@auth0/auth0-react": "latest",
+    "@clerk/clerk-react": "latest",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/primitive": "^1.1.2",
@@ -41,11 +43,13 @@
     "@radix-ui/react-tooltip": "latest",
     "@supabase/supabase-js": "latest",
     "@tailwindcss/typography": "latest",
+    "@tanstack/react-table": "latest",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
+    "convex": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
     "framer-motion": "latest",
