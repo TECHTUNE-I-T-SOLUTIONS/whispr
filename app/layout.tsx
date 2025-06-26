@@ -12,6 +12,11 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 
 export const metadata: Metadata = {
   title: "Whispr - Poetry & Writing",
+  keywords: ["poetry", "writing", "creative writing", "literature", "whispers"],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
   description: "A collection of poems and writings that speak in whispers",
     generator: 'v0.dev'
 }

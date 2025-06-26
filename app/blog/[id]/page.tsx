@@ -1,0 +1,110 @@
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import { formatDate, markdownToHtml } from "@/lib/utils"
+import Image from "next/image"
+import { createSupabaseServer } from "@/lib/supabase-server"
+import { SafeImage } from "@/components/SafeImage"
+
+type BlogPostPageProps = {
+  params: { id: string }
+}
+
+export async function generateMetadata(
+  { params }: { params: { id: string } }
+): Promise<Metadata> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+
+  const res = await fetch(`${baseUrl}/api/posts/${params.id}`, {
+    cache: "no-store",
+  })
+
+  if (!res.ok) return {}
+
+  const post = await res.json()
+
+  return {
+    title: `${post.title} - Whispr`,
+    description: post.seo_description || post.excerpt || "",
+  }
+}
+
+
+
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const supabase = createSupabaseServer()
+  const { data: post } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      admin (
+        full_name,
+        username,
+        bio,
+        avatar_url
+      )
+    `)
+    .eq("id", params.id)
+    .eq("status", "published")
+    .single()
+
+  if (!post) return notFound()
+
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+
+
+  const htmlContent = post.content_html || (await markdownToHtml(post.content || ""))
+
+  return (
+    <div className="whispr-gradient min-h-screen py-10">
+      <article className="container max-w-3xl space-y-6">
+        <h1 className="text-4xl font-bold">{post.title}</h1>
+
+        <p className="text-muted-foreground text-sm">
+          {post.admin?.full_name || post.admin?.username || "Anonymous"} •{" "}
+          {formatDate(post.created_at)} • {post.reading_time || 1} min read
+        </p>
+
+        {/* Tags */}
+        {post.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-2 text-sm">
+            {post.tags.map((tag: string) => (
+              <span key={tag} className="bg-muted/30 px-3 py-1 rounded-full">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Media files */}
+        {post.media_files?.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {post.media_files.map((file: any, index: number) => {
+            const src = file.file_url || null
+            return src ? (
+                <SafeImage
+                key={index}
+                src={src}
+                alt={file.original_name || post.title}
+                width={800}
+                height={400}
+                className="rounded-lg"
+                loading="lazy"
+                placeholder="blur"
+                blurDataURL="/placeholder-blur.png" // You can use a custom local placeholder image or a data URL
+                />
+            ) : null
+            })}
+        </div>
+        )}
+
+
+
+        {/* Content */}
+        <div className="prose prose-lg dark:prose-invert">
+          <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+        </div>
+      </article>
+    </div>
+  )
+}

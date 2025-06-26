@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
+    "@radix-ui/primitive": "^1.1.2",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",
@@ -34,7 +35,7 @@
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-switch": "latest",
     "@radix-ui/react-tabs": "latest",
-    "@radix-ui/react-toast": "latest",
+    "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
@@ -50,6 +51,7 @@
     "framer-motion": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
+    "marked": "^15.0.12",
     "next": "15.2.4",
     "next-themes": "latest",
     "react": "^19",
@@ -66,7 +68,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^24.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "ngrok": "^5.0.0-beta.2",

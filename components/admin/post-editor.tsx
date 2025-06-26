@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Save, Eye, Upload, X, Plus, Loader2, FileText, Sparkles } from "lucide-react"
+import { Save, Eye, Upload, X, Plus, Loader2, FileText, Sparkles, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface PostEditorProps {
@@ -36,8 +35,44 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const contentRef = useRef<HTMLTextAreaElement>(null)
   const router = useRouter()
   const { toast } = useToast()
+
+  const formatText = (wrap: string, prefix = wrap, suffix = wrap) => {
+    const el = contentRef.current
+    if (!el) return
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const selectedText = el.value.slice(start, end)
+    const newText = el.value.slice(0, start) + prefix + selectedText + suffix + el.value.slice(end)
+    setFormData((prev) => ({ ...prev, content: newText }))
+  }
+
+  const handleAlignment = (type: string) => {
+    const el = contentRef.current
+    if (!el) return
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    const selectedText = el.value.slice(start, end)
+    let alignedText = selectedText
+    switch (type) {
+      case "center":
+        alignedText = `<div style=\"text-align:center;\">${selectedText}</div>`
+        break
+      case "left":
+        alignedText = `<div style=\"text-align:left;\">${selectedText}</div>`
+        break
+      case "right":
+        alignedText = `<div style=\"text-align:right;\">${selectedText}</div>`
+        break
+      case "justify":
+        alignedText = `<div style=\"text-align:justify;\">${selectedText}</div>`
+        break
+    }
+    const newText = el.value.slice(0, start) + alignedText + el.value.slice(end)
+    setFormData((prev) => ({ ...prev, content: newText }))
+  }
 
   const handleSubmit = async (status: "draft" | "published") => {
     setIsLoading(true)
@@ -176,17 +211,25 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                 />
               </div>
 
+              {/* Formatting toolbar */}
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="ghost" onClick={() => formatText("**")}> <Bold className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("_")}> <Italic className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("<u>", "<u>", "</u>")}> <Underline className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("left")}> <AlignLeft className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("center")}> <AlignCenter className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("right")}> <AlignRight className="h-4 w-4" /> </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("justify")}> <AlignJustify className="h-4 w-4" /> </Button>
+              </div>
+
               <div>
                 <Label htmlFor="content">{formData.type === "poem" ? "Poem Content" : "Post Content"}</Label>
                 <Textarea
+                  ref={contentRef}
                   id="content"
                   value={formData.content}
                   onChange={(e) => setFormData((prev) => ({ ...prev, content: e.target.value }))}
-                  placeholder={
-                    formData.type === "poem"
-                      ? "Write your poem here...\n\nLine breaks will be preserved for poetry formatting."
-                      : "Write your blog post content here..."
-                  }
+                  placeholder={formData.type === "poem" ? "Write your poem here..." : "Write your blog post content here..."}
                   className={`min-h-[400px] resize-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                 />
               </div>

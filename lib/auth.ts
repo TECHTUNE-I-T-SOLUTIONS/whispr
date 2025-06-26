@@ -28,7 +28,7 @@ export async function getSession(): Promise<{ admin: any } | null> {
   }
 
   try {
-    const adminData = JSON.parse(adminDataCookie)
+    const adminData = JSON.parse(decodeURIComponent(adminDataCookie))
     return { admin: adminData }
   } catch (error) {
     console.error("Error parsing admin data:", error)

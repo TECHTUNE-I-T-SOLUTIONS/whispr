@@ -2,7 +2,6 @@ import type { NextRequest } from "next/server"
 
 export async function getAdminFromRequest(request: NextRequest) {
   try {
-    // Check if admin is authenticated
     const isAuthenticated = request.cookies.get("whispr-admin-auth")?.value === "true"
     const adminDataCookie = request.cookies.get("whispr-admin-data")?.value
 
@@ -11,9 +10,9 @@ export async function getAdminFromRequest(request: NextRequest) {
     }
 
     try {
-      const adminData = JSON.parse(adminDataCookie)
+      const decoded = decodeURIComponent(adminDataCookie)
+      const adminData = JSON.parse(decoded)
 
-      // Verify admin is still active
       if (!adminData.is_active) {
         return null
       }

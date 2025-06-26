@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs"
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json()
-
     if (!username || !password) {
       return NextResponse.json({ error: "Username and password are required" }, { status: 400 })
     }
@@ -36,13 +35,12 @@ export async function POST(request: Request) {
     const isValidPassword = await bcrypt.compare(password, admin.password_hash)
     if (!isValidPassword) {
       const failedAttempts = (admin.failed_login_attempts || 0) + 1
-      const updateData: any = { failed_login_attempts: failedAttempts }
-
-      if (failedAttempts >= 5) {
-        updateData.locked_until = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      }
-
-      await supabase.from("admin").update(updateData).eq("id", admin.id)
+      await supabase.from("admin").update({
+        failed_login_attempts: failedAttempts,
+        ...(failedAttempts >= 5 && {
+          locked_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        })
+      }).eq("id", admin.id)
 
       return NextResponse.json({
         error: failedAttempts >= 5
@@ -52,14 +50,11 @@ export async function POST(request: Request) {
       }, { status: 423 })
     }
 
-    await supabase
-      .from("admin")
-      .update({
-        failed_login_attempts: 0,
-        locked_until: null,
-        last_login: new Date().toISOString(),
-      })
-      .eq("id", admin.id)
+    await supabase.from("admin").update({
+      failed_login_attempts: 0,
+      locked_until: null,
+      last_login: new Date().toISOString()
+    }).eq("id", admin.id)
 
     const adminData = {
       id: admin.id,
@@ -69,28 +64,27 @@ export async function POST(request: Request) {
       avatar_url: admin.avatar_url,
       is_active: admin.is_active,
       created_at: admin.created_at,
-      last_login: new Date().toISOString(),
+      last_login: new Date().toISOString()
     }
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
-    // ✅ Correct way to set cookies in Next.js App Router
     const response = NextResponse.json({ success: true, admin: adminData })
 
     response.cookies.set("whispr-admin-auth", "true", {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // ✅ Secure only in production
       sameSite: "lax",
-      expires: expiresAt,
       path: "/",
+      expires: expiresAt
     })
 
-    response.cookies.set("whispr-admin-data", JSON.stringify(adminData), {
+    response.cookies.set("whispr-admin-data", encodeURIComponent(JSON.stringify(adminData)), {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      expires: expiresAt,
       path: "/",
+      expires: expiresAt
     })
 
     return response

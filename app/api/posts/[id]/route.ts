@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   try {
@@ -22,26 +22,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .eq("status", "published")
       .single()
 
-    if (error) {
+    if (error || !data) {
       console.error("Database error:", error)
-      return NextResponse.json({ error: error.message }, { status: 404 })
+      return NextResponse.json({ error: error?.message || "Not found" }, { status: 404 })
     }
 
-    // Transform the data to match the expected format
-    const transformedData = {
-      ...data,
-      authors: {
-        name: data.admin?.full_name || data.admin?.username || "Prayce",
-        bio: data.admin?.bio,
-        avatar_url: data.admin?.avatar_url,
-      },
-    }
-
-    // Increment view count
     await supabase
       .from("posts")
       .update({ view_count: (data.view_count || 0) + 1 })
       .eq("id", id)
+
+    const transformedData = {
+      ...data,
+      authors: {
+        name: data.admin?.full_name || data.admin?.username || "Anonymous",
+        bio: data.admin?.bio,
+        avatar_url: data.admin?.avatar_url,
+      },
+    }
 
     return NextResponse.json(transformedData)
   } catch (error) {
