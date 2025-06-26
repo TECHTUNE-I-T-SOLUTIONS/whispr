@@ -3,7 +3,7 @@ import { createSupabaseServer } from "@/lib/supabase-server"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const postId = searchParams.get("postId")
+  const postId = searchParams.get("post_id") // ✅ fixed here
 
   if (!postId) {
     return NextResponse.json({ error: "Post ID is required" }, { status: 400 })
@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { postId, authorName, authorEmail, content } = await request.json()
+    const { post_id, author_name, author_email, content } = await request.json()
 
-    if (!postId || !authorName || !authorEmail || !content) {
+    if (!post_id || !author_name || !author_email || !content) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 })
     }
 
@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from("comments")
       .insert({
-        post_id: postId,
-        author_name: authorName,
-        author_email: authorEmail,
-        content: content,
-        status: "pending", // Comments need approval
+        post_id,
+        author_name,
+        author_email,
+        content,
+        status: "pending", // awaiting approval
       })
       .select()
       .single()
