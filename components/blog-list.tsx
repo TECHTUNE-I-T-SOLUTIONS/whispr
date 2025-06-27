@@ -6,7 +6,7 @@ import { formatDistanceToNow } from "date-fns"
 
 async function getBlogPosts() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
     const response = await fetch(`${baseUrl}/api/posts?type=blog`, {
       next: { revalidate: 60 },
     })

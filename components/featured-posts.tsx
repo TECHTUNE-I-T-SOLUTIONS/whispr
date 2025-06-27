@@ -5,7 +5,7 @@ import { Clock, User } from "lucide-react"
 
 async function getFeaturedPosts() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
   const response = await fetch(`${baseUrl}/api/posts?featured=true&limit=3`, {
     next: { revalidate: 60 },
   })
