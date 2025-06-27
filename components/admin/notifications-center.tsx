@@ -6,20 +6,30 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Bell, Check, Settings, MessageCircle, Heart, Eye, Trash2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { useToast } from "@/hooks/use-toast"
 
+type NotificationType = 
+  | "comment" 
+  | "reaction" 
+  | "milestone" 
+  | "system"
+  | "wall_comment"
+  | "wall_reaction"
+  | "whispr_wall";
+
 interface Notification {
   id: string
-  type: "comment" | "reaction" | "milestone" | "system"
+  type: NotificationType
   title: string
   message: string
   read: boolean
   created_at: string
   metadata?: any
 }
-
 interface NotificationSettings {
   emailNotifications: boolean
   commentNotifications: boolean
@@ -39,6 +49,11 @@ export function NotificationsCenter() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [search, setSearch] = useState("")
+  const [sort, setSort] = useState("newest")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [page, setPage] = useState(1)
+  const pageSize = 10
   const { toast } = useToast()
 
   useEffect(() => {
@@ -148,12 +163,15 @@ export function NotificationsCenter() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "comment":
+      case "wall_comment":
         return <MessageCircle className="h-4 w-4 text-green-600" />
       case "reaction":
+      case "wall_reaction":
         return <Heart className="h-4 w-4 text-red-600" />
       case "milestone":
         return <Eye className="h-4 w-4 text-purple-600" />
       case "system":
+      case "whispr_wall":
         return <Bell className="h-4 w-4 text-blue-600" />
       default:
         return <Bell className="h-4 w-4 text-muted-foreground" />
@@ -163,12 +181,15 @@ export function NotificationsCenter() {
   const getNotificationColor = (type: string) => {
     switch (type) {
       case "comment":
+      case "wall_comment":
         return "bg-green-50 dark:bg-green-900/20"
       case "reaction":
+      case "wall_reaction":
         return "bg-red-50 dark:bg-red-900/20"
       case "milestone":
         return "bg-purple-50 dark:bg-purple-900/20"
       case "system":
+      case "whispr_wall":
         return "bg-blue-50 dark:bg-blue-900/20"
       default:
         return "bg-muted/50"
@@ -177,30 +198,21 @@ export function NotificationsCenter() {
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-8 bg-muted rounded w-1/3"></div>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="h-10 w-10 bg-muted rounded-full"></div>
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    )
-  }
+  const filtered = notifications
+    .filter((n) => (typeFilter === "all" ? true : n.type === typeFilter))
+    .filter((n) => n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      if (sort === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      if (sort === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      return 0
+    })
+
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
+  const totalPages = Math.ceil(filtered.length / pageSize)
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
             <Bell className="h-8 w-8 text-primary" />
@@ -209,14 +221,53 @@ export function NotificationsCenter() {
           </h1>
           <p className="text-muted-foreground">Stay updated with your content activity</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full">
+          <Input
+            placeholder="Search notifications..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full sm:w-48"
+          />
+          
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Filter by Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="comment">Comment</SelectItem>
+              <SelectItem value="reaction">Reaction</SelectItem>
+              <SelectItem value="milestone">Milestone</SelectItem>
+              <SelectItem value="system">System</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={sort} onValueChange={setSort}>
+            <SelectTrigger className="w-full sm:w-36">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
+
           {unreadCount > 0 && (
-            <Button variant="outline" onClick={markAllAsRead}>
+            <Button
+              variant="outline"
+              onClick={markAllAsRead}
+              className="w-full sm:w-auto"
+            >
               <Check className="mr-2 h-4 w-4" />
               Mark all as read
             </Button>
           )}
-          <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
+
+          <Button
+            variant="outline"
+            onClick={() => setShowSettings(!showSettings)}
+            className="w-full sm:w-auto"
+          >
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
@@ -271,7 +322,7 @@ export function NotificationsCenter() {
       )}
 
       <div className="space-y-4">
-        {notifications.length === 0 ? (
+        {paginated.length === 0 ? (
           <Card className="border-dashed border-2 border-muted-foreground/25">
             <CardContent className="p-8 text-center">
               <Bell className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
@@ -280,7 +331,7 @@ export function NotificationsCenter() {
             </CardContent>
           </Card>
         ) : (
-          notifications.map((notification, index) => (
+          paginated.map((notification, index) => (
             <Card
               key={notification.id}
               className={`animate-slide-up border-0 backdrop-blur transition-colors hover:bg-card/80 ${
@@ -332,6 +383,20 @@ export function NotificationsCenter() {
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </span>
+          <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

@@ -20,9 +20,10 @@ export async function PATCH(request: NextRequest) {
 
     const { error } = await supabase
       .from("notifications")
-      .update({ read: true })
+      .update({ read: true, admin_id: admin.id })
       .eq("id", id)
-      .eq("admin_id", admin.id)
+      .or(`admin_id.eq.${admin.id},admin_id.is.null`)
+
 
     if (error) {
       console.error("Supabase error:", error)
@@ -38,7 +39,6 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const id = extractIdFromUrl(request.nextUrl.pathname)
-
   if (!id) {
     return NextResponse.json({ error: "Notification ID is required" }, { status: 400 })
   }
@@ -51,7 +51,7 @@ export async function DELETE(request: NextRequest) {
       .from("notifications")
       .delete()
       .eq("id", id)
-      .eq("admin_id", admin.id)
+      .or(`admin_id.eq.${admin.id},admin_id.is.null`)
 
     if (error) {
       console.error("Supabase error:", error)

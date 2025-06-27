@@ -35,12 +35,28 @@ export async function GET(request: NextRequest) {
       .eq("status", "approved")
       .gte("created_at", startDate.toISOString())
 
-    // Overview calculations
+    // Whispr Wall Posts
+    const { count: totalWallPosts } = await supabase
+      .from("whispr_wall")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startDate.toISOString())
+
+    // Wall Comments
+    const { count: totalWallComments } = await supabase
+      .from("wall_comments")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startDate.toISOString())
+
+    // Wall Reactions
+    const { count: totalWallReactions } = await supabase
+      .from("wall_reactions")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startDate.toISOString())
+
     const totalViews = posts.reduce((sum, post) => sum + (post.view_count || 0), 0)
     const avgReadingTime =
       posts.reduce((sum, post) => sum + (post.reading_time || 0), 0) / (posts.length || 1)
 
-    // Views over time: group post view_counts by date
     const viewsOverTimeMap: Record<string, { views: number; reactions: number }> = {}
 
     posts.forEach((post) => {
@@ -49,7 +65,6 @@ export async function GET(request: NextRequest) {
         viewsOverTimeMap[dateKey] = { views: 0, reactions: 0 }
       }
       viewsOverTimeMap[dateKey].views += post.view_count || 0
-      // NOTE: If you have a separate table for reactions per post/date, map that too.
     })
 
     const viewsOverTime = Object.entries(viewsOverTimeMap).map(([date, { views, reactions }]) => ({
@@ -58,7 +73,6 @@ export async function GET(request: NextRequest) {
       reactions,
     }))
 
-    // Top posts
     const { data: topPosts, error: topPostsError } = await supabase
       .from("posts")
       .select("title, view_count, type")
@@ -71,11 +85,10 @@ export async function GET(request: NextRequest) {
     const topPostsFormatted = topPosts.map((post) => ({
       title: post.title.length > 20 ? post.title.substring(0, 20) + "..." : post.title,
       views: post.view_count || 0,
-      reactions: 0, // You can fetch real reaction counts per post if needed
+      reactions: 0,
       type: post.type,
     }))
 
-    // Real reaction breakdown (optional: group by type)
     const { data: reactionRows } = await supabase
       .from("reactions")
       .select("type")
@@ -100,14 +113,14 @@ export async function GET(request: NextRequest) {
       color: colors[name] || "#8884d8",
     }))
 
-    // Traffic sources (you'd need a 'source' field in a 'visits' or 'analytics' table)
-    const trafficSources: { source: string; visits: number }[] = [] // populate when available
+    const trafficSources: { source: string; visits: number }[] = []
 
     const analyticsData = {
       overview: {
         totalViews,
-        totalReactions: totalReactions || 0,
-        totalComments: totalComments || 0,
+        totalReactions: (totalReactions || 0) + (totalWallReactions || 0),
+        totalComments: (totalComments || 0) + (totalWallComments || 0),
+        totalWallPosts: totalWallPosts || 0,
         avgReadingTime: Math.round(avgReadingTime),
         viewsGrowth: 0,
         reactionsGrowth: 0,

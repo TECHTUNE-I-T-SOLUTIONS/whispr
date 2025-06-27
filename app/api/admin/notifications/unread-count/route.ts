@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const { count, error } = await supabase
       .from("notifications")
       .select("*", { count: "exact", head: true })
-      .eq("admin_id", admin.id)
+      .or(`admin_id.eq.${admin.id},admin_id.is.null`)
       .eq("read", false)
 
     if (error) throw error

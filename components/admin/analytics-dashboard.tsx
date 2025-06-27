@@ -27,6 +27,9 @@ interface AnalyticsData {
     avgReadingTime: number
     viewsGrowth: number
     reactionsGrowth: number
+    totalWallPosts?: number
+    totalWallComments?: number
+    totalWallReactions?: number
   }
   viewsOverTime: Array<{ date: string; views: number; reactions: number }>
   topPosts: Array<{ title: string; views: number; reactions: number; type: string }>
@@ -176,6 +179,34 @@ export function AnalyticsDashboard() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Add Wall Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-0 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Wall Posts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{analytics.overview.totalWallPosts?.toLocaleString() || 0}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-0 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Wall Comments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{analytics.overview.totalWallComments?.toLocaleString() || 0}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-0 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Wall Reactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{analytics.overview.totalWallReactions?.toLocaleString() || 0}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Grid */}

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const { data: notifications, error } = await supabase
       .from("notifications")
       .select("id, type, title, message, read, created_at")
-      .eq("admin_id", admin.id)
+      .or(`admin_id.eq.${admin.id},admin_id.is.null`)
       .order("created_at", { ascending: false })
 
     if (error) {

@@ -4,13 +4,29 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MessageCircle, Heart, Eye, Clock, ArrowRight, Feather, PenTool } from "lucide-react"
+import {
+  MessageCircle,
+  Heart,
+  Eye,
+  Clock,
+  ArrowRight,
+  Feather,
+  PenTool,
+  Megaphone,
+} from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 
 interface ActivityItem {
   id: string
-  type: "post_created" | "comment_received" | "reaction_received" | "post_viewed"
+  type:
+    | "post_created"
+    | "comment_received"
+    | "reaction_received"
+    | "post_viewed"
+    | "whispr_wall_posted"
+    | "wall_comment_received"
+    | "wall_reaction_received"
   title: string
   description: string
   timestamp: string
@@ -30,7 +46,9 @@ export function RecentActivity() {
       const response = await fetch("/api/admin/activity")
       if (response.ok) {
         const data = await response.json()
-        setActivities(data)
+        // Just to be sure we only show the 10 most recent
+        const limited = data.slice(0, 10)
+        setActivities(limited)
       }
     } catch (error) {
       console.error("Error fetching activity:", error)
@@ -44,11 +62,15 @@ export function RecentActivity() {
       case "post_created":
         return <PenTool className="h-4 w-4 text-blue-600" />
       case "comment_received":
+      case "wall_comment_received":
         return <MessageCircle className="h-4 w-4 text-green-600" />
       case "reaction_received":
+      case "wall_reaction_received":
         return <Heart className="h-4 w-4 text-red-600" />
       case "post_viewed":
         return <Eye className="h-4 w-4 text-purple-600" />
+      case "whispr_wall_posted":
+        return <Megaphone className="h-4 w-4 text-indigo-600" />
       default:
         return <Clock className="h-4 w-4 text-muted-foreground" />
     }
@@ -59,11 +81,15 @@ export function RecentActivity() {
       case "post_created":
         return "bg-blue-50 dark:bg-blue-900/20"
       case "comment_received":
+      case "wall_comment_received":
         return "bg-green-50 dark:bg-green-900/20"
       case "reaction_received":
+      case "wall_reaction_received":
         return "bg-red-50 dark:bg-red-900/20"
       case "post_viewed":
         return "bg-purple-50 dark:bg-purple-900/20"
+      case "whispr_wall_posted":
+        return "bg-indigo-50 dark:bg-indigo-900/20"
       default:
         return "bg-muted/50"
     }
@@ -104,6 +130,7 @@ export function RecentActivity() {
           </Link>
         </Button>
       </CardHeader>
+
       <CardContent className="space-y-4">
         {activities.length === 0 ? (
           <div className="text-center py-8">
