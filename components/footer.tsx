@@ -51,7 +51,7 @@ export function Footer() {
               </motion.span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Where words find their voice in the quiet moments.
+              ...from silence to whispers, from whispers to words
             </p>
           </div>
 
@@ -89,7 +89,10 @@ export function Footer() {
         {/* Bottom Note */}
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
           <p className="flex items-center justify-center gap-1">
-            Made with <Heart className="h-4 w-4 text-primary" /> for the love of words
+            Made with <Heart className="h-4 w-4 text-primary" /> for lovers of art and words.
+          </p>
+          <p className="mt-2">
+            © {new Date().getFullYear()} Whispr. All rights reserved.
           </p>
         </div>
       </div>
