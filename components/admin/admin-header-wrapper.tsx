@@ -5,7 +5,11 @@ import { AdminHeader } from "@/components/admin/admin-header"
 import { Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { MobileSidebar } from "@/components/admin/mobile-sidebar"
-import { BarChart3, FileText, PenTool, Bell, Home } from "lucide-react"
+import {
+  User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
+  MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart,
+  FileText, BarChart3, Bell
+} from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export default function AdminHeaderWrapper({ children }: { children: React.ReactNode }) {
@@ -14,13 +18,14 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
   const [unreadCount, setUnreadCount] = useState(0)
   const pathname = usePathname()
 
-  const navigation = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: BarChart3 },
-    { name: "Posts", href: "/admin/posts", icon: FileText },
-    { name: "New Post", href: "/admin/posts/new", icon: PenTool },
-    { name: "Media", href: "/admin/media", icon: FileText },
-    { name: "Comments", href: "/admin/comments", icon: FileText },
-  ]
+const navigation = [
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Posts", href: "/admin/posts", icon: FileEdit },
+  { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
+  { name: "Media", href: "/admin/media", icon: ImageIcon },
+  { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
+  { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
+]
 
   const excludedRoutes = ["/admin/login", "/admin/signup", "/admin/forgot-password"]
 

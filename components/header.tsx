@@ -25,6 +25,7 @@ export function Header() {
     { name: "Blog", href: "/blog" },
     { name: "Poems", href: "/poems" },
     { name: "About", href: "/about" },
+    { name: "whispr Wall", href: "/whispr-wall" },
   ]
 
   const logoSrc = hasMounted
