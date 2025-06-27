@@ -2,19 +2,58 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
 
+interface Activity {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  metadata: Record<string, any>;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  type: string;
+  created_at: string;
+  status: string;
+}
+
+interface CommentWithPost {
+  id: string;
+  content: string;
+  author_name: string;
+  created_at: string;
+  posts: {
+    title: string;
+    type: string;
+  } | null;
+}
+
+interface ReactionWithPost {
+  id: string;
+  reaction_type: string;
+  created_at: string;
+  posts: {
+    title: string;
+    type: string;
+  } | null;
+}
+
 export async function GET(request: NextRequest) {
   try {
     await requireAuthFromRequest(request)
     const supabase = createSupabaseServer()
 
-    const activities = []
+    const activities: Activity[] = []
 
     // Get recent posts
-    const { data: recentPosts } = await supabase
-      .from("posts")
-      .select("id, title, type, created_at, status")
-      .order("created_at", { ascending: false })
-      .limit(3)
+  const { data: recentPosts } = await supabase
+    .from("posts")
+    .select("id, title, type, created_at, status")
+    .order("created_at", { ascending: false })
+    .limit(3) as unknown as { data: Post[] };
+
 
     if (recentPosts) {
       recentPosts.forEach((post) => {
@@ -30,17 +69,21 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent comments
-    const { data: recentComments } = await supabase
-      .from("comments")
-      .select(`
-        id, 
-        content, 
-        author_name, 
-        created_at,
-        posts (title, type)
-      `)
-      .order("created_at", { ascending: false })
-      .limit(3)
+  const { data: recentComments } = await supabase
+    .from("comments")
+    .select(`
+      id, 
+      content, 
+      author_name, 
+      created_at,
+      posts (
+        title, 
+        type
+      )
+    `)
+    .order("created_at", { ascending: false })
+    .limit(3) as unknown as { data: CommentWithPost[] };
+
 
     if (recentComments) {
       recentComments.forEach((comment) => {
@@ -56,16 +99,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent reactions
-    const { data: recentReactions } = await supabase
-      .from("reactions")
-      .select(`
-        id,
-        reaction_type,
-        created_at,
-        posts (title, type)
-      `)
-      .order("created_at", { ascending: false })
-      .limit(3)
+  const { data: recentReactions } = await supabase
+    .from("reactions")
+    .select(`
+      id,
+      reaction_type,
+      created_at,
+      posts (
+        title, 
+        type
+      )
+    `)
+    .order("created_at", { ascending: false })
+    .limit(3) as unknown as { data: ReactionWithPost[] };
+
 
     if (recentReactions) {
       recentReactions.forEach((reaction) => {

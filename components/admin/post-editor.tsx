@@ -28,7 +28,11 @@ import {
   AlignRight,
   AlignJustify,
 } from "lucide-react"
+import { marked } from "marked"
 import { useToast } from "@/hooks/use-toast"
+import DOMPurify from "dompurify"
+marked.setOptions({ breaks: true })
+
 
 interface PostEditorProps {
   type?: "blog" | "poem"
@@ -36,8 +40,20 @@ interface PostEditorProps {
   initialData?: any
 }
 
+interface FormData {
+  title: string
+  content: string
+  excerpt: string
+  type: "blog" | "poem"
+  status: "draft" | "published"
+  featured: boolean
+  tags: string[]
+  seoTitle: string
+  seoDescription: string
+}
+
 export function PostEditor({ type: initialType, postId, initialData }: PostEditorProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: initialData?.title || "",
     content: initialData?.content || "",
     excerpt: initialData?.excerpt || "",
@@ -56,38 +72,62 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   const router = useRouter()
   const { toast } = useToast()
 
+  const escapeRegExp = (string: string) =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
   const formatText = (wrap: string, prefix = wrap, suffix = wrap) => {
     const el = contentRef.current
     if (!el) return
+
     const start = el.selectionStart
     const end = el.selectionEnd
-    const selectedText = el.value.slice(start, end)
-    const newText = el.value.slice(0, start) + prefix + selectedText + suffix + el.value.slice(end)
+    let selectedText = el.value.slice(start, end)
+    let before = el.value.slice(0, start)
+    let after = el.value.slice(end)
+
+    const divMatch = selectedText.match(/^<div style="text-align:(.*?)">([\s\S]*?)<\/div>$/)
+
+    if (divMatch) {
+      // If text is aligned, unwrap, apply formatting, rewrap
+      const alignment = divMatch[1]
+      const inner = divMatch[2]
+
+      const regex = new RegExp(`^${escapeRegExp(prefix)}(.*?)${escapeRegExp(suffix)}$`)
+      const newInner = regex.test(inner)
+        ? inner.replace(regex, '$1')
+        : `${prefix}${inner}${suffix}`
+
+      selectedText = `<div style="text-align:${alignment}">${newInner}</div>`
+    } else {
+      const regex = new RegExp(`^${escapeRegExp(prefix)}(.*?)${escapeRegExp(suffix)}$`)
+      selectedText = regex.test(selectedText)
+        ? selectedText.replace(regex, '$1')
+        : `${prefix}${selectedText}${suffix}`
+    }
+
+    const newText = before + selectedText + after
     setFormData((prev) => ({ ...prev, content: newText }))
   }
+
 
   const handleAlignment = (type: string) => {
     const el = contentRef.current
     if (!el) return
+
     const start = el.selectionStart
     const end = el.selectionEnd
-    const selectedText = el.value.slice(start, end)
-    let alignedText = selectedText
-    switch (type) {
-      case "center":
-        alignedText = `<div style=\"text-align:center;\">${selectedText}</div>`
-        break
-      case "left":
-        alignedText = `<div style=\"text-align:left;\">${selectedText}</div>`
-        break
-      case "right":
-        alignedText = `<div style=\"text-align:right;\">${selectedText}</div>`
-        break
-      case "justify":
-        alignedText = `<div style=\"text-align:justify;\">${selectedText}</div>`
-        break
+    let selectedText = el.value.slice(start, end)
+
+    const divRegex = /^<div style="text-align:(.*?)">([\s\S]*)<\/div>$/
+    const match = selectedText.match(divRegex)
+    if (match) {
+      selectedText = match[2] // unwrap inner content only
     }
+
+    // Apply alignment
+    const alignedText = `<div style="text-align:${type}">${selectedText}</div>`
     const newText = el.value.slice(0, start) + alignedText + el.value.slice(end)
+
     setFormData((prev) => ({ ...prev, content: newText }))
   }
 
@@ -177,7 +217,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   const removeTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+      tags: prev.tags.filter((tag: string) => tag !== tagToRemove),
     }))
   }
 
@@ -278,6 +318,19 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   className={`min-h-[400px] resize-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                 />
               </div>
+
+              {formData.content && (
+                <div>
+                  <Label className="block mt-6 mb-2">Live Preview</Label>
+                  <div
+                    className="prose prose-neutral dark:prose-invert max-w-none border rounded-md p-4 bg-muted/30"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(marked.parse(formData.content) as string),
+                    }}
+                  />
+                </div>
+              )}
+
 
               <div>
                 <Label htmlFor="excerpt">Excerpt</Label>
@@ -384,7 +437,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag) => (
+                  {formData.tags.map((tag: string) => (
                     <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                       {tag}
                       <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">

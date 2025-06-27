@@ -8,7 +8,7 @@ async function getBlogPosts() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     const response = await fetch(`${baseUrl}/api/posts?type=blog`, {
-      cache: "no-store",
+      next: { revalidate: 60 },
     })
 
     if (!response.ok) {

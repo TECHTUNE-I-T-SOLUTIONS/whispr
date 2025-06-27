@@ -1,4 +1,7 @@
+import notFound from "./not-found"
 import PoemClientPage from "./PoemClientPage"
+import { createSupabaseServer } from "@/lib/supabase-server"
+import { markdownToHtml } from "@/lib/utils" // ✅ import the utility
 
 interface PoemPageProps {
   params: {
@@ -6,9 +9,8 @@ interface PoemPageProps {
   }
 }
 
-import { supabase } from "@/lib/supabase-server"
-
 async function getPoem(id: string) {
+  const supabase = createSupabaseServer()
   const { data: poem, error } = await supabase
     .from("posts")
     .select("*")
@@ -17,11 +19,7 @@ async function getPoem(id: string) {
     .eq("status", "published")
     .single()
 
-  if (error || !poem) {
-    return null
-  }
-
-  return poem
+  return error || !poem ? null : poem
 }
 
 export async function generateMetadata({ params }: PoemPageProps) {
@@ -54,5 +52,15 @@ export async function generateMetadata({ params }: PoemPageProps) {
 }
 
 export default async function PoemPage({ params }: PoemPageProps) {
-  return <PoemClientPage params={params} />
+  const poem = await getPoem(params.id)
+
+  if (!poem) {
+    return notFound()
+  }
+
+  // ✅ Convert poem.content (Markdown) to HTML
+  const htmlContent = await markdownToHtml(poem.content || "")
+
+  // ✅ Pass HTML content to client page
+  return <PoemClientPage poem={{ ...poem, content: htmlContent }} />
 }

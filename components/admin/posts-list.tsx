@@ -31,21 +31,26 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
-import { api } from "@/convex/_generated/api"
 import { useMutation } from "convex/react"
 import { useRouter } from "next/navigation"
-import Link from "next/navigation"
+import Link from "next/link"
+import type { Database } from "@/types/supabase"
+type Post = Database["public"]["Tables"]["posts"]["Row"]
+import { marked } from "marked"
+import DOMPurify from "dompurify"
 
 interface PostsListProps {
-  data: any[]
+  data?: Post[]
 }
 
-export const PostsList = ({ data }: PostsListProps) => {
+export const PostsList = ({ data = [] }: PostsListProps) => {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
-  const deletePost = useMutation(api.posts.deletePost)
+  const deletePost = async ({ id }: { id: string }) => {
+    await fetch(`/api/admin/posts/${id}`, { method: "DELETE" })
+  }
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<Post>[] = [
     {
       accessorKey: "title",
       header: "Title",
@@ -53,7 +58,16 @@ export const PostsList = ({ data }: PostsListProps) => {
     {
       accessorKey: "content",
       header: "Content",
+      cell: ({ row }) => (
+        <div
+          className="prose max-w-none"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(marked.parse(row.original.content) as string),
+          }}
+        />
+      ),
     },
+
     {
       id: "actions",
       cell: ({ row }) => {
@@ -95,7 +109,7 @@ export const PostsList = ({ data }: PostsListProps) => {
                     <AlertDialogAction
                       onClick={() => {
                         setIsPending(true)
-                        deletePost({ id: post._id })
+                        deletePost({ id: post.id })
                           .then(() => {
                             router.refresh()
                             toast.success("Post deleted successfully")
@@ -146,19 +160,23 @@ export const PostsList = ({ data }: PostsListProps) => {
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row) => {
-                return (
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-4">
+                    No posts found.
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
                   <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td key={cell.id} className="px-4 py-2">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      )
-                    })}
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-2">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
                   </tr>
-                )
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>

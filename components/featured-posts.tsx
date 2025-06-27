@@ -6,9 +6,9 @@ import { Clock, User } from "lucide-react"
 async function getFeaturedPosts() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    const response = await fetch(`${baseUrl}/api/posts?featured=true&limit=3`, {
-      cache: "no-store",
-    })
+  const response = await fetch(`${baseUrl}/api/posts?featured=true&limit=3`, {
+    next: { revalidate: 60 },
+  })
 
     if (!response.ok) {
       console.error("Failed to fetch featured posts:", response.status, response.statusText)
@@ -73,7 +73,7 @@ export async function FeaturedPosts() {
                   {post.authors?.name || "Prayce"}
                 </div>
                 <Link
-                  href={`/${post.type}/${post.id}`}
+                  href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read {post.type === "poem" ? "poem" : "more"} →

@@ -2,7 +2,6 @@
 
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { supabase } from "@/lib/supabase-server"
 import { Comments } from "@/components/comments"
 import { Reactions } from "@/components/reactions"
 import { ShareButtons } from "@/components/share-buttons"
@@ -12,35 +11,11 @@ import { Calendar, Clock, User, BookOpen } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { SafeImage } from "@/components/SafeImage"
 
-interface PoemPageProps {
-  params: {
-    id: string
-  }
+interface PoemClientPageProps {
+  poem: any
 }
 
-async function getPoem(id: string) {
-  const { data: poem, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .eq("type", "poem")
-    .eq("status", "published")
-    .single()
-
-  if (error || !poem) {
-    return null
-  }
-
-  return poem
-}
-
-export default async function PoemClientPage({ params }: PoemPageProps) {
-  const poem = await getPoem(params.id)
-
-  if (!poem) {
-    notFound()
-  }
-
+export default function PoemClientPage({ poem }: PoemClientPageProps) {
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/poems/${poem.id}`
 
   return (
@@ -100,23 +75,17 @@ export default async function PoemClientPage({ params }: PoemPageProps) {
           {/* Poem Content */}
           <Card className="mb-8">
             <CardContent className="p-8">
-              <div
-                className="prose prose-lg dark:prose-invert max-w-none poem-content"
-                dangerouslySetInnerHTML={{ __html: poem.content }}
-              />
+              <div className="prose poem-content" dangerouslySetInnerHTML={{ __html: poem.content }} />
             </CardContent>
           </Card>
 
           {/* Engagement Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Reactions */}
             <div className="lg:col-span-1">
               <Suspense fallback={<ReactionsSkeleton />}>
                 <Reactions postId={poem.id} />
               </Suspense>
             </div>
-
-            {/* Share Buttons */}
             <div className="lg:col-span-2">
               <ShareButtons
                 url={currentUrl}
@@ -126,7 +95,6 @@ export default async function PoemClientPage({ params }: PoemPageProps) {
             </div>
           </div>
 
-          {/* Comments Section */}
           <Suspense fallback={<CommentsSkeleton />}>
             <Comments postId={poem.id} />
           </Suspense>
@@ -136,15 +104,22 @@ export default async function PoemClientPage({ params }: PoemPageProps) {
       {/* Custom styles for poem content */}
       <style jsx global>{`
         .poem-content {
+          white-space: pre-wrap;
           line-height: 1.8;
           font-size: 1.1rem;
+          word-break: break-word;
         }
-        
+
+        .poem-content strong {
+          font-weight: bold;
+          color: inherit;
+        }
+
         .poem-content p {
           margin-bottom: 1.5rem;
           text-align: left;
         }
-        
+            
         .poem-content blockquote {
           border-left: 4px solid hsl(var(--primary));
           padding-left: 1rem;

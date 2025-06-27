@@ -12,13 +12,12 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 
 export const metadata: Metadata = {
   title: "Whispr - Poetry & Writing",
+  description: "A collection of poems and writings that speak in whispers",
   keywords: ["poetry", "writing", "creative writing", "literature", "whispers"],
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
   },
-  description: "A collection of poems and writings that speak in whispers",
-    generator: 'v0.dev'
 }
 
 interface RootLayoutProps {
@@ -30,13 +29,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <ThemeScript />
+        {/* Fallback link for favicon */}
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem={true}
-          disableTransitionOnChange={false}
+          enableSystem
           storageKey="whispr-theme"
         >
           <ConditionalLayout>{children}</ConditionalLayout>

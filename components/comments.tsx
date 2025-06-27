@@ -19,8 +19,10 @@ interface Comment {
   author_email: string
   created_at: string
   status: "pending" | "approved" | "rejected"
-  likes: number
+  admin_reply?: string | null
+  author_website?: string | null
 }
+
 
 interface CommentsProps {
   postId: string
@@ -201,7 +203,8 @@ export function Comments({ postId }: CommentsProps) {
         ) : (
           comments.map((comment) => (
             <Card key={comment.id}>
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 space-y-4">
+                {/* User Comment */}
                 <div className="flex space-x-4">
                   <Avatar>
                     <AvatarImage src="/placeholder.svg" />
@@ -213,16 +216,18 @@ export function Comments({ postId }: CommentsProps) {
                         <p className="font-medium">{comment.author_name}</p>
                         <p className="text-sm text-muted-foreground">{formatDate(comment.created_at)}</p>
                       </div>
-                      {comment.likes > 0 && (
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Heart className="h-4 w-4" />
-                          {comment.likes}
-                        </div>
-                      )}
                     </div>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
                   </div>
                 </div>
+
+                {/* Admin Reply */}
+                {comment.admin_reply && (
+                  <div className="ml-14 border-l-2 border-primary pl-4">
+                    <p className="text-xs text-muted-foreground mb-1">Admin reply:</p>
+                    <p className="text-sm text-primary">{comment.admin_reply}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))

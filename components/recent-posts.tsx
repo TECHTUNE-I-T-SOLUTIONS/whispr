@@ -89,7 +89,7 @@ export async function RecentPosts() {
                   {post.authors?.name}
                 </div>
                 <Link
-                  href={`/${post.type}/${post.id}`}
+                  href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read →

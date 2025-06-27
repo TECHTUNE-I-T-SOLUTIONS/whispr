@@ -1,6 +1,7 @@
 import { Suspense } from "react"
-import { PoemsList } from "@/components/poems-list"
 import { PoemsHero } from "@/components/poems-hero"
+import { PoemsList } from "@/components/poems-list"
+import { createSupabaseServer } from "@/lib/supabase-server"
 
 export const metadata = {
   title: "Poems - Whispr | Prayce's Poetry Collection",
@@ -8,13 +9,30 @@ export const metadata = {
     "Discover Prayce's beautiful collection of poems that capture emotions, moments, and whispered thoughts in verse.",
 }
 
-export default function PoemsPage() {
+async function getPoems() {
+  const supabase = createSupabaseServer()
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "published")
+    .eq("type", "poem")
+    .order("created_at", { ascending: false })
+
+  if (error || !data) return []
+
+  return data
+}
+
+export default async function PoemsPage() {
+  const poems = await getPoems()
+
   return (
     <div className="whispr-gradient min-h-screen">
       <PoemsHero />
       <section className="container py-16">
         <Suspense fallback={<PoemsListSkeleton />}>
-          <PoemsList />
+          <PoemsList poems={poems} />
         </Suspense>
       </section>
     </div>

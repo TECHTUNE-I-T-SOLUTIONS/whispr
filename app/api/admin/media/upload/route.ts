@@ -1,11 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
+import type { Database } from "@/types/supabase";
+type Admin = Database["public"]["Tables"]["admin"]["Row"];
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const admin = await requireAuthFromRequest(request)
+    const { admin } = (await requireAuthFromRequest(request)) as { admin: Admin }
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

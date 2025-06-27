@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,19 +14,19 @@ import { useToast } from "@/hooks/use-toast"
 import { useSession } from "@/components/admin/session-provider"
 
 export function ProfileManager() {
-  const { admin, refreshSession } = useSession()
+  const [admin, setAdmin] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
-    username: admin?.username || "",
-    email: admin?.email || "",
-    full_name: admin?.full_name || "",
-    bio: admin?.bio || "",
-    phone: admin?.phone || "",
-    date_of_birth: admin?.date_of_birth || "",
+    username: "",
+    email: "",
+    full_name: "",
+    bio: "",
+    phone: "",
+    date_of_birth: "",
   })
 
   const [passwordData, setPasswordData] = useState({
@@ -34,6 +34,36 @@ export function ProfileManager() {
     newPassword: "",
     confirmPassword: "",
   })
+
+  // ✅ Fetch Admin profile on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/admin/profile")
+        const data = await res.json()
+
+        if (!res.ok) throw new Error(data.error || "Failed to fetch profile")
+
+        setAdmin(data.admin)
+        setFormData({
+          username: data.admin.username || "",
+          email: data.admin.email || "",
+          full_name: data.admin.full_name || "",
+          bio: data.admin.bio || "",
+          phone: data.admin.phone || "",
+          date_of_birth: data.admin.date_of_birth || "",
+        })
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err instanceof Error ? err.message : "Failed to load profile",
+        })
+      }
+    }
+
+    fetchProfile()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,74 +76,30 @@ export function ProfileManager() {
         body: JSON.stringify(formData),
       })
 
-      if (response.ok) {
-        await refreshSession()
-        toast({
-          variant: "success",
-          title: "Profile updated",
-          description: "Your profile has been successfully updated.",
-        })
-      } else {
-        throw new Error("Failed to update profile")
-      }
+      const result = await response.json()
+
+      if (!response.ok) throw new Error(result.error || "Failed to update profile")
+
+      setAdmin(result.admin)
+      setFormData({
+        username: result.admin.username || "",
+        email: result.admin.email || "",
+        full_name: result.admin.full_name || "",
+        bio: result.admin.bio || "",
+        phone: result.admin.phone || "",
+        date_of_birth: result.admin.date_of_birth || "",
+      })
+
+      toast({
+        variant: "success",
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      })
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile. Please try again.",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "New passwords do not match.",
-      })
-      return
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Password must be at least 8 characters long.",
-      })
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      const response = await fetch("/api/admin/profile/password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(passwordData),
-      })
-
-      if (response.ok) {
-        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
-        setShowPasswordForm(false)
-        toast({
-          variant: "success",
-          title: "Password updated",
-          description: "Your password has been successfully changed.",
-        })
-      } else {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to update password")
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update password.",
+        description: error instanceof Error ? error.message : "Failed to update profile.",
       })
     } finally {
       setIsLoading(false)
@@ -133,15 +119,17 @@ export function ProfileManager() {
         body: formData,
       })
 
-      if (response.ok) {
-        await refreshSession()
-        toast({
-          variant: "success",
-          title: "Avatar updated",
-          description: "Your profile picture has been updated.",
-        })
-      }
-    } catch (error) {
+      if (!response.ok) throw new Error("Upload failed")
+
+      const result = await response.json()
+      setAdmin(result.admin)
+
+      toast({
+        variant: "success",
+        title: "Avatar updated",
+        description: "Your profile picture has been updated.",
+      })
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
@@ -150,9 +138,59 @@ export function ProfileManager() {
     }
   }
 
-  if (!admin) {
-    return <div>Loading...</div>
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "New passwords do not match.",
+      })
+      return
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Password must be at least 8 characters.",
+      })
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("/api/admin/profile/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(passwordData),
+      })
+
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || "Failed to update password")
+
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+      setShowPasswordForm(false)
+
+      toast({
+        variant: "success",
+        title: "Password updated",
+        description: "Your password has been successfully changed.",
+      })
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update password.",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
+
+  if (!admin) return <div>Loading...</div>
 
   return (
     <div className="space-y-8">

@@ -1,11 +1,18 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { marked } from "marked"
+import MarkdownIt from "markdown-it"
+
+// Configure markdown-it to allow raw HTML and render common Markdown syntax
+const md = new MarkdownIt({
+  html: true,          // Allow raw HTML like <div>
+  linkify: true,       // Auto-detect links
+  typographer: true,   // Smart punctuation
+  breaks: true,        // Convert line breaks to <br>
+})
 
 export async function markdownToHtml(markdown: string): Promise<string> {
-  return await marked.parse(markdown)
+  return md.render(markdown)
 }
-
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

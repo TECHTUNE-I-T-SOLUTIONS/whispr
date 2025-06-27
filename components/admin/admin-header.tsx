@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
-  User, Settings, LogOut, Home, PenTool,
+  User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
+  MessageSquareText, Settings, LogOut, Home, PenTool,
   FileText, BarChart3, Bell
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -54,11 +55,11 @@ export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHea
     : "/darklogo.png"
 
   const navigation = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: BarChart3 },
-    { name: "Posts", href: "/admin/posts", icon: FileText },
-    { name: "New Post", href: "/admin/posts/new", icon: PenTool },
-    { name: "Media", href: "/admin/media", icon: FileText },
-    { name: "Comments", href: "/admin/comments", icon: FileText },
+    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Posts", href: "/admin/posts", icon: FileEdit },
+    { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
+    { name: "Media", href: "/admin/media", icon: ImageIcon },
+    { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
   ]
 
   return (

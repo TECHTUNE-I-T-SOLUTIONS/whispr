@@ -1,20 +1,56 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Upload, Search, Filter, ImageIcon, FileText, Video, Music, Trash2, Download, Eye } from "lucide-react"
+import { Upload, Search, Filter, ImageIcon, FileText, Video, Music, Trash2, Download, Eye, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import type { Database } from "@/types/supabase"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+
+type MediaFile = Database["public"]["Tables"]["media"]["Row"]
 
 export function MediaLibrary() {
-  const [files, setFiles] = useState([])
+  const [files, setFiles] = useState<MediaFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [type, setType] = useState("")
+  const [search, setSearch] = useState("")
+  const [showImage, setShowImage] = useState<string | null>(null)
+  const [isLastPage, setIsLastPage] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+  const getPublicUrl = (path: string) =>
+    `https://vkftywhuaxwbknlrymnr.supabase.co/storage/v1/object/public/media/${path}`
+
+
+  const fetchMediaFiles = async () => {
+    try {
+      const query = new URLSearchParams({ page: page.toString(), limit: "20" })
+      if (type) query.append("type", type)
+      if (search) query.append("search", search)
+
+      const response = await fetch(`/api/admin/media?${query.toString()}`)
+      if (response.ok) {
+        const result = await response.json()
+        setFiles(result.media || [])
+        setIsLastPage((result.media || []).length < 20)
+      } else {
+        setFiles([])
+        setIsLastPage(true)
+        toast({ variant: "destructive", title: "Fetch Failed", description: "Could not load media files." })
+      }
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "An error occurred while fetching media." })
+    }
+  }
+
+  useEffect(() => {
+    fetchMediaFiles()
+  }, [page, type, search])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files
@@ -35,22 +71,27 @@ export function MediaLibrary() {
         if (response.ok) {
           const data = await response.json()
           setFiles((prev) => [data, ...prev])
-          toast({
-            variant: "success",
-            title: "File uploaded",
-            description: `${file.name} has been uploaded successfully.`,
-          })
+          toast({ variant: "success", title: "File uploaded", description: `${file.name} has been uploaded.` })
         }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Upload failed",
-          description: `Failed to upload ${file.name}.`,
-        })
+      } catch {
+        toast({ variant: "destructive", title: "Upload failed", description: `Failed to upload ${file.name}.` })
       }
     }
-
     setIsUploading(false)
+  }
+
+  const deleteFile = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/media/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        setFiles((prev) => prev.filter((file: any) => file.id !== id))
+        toast({ variant: "success", title: "Deleted", description: "File successfully deleted." })
+      } else {
+        toast({ variant: "destructive", title: "Delete failed" })
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Error", description: "Could not delete file." })
+    }
   }
 
   const getFileIcon = (fileType: string) => {
@@ -70,34 +111,37 @@ export function MediaLibrary() {
 
   return (
     <div className="space-y-8">
+      <Dialog open={!!showImage} onOpenChange={() => setShowImage(null)}>
+        <DialogContent className="w-full max-w-md p-4">
+          <DialogTitle className="sr-only">Image Preview</DialogTitle>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Image Preview</h2>
+            {/* <button onClick={() => setShowImage(null)} className="text-red-500"><X /></button> */}
+          </div>
+          {showImage && (
+            <img src={showImage} alt="Preview" className="w-full h-auto rounded" />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
-            <ImageIcon className="h-8 w-8 text-primary" />
-            Media Library
+            <ImageIcon className="h-8 w-8 text-primary" /> Media Library
           </h1>
           <p className="text-muted-foreground">Upload and manage your images, videos, and other media files</p>
         </div>
       </div>
 
-      {/* Upload Section */}
       <Card className="border-0 bg-card/50 backdrop-blur">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Upload Files
+            <Upload className="h-5 w-5" /> Upload Files
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx" onChange={handleFileUpload} className="hidden" />
             <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-lg font-semibold mb-2">Drop files here or click to upload</h3>
             <p className="text-muted-foreground mb-4">Support for images, videos, audio, and documents</p>
@@ -108,19 +152,14 @@ export function MediaLibrary() {
         </CardContent>
       </Card>
 
-      {/* Search and Filter */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search files..." className="pl-10" />
+          <Input placeholder="Search files..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
+        <Button variant="outline" onClick={() => setType(type === "image" ? "" : "image")}>Filter</Button>
       </div>
 
-      {/* Files Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {files.length === 0 ? (
           <div className="col-span-full text-center py-12">
@@ -130,43 +169,25 @@ export function MediaLibrary() {
           </div>
         ) : (
           files.map((file: any, index) => (
-            <Card
-              key={file.id}
-              className="group hover:shadow-lg transition-all duration-300 animate-slide-up border-0 bg-card/50 backdrop-blur hover:bg-card/80"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
+            <Card key={file.id} className="group hover:shadow-lg transition-all duration-300 animate-slide-up border-0 bg-card/50 backdrop-blur hover:bg-card/80" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-4">
                 <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4 overflow-hidden">
                   {file.file_type.startsWith("image/") ? (
-                    <img
-                      src={file.file_url || "/placeholder.svg"}
-                      alt={file.original_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    getFileIcon(file.file_type)
-                  )}
+                    <img src={getPublicUrl(file.file_path)} alt={file.original_name} className="w-full h-full object-cover" />
+                  ) : getFileIcon(file.file_type)}
                 </div>
-
                 <div className="space-y-2">
-                  <h3 className="font-medium text-sm truncate" title={file.original_name}>
-                    {file.original_name}
-                  </h3>
+                  <h3 className="font-medium text-sm truncate" title={file.original_name}>{file.original_name}</h3>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <Badge variant="outline" className="text-xs">
-                      {file.file_type.split("/")[0]}
-                    </Badge>
+                    <Badge variant="outline" className="text-xs">{file.file_type.split("/")[0]}</Badge>
                     <span>{formatFileSize(file.file_size)}</span>
                   </div>
-
                   <div className="flex items-center gap-1 pt-2">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                      <Eye className="h-3 w-3" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                      <Download className="h-3 w-3" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowImage(getPublicUrl(file.file_path))}><Eye className="h-3 w-3" /></Button>
+                    <a href={getPublicUrl(file.file_path)} download target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0"><Download className="h-3 w-3" /></Button>
+                    </a>
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:text-red-700" onClick={() => deleteFile(file.id)}>
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
@@ -176,6 +197,13 @@ export function MediaLibrary() {
           ))
         )}
       </div>
+
+      {files.length > 0 && (
+        <div className="flex justify-center gap-4 pt-6">
+          <Button variant="outline" onClick={() => setPage((prev) => Math.max(1, prev - 1))} disabled={page === 1}>Previous</Button>
+          <Button variant="outline" onClick={() => setPage((prev) => prev + 1)} disabled={isLastPage}>Next</Button>
+        </div>
+      )}
     </div>
   )
 }
