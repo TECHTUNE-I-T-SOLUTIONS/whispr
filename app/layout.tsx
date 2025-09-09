@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeScript } from "@/components/theme-script"
 import { Toaster } from "@/components/ui/toaster"
 import { ConditionalLayout } from "@/components/conditional-layout"
+import { FloatingNotificationBell } from "@/components/floating-notification-bell"
+import { PushNotificationScript } from "@/components/push-notification-script"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -31,6 +33,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ThemeScript />
         {/* Fallback link for favicon */}
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <ThemeProvider
@@ -39,7 +42,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           storageKey="whispr-theme"
         >
+          <PushNotificationScript />
           <ConditionalLayout>{children}</ConditionalLayout>
+          <FloatingNotificationBell />
           <Toaster />
         </ThemeProvider>
       </body>

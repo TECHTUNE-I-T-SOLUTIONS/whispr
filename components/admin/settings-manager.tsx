@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Settings, Palette, Bell, Shield, Database, Download } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { PushNotificationManager } from "@/components/push-notification-manager"
+import { PushNotificationTester } from "@/components/push-notification-tester"
 
 interface AppSettings {
   theme: "light" | "dark" | "system"
@@ -162,6 +164,11 @@ export function SettingsManager() {
                 onCheckedChange={(checked) => updateSetting("pushNotifications", checked)}
               />
             </div>
+
+            {/* Push Notification Manager */}
+            <div className="pt-4 border-t">
+              <PushNotificationManager showTestButton={true} />
+            </div>
           </CardContent>
         </Card>
 
@@ -241,6 +248,11 @@ export function SettingsManager() {
             </Button>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Push Notification Test */}
+      <div className="mt-8">
+        <PushNotificationTester />
       </div>
     </div>
   )

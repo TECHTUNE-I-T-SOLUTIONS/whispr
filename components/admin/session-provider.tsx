@@ -56,19 +56,24 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const checkSession = async () => {
     if (!mounted) return
 
+    console.log("Checking session for path:", pathname)
     try {
-      const response = await fetch("/api/session", {
+      const response = await fetch("/api/auth/me", {
         method: "GET",
         credentials: "include",
         cache: "no-store",
       })
 
+      console.log("Session check response:", response.status)
       if (response.ok) {
         const data = await response.json()
-        if (data.authenticated && data.admin) {
+        console.log("Session data:", data)
+        if (data.admin) {
+          console.log("Setting authenticated state")
           setAdmin(data.admin)
           setIsAuthenticated(true)
         } else {
+          console.log("No admin data, clearing authentication")
           setAdmin(null)
           setIsAuthenticated(false)
 
@@ -83,6 +88,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
           }
         }
       } else {
+        console.log("Session check failed with status:", response.status)
         setAdmin(null)
         setIsAuthenticated(false)
 
@@ -112,8 +118,8 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
   const logout = async () => {
     try {
-      await fetch("/api/session", {
-        method: "DELETE",
+      await fetch("/api/auth/logout", {
+        method: "POST",
         credentials: "include",
       })
 
@@ -130,7 +136,9 @@ export function SessionProvider({ children }: SessionProviderProps) {
   }
 
   useEffect(() => {
-    if (mounted) {
+    if (mounted && pathname.startsWith("/admin")) {
+      console.log("Admin route detected, checking session immediately")
+      // Check session immediately for all admin routes
       checkSession()
     }
   }, [pathname, mounted])

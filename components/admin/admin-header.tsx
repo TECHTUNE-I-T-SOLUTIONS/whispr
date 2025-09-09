@@ -60,6 +60,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHea
     { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
+    { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
   ]
 

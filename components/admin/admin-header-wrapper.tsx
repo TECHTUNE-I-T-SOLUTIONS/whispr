@@ -18,14 +18,15 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
   const [unreadCount, setUnreadCount] = useState(0)
   const pathname = usePathname()
 
-const navigation = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { name: "Posts", href: "/admin/posts", icon: FileEdit },
-  { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
-  { name: "Media", href: "/admin/media", icon: ImageIcon },
-  { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
-  { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
-]
+  const navigation = [
+    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Posts", href: "/admin/posts", icon: FileEdit },
+    { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
+    { name: "Media", href: "/admin/media", icon: ImageIcon },
+    { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
+    { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
+    { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
+  ]
 
   const excludedRoutes = ["/admin/login", "/admin/signup", "/admin/forgot-password"]
 
@@ -49,6 +50,11 @@ const navigation = [
     const interval = setInterval(fetchUnreadCount, 60000)
     return () => clearInterval(interval)
   }, [admin, pathname])
+
+  // Don't show header on excluded routes
+  if (excludedRoutes.includes(pathname)) {
+    return <>{children}</>
+  }
 
   // ⏳ Show loading while checking session
   if (isLoading) {

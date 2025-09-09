@@ -24,6 +24,7 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
     { name: "Poems", href: "/poems" },
+    { name: "Spoken Words", href: "/media" },
     { name: "About", href: "/about" },
     { name: "whispr Wall", href: "/whispr-wall" },
   ]
@@ -114,6 +115,9 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            <div className="pt-4 border-t">
+              {/* Mobile-specific content can go here */}
+            </div>
           </nav>
         </motion.div>
       )}

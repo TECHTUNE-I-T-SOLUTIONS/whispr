@@ -2,7 +2,7 @@
 
 **Whispr** is a modern poetry and writing platform that transforms thoughts into whispers, and whispers into words. It’s a space where creativity meets minimalism—built for poets, writers, and readers alike.
 
-[![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://whispr.vercel.app)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://whisprwords.vercel.app)
 [![Tech Stack](https://img.shields.io/badge/Built%20with-Next.js%20%7C%20Tailwind%20%7C%20Supabase-black?style=for-the-badge)](#tech-stack)
 
 ---
@@ -21,7 +21,7 @@
 ## 🚀 Live Demo
 
 Visit the live app:  
-🔗 [https://whispr.vercel.app](https://whispr.vercel.app)
+🔗 [https://whisprwords.vercel.app](https://whisprwords.vercel.app)
 
 ---
 

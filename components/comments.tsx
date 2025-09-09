@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatDate } from "@/lib/utils"
 import { MessageCircle, Send, Heart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useCommentCache } from "@/hooks/use-comment-cache"
 
 interface Comment {
   id: string
@@ -39,6 +40,18 @@ export function Comments({ postId }: CommentsProps) {
     author_email: "",
   })
   const { toast } = useToast()
+  const { cachedData, saveCommentData } = useCommentCache()
+
+  // Auto-populate form with cached data when form is shown
+  useEffect(() => {
+    if (showForm && cachedData) {
+      setFormData(prev => ({
+        ...prev,
+        author_name: cachedData.name,
+        author_email: cachedData.email
+      }))
+    }
+  }, [showForm, cachedData])
 
   useEffect(() => {
     fetchComments()
@@ -86,6 +99,11 @@ export function Comments({ postId }: CommentsProps) {
         toast({
           title: "Success",
           description: "Comment submitted! It will appear after approval.",
+        })
+        // Save comment data to cache
+        saveCommentData({
+          name: formData.author_name,
+          email: formData.author_email
         })
         setFormData({ content: "", author_name: "", author_email: "" })
         setShowForm(false)

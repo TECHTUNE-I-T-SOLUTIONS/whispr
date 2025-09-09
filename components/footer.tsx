@@ -6,10 +6,13 @@ import { Heart } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { usePushNotifications } from "@/hooks/use-push-notifications"
+import { PushNotificationManager } from "@/components/push-notification-manager"
 
 export function Footer() {
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
+  const { isSubscribed } = usePushNotifications()
 
   useEffect(() => {
     setHasMounted(true)
@@ -80,9 +83,10 @@ export function Footer() {
           {/* Connect */}
           <div>
             <h3 className="font-semibold mb-4">Connect</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-4">
               Follow the whispers and stay updated with new writings.
             </p>
+            {isSubscribed && <PushNotificationManager compact={true} />}
           </div>
         </div>
 

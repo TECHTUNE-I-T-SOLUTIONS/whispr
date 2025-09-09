@@ -3,18 +3,20 @@ import type { Metadata } from "next"
 import { formatDate, markdownToHtml } from "@/lib/utils"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { SafeImage } from "@/components/SafeImage"
+import { MediaPlayer } from "@/components/media-player"
 import { Reactions } from "@/components/reactions"
 import { Comments } from "@/components/comments"
 import { ShareButtons } from "@/components/share-buttons"
 
 type BlogPostPageProps = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  const { id } = await params
 
-  const res = await fetch(`${baseUrl}/api/posts/${params.id}`, {
+  const res = await fetch(`${baseUrl}/api/posts/${id}`, {
     cache: "no-store",
   })
 
@@ -30,6 +32,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const supabase = createSupabaseServer()
+  const { id } = await params
   const { data: post } = await supabase
     .from("posts")
     .select(`
@@ -41,7 +44,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         avatar_url
       )
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("status", "published")
     .single()
 
@@ -75,22 +78,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Media files */}
         {post.media_files?.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {post.media_files.map((file: any, index: number) => {
-              const src = file.file_url || null
-              return src ? (
-                <SafeImage
-                  key={index}
-                  src={src}
-                  alt={file.original_name || post.title}
-                  width={800}
-                  height={400}
-                  className="rounded-lg"
-                  loading="lazy"
-                  placeholder="blur"
-                  blurDataURL="/placeholder-blur.png" // You can use a custom local placeholder image or a data URL
-                />
-              ) : null
-            })}
+            {post.media_files.map((file: any, index: number) => (
+              <MediaPlayer
+                key={index}
+                media={{
+                  id: file.id || `media-${index}`,
+                  original_name: file.original_name || file.file_name || `Media ${index + 1}`,
+                  file_name: file.file_name || file.original_name || `media-${index}`,
+                  file_path: file.file_path || "",
+                  file_url: file.file_url || "",
+                  file_type: file.file_type || "application/octet-stream",
+                  file_size: file.file_size || 0
+                }}
+                showControls={true}
+                showDownload={true}
+              />
+            ))}
           </div>
         )}
 

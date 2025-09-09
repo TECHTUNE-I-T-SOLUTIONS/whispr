@@ -28,9 +28,11 @@ import {
   AlignRight,
   AlignJustify,
 } from "lucide-react"
+import { MediaPlayer } from "@/components/media-player"
 import { marked } from "marked"
 import { useToast } from "@/hooks/use-toast"
 import DOMPurify from "dompurify"
+import { MediaSelector } from "@/components/admin/media-selector"
 marked.setOptions({ breaks: true })
 
 
@@ -156,6 +158,29 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
           title: `${formData.type === "poem" ? "Poem" : "Post"} ${postId ? "updated" : status === "published" ? "published" : "saved"}!`,
           description: `Your ${formData.type} has been successfully ${postId ? "updated" : status === "published" ? "published" : "saved as draft"}.`,
         })
+
+        // Send push notification if published and it's a new post
+        if (status === "published" && !postId) {
+          try {
+            const notificationType = formData.type === "poem" ? "poem" : "blog";
+            await fetch(`/api/push/notify/${notificationType}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: formData.title,
+                content: formData.excerpt || formData.content.substring(0, 200),
+                author: "Whispr Admin", // You can get this from user session
+                url: formData.type === "poem" ? `/poems/${data.id}` : `/blog/${data.id}`,
+              }),
+            });
+          } catch (notificationError) {
+            console.error("Failed to send push notification:", notificationError);
+            // Don't show error to user as the post was successfully created
+          }
+        }
+
         router.push("/admin/posts")
       } else {
         throw new Error(`Failed to ${postId ? "update" : "save"} post`)
@@ -362,36 +387,62 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   accept="image/*,video/*,audio/*"
                   onChange={handleFileUpload}
                   className="hidden"
+                  aria-label="Upload media files"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload Images, Videos, or Audio
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex-1"
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload New Files
+                  </Button>
+                  <MediaSelector
+                    onSelect={(selected) => setUploadedFiles(selected)}
+                    selectedMedia={uploadedFiles}
+                    trigger={
+                      <Button type="button" variant="outline" className="flex-1">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Select Existing
+                      </Button>
+                    }
+                  />
+                </div>
               </div>
 
               {uploadedFiles.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {uploadedFiles.map((file, index) => (
-                    <div key={index} className="relative group">
-                      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                        {file.file_type?.startsWith("image/") ? (
+                    <div key={index} className="relative group border rounded-lg p-4">
+                      {file.file_type?.startsWith("image/") ? (
+                        <div className="space-y-2">
                           <img
                             src={file.file_url || "/placeholder.svg"}
                             alt={file.original_name}
-                            className="w-full h-full object-cover rounded-lg"
+                            className="w-full h-32 object-cover rounded"
                           />
-                        ) : (
-                          <div className="text-center p-4">
-                            <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-xs text-muted-foreground truncate">{file.original_name}</p>
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      ) : (file.file_type?.startsWith("video/") || file.file_type?.startsWith("audio/")) ? (
+                        <div className="space-y-2">
+                          <MediaPlayer
+                            media={file}
+                            showControls={true}
+                            showDownload={false}
+                            className="w-full"
+                          />
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+                            <FileText className="h-8 w-8 text-muted-foreground" />
                           </div>
-                        )}
-                      </div>
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      )}
                       <Button
                         size="sm"
                         variant="destructive"
@@ -440,7 +491,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   {formData.tags.map((tag: string) => (
                     <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                       {tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">
+                      <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive" title={`Remove ${tag}`}>
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>

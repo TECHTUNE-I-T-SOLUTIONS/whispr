@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
+import { sendPushNotificationToSubscribers } from "@/lib/push-notifications"
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,6 +70,23 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Database error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Send push notification if post is published
+    if (status === "published") {
+      try {
+        const postType = type === "blog" ? "blog post" : "poem";
+        await sendPushNotificationToSubscribers({
+          title: `New ${postType}: ${title}`,
+          body: excerpt || `Check out this new ${postType} by ${admin.full_name || admin.username || 'Whispr'}`,
+          url: `/${type}/${data.id}`,
+          type: type as 'blog' | 'poem',
+          image: data.media_files?.[0]?.file_url || '/placeholder-logo.png'
+        });
+      } catch (pushError) {
+        console.error("Error sending push notification:", pushError);
+        // Don't fail the post creation if push notification fails
+      }
     }
 
     return NextResponse.json(data)

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Upload, Search, Filter, ImageIcon, FileText, Video, Music, Trash2, Download, Eye, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { MediaPlayer } from "@/components/media-player"
 import type { Database } from "@/types/supabase"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 
@@ -19,7 +20,7 @@ export function MediaLibrary() {
   const [page, setPage] = useState(1)
   const [type, setType] = useState("")
   const [search, setSearch] = useState("")
-  const [showImage, setShowImage] = useState<string | null>(null)
+  const [showImage, setShowImage] = useState<string | MediaFile | null>(null)
   const [isLastPage, setIsLastPage] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -112,14 +113,27 @@ export function MediaLibrary() {
   return (
     <div className="space-y-8">
       <Dialog open={!!showImage} onOpenChange={() => setShowImage(null)}>
-        <DialogContent className="w-full max-w-md p-4">
-          <DialogTitle className="sr-only">Image Preview</DialogTitle>
+        <DialogContent className="w-full max-w-2xl p-4">
+          <DialogTitle className="sr-only">Media Preview</DialogTitle>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Image Preview</h2>
-            {/* <button onClick={() => setShowImage(null)} className="text-red-500"><X /></button> */}
+            <h2 className="text-lg font-semibold">Media Preview</h2>
           </div>
           {showImage && (
-            <img src={showImage} alt="Preview" className="w-full h-auto rounded" />
+            <div className="max-h-96 overflow-auto">
+              {typeof showImage === 'string' ? (
+                <img src={showImage} alt="Preview" className="w-full h-auto rounded" />
+              ) : (
+                <MediaPlayer
+                  media={{
+                    ...showImage,
+                    file_url: getPublicUrl(showImage.file_path)
+                  }}
+                  showControls={true}
+                  showDownload={true}
+                  className="w-full"
+                />
+              )}
+            </div>
           )}
         </DialogContent>
       </Dialog>
@@ -141,7 +155,7 @@ export function MediaLibrary() {
         </CardHeader>
         <CardContent>
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-            <input ref={fileInputRef} type="file" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx" onChange={handleFileUpload} className="hidden" />
+            <input ref={fileInputRef} type="file" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx" onChange={handleFileUpload} className="hidden" aria-label="Upload media files" />
             <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-lg font-semibold mb-2">Drop files here or click to upload</h3>
             <p className="text-muted-foreground mb-4">Support for images, videos, audio, and documents</p>
@@ -174,6 +188,18 @@ export function MediaLibrary() {
                 <div className="aspect-square bg-muted rounded-lg flex items-center justify-center mb-4 overflow-hidden">
                   {file.file_type.startsWith("image/") ? (
                     <img src={getPublicUrl(file.file_path)} alt={file.original_name} className="w-full h-full object-cover" />
+                  ) : file.file_type.startsWith("video/") || file.file_type.startsWith("audio/") ? (
+                    <div className="w-full h-full flex items-center justify-center bg-black/20">
+                      <MediaPlayer
+                        media={{
+                          ...file,
+                          file_url: getPublicUrl(file.file_path)
+                        }}
+                        showControls={false}
+                        showDownload={false}
+                        className="w-full h-full border-0 bg-transparent"
+                      />
+                    </div>
                   ) : getFileIcon(file.file_type)}
                 </div>
                 <div className="space-y-2">
@@ -183,8 +209,8 @@ export function MediaLibrary() {
                     <span>{formatFileSize(file.file_size)}</span>
                   </div>
                   <div className="flex items-center gap-1 pt-2">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowImage(getPublicUrl(file.file_path))}><Eye className="h-3 w-3" /></Button>
-                    <a href={getPublicUrl(file.file_path)} download target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setShowImage(file)}><Eye className="h-3 w-3" /></Button>
+                    <a href={getPublicUrl(file.file_path)} download target="_blank" rel="noopener noreferrer" title={`Download ${file.original_name}`}>
                       <Button size="sm" variant="ghost" className="h-8 w-8 p-0"><Download className="h-3 w-3" /></Button>
                     </a>
                     <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-600 hover:text-red-700" onClick={() => deleteFile(file.id)}>

@@ -14,14 +14,16 @@ import { Loader2, Lock, User, Feather, AlertTriangle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useSession } from "@/components/admin/session-provider"
 import Link from "next/link"
+import { DashboardLoader } from "@/components/admin/dashboard-loader"
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
+  const [showDashboardLoader, setShowDashboardLoader] = useState(false)
   const [error, setError] = useState("")
   const [accountLocked, setAccountLocked] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const { refreshSession } = useSession()
+  const { refreshSession, isAuthenticated } = useSession()
 
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
@@ -66,17 +68,39 @@ export function LoginForm() {
       const data = await response.json()
 
       if (response.ok && data.success) {
+        console.log("Login successful, refreshing session...")
         toast({
           variant: "success",
           title: "Welcome back! 🎉",
           description: "You've successfully signed in to your dashboard.",
         })
 
-        // Refresh session to get the latest data
+        // Show dashboard loader
+        setShowDashboardLoader(true)
+
+        // Refresh session and wait for authentication to be established
         await refreshSession()
 
-        // Navigate to dashboard
-        router.push("/admin/dashboard")
+        // Wait for authentication state to update
+        let attempts = 0
+        while (!isAuthenticated && attempts < 10) {
+          console.log(`Waiting for authentication... attempt ${attempts + 1}`)
+          await new Promise(resolve => setTimeout(resolve, 100))
+          attempts++
+        }
+
+        console.log("Authentication state:", isAuthenticated)
+        if (isAuthenticated) {
+          console.log("Authentication confirmed, navigating to dashboard")
+          // Keep loader visible for a moment before redirecting
+          setTimeout(() => {
+            router.push("/admin/dashboard")
+          }, 2000)
+        } else {
+          console.log("Authentication not confirmed, staying on login page")
+          setShowDashboardLoader(false)
+          setError("Session not established. Please try logging in again.")
+        }
       } else {
         setError(data.error || "Login failed")
 
@@ -104,7 +128,16 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
+    <>
+      {showDashboardLoader && (
+        <DashboardLoader
+          onComplete={() => {
+            // This will be called when the loader animation completes
+            // The redirect is already handled in the login logic above
+          }}
+        />
+      )}
+      <Card className="w-full max-w-md animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
       <CardHeader className="text-center space-y-4">
         <div className="animate-float mx-auto mb-2">
           <div className="h-40 w-40 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
@@ -202,5 +235,6 @@ export function LoginForm() {
         </form>
       </CardContent>
     </Card>
+    </>
   )
 }

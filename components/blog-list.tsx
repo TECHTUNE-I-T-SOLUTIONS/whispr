@@ -86,10 +86,10 @@ export async function BlogList() {
 
               <div className="flex items-center justify-between pt-4 border-t border-border/30">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
-                    Prayce
-                  </div>
+                    {post.admin?.username ?? post.admin?.full_name ?? "Unknown"}
+                    </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {post.reading_time || 5}m

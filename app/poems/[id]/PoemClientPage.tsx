@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, User, BookOpen } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { SafeImage } from "@/components/SafeImage"
+import { MediaPlayer } from "@/components/media-player"
 
 interface PoemClientPageProps {
   poem: any
@@ -69,6 +70,28 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
                 className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
                 priority
               />
+            </div>
+          )}
+
+          {/* Media Files */}
+          {poem.media_files?.length > 0 && (
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {poem.media_files.map((file: any, index: number) => (
+                <MediaPlayer
+                  key={index}
+                  media={{
+                    id: file.id || `media-${index}`,
+                    original_name: file.original_name || file.file_name || `Media ${index + 1}`,
+                    file_name: file.file_name || file.original_name || `media-${index}`,
+                    file_path: file.file_path || "",
+                    file_url: file.file_url || "",
+                    file_type: file.file_type || "application/octet-stream",
+                    file_size: file.file_size || 0
+                  }}
+                  showControls={true}
+                  showDownload={true}
+                />
+              ))}
             </div>
           )}
 
