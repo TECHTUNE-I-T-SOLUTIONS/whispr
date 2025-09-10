@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Bell, Send, Eye, Smartphone, Monitor, Tablet, Save, History } from 'lucide-react'
+import { Bell, Send, Eye, Smartphone, Monitor, Tablet, Save, History, X } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 
@@ -28,13 +28,22 @@ interface NotificationData {
 }
 
 export default function CreateNotificationPage() {
+  const DEFAULT_ICON = '/placeholder-logo.png'
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const iconFileInputRef = useRef<HTMLInputElement | null>(null)
+
   const [notification, setNotification] = useState<NotificationData>({
     title: '',
     body: '',
     url: '/',
     type: 'manual',
+    icon: DEFAULT_ICON,
     actions: []
   })
+  const [recentImages, setRecentImages] = useState<any[]>([])
+  const [isLoadingImages, setIsLoadingImages] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const { toast } = useToast()
@@ -114,6 +123,116 @@ export default function CreateNotificationPage() {
         title: 'Error',
         description: 'Failed to save draft'
       })
+    }
+  }
+
+  // Fetch recently uploaded images so admin can reuse them
+  useEffect(() => {
+    let mounted = true
+    async function loadImages() {
+      setIsLoadingImages(true)
+      try {
+        const res = await fetch('/api/admin/media?type=image&limit=50')
+        if (!res.ok) return
+        const data = await res.json()
+        if (mounted) setRecentImages(data.media || [])
+      } catch (e) {
+        console.error('Failed to load media', e)
+      } finally {
+        setIsLoadingImages(false)
+      }
+    }
+
+    loadImages()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleSelectImage = (url: string) => {
+    setNotification(prev => ({ ...prev, image: url }))
+  }
+
+  const handleTriggerUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleTriggerIconUpload = () => {
+    iconFileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploading(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+
+      const res = await fetch('/api/admin/media/upload', {
+        method: 'POST',
+        body: form,
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || 'Upload failed')
+      }
+
+      const data = await res.json()
+      // server returns file_url
+      if (data?.file_url) {
+        setNotification(prev => ({ ...prev, image: data.file_url }))
+        // prepend to recent images so admin can reuse immediately
+        setRecentImages(prev => [data, ...prev])
+      }
+    } catch (err) {
+      console.error('Upload error', err)
+      toast({ variant: 'destructive', title: 'Upload failed', description: String(err) })
+    } finally {
+      setIsUploading(false)
+      // clear input value so same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleRemoveAction = (index: number) => {
+    setNotification(prev => ({
+      ...prev,
+      actions: (prev.actions || []).filter((_, i) => i !== index)
+    }))
+  }
+
+  const handleIconFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploading(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+
+      const res = await fetch('/api/admin/media/upload', {
+        method: 'POST',
+        body: form,
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || 'Upload failed')
+      }
+
+      const data = await res.json()
+      if (data?.file_url) {
+        setNotification(prev => ({ ...prev, icon: data.file_url }))
+        setRecentImages(prev => [data, ...prev])
+      }
+    } catch (err) {
+      console.error('Icon upload error', err)
+      toast({ variant: 'destructive', title: 'Upload failed', description: String(err) })
+    } finally {
+      setIsUploading(false)
+      if (iconFileInputRef.current) iconFileInputRef.current.value = ''
     }
   }
 
@@ -227,22 +346,64 @@ export default function CreateNotificationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="icon">Icon URL (optional)</Label>
-                <Input
-                  id="icon"
-                  placeholder="https://yoursite.com/icon.png"
-                  value={notification.icon || ''}
-                  onChange={(e) => setNotification(prev => ({ ...prev, icon: e.target.value }))}
-                />
+                <div className="flex gap-2 items-center">
+                  <Input
+                    id="icon"
+                    placeholder="https://yoursite.com/icon.png"
+                    value={notification.icon || ''}
+                    onChange={(e) => setNotification(prev => ({ ...prev, icon: e.target.value }))}
+                  />
+                  <input ref={iconFileInputRef} aria-label="Upload icon" type="file" accept="image/*" onChange={handleIconFileChange} className="hidden" />
+                  <Button variant="outline" onClick={handleTriggerIconUpload} disabled={isUploading}>Upload Icon</Button>
+                </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                    {notification.icon ? (
+                      <img src={notification.icon} alt="icon" className="w-full h-full object-cover" />
+                    ) : (
+                      <Bell className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Default icon is hardcoded for consistency. You can upload or paste a URL.</p>
+                </div>
+                <div className="mt-2 grid grid-cols-6 gap-2">
+                  {recentImages.slice(0,12).map(img => (
+                    <button key={img.id} type="button" className="border rounded overflow-hidden" onClick={() => setNotification(prev => ({ ...prev, icon: img.file_url }))}>
+                      <img src={img.file_url} alt={img.original_name} className="h-8 w-8 object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="image">Image URL (optional)</Label>
-                <Input
-                  id="image"
-                  placeholder="https://yoursite.com/image.jpg"
-                  value={notification.image || ''}
-                  onChange={(e) => setNotification(prev => ({ ...prev, image: e.target.value }))}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="image"
+                    placeholder="https://yoursite.com/image.jpg"
+                    value={notification.image || ''}
+                    onChange={(e) => setNotification(prev => ({ ...prev, image: e.target.value }))}
+                  />
+                  <input ref={fileInputRef} aria-label="Upload image" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                  <Button variant="outline" onClick={handleTriggerUpload} disabled={isUploading}>Upload</Button>
+                </div>
+                <div className="mt-2 grid grid-cols-4 gap-2">
+                  {isLoadingImages ? (
+                    <div className="text-xs text-muted-foreground col-span-4">Loading recent images...</div>
+                  ) : (
+                    recentImages.slice(0,8).map(img => (
+                      <button key={img.id} type="button" className="border rounded overflow-hidden" onClick={() => handleSelectImage(img.file_url)}>
+                        <img src={img.file_url} alt={img.original_name} className="h-16 w-16 object-cover" />
+                      </button>
+                    ))
+                  )}
+                </div>
+                {notification.image ? (
+                  <div className="mt-2">
+                    <p className="text-xs text-muted-foreground mb-1">Selected image preview:</p>
+                    <img src={notification.image} alt="preview" className="w-full max-h-48 object-contain rounded" />
+                  </div>
+                ) : null}
               </div>
             </CardContent>
           </Card>
@@ -342,9 +503,15 @@ export default function CreateNotificationPage() {
 
               <div className={`bg-black text-white rounded-lg p-4 shadow-lg ${getPreviewStyles()}`}>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bell className="h-5 w-5 text-white" />
-                  </div>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ backgroundColor: notification.icon ? 'transparent' : '#2563eb' }}>
+                      {notification.icon ? (
+                        // show uploaded or selected icon
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={notification.icon} alt="icon" className="w-full h-full object-cover" />
+                      ) : (
+                        <Bell className="h-5 w-5 text-white" />
+                      )}
+                    </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-semibold text-sm truncate">
@@ -366,16 +533,25 @@ export default function CreateNotificationPage() {
                 {(notification.actions?.length || 0) > 0 && (
                   <>
                     <Separator className="my-3 bg-gray-700" />
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       {notification.actions?.map((action, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-8 px-3 bg-gray-800 hover:bg-gray-700 text-white"
-                        >
-                          {action.title}
-                        </Button>
+                        <div key={index} className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-8 px-3 bg-gray-800 hover:bg-gray-700 text-white"
+                          >
+                            {action.title}
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAction(index)}
+                            className="absolute -top-2 -right-2 bg-red-600 rounded-full p-0.5 text-white"
+                            aria-label={`Remove action ${action.title}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
                       ))}
                     </div>
                   </>

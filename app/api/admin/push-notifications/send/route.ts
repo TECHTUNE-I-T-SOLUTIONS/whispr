@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
           timestamp: new Date().toISOString()
         })
 
-        await webpush.sendNotification(pushSubscription, payload)
-        console.log('Notification sent successfully to:', subscription.endpoint)
+  await webpush.sendNotification(pushSubscription, payload)
+  console.log('Notification sent successfully to:', subscription.endpoint)
 
         // Update last_active_at for this subscriber
         await supabase
@@ -83,8 +83,12 @@ export async function POST(request: NextRequest) {
           .update({ last_active_at: new Date().toISOString() })
           .eq('id', subscription.id)
 
-      } catch (error) {
-        console.error('Error sending notification:', error)
+      } catch (error: any) {
+        console.error('Error sending notification to', subscription.endpoint, {
+          message: error?.message,
+          stack: error?.stack,
+          statusCode: error?.statusCode,
+        })
         // Mark subscription as inactive if it fails
         await supabase
           .from('push_subscriptions')

@@ -36,21 +36,18 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
     const webpush = (await import('web-push')).default;
 
     // Configure VAPID keys
-    const vapidKeys = {
-      subject: process.env.VAPID_SUBJECT,
-      publicKey: process.env.VAPID_PUBLIC_KEY,
-      privateKey: process.env.VAPID_PRIVATE_KEY,
-    };
+    // Support multiple env naming conventions. Ensure server uses the same
+    // public key the client uses (NEXT_PUBLIC_VAPID_PUBLIC_KEY).
+    const vapidSubject = process.env.VAPID_SUBJECT || `mailto:admin@${process.env.VITE_APP_DOMAIN || 'whispr.com'}`;
+    const vapidPublic = process.env.VAPID_PUBLIC_KEY || process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    const vapidPrivate = process.env.VAPID_PRIVATE_KEY || process.env.VAPID_PRIVATE_KEY;
 
-    if (vapidKeys.subject && vapidKeys.publicKey && vapidKeys.privateKey) {
-      webpush.setVapidDetails(
-        vapidKeys.subject,
-        vapidKeys.publicKey,
-        vapidKeys.privateKey
-      );
-    } else {
+    if (!vapidPublic || !vapidPrivate) {
+      console.error('VAPID keys missing. Ensure VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY or NEXT_PUBLIC_VAPID_PUBLIC_KEY are set.')
       return { success: false, error: 'VAPID keys not configured' };
     }
+
+    webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
 
     const payload = {
       title: notificationData.title,
