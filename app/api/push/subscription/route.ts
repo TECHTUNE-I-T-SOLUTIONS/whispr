@@ -4,7 +4,7 @@ import { createSupabaseServer } from '@/lib/supabase-server';
 export async function POST(request: NextRequest) {
   try {
     const supabase = createSupabaseServer();
-    const { subscription, userAgent, ipAddress } = await request.json();
+    const { subscription, userAgent } = await request.json();
 
     if (!subscription || !subscription.endpoint) {
       return NextResponse.json(
@@ -13,8 +13,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get real IP address from request headers
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    const clientIp = request.headers.get('x-client-ip');
+    const cfConnectingIp = request.headers.get('cf-connecting-ip');
+
+    // Use the first available IP address
+    const ipAddress = forwardedFor?.split(',')[0]?.trim() ||
+                     realIp ||
+                     clientIp ||
+                     cfConnectingIp ||
+                     '127.0.0.1';
+
     // Get browser info from user agent
     const browserInfo = parseUserAgent(userAgent);
+
+    // Generate user_id from IP address (since users don't sign up)
+    const userId = generateUserIdFromIp(ipAddress);
 
     // Check if subscription already exists
     const { data: existingSubscription } = await supabase
@@ -33,6 +49,7 @@ export async function POST(request: NextRequest) {
           user_agent: userAgent,
           ip_address: ipAddress,
           browser_info: browserInfo,
+          user_id: userId,
           last_active_at: new Date().toISOString(),
           is_active: true
         })
@@ -60,7 +77,8 @@ export async function POST(request: NextRequest) {
           auth: subscription.keys?.auth,
           user_agent: userAgent,
           ip_address: ipAddress,
-          browser_info: browserInfo
+          browser_info: browserInfo,
+          user_id: userId
         });
 
       if (error) {
@@ -182,4 +200,21 @@ function parseUserAgent(userAgent: string) {
   }
 
   return browserInfo;
+}
+
+// Generate a consistent UUID from IP address
+function generateUserIdFromIp(ipAddress: string): string {
+  // Create a simple hash from the IP address
+  let hash = 0;
+  for (let i = 0; i < ipAddress.length; i++) {
+    const char = ipAddress.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+
+  // Convert hash to hex and ensure it's 32 characters for UUID
+  const hashHex = Math.abs(hash).toString(16).padStart(32, '0');
+
+  // Create a proper UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  return `${hashHex.substring(0, 8)}-${hashHex.substring(8, 12)}-${hashHex.substring(12, 16)}-${hashHex.substring(16, 20)}-${hashHex.substring(20, 32)}`;
 }

@@ -161,25 +161,30 @@ export const PostsList = ({ data = [] }: PostsListProps) => {
               </tr>
             ))}
           </thead>
-          <tbody>
+            <tbody>
             {table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="text-center py-4">
-                  No posts found.
-                </td>
+              <td colSpan={columns.length} className="text-center py-4">
+                No posts found.
+              </td>
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="border-b last:border-none">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3 align-top">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
+              <tr key={row.id} className="border-b last:border-none">
+                {row.getVisibleCells().map((cell) => (
+                <td
+                  key={cell.id}
+                  className={`px-4 py-3 align-top ${
+                  cell.column.id === "content" ? "text-black dark:text-white" : ""
+                  }`}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+                ))}
+              </tr>
               ))
             )}
-          </tbody>
+            </tbody>
         </table>
       </div>
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4">

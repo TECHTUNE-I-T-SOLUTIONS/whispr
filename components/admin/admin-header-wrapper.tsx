@@ -26,6 +26,9 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
+    { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
+    { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
+    { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
   ]
 
   const excludedRoutes = ["/admin/login", "/admin/signup", "/admin/forgot-password"]

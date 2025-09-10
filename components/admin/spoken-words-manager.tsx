@@ -57,6 +57,11 @@ export function SpokenWordsManager() {
   const [editingWord, setEditingWord] = useState<SpokenWord | null>(null)
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
   const [audioRefs, setAudioRefs] = useState<{ [key: string]: HTMLAudioElement | null }>({})
+  // refs for synchronous access to audio elements and playing id to avoid race conditions
+  const audioRefsRef = useRef<{ [key: string]: HTMLAudioElement | null }>({})
+  const playingAudioRef = useRef<string | null>(null)
+  const [previewMedia, setPreviewMedia] = useState<any | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -212,6 +217,11 @@ export function SpokenWordsManager() {
     }
   }, [audioRefs])
 
+  // keep refs in sync with state when audioRefs state changes
+  useEffect(() => {
+    audioRefsRef.current = { ...audioRefsRef.current, ...audioRefs }
+  }, [audioRefs])
+
   const handleCreate = async () => {
     if (!formData.title) {
       toast({ variant: "destructive", title: "Error", description: "Title is required" })
@@ -350,21 +360,24 @@ export function SpokenWordsManager() {
     console.log('handleAudioPlay called for word:', word.id, 'playingAudioId:', playingAudioId)
     if (!word.media_file) return
 
-    // Stop any currently playing audio
-    if (playingAudioId && playingAudioId !== word.id) {
-      const currentAudio = audioRefs[playingAudioId]
+    // Stop any currently playing audio (use ref for immediate access)
+    if (playingAudioRef.current && playingAudioRef.current !== word.id) {
+      const currentAudio = audioRefsRef.current[playingAudioRef.current]
       if (currentAudio) {
-        currentAudio.pause()
-        currentAudio.currentTime = 0
+        try { currentAudio.pause(); currentAudio.currentTime = 0 } catch (e) {}
       }
+      // clear state but keep refs until new audio is created
+      playingAudioRef.current = null
+      setPlayingAudioId(null)
     }
 
     // If clicking the same audio that's playing, pause it
-    if (playingAudioId === word.id) {
+    if (playingAudioRef.current === word.id) {
       console.log('Pausing audio for word:', word.id)
-      const audio = audioRefs[word.id]
+      const audio = audioRefsRef.current[word.id]
       if (audio) {
-        audio.pause()
+        try { audio.pause(); audio.currentTime = 0 } catch (e) {}
+        playingAudioRef.current = null
         setPlayingAudioId(null)
         // Don't continue to play logic
         return
@@ -373,41 +386,128 @@ export function SpokenWordsManager() {
       }
     }
 
-    // Play the new audio
-    console.log('Playing new audio for word:', word.id)
+    // Play (or resume) the selected audio by reusing an audio element stored in refs
+    const existing = audioRefsRef.current[word.id]
+    if (existing) {
+      try {
+        existing.currentTime = 0
+        void existing.play()
+        playingAudioRef.current = word.id
+        setPlayingAudioId(word.id)
+        return
+      } catch (e) {
+        console.error('Error playing existing audio element for word:', word.id, e)
+        // fallback: remove and recreate
+        try { existing.pause(); existing.src = ''; } catch (_) {}
+        audioRefsRef.current[word.id] = null
+        setAudioRefs(prev => ({ ...prev, [word.id]: null }))
+      }
+    }
+
+    console.log('Creating audio element and playing for word:', word.id)
     const audioUrl = getPublicUrl(word.media_file.file_path)
-    const audio = new Audio(audioUrl)
+    const audioEl = new Audio()
+    audioEl.preload = 'auto'
+    audioEl.src = audioUrl
 
-    audio.addEventListener('ended', () => {
-      console.log('Audio ended for word:', word.id)
+    const handleEnded = () => {
+      playingAudioRef.current = null
+      setPlayingAudioId(null)
+      // keep ref in case user plays again
+      setAudioRefs(prev => ({ ...prev, [word.id]: null }))
+    }
+
+    const handleError = (e: any) => {
+      // Treat certain transient errors as benign; otherwise show toast
+      const msg = (e && e.message) ? String(e.message).toLowerCase() : ''
+      const isTransient = e && e.name === 'AbortError' || msg.includes('interrupted') || msg.includes('pause') || msg.includes('canceled') || msg.includes('cancelled')
+      console.log('Audio element error for word:', word.id, e, 'transient=', isTransient)
+      if (isTransient) {
+        // don't clear UI for transient errors
+        return
+      }
+      playingAudioRef.current = null
       setPlayingAudioId(null)
       setAudioRefs(prev => ({ ...prev, [word.id]: null }))
-    })
+      toast({ variant: 'destructive', title: 'Playback error', description: 'Failed to play audio file.' })
+    }
 
-    audio.addEventListener('error', (e) => {
-      console.log('Audio error for word:', word.id, e)
-      setPlayingAudioId(null)
-      setAudioRefs(prev => ({ ...prev, [word.id]: null }))
-      toast({
-        variant: "destructive",
-        title: "Playback error",
-        description: "Failed to play audio file."
-      })
-    })
+    audioEl.addEventListener('ended', handleEnded)
+    audioEl.addEventListener('error', handleError)
 
-    setAudioRefs(prev => ({ ...prev, [word.id]: audio }))
+    // store element in both ref and state so we can access synchronously and re-render
+    audioRefsRef.current[word.id] = audioEl
+    setAudioRefs(prev => ({ ...prev, [word.id]: audioEl }))
+
+    // set playing id immediately so UI reflects intent
+    playingAudioRef.current = word.id
     setPlayingAudioId(word.id)
 
-    audio.play().catch((e) => {
-      console.log('Audio play failed for word:', word.id, e)
-      setPlayingAudioId(null)
-      setAudioRefs(prev => ({ ...prev, [word.id]: null }))
-      toast({
-        variant: "destructive",
-        title: "Playback blocked",
-        description: "Audio playback was blocked by the browser."
-      })
-    })
+    // Wait for canplay or a short timeout before attempting play to avoid AbortError races
+    let played = false
+    const tryPlay = async () => {
+      if (played) return
+      played = true
+      try {
+        await audioEl.play()
+      } catch (err: any) {
+        const msg = (err && err.message) ? String(err.message).toLowerCase() : ''
+        const isBenign = err && err.name === 'AbortError' || msg.includes('interrupted') || msg.includes('pause') || msg.includes('canceled') || msg.includes('cancelled')
+        if (isBenign) {
+          console.debug('Audio play interrupted/benign for word:', word.id, err)
+          return
+        }
+
+        const isNotSupported = err && (err.name === 'NotSupportedError' || msg.includes('no supported sources') || msg.includes('not supported'))
+        if (isNotSupported) {
+          // Try to reload the source once and attempt to play again (helps when the element lost its src or timing issue)
+          try {
+            console.warn('NotSupportedError encountered, retrying load/play for word:', word.id)
+            audioEl.src = audioUrl
+            audioEl.load()
+            await new Promise((r) => setTimeout(r, 200))
+            await audioEl.play()
+            return
+          } catch (err2) {
+            console.error('Retry after NotSupportedError failed for word:', word.id, err2)
+            // fall through to show toast below
+          }
+        }
+
+        console.error('Audio play failed for word:', word.id, err)
+        playingAudioRef.current = null
+        setPlayingAudioId(null)
+        audioRefsRef.current[word.id] = null
+        setAudioRefs(prev => ({ ...prev, [word.id]: null }))
+        toast({ variant: 'destructive', title: 'Playback blocked', description: 'Audio playback was blocked by the browser.' })
+      }
+    }
+
+    const canplayHandler = () => {
+      // remove listener and try to play
+      audioEl.removeEventListener('canplay', canplayHandler)
+      tryPlay()
+    }
+
+    audioEl.addEventListener('canplay', canplayHandler)
+
+    // Fallback: attempt play after short delay even if canplay didn't fire
+    const playTimeout = setTimeout(() => {
+      tryPlay()
+    }, 250)
+
+    // cleanup if element is later removed
+    const cleanup = () => {
+      clearTimeout(playTimeout)
+      audioEl.removeEventListener('canplay', canplayHandler)
+      audioEl.removeEventListener('ended', handleEnded)
+      audioEl.removeEventListener('error', handleError)
+    }
+
+    // Attach a one-time ended/error cleanup via the handlers above; also ensure we cleanup when refs change
+    // Note: we intentionally do not immediately revoke src so the element can be reused until user action.
+
+  // playback initiated via audioEl.play() above; removed stray call to undefined `audio`
   }
 
   const openEditDialog = (word: SpokenWord) => {
@@ -764,18 +864,20 @@ export function SpokenWordsManager() {
                   <div className="w-16 h-16 flex-shrink-0">
                     <Button
                       variant="outline"
-                      className={`w-full h-full flex items-center justify-center transition-colors ${
-                        playingAudioId === word.id ? 'bg-primary text-primary-foreground' : ''
-                      }`}
-                      onClick={() => word.type === "audio" && handleAudioPlay(word)}
-                      disabled={word.type !== "audio"}
+                      className="w-full h-full flex items-center justify-center transition-colors"
+                      onClick={() => {
+                        // open preview modal with media (audio or video)
+                        if (!word.media_file) return
+                        setPreviewMedia({
+                          ...word.media_file,
+                          file_url: getPublicUrl(word.media_file.file_path),
+                          type: word.type
+                        })
+                        setIsPreviewOpen(true)
+                      }}
                     >
                       {word.type === "audio" ? (
-                        playingAudioId === word.id ? (
-                          <VolumeX className="h-6 w-6" />
-                        ) : (
-                          <Volume2 className="h-6 w-6" />
-                        )
+                        <Volume2 className="h-6 w-6" />
                       ) : (
                         <Play className="h-6 w-6" />
                       )}
@@ -897,6 +999,26 @@ export function SpokenWordsManager() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Dialog for audio/video */}
+      <Dialog open={isPreviewOpen} onOpenChange={(open) => { if (!open) setPreviewMedia(null); setIsPreviewOpen(open) }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Preview Media</DialogTitle>
+          </DialogHeader>
+          {previewMedia && (
+            <div>
+              <MediaPlayer
+                media={{
+                  ...previewMedia,
+                }}
+                showControls={true}
+                showDownload={true}
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

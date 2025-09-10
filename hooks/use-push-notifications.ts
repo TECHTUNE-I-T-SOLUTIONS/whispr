@@ -15,6 +15,7 @@ interface PushNotificationHook {
   isSupported: boolean;
   isSubscribed: boolean;
   isLoading: boolean;
+  hasChecked: boolean;
   subscribe: () => Promise<void>;
   unsubscribe: () => Promise<void>;
   sendTestNotification: () => Promise<void>;
@@ -23,9 +24,38 @@ interface PushNotificationHook {
 export function usePushNotifications(): PushNotificationHook {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [hasChecked, setHasChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const { toast } = useToast();
+
+  // BroadcastChannel for cross-tab/component subscription state sync
+  const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('push-subscription') : null;
+
+  useEffect(() => {
+    if (bc) {
+      bc.onmessage = (msg: MessageEvent) => {
+        try {
+          const data = msg.data as any;
+          if (data && typeof data.isSubscribed === 'boolean') {
+            setIsSubscribed(Boolean(data.isSubscribed));
+          }
+        } catch (e) {
+          // ignore
+        }
+      };
+      return () => bc.close();
+    }
+
+    const onCustom = (e: Event) => {
+      const detail = (e as CustomEvent).detail as any;
+      if (detail && typeof detail.isSubscribed === 'boolean') {
+        setIsSubscribed(Boolean(detail.isSubscribed));
+      }
+    };
+    window.addEventListener('push:subscription-changed', onCustom as EventListener);
+    return () => window.removeEventListener('push:subscription-changed', onCustom as EventListener);
+  }, []);
 
   useEffect(() => {
     // Check if push notifications are supported
@@ -40,9 +70,22 @@ export function usePushNotifications(): PushNotificationHook {
       const reg = await navigator.serviceWorker.register('/sw.js');
       setRegistration(reg);
 
+      // Wait a bit for the service worker to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Check if already subscribed
       const subscription = await reg.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
+      const isCurrentlySubscribed = !!subscription;
+      setIsSubscribed(isCurrentlySubscribed);
+        // mark that initial check completed to avoid UI flicker
+        setHasChecked(true);
+        // notify other tabs/components
+        try {
+          if (bc) bc.postMessage({ isSubscribed: isCurrentlySubscribed });
+          else window.dispatchEvent(new CustomEvent('push:subscription-changed', { detail: { isSubscribed: isCurrentlySubscribed } }));
+        } catch (e) {
+          // ignore
+        }
     } catch (error) {
       console.error('Service Worker registration failed:', error);
     }
@@ -121,6 +164,13 @@ export function usePushNotifications(): PushNotificationHook {
 
         // Send welcome notification
         await sendWelcomeNotification();
+        // Broadcast state change
+        try {
+          if (bc) bc.postMessage({ isSubscribed: true });
+          else window.dispatchEvent(new CustomEvent('push:subscription-changed', { detail: { isSubscribed: true } }));
+        } catch (e) {
+          // ignore
+        }
       } else {
         throw new Error('Failed to subscribe');
       }
@@ -159,11 +209,18 @@ export function usePushNotifications(): PushNotificationHook {
           }),
         });
 
-        setIsSubscribed(false);
+          setIsSubscribed(false);
         toast({
           title: "Unsubscribed",
           description: "You won't receive push notifications anymore"
         });
+          // Broadcast state change
+          try {
+            if (bc) bc.postMessage({ isSubscribed: false });
+            else window.dispatchEvent(new CustomEvent('push:subscription-changed', { detail: { isSubscribed: false } }));
+          } catch (e) {
+            // ignore
+          }
       }
     } catch (error) {
       console.error('Unsubscription failed:', error);
@@ -236,6 +293,7 @@ export function usePushNotifications(): PushNotificationHook {
     isSupported,
     isSubscribed,
     isLoading,
+  hasChecked,
     subscribe,
     unsubscribe,
     sendTestNotification

@@ -116,6 +116,8 @@ const ChartTooltipContent = React.forwardRef<
   (
     {
       active,
+      // Recharts payload typing can be complex across versions; use `any` here
+      // and guard at runtime.
       payload,
       className,
       indicator = "dot",
@@ -128,7 +130,7 @@ const ChartTooltipContent = React.forwardRef<
       color,
       nameKey,
       labelKey,
-    },
+    }: any,
     ref
   ) => {
     const { config } = useChart()
@@ -173,7 +175,7 @@ const ChartTooltipContent = React.forwardRef<
       return null
     }
 
-    const nestLabel = payload.length === 1 && indicator !== "dot"
+  const nestLabel = Array.isArray(payload) && payload.length === 1 && indicator !== "dot"
 
     return (
       <div
@@ -185,10 +187,10 @@ const ChartTooltipContent = React.forwardRef<
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
-          {payload.map((item, index) => {
-            const key = `${nameKey || item.name || item.dataKey || "value"}`
-            const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload.fill || item.color
+          {Array.isArray(payload) && payload.map((item: any, index: number) => {
+        const key = `${nameKey || item.name || item.dataKey || "value"}`
+      const itemConfig = getPayloadConfigFromPayload(config, item, key)
+      const indicatorColor = color || (item?.payload && item.payload.fill) || item.color
 
             return (
               <div
@@ -258,21 +260,11 @@ ChartTooltipContent.displayName = "ChartTooltip"
 
 const ChartLegend = RechartsPrimitive.Legend
 
-const ChartLegendContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean
-      nameKey?: string
-    }
->(
-  (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
-    ref
-  ) => {
+const ChartLegendContent = React.forwardRef<HTMLDivElement, any>(
+  ({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }: any, ref) => {
     const { config } = useChart()
 
-    if (!payload?.length) {
+    if (!Array.isArray(payload) || !payload.length) {
       return null
     }
 
@@ -285,31 +277,32 @@ const ChartLegendContent = React.forwardRef<
           className
         )}
       >
-        {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`
-          const itemConfig = getPayloadConfigFromPayload(config, item, key)
+        {Array.isArray(payload) &&
+          payload.map((item: any) => {
+            const key = `${nameKey || item.dataKey || "value"}`
+            const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
-          return (
-            <div
-              key={item.value}
-              className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
-              )}
-            >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
-              {itemConfig?.label}
-            </div>
-          )
-        })}
+            return (
+              <div
+                key={String(item?.value)}
+                className={cn(
+                  "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                )}
+              >
+                {itemConfig?.icon && !hideIcon ? (
+                  <itemConfig.icon />
+                ) : (
+                  <div
+                    className="h-2 w-2 shrink-0 rounded-[2px]"
+                    style={{
+                      backgroundColor: item?.color,
+                    }}
+                  />
+                )}
+                {itemConfig?.label}
+              </div>
+            )
+          })}
       </div>
     )
   }

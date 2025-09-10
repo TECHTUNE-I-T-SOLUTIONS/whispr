@@ -5,12 +5,29 @@ import { Bell, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePushNotifications } from '@/hooks/use-push-notifications'
 import { NotificationPermissionModal } from '@/components/notification-permission-modal'
+import { usePathname } from 'next/navigation'
 
 export function FloatingNotificationBell() {
-  const { isSupported, isSubscribed, isLoading, subscribe } = usePushNotifications()
+  const { isSupported, isSubscribed, isLoading, subscribe, hasChecked } = usePushNotifications()
   const [isVisible, setIsVisible] = useState(false)
   const [showPermissionModal, setShowPermissionModal] = useState(false)
   const [hasDismissed, setHasDismissed] = useState(false)
+  const pathname = usePathname()
+
+  // listen for same-tab subscription updates so UI updates immediately
+  useEffect(() => {
+    const onCustom = (e: Event) => {
+      const detail = (e as CustomEvent).detail as any
+      if (detail && typeof detail.isSubscribed === 'boolean') {
+        if (detail.isSubscribed) {
+          setIsVisible(false)
+        }
+      }
+    }
+
+    window.addEventListener('push:subscription-changed', onCustom as EventListener)
+    return () => window.removeEventListener('push:subscription-changed', onCustom as EventListener)
+  }, [])
 
   useEffect(() => {
     // Check if user has dismissed the bell before
@@ -18,8 +35,12 @@ export function FloatingNotificationBell() {
     const hasDismissedBefore = dismissed === 'true'
     setHasDismissed(hasDismissedBefore)
 
-    // Show bell for unsubscribed users who haven't dismissed it
-    if (isSupported && !isSubscribed && !hasDismissedBefore) {
+    // Check if we're on admin pages
+    const isAdminPage = pathname.startsWith('/admin')
+
+    // Show bell for unsubscribed users who haven't dismissed it and not on admin pages
+    // Wait until hasChecked to avoid flicker on initial load
+    if (hasChecked && isSupported && !isSubscribed && !hasDismissedBefore && !isAdminPage) {
       // Small delay to avoid showing immediately on page load
       const timer = setTimeout(() => {
         setIsVisible(true)
@@ -28,7 +49,7 @@ export function FloatingNotificationBell() {
     } else {
       setIsVisible(false)
     }
-  }, [isSupported, isSubscribed])
+  }, [isSupported, isSubscribed, pathname, hasChecked])
 
   const handleSubscribe = async () => {
     try {
@@ -50,8 +71,8 @@ export function FloatingNotificationBell() {
     localStorage.setItem('notification-bell-dismissed', 'true')
   }
 
-  // For testing - show the bell regardless of conditions
-  if (!isSupported) {
+  // Don't render if push isn't supported or the bell shouldn't be visible
+  if (!isSupported || !isVisible) {
     return null
   }
 

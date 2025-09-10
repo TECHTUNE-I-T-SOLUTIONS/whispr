@@ -236,14 +236,14 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
       const chunks: Blob[] = []
 
       recorder.ondataavailable = (event: BlobEvent) => {
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
           chunks.push(event.data)
         }
       }
 
       recorder.onstop = () => {
-        const newChunks = [...recordingState.chunks, ...chunks]
-        const blob = new Blob(newChunks, {
+        // Use only the local chunks collected for this recording session
+        const blob = new Blob(chunks, {
           type: type === "audio" ? "audio/webm" : "video/webm"
         })
         const url = URL.createObjectURL(blob)
@@ -255,12 +255,17 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
           size: blob.size
         })
         setIsMediaLoading(true) // Set loading while media loads metadata
+
+        // Reset recording state (clear chunks for next recording)
         setRecordingState(prev => ({
           ...prev,
-          chunks: newChunks,
+          chunks: [],
           isRecording: false,
           isPaused: false
         }))
+
+        // Clear the ref to the recorder so a new one can be created later
+        mediaRecorderRef.current = null
 
         onRecordingComplete(blob, recordingState.duration)
       }
@@ -360,7 +365,11 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && recordingState.isRecording) {
-      mediaRecorderRef.current.stop()
+      try {
+        mediaRecorderRef.current.stop()
+      } catch (e) {
+        console.warn('Error stopping recorder:', e)
+      }
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
@@ -369,8 +378,25 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
   }
 
   const deleteRecording = () => {
+    // Pause and clear any media elements that might be using the recorded URL
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        // Remove source to avoid using revoked URL
+        audioRef.current.src = ''
+        audioRef.current.load()
+      }
+      if (videoRef.current) {
+        videoRef.current.pause()
+        videoRef.current.src = ''
+        videoRef.current.load()
+      }
+    } catch (e) {
+      // ignore cleanup errors
+    }
+
     if (recordedUrl) {
-      URL.revokeObjectURL(recordedUrl)
+      try { URL.revokeObjectURL(recordedUrl) } catch (e) { /* ignore */ }
     }
 
     setRecordedBlob(null)
@@ -398,8 +424,16 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
     if (recordedUrl) {
       if (type === "audio" && audioRef.current) {
         const audio = audioRef.current
-        audio.currentTime = 0
-        audio.play()
+        try {
+          audio.currentTime = 0
+          void audio.play()
+        } catch (e) {
+          console.error('Audio play error:', e)
+          setIsPlaying(false)
+          setPlaybackTime(0)
+          toast({ variant: 'destructive', title: 'Playback error', description: 'Failed to play the recording.' })
+          return
+        }
         setIsPlaying(true)
         setPlaybackTime(0)
 
@@ -426,9 +460,17 @@ export function MediaRecorder({ type, onRecordingComplete, maxSizeMB = 50 }: Med
 
       } else if (type === "video" && videoRef.current) {
         const video = videoRef.current
-        video.src = recordedUrl
-        video.currentTime = 0
-        video.play()
+        try {
+          video.src = recordedUrl
+          video.currentTime = 0
+          void video.play()
+        } catch (e) {
+          console.error('Video play error:', e)
+          setIsPlaying(false)
+          setPlaybackTime(0)
+          toast({ variant: 'destructive', title: 'Playback error', description: 'Failed to play the recording.' })
+          return
+        }
         setIsPlaying(true)
         setPlaybackTime(0)
 
