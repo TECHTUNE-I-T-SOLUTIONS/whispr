@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
         title: `New Blog: ${title}`,
         body: `By ${author || 'Anonymous'}: ${content.substring(0, 100)}...`,
         url: url || `/blog/${title.toLowerCase().replace(/\s+/g, '-')}`,
-        image: '/placeholder-logo.png',
+  image: '/logotype.png',
         type: 'blog',
         actions: [
           {
             action: 'read',
             title: 'Read Now',
-            icon: '/lightlogo.png'
+            icon: '/logotype.png'
           }
         ]
       }),

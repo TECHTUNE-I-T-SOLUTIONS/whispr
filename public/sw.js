@@ -36,9 +36,9 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification from Whispr',
-    icon: '/lightlogo.png',
-    badge: '/lightlogo.png',
-    image: data.image || '/placeholder-logo.png',
+  icon: '/logotype.png',
+  badge: '/logotype.png',
+  image: data.image || '/logotype.png',
     tag: data.tag || 'whispr-notification',
     requireInteraction: data.requireInteraction || false,
     silent: data.silent || false,
@@ -50,7 +50,7 @@ self.addEventListener('push', (event) => {
       {
         action: 'view',
         title: 'View',
-        icon: '/lightlogo.png'
+        icon: '/logotype.png'
       },
       {
         action: 'dismiss',

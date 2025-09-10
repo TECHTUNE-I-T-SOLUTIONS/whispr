@@ -25,13 +25,13 @@ export async function POST(request: NextRequest) {
         title: `New ${contentType}: ${title}`,
         body: description ? `${description.substring(0, 100)}...` : `New spoken word content available`,
         url: url || `/media`,
-        image: '/placeholder-logo.png',
+  image: '/logotype.png',
         type: 'spoken-word',
         actions: [
           {
             action: 'listen',
             title: type === 'audio' ? 'Listen Now' : 'Watch Now',
-            icon: '/lightlogo.png'
+            icon: '/logotype.png'
           }
         ]
       }),

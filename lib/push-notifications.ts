@@ -53,13 +53,13 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
       title: notificationData.title,
       body: notificationData.body,
       url: notificationData.url,
-      image: notificationData.image || '/placeholder-logo.png',
+  image: notificationData.image || '/logotype.png',
       type: notificationData.type,
       actions: notificationData.actions || [
         {
           action: 'view',
           title: 'View',
-          icon: '/lightlogo.png'
+          icon: '/logotype.png'
         },
         {
           action: 'dismiss',
@@ -143,15 +143,16 @@ export async function sendWelcomeNotification(endpoint: string, keys: { p256dh: 
     );
 
     const payload = {
-      title: 'Welcome to Whispr! 🎉',
-      body: 'Thanks for subscribing! You\'ll now receive notifications about new blog posts, poems, and spoken words.',
+      title: 'A soft hello from Whispr',
+      body: `You have joined the hush — gentle ripples of poems, posts, and spoken words will find you.`,
       url: '/',
+      image: '/logotype.png',
       type: 'welcome',
       actions: [
         {
           action: 'explore',
           title: 'Explore',
-          icon: '/lightlogo.png'
+          icon: '/logotype.png'
         }
       ]
     };

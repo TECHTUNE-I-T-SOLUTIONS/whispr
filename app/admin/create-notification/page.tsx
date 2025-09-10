@@ -28,7 +28,7 @@ interface NotificationData {
 }
 
 export default function CreateNotificationPage() {
-  const DEFAULT_ICON = '/placeholder-logo.png'
+  const DEFAULT_ICON = '/logotype.png'
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const iconFileInputRef = useRef<HTMLInputElement | null>(null)

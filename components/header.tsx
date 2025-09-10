@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -15,9 +15,30 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     setHasMounted(true)
+  }, [])
+
+  // Determine if admin is logged in (server session endpoint)
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/session')
+        if (!mounted) return
+        if (!res.ok) return
+        const data = await res.json()
+        if (mounted) setIsAdmin(Boolean(data?.authenticated))
+      } catch (err) {
+        // ignore
+      }
+    })()
+
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const navigation = [
@@ -81,6 +102,14 @@ export function Header() {
 
         <div className="flex items-center space-x-4">
           <ThemeToggle />
+
+          {/* Quick dashboard shortcut for logged-in admin when browsing public pages */}
+          {isAdmin && !pathname?.startsWith('/admin') && (
+            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
+          )}
 
           {/* Mobile Menu Button */}
           <Button

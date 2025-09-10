@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           body: excerpt || `Check out this new ${postType} by ${admin.full_name || admin.username || 'Whispr'}`,
           url: `/${type}/${data.id}`,
           type: type as 'blog' | 'poem',
-          image: data.media_files?.[0]?.file_url || '/placeholder-logo.png'
+          image: data.media_files?.[0]?.file_url || '/logotype.png'
         });
       } catch (pushError) {
         console.error("Error sending push notification:", pushError);

@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
         title: `New Poem: ${title}`,
         body: excerpt ? `${excerpt.substring(0, 100)}...` : `A new poem by ${author || 'Anonymous'}`,
         url: url || `/poems/${title.toLowerCase().replace(/\s+/g, '-')}`,
-        image: '/placeholder-logo.png',
+  image: '/logotype.png',
         type: 'poem',
         actions: [
           {
             action: 'read',
             title: 'Read Poem',
-            icon: '/lightlogo.png'
+            icon: '/logotype.png'
           }
         ]
       }),

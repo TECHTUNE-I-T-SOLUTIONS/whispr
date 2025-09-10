@@ -63,13 +63,13 @@ export async function POST(request: NextRequest) {
       title,
       body,
       url: url || '/',
-      image: image || '/placeholder-logo.png',
+  image: image || '/logotype.png',
       type: type || 'general',
       actions: actions || [
         {
           action: 'view',
           title: 'View',
-          icon: '/lightlogo.png'
+          icon: '/logotype.png'
         },
         {
           action: 'dismiss',

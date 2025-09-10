@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           body: notificationBody,
           url: url,
           type: type,
-          image: '/lightlogo.png'
+          image: '/logotype.png'
         }),
       });
 

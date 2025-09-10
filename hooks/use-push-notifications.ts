@@ -243,14 +243,14 @@ export function usePushNotifications(): PushNotificationHook {
         },
         body: JSON.stringify({
           title: 'Welcome to Whispr! 🎉',
-          body: 'Thanks for subscribing! You\'ll now receive notifications about new content.',
+        body: `You have joined the hush — gentle ripples of poems, posts, and spoken words will find you.`,
           url: '/',
           type: 'welcome',
           actions: [
             {
               action: 'explore',
               title: 'Explore',
-              icon: '/lightlogo.png'
+              icon: '/logotype.png'
             }
           ]
         }),

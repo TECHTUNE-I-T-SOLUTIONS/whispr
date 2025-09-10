@@ -11,24 +11,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send welcome notification to specific user
-    const pushResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/push/send`, {
+  // Send welcome notification to specific user
+  const pushResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/push/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        title: 'Welcome to Whispr! 🎉',
-        body: 'Thanks for subscribing! You\'ll now receive notifications about new content, poems, and updates.',
+    title: 'A soft hello from Whispr',
+    body: `You have joined the hush — gentle ripples of poems, posts, and spoken words will find you.`,
         url: '/',
         type: 'welcome',
-        image: '/lightlogo.png',
+    image: '/logotype.png',
         targetUsers: [], // Empty array means send to all, but we'll filter by endpoint
         actions: [
           {
             action: 'explore',
             title: 'Explore',
-            icon: '/lightlogo.png'
+      icon: '/logotype.png'
           },
           {
             action: 'dismiss',

@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         body: description || `Check out this new ${contentType} spoken word content`,
         url: `/admin/spoken-words`,
         type: 'spoken_word',
-        image: spokenWord.media_file?.file_url || '/placeholder-logo.png'
+  image: spokenWord.media_file?.file_url || '/logotype.png'
       });
     } catch (pushError) {
       console.error("Error sending push notification:", pushError);
