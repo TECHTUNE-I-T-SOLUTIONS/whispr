@@ -27,10 +27,14 @@ export function LoginForm() {
 
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(false)
 
   useEffect(() => {
     setHasMounted(true)
   }, [])
+
+  // No automatic session auto-login from the login page to avoid extra
+  // session checks; the manual login flow will call `refreshSession`.
 
   const logoSrc = hasMounted
     ? theme === "dark"
@@ -78,19 +82,12 @@ export function LoginForm() {
         // Show dashboard loader
         setShowDashboardLoader(true)
 
-        // Refresh session and wait for authentication to be established
-        await refreshSession()
+        // Refresh session and use the boolean result it returns to avoid
+        // relying on a possibly-stale `isAuthenticated` closure value.
+        const authenticated = await refreshSession({ timeoutMs: 5000 })
+        console.log("Authentication result from refreshSession:", authenticated)
 
-        // Wait for authentication state to update
-        let attempts = 0
-        while (!isAuthenticated && attempts < 10) {
-          console.log(`Waiting for authentication... attempt ${attempts + 1}`)
-          await new Promise(resolve => setTimeout(resolve, 100))
-          attempts++
-        }
-
-        console.log("Authentication state:", isAuthenticated)
-        if (isAuthenticated) {
+        if (authenticated) {
           console.log("Authentication confirmed, navigating to dashboard")
           // Keep loader visible for a moment before redirecting
           setTimeout(() => {
@@ -129,7 +126,7 @@ export function LoginForm() {
 
   return (
     <>
-      {showDashboardLoader && (
+  {(showDashboardLoader || checkingSession) && (
         <DashboardLoader
           onComplete={() => {
             // This will be called when the loader animation completes
@@ -197,7 +194,7 @@ export function LoginForm() {
           </div>
 
           {error && (
-            <Alert variant="destructive" className="animate-slide-up">
+            <Alert variant="destructive" className="animate-slide-up text-black dark:text-white">
               {accountLocked && <AlertTriangle className="h-4 w-4" />}
               <AlertDescription>{error}</AlertDescription>
             </Alert>
