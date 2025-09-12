@@ -8,11 +8,18 @@ export async function GET(request: NextRequest) {
     const { admin } = await requireAuthFromRequest(request)
     const supabase = createSupabaseServer()
 
-    const { data, error } = await supabase
+    // select posts and include creator/admin data for display in admin UI
+    // use explicit select to join admin fields: admin(id, username, full_name, avatar_url)
+    let query = supabase
       .from("posts")
-      .select("*")
-      .eq("admin_id", admin.id)
-      .order("created_at", { ascending: false })
+      .select("*, admin:admin_id(id, username, full_name, avatar_url)")
+
+    // Allow the special admin to see all posts
+    if (admin.id !== '8ac41ab5-c544-4068-a628-426593a2d4e2') {
+      query = query.eq("admin_id", admin.id)
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false })
 
     if (error) {
       console.error("Database error:", error)

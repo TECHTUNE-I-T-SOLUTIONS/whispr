@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import InitialsAvatar from "@/components/initials-avatar"
 import { formatDate } from "@/lib/utils"
 import { MessageCircle, Send, Heart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -38,6 +39,7 @@ export function Comments({ postId }: CommentsProps) {
     content: "",
     author_name: "",
     author_email: "",
+  author_website: "",
   })
   const { toast } = useToast()
   const { cachedData, saveCommentData } = useCommentCache()
@@ -96,16 +98,26 @@ export function Comments({ postId }: CommentsProps) {
       })
 
       if (response.ok) {
+        const json = await response.json()
+        const created = json.comments || json.comment || json
         toast({
           title: "Success",
-          description: "Comment submitted! It will appear after approval.",
+          description: "Comment submitted!",
         })
         // Save comment data to cache
         saveCommentData({
           name: formData.author_name,
           email: formData.author_email
         })
-        setFormData({ content: "", author_name: "", author_email: "" })
+        // Optimistically add the created comment to the list if returned
+        if (created && created.id) {
+          setComments((prev) => [...prev, created])
+        } else {
+          // fallback: refetch
+          fetchComments()
+        }
+
+        setFormData({ content: "", author_name: "", author_email: "", author_website: "" })
         setShowForm(false)
       } else {
         throw new Error("Failed to submit comment")
@@ -185,6 +197,11 @@ export function Comments({ postId }: CommentsProps) {
                   onChange={(e) => setFormData((prev) => ({ ...prev, author_email: e.target.value }))}
                   required
                 />
+              <Input
+                placeholder="Your website (optional)"
+                value={formData.author_website}
+                onChange={(e) => setFormData((prev) => ({ ...prev, author_website: e.target.value }))}
+              />
               </div>
               <Textarea
                 placeholder="Write your comment..."
@@ -224,10 +241,7 @@ export function Comments({ postId }: CommentsProps) {
               <CardContent className="pt-6 space-y-4">
                 {/* User Comment */}
                 <div className="flex space-x-4">
-                  <Avatar>
-                    <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback>{getInitials(comment.author_name)}</AvatarFallback>
-                  </Avatar>
+                  <InitialsAvatar name={comment.author_name} src={null} size="md" />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
                       <div>

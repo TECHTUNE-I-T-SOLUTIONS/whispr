@@ -22,7 +22,6 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LogoutModal } from "@/components/admin/logout-modal"
 import { Badge } from "@/components/ui/badge"
-import QuickCompose from '@/components/admin/quick-compose'
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -109,8 +108,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
                   <Badge className="ml-2">{messagesUnread}</Badge>
                 )}
               </Link>
-              {/* removed 'All' per request */}
-              <QuickCompose />
+              {/* QuickCompose removed from desktop header per request */}
             </div>
             <Tooltip>
               <TooltipTrigger asChild>

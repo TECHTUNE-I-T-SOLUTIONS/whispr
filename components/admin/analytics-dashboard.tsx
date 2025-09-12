@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BarChart3, TrendingUp, Eye, Heart, MessageCircle, Calendar, Clock } from "lucide-react"
+import { BarChart3, TrendingUp, Eye, Heart, MessageCircle, Calendar, Clock, Share2 } from "lucide-react"
 import {
   LineChart,
   Line,
@@ -45,6 +45,24 @@ export function AnalyticsDashboard() {
   useEffect(() => {
     fetchAnalytics()
   }, [timeRange])
+
+  useEffect(() => {
+    fetchShares()
+  }, [timeRange])
+
+  const [sharesData, setSharesData] = useState<any | null>(null)
+
+  const fetchShares = async () => {
+    try {
+      const res = await fetch(`/api/admin/shares?range=${timeRange}`)
+      if (res.ok) {
+        const j = await res.json()
+        setSharesData(j)
+      }
+    } catch (e) {
+      console.error('Failed to fetch shares', e)
+    }
+  }
 
   const fetchAnalytics = async () => {
     try {
@@ -122,6 +140,14 @@ export function AnalyticsDashboard() {
       growth: 0,
       color: "text-purple-600",
       bgColor: "bg-purple-50 dark:bg-purple-900/20",
+    },
+    {
+      title: "Total Shares",
+      value: (sharesData?.totalShares || 0).toLocaleString(),
+      icon: Share2,
+      growth: 0,
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
     },
   ]
 
@@ -205,6 +231,35 @@ export function AnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{analytics.overview.totalWallReactions?.toLocaleString() || 0}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Shares Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-0 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Shares</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{(sharesData?.totalShares || 0).toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground">Total shares in the selected range</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 bg-card/50 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Top Recent Shares</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {(sharesData?.topReferrers || []).slice(0, 10).map((r: any, i: number) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="text-sm">{r.user_agent ? (r.user_agent.substring(0, 60) + (r.user_agent.length>60? '...':'')) : 'Unknown'}</div>
+                  <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString?.() || ''}</div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

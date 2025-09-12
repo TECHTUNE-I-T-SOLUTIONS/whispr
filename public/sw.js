@@ -118,6 +118,23 @@ self.addEventListener('sync', (event) => {
   }
 });
 
+// Listen for messages from clients (e.g., thank-you-share)
+self.addEventListener('message', (event) => {
+  try {
+    const data = event.data
+    if (!data || data.type !== 'thank-you-share') return
+    const payload = data.payload || {}
+    const title = payload.title || 'Thanks!'
+    const options = {
+      body: payload.message || 'Thanks for sharing Whispr!',
+      icon: '/logotype.png',
+      tag: 'whispr-thank-you',
+      data: { url: '/' }
+    }
+    self.registration.showNotification(title, options).catch(()=>{})
+  } catch (e) {}
+})
+
 async function doBackgroundSync() {
   // Handle any background sync tasks here
   console.log('Performing background sync...');

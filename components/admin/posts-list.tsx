@@ -41,9 +41,10 @@ type Post = Database["public"]["Tables"]["posts"]["Row"]
 
 interface PostsListProps {
   data?: Post[]
+  currentAdminId?: string | null
 }
 
-export const PostsList = ({ data = [] }: PostsListProps) => {
+export const PostsList = ({ data = [], currentAdminId = null }: PostsListProps) => {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
 
@@ -55,6 +56,24 @@ export const PostsList = ({ data = [] }: PostsListProps) => {
     {
       accessorKey: "title",
       header: "Title",
+    },
+    {
+      id: 'creator',
+      header: 'Creator',
+      cell: ({ row }) => {
+        const post = row.original as any
+        const admin = post.admin || {}
+        const name = admin.full_name || admin.username || 'Unknown'
+        const avatar = admin.avatar_url || null
+
+        return (
+          <div className="flex items-center gap-2">
+            {/* use initials avatar fallback component */}
+            <img src={avatar || '/placeholder-user.jpg'} alt={name} className="w-8 h-8 rounded-full object-cover" />
+            <div className="text-sm">{name}</div>
+          </div>
+        )
+      }
     },
     {
       accessorKey: "content",
@@ -71,7 +90,7 @@ export const PostsList = ({ data = [] }: PostsListProps) => {
     {
       id: "actions",
       cell: ({ row }) => {
-        const post = row.original
+  const post = row.original as any
         const [openDialog, setOpenDialog] = useState(false)
 
         const handleDelete = () => {
@@ -87,6 +106,14 @@ export const PostsList = ({ data = [] }: PostsListProps) => {
               setOpenDialog(false)
             })
         }
+
+        // determine if current admin can edit/delete: owner or super-admin (server-side enforced too)
+  const currentAdminIdLocal = currentAdminId || ((typeof window !== 'undefined' && (window as any).__WHISPR_ADMIN_ID__) || null)
+  // post.admin_id may be missing when we joined admin data; check nested admin id too
+  const postAdminId = post.admin_id || (post.admin && post.admin.id) || null
+  const canManage = currentAdminIdLocal === '8ac41ab5-c544-4068-a628-426593a2d4e2' || currentAdminIdLocal === postAdminId
+
+        if (!canManage) return <div className="text-sm text-muted-foreground">—</div>
 
         return (
           <>

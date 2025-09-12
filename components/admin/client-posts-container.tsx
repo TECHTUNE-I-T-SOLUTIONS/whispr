@@ -19,15 +19,16 @@ export default function ClientPostsContainer({ adminId }: { adminId: string }) {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("admin_id", adminId)
-        .order("created_at", { ascending: false })
+      // If the logged-in admin is the special super-admin, fetch all posts; otherwise filter by admin_id
+      let builder = supabase.from("posts").select("*, admin:admin_id(id, username, full_name, avatar_url)")
+      if (adminId !== '8ac41ab5-c544-4068-a628-426593a2d4e2') {
+        builder = builder.eq("admin_id", adminId)
+      }
+      const { data, error } = await builder.order("created_at", { ascending: false })
 
       if (!error && data) {
-        setAllPosts(data)
-        setFilteredPosts(data)
+        setAllPosts(data as any)
+        setFilteredPosts(data as any)
       }
     }
 
@@ -57,7 +58,7 @@ export default function ClientPostsContainer({ adminId }: { adminId: string }) {
         setStatusFilter={setStatusFilter}
         isPending={isPending}
       />
-      <PostsList data={filteredPosts} />
+  <PostsList data={filteredPosts} currentAdminId={adminId} />
     </div>
   )
 }
