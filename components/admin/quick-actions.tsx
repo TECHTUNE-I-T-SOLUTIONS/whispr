@@ -53,6 +53,15 @@ export function QuickActions() {
       hoverColor: "hover:bg-red-100 dark:hover:bg-red-900/30",
     },
     {
+      title: "Feedback",
+      description: "View user feedback",
+      icon: MessageCircle,
+      href: "/admin/feedback",
+      color: "text-teal-600",
+      bgColor: "bg-teal-50 dark:bg-teal-900/20",
+      hoverColor: "hover:bg-teal-100 dark:hover:bg-teal-900/30",
+    },
+    {
       title: "Analytics",
       description: "View detailed stats",
       icon: BarChart3,

@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
-  MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart,
+  MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart, MessageCircle,
   FileText, BarChart3, Bell
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -63,6 +63,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
+  { name: "Feedback", href: "/admin/feedback", icon: MessageCircle },
   ]
 
   return (

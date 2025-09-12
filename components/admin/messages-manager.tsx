@@ -353,6 +353,15 @@ export function MessagesManager({
       } catch (e) {
         // ignore broadcast failures
       }
+
+      // also broadcast to global channel for conversation list updates on other clients
+      try {
+        await supabase
+          .channel('public:messages:all')
+          .send({ type: 'broadcast', event: 'message', payload: data.message })
+      } catch (e) {
+        // ignore broadcast failures
+      }
       setText("")
     } catch (err) {
       toast({ variant: "destructive", title: "Error", description: "Failed to send message" })

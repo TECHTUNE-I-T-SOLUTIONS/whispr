@@ -1,25 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useEffect, useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Bell, Check, Settings, MessageCircle, Heart, Eye, Trash2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { Bell, Check, Trash2, MessageCircle, Heart, Eye } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-type NotificationType = 
-  | "comment" 
-  | "reaction" 
-  | "milestone" 
-  | "system"
-  | "wall_comment"
-  | "wall_reaction"
-  | "whispr_wall";
+type NotificationType = "comment" | "reaction" | "milestone" | "system" | "wall_comment" | "wall_reaction" | "whispr_wall"
 
 interface Notification {
   id: string
@@ -28,355 +17,173 @@ interface Notification {
   message: string
   read: boolean
   created_at: string
-  metadata?: any
 }
-interface NotificationSettings {
-  emailNotifications: boolean
-  commentNotifications: boolean
-  reactionNotifications: boolean
-  milestoneNotifications: boolean
-  systemNotifications: boolean
+
+// helper: return a small icon for the notification type
+function getNotificationIcon(type: NotificationType) {
+  switch (type) {
+    case "comment":
+    case "wall_comment":
+      return <MessageCircle className="h-5 w-5 text-green-600" />
+    case "reaction":
+    case "wall_reaction":
+      return <Heart className="h-5 w-5 text-red-600" />
+    case "milestone":
+      return <Eye className="h-5 w-5 text-purple-600" />
+    case "system":
+    case "whispr_wall":
+      return <Bell className="h-5 w-5 text-blue-600" />
+    default:
+      return <Bell className="h-5 w-5 text-muted-foreground" />
+  }
+}
+
+// helper: return a background class for the icon container
+function getNotificationBg(type: NotificationType) {
+  switch (type) {
+    case "comment":
+    case "wall_comment":
+      return "bg-green-50"
+    case "reaction":
+    case "wall_reaction":
+      return "bg-red-50"
+    case "milestone":
+      return "bg-purple-50"
+    case "system":
+    case "whispr_wall":
+      return "bg-blue-50"
+    default:
+      return "bg-muted/10"
+  }
 }
 
 export function NotificationsCenter() {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [settings, setSettings] = useState<NotificationSettings>({
-    emailNotifications: true,
-    commentNotifications: true,
-    reactionNotifications: true,
-    milestoneNotifications: true,
-    systemNotifications: true,
-  })
   const [isLoading, setIsLoading] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
-  const [search, setSearch] = useState("")
-  const [sort, setSort] = useState("newest")
-  const [typeFilter, setTypeFilter] = useState("all")
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [page, setPage] = useState(1)
   const pageSize = 10
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchNotifications()
-    fetchSettings()
-  }, [])
-
   const fetchNotifications = async () => {
+    setIsRefreshing(true)
     try {
-      const response = await fetch("/api/admin/notifications")
-      if (response.ok) {
-        const data = await response.json()
-        setNotifications(data)
+      const res = await fetch("/api/admin/notifications", { cache: "no-store" })
+      if (res.ok) {
+  const data = await res.json()
+  setNotifications(data)
+  setPage(1)
+  return data
       }
-    } catch (error) {
-      console.error("Error fetching notifications:", error)
+    } catch (e) {
+      console.error(e)
     } finally {
       setIsLoading(false)
+      setIsRefreshing(false)
+    }
+    return []
+  }
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      if (!mounted) return
+      await fetchNotifications()
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const markAsRead = async (id: string) => {
+    try {
+      await fetch(`/api/admin/notifications/${id}`, { method: "PATCH" })
+      // refresh from server to keep counts accurate
+      await fetchNotifications()
+    } catch (e) {
+      console.error(e)
+      toast({ title: "Failed to mark as read" })
     }
   }
 
-  const fetchSettings = async () => {
+  const deleteNotification = async (id: string) => {
     try {
-      const response = await fetch("/api/admin/notifications/settings")
-      if (response.ok) {
-        const data = await response.json()
-        setSettings(data)
-      }
-    } catch (error) {
-      console.error("Error fetching settings:", error)
-    }
-  }
-
-  const markAsRead = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/admin/notifications/${notificationId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ read: true }),
-      })
-
-      if (response.ok) {
-        setNotifications(notifications.map((n) => (n.id === notificationId ? { ...n, read: true } : n)))
-      }
-    } catch (error) {
-      console.error("Error marking notification as read:", error)
+      await fetch(`/api/admin/notifications/${id}`, { method: "DELETE" })
+      // refresh to ensure unread counts and list correctness
+      await fetchNotifications()
+      toast({ title: "Notification deleted" })
+    } catch (e) {
+      console.error(e)
+      toast({ title: "Failed to delete notification" })
     }
   }
 
   const markAllAsRead = async () => {
+    if (notifications.filter((n) => !n.read).length === 0) return
     try {
-      const response = await fetch("/api/admin/notifications/mark-all-read", {
-        method: "POST",
-      })
-
-      if (response.ok) {
-        setNotifications(notifications.map((n) => ({ ...n, read: true })))
-        toast({
-          variant: "success",
-          title: "All notifications marked as read",
-        })
-      }
-    } catch (error) {
-      console.error("Error marking all as read:", error)
-    }
-  }
-
-  const deleteNotification = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/admin/notifications/${notificationId}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        setNotifications(notifications.filter((n) => n.id !== notificationId))
-        toast({
-          variant: "success",
-          title: "Notification deleted",
-        })
-      }
-    } catch (error) {
-      console.error("Error deleting notification:", error)
-    }
-  }
-
-  const updateSettings = async (newSettings: NotificationSettings) => {
-    try {
-      const response = await fetch("/api/admin/notifications/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSettings),
-      })
-
-      if (response.ok) {
-        setSettings(newSettings)
-        toast({
-          variant: "success",
-          title: "Settings updated",
-          description: "Your notification preferences have been saved.",
-        })
-      }
-    } catch (error) {
-      console.error("Error updating settings:", error)
-    }
-  }
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "comment":
-      case "wall_comment":
-        return <MessageCircle className="h-4 w-4 text-green-600" />
-      case "reaction":
-      case "wall_reaction":
-        return <Heart className="h-4 w-4 text-red-600" />
-      case "milestone":
-        return <Eye className="h-4 w-4 text-purple-600" />
-      case "system":
-      case "whispr_wall":
-        return <Bell className="h-4 w-4 text-blue-600" />
-      default:
-        return <Bell className="h-4 w-4 text-muted-foreground" />
-    }
-  }
-
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case "comment":
-      case "wall_comment":
-        return "bg-green-50 dark:bg-green-900/20"
-      case "reaction":
-      case "wall_reaction":
-        return "bg-red-50 dark:bg-red-900/20"
-      case "milestone":
-        return "bg-purple-50 dark:bg-purple-900/20"
-      case "system":
-      case "whispr_wall":
-        return "bg-blue-50 dark:bg-blue-900/20"
-      default:
-        return "bg-muted/50"
+      await fetch(`/api/admin/notifications/mark-all-read`, { method: "POST" })
+      await fetchNotifications()
+      toast({ title: "All notifications marked as read" })
+    } catch (e) {
+      console.error(e)
+      toast({ title: "Failed to mark all as read" })
     }
   }
 
   const unreadCount = notifications.filter((n) => !n.read).length
-
-  const filtered = notifications
-    .filter((n) => (typeFilter === "all" ? true : n.type === typeFilter))
-    .filter((n) => n.title.toLowerCase().includes(search.toLowerCase()) || n.message.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => {
-      if (sort === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      if (sort === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      return 0
-    })
-
-  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
-  const totalPages = Math.ceil(filtered.length / pageSize)
+  const paginated = notifications.slice((page - 1) * pageSize, page * pageSize)
+  const totalPages = Math.max(1, Math.ceil(notifications.length / pageSize))
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
-            <Bell className="h-8 w-8 text-primary" />
-            Notifications
-            {unreadCount > 0 && <Badge className="bg-red-500 text-white">{unreadCount}</Badge>}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Bell /> Notifications {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
           </h1>
-          <p className="text-muted-foreground">Stay updated with your content activity</p>
+          <span className="text-sm text-muted-foreground">{isRefreshing ? 'Refreshing…' : `${notifications.length} total`}</span>
         </div>
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full">
-          <Input
-            placeholder="Search notifications..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full sm:w-48"
-          />
-          
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="comment">Comment</SelectItem>
-              <SelectItem value="reaction">Reaction</SelectItem>
-              <SelectItem value="milestone">Milestone</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-full sm:w-36">
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="oldest">Oldest First</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              onClick={markAllAsRead}
-              className="w-full sm:w-auto"
-            >
-              <Check className="mr-2 h-4 w-4" />
-              Mark all as read
-            </Button>
-          )}
-
-          <Button
-            variant="outline"
-            onClick={() => setShowSettings(!showSettings)}
-            className="w-full sm:w-auto"
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled={unreadCount === 0 || isRefreshing} onClick={markAllAsRead}>
+            <Check className="mr-2 h-4 w-4" /> Mark all as read
           </Button>
         </div>
       </div>
 
-      {showSettings && (
-        <Card className="border-0 bg-card/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Notification Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="email-notifications">Email Notifications</Label>
-                <Switch
-                  id="email-notifications"
-                  checked={settings.emailNotifications}
-                  onCheckedChange={(checked) => updateSettings({ ...settings, emailNotifications: checked })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="comment-notifications">Comment Notifications</Label>
-                <Switch
-                  id="comment-notifications"
-                  checked={settings.commentNotifications}
-                  onCheckedChange={(checked) => updateSettings({ ...settings, commentNotifications: checked })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="reaction-notifications">Reaction Notifications</Label>
-                <Switch
-                  id="reaction-notifications"
-                  checked={settings.reactionNotifications}
-                  onCheckedChange={(checked) => updateSettings({ ...settings, reactionNotifications: checked })}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="milestone-notifications">Milestone Notifications</Label>
-                <Switch
-                  id="milestone-notifications"
-                  checked={settings.milestoneNotifications}
-                  onCheckedChange={(checked) => updateSettings({ ...settings, milestoneNotifications: checked })}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <div className="space-y-4">
-        {paginated.length === 0 ? (
-          <Card className="border-dashed border-2 border-muted-foreground/25">
-            <CardContent className="p-8 text-center">
-              <Bell className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-              <h3 className="text-lg font-semibold mb-2">No notifications</h3>
-              <p className="text-muted-foreground">You're all caught up! New notifications will appear here.</p>
-            </CardContent>
+        {isLoading ? (
+          <Card>
+            <CardContent>Loading...</CardContent>
+          </Card>
+        ) : paginated.length === 0 ? (
+          <Card>
+            <CardContent>No notifications</CardContent>
           </Card>
         ) : (
-          paginated.map((notification, index) => (
-            <Card
-              key={notification.id}
-              className={`animate-slide-up border-0 backdrop-blur transition-colors hover:bg-card/80 ${
-                notification.read ? "bg-card/30" : "bg-card/50 border-l-4 border-l-primary"
-              }`}
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
-                    <div
-                      className={`h-10 w-10 rounded-full ${getNotificationColor(notification.type)} flex items-center justify-center flex-shrink-0`}
-                    >
-                      {getNotificationIcon(notification.type)}
+          paginated.map((n) => (
+            <Card key={n.id} className="overflow-hidden">
+              <CardContent className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-3">
+                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getNotificationBg(n.type)}`}>
+                      {getNotificationIcon(n.type)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3
-                          className={`text-sm font-medium ${notification.read ? "text-muted-foreground" : "text-foreground"}`}
-                        >
-                          {notification.title}
-                        </h3>
-                        {!notification.read && <div className="h-2 w-2 bg-primary rounded-full" />}
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                      </p>
+                    <div className="min-w-0 mt-2">
+                      <div className="font-medium text-sm leading-tight break-words">{n.title}</div>
+                      <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words mb-1 max-w-[60ch]">{n.message}</div>
+                      <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {!notification.read && (
-                      <Button size="sm" variant="ghost" onClick={() => markAsRead(notification.id)}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => deleteNotification(notification.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
+                </div>
+                <div className="flex-shrink-0 flex items-center gap-2 ml-4">
+                  {!n.read && (
+                    <Button variant="ghost" size="icon" className="p-1" onClick={() => markAsRead(n.id)}>
+                      <Check className="h-4 w-4" />
                     </Button>
-                  </div>
+                  )}
+                  <Button variant="ghost" size="icon" className="p-1" onClick={() => deleteNotification(n.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -386,13 +193,13 @@ export function NotificationsCenter() {
 
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
-          <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
+          <Button variant="outline" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
             Previous
           </Button>
           <span className="text-sm text-muted-foreground">
             Page {page} of {totalPages}
           </span>
-          <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+          <Button variant="outline" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
             Next
           </Button>
         </div>

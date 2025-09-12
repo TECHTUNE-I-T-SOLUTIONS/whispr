@@ -28,6 +28,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
   { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
+  { name: "Feedback", href: "/admin/feedback", icon: MessageSquareText },
   // { name: "All", href: "/admin", icon: FileText },
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },

@@ -9,6 +9,7 @@ import { ConditionalLayout } from "@/components/conditional-layout"
 import { FloatingNotificationBell } from "@/components/floating-notification-bell"
 import { FeedbackWidget } from '@/components/feedback-widget'
 import { PushNotificationScript } from "@/components/push-notification-script"
+import { TooltipProvider } from '@/components/ui/tooltip'
 import ErrorCatcher from '@/components/error-catcher'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -46,9 +47,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
           <ErrorCatcher />
           <PushNotificationScript />
-          <ConditionalLayout>{children}</ConditionalLayout>
-          <FloatingNotificationBell />
-          <FeedbackWidget />
+          <TooltipProvider>
+            <ConditionalLayout>{children}</ConditionalLayout>
+            <FloatingNotificationBell />
+            <FeedbackWidget />
+          </TooltipProvider>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -1,10 +1,13 @@
 import React from 'react'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import Link from 'next/link'
+import { requireAuth } from '@/lib/auth'
 
 export const metadata = { title: 'Feedback - Admin' }
 
 export default async function AdminFeedbackPage() {
+  await requireAuth()
+
   const supabase = createSupabaseServer()
   const { data, error } = await supabase.from('feedback').select('*').order('created_at', { ascending: false }).limit(100)
 
