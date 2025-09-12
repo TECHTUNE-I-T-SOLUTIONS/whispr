@@ -11,28 +11,68 @@ export async function GET(request: NextRequest) {
     }
     const supabase = createSupabaseServer()
 
-    const { data: spokenWords, error } = await supabase
-      .from("spoken_words")
-      .select(`
-        *,
-        media_file:media (
-          id,
-          original_name,
-          file_name,
-          file_path,
-          file_url,
-          file_type,
-          file_size
-        )
-      `)
-      .order("created_at", { ascending: false })
+    // Only the CEO should see all spoken words and the creator admin info.
+    const CEO_ID = "8ac41ab5-c544-4068-a628-426593a2d4e2"
+    const isCEO = session.admin?.id === CEO_ID
+
+    let spokenWords: any[] | null = []
+    let error: any = null
+
+    if (isCEO) {
+      // include admin info so the CEO can see who created each item
+      const res = await supabase
+        .from("spoken_words")
+        .select(`
+          *,
+          media_file:media (
+            id,
+            original_name,
+            file_name,
+            file_path,
+            file_url,
+            file_type,
+            file_size
+          ),
+          admin:admin (
+            id,
+            full_name,
+            username,
+            email
+          )
+        `)
+        .order("created_at", { ascending: false })
+
+      spokenWords = res.data
+      error = res.error
+    } else {
+      // regular admins only see items they created
+      const res = await supabase
+        .from("spoken_words")
+        .select(`
+          *,
+          media_file:media (
+            id,
+            original_name,
+            file_name,
+            file_path,
+            file_url,
+            file_type,
+            file_size
+          )
+        `)
+        .eq("admin_id", session.admin.id)
+        .order("created_at", { ascending: false })
+
+      spokenWords = res.data
+      error = res.error
+    }
 
     if (error) {
       console.error("Error fetching spoken words:", error)
       return NextResponse.json({ error: "Failed to fetch spoken words" }, { status: 500 })
     }
 
-    return NextResponse.json({ spokenWords: spokenWords || [] })
+  return NextResponse.json({ spokenWords: spokenWords || [], isCEO })
   } catch (error) {
     console.error("Error in GET /api/admin/spoken-words:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

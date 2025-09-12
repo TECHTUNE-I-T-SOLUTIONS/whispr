@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { endpoint } = await request.json();
+    const { endpoint, admin } = await request.json();
 
     if (!endpoint) {
       return NextResponse.json(
@@ -11,31 +11,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-  // Send welcome notification to specific user
-  const pushResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/push/send`, {
+    // Build payload for regular or admin welcome
+    const payload = admin
+      ? {
+          title: 'Admin notifications enabled',
+          body: `You're subscribed to admin alerts: message notifications, moderation events, and other admin updates.`,
+          url: '/admin/messages',
+          type: 'admin_welcome',
+          image: '/logotype.png',
+          endpoint,
+          actions: [
+            { action: 'open', title: 'Open messages', icon: '/logotype.png' },
+            { action: 'settings', title: 'Notification settings' }
+          ]
+        }
+      : {
+          title: 'A soft hello from Whispr',
+          body: `You have joined the hush — gentle ripples of poems, posts, and spoken words will find you.`,
+          url: '/',
+          type: 'welcome',
+          image: '/logotype.png',
+          endpoint,
+          actions: [
+            { action: 'explore', title: 'Explore', icon: '/logotype.png' },
+            { action: 'dismiss', title: 'Got it!' }
+          ]
+        };
+
+    // Forward to /api/push/send which will target the specific endpoint when endpoint is provided
+    const pushResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/push/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-    title: 'A soft hello from Whispr',
-    body: `You have joined the hush — gentle ripples of poems, posts, and spoken words will find you.`,
-        url: '/',
-        type: 'welcome',
-    image: '/logotype.png',
-        targetUsers: [], // Empty array means send to all, but we'll filter by endpoint
-        actions: [
-          {
-            action: 'explore',
-            title: 'Explore',
-      icon: '/logotype.png'
-          },
-          {
-            action: 'dismiss',
-            title: 'Got it!'
-          }
-        ]
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!pushResponse.ok) {

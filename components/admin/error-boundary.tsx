@@ -35,6 +35,28 @@ class ErrorBoundary extends Component<Props, State> {
     });
   }
 
+  componentDidMount() {
+    // capture uncaught errors and unhandled promise rejections
+    (window as any).__errorBoundaryOnError = (msg: string | Event, url?: string, line?: number, col?: number, err?: Error) => {
+      console.error('window.onerror captured:', msg, err);
+      this.setState({ hasError: true, error: err instanceof Error ? err : new Error(String(msg)) });
+      return false;
+    };
+    (window as any).__errorBoundaryOnUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('unhandledrejection captured:', event.reason);
+      this.setState({ hasError: true, error: event.reason instanceof Error ? event.reason : new Error(String(event.reason)) });
+    };
+    window.addEventListener('error', (window as any).__errorBoundaryOnError as EventListener)
+    window.addEventListener('unhandledrejection', (window as any).__errorBoundaryOnUnhandledRejection as EventListener)
+  }
+
+  componentWillUnmount() {
+    if ((window as any).__errorBoundaryOnError) window.removeEventListener('error', (window as any).__errorBoundaryOnError as EventListener)
+    if ((window as any).__errorBoundaryOnUnhandledRejection) window.removeEventListener('unhandledrejection', (window as any).__errorBoundaryOnUnhandledRejection as EventListener)
+    ;(window as any).__errorBoundaryOnError = undefined
+    ;(window as any).__errorBoundaryOnUnhandledRejection = undefined
+  }
+
   handleRetry = () => {
     this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };

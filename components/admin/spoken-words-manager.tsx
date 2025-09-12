@@ -45,6 +45,12 @@ interface SpokenWord {
   }
   created_at: string
   updated_at: string
+  admin?: {
+    id: string
+    full_name?: string | null
+    username?: string | null
+    email?: string | null
+  }
 }
 
 export function SpokenWordsManager() {
@@ -177,6 +183,9 @@ export function SpokenWordsManager() {
       if (response.ok) {
         const data = await response.json()
         setSpokenWords(data.spokenWords || [])
+        // expose CEO flag for rendering creator info
+        // store on window for simplicity in client component (not reactive)
+        ;(window as any).__WHISPR_IS_CEO = Boolean(data.isCEO)
       } else {
         toast({ variant: "destructive", title: "Error", description: "Failed to fetch spoken words" })
       }
@@ -806,7 +815,14 @@ export function SpokenWordsManager() {
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-lg">{word.title}</h3>
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-medium text-lg">{word.title}</h3>
+                          {typeof (window as any).__WHISPR_IS_CEO !== 'undefined' && (window as any).__WHISPR_IS_CEO && word.admin && (
+                            <Badge variant="outline" className="text-xs">
+                              {word.admin.full_name || word.admin.username || word.admin.email}
+                            </Badge>
+                          )}
+                        </div>
                         <Badge variant={word.type === "audio" ? "default" : "secondary"}>
                           {word.type === "audio" ? <Volume2 className="h-3 w-3 mr-1" /> : <Play className="h-3 w-3 mr-1" />}
                           {word.type}
@@ -906,6 +922,10 @@ export function SpokenWordsManager() {
                       <span className="text-xs text-muted-foreground">
                         {new Date(word.created_at).toLocaleDateString()}
                       </span>
+                      {/* Show creator name for CEO in list view as well */}
+                      {typeof (window as any).__WHISPR_IS_CEO !== 'undefined' && (window as any).__WHISPR_IS_CEO && word.admin && (
+                        <span className="text-xs text-muted-foreground ml-2">by {word.admin.full_name || word.admin.username || word.admin.email}</span>
+                      )}
                     </div>
                   </div>
 

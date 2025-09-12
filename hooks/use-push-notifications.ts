@@ -21,7 +21,7 @@ interface PushNotificationHook {
   sendTestNotification: () => Promise<void>;
 }
 
-export function usePushNotifications(): PushNotificationHook {
+export function usePushNotifications() : PushNotificationHook & { subscribeWithKey?: (key: string)=>Promise<void> } {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
@@ -91,7 +91,7 @@ export function usePushNotifications(): PushNotificationHook {
     }
   };
 
-  const subscribe = async () => {
+  const subscribe = async (applicationServerKeyOverride?: string) => {
     if (!registration) {
       toast({
         variant: "destructive",
@@ -104,6 +104,7 @@ export function usePushNotifications(): PushNotificationHook {
     setIsLoading(true);
 
     try {
+  console.log('subscribe: current registration', registration);
       // Check for existing subscription and unsubscribe if it exists
       const existingSubscription = await registration.pushManager.getSubscription();
       if (existingSubscription) {
@@ -131,10 +132,33 @@ export function usePushNotifications(): PushNotificationHook {
       }
 
       // Subscribe to push notifications
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
-      });
+  // Prefer the main public VAPID key (legacy) so client and server use same credentials
+  const preferredKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.NEXT_PUBLIC_VAPID_REALTIME_PUBLIC_KEY
+      const fallbackKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+      const appKey = applicationServerKeyOverride || preferredKey || fallbackKey!
+      let subscription
+      try {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(appKey)
+        })
+      } catch (subErr) {
+        console.warn('Initial pushManager.subscribe failed, attempting fallback if available', subErr)
+        // Some browsers / servers may fail with specific key; try fallback if different
+        if (preferredKey && fallbackKey && preferredKey !== fallbackKey) {
+          try {
+            subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(fallbackKey)
+            })
+          } catch (subErr2) {
+            console.error('Fallback subscribe also failed', subErr2)
+            throw subErr2
+          }
+        } else {
+          throw subErr
+        }
+      }
 
       // Send subscription to server
       const response = await fetch('/api/push/subscription', {
@@ -161,9 +185,6 @@ export function usePushNotifications(): PushNotificationHook {
           title: "Subscribed!",
           description: "You'll now receive push notifications from Whispr"
         });
-
-        // Send welcome notification
-        await sendWelcomeNotification();
         // Broadcast state change
         try {
           if (bc) bc.postMessage({ isSubscribed: true });
@@ -172,7 +193,20 @@ export function usePushNotifications(): PushNotificationHook {
           // ignore
         }
       } else {
-        throw new Error('Failed to subscribe');
+        // read server response for helpful error information
+        let details: any = null;
+        try {
+          details = await response.json();
+        } catch (ex) {
+          try { details = await response.text(); } catch (_) { details = null; }
+        }
+        console.error('Subscribe failed:', response.status, details);
+        toast({
+          variant: 'destructive',
+          title: 'Subscription Failed',
+          description: details?.error || details?.message || `Server responded ${response.status}`,
+        });
+        throw new Error('Failed to subscribe: ' + (details?.error || JSON.stringify(details)));
       }
     } catch (error) {
       console.error('Subscription failed:', error);
@@ -185,6 +219,10 @@ export function usePushNotifications(): PushNotificationHook {
       setIsLoading(false);
     }
   };
+
+  const subscribeWithKey = async (key: string) => {
+    return subscribe(key)
+  }
 
   const unsubscribe = async () => {
     if (!registration) return;
@@ -294,7 +332,8 @@ export function usePushNotifications(): PushNotificationHook {
     isSubscribed,
     isLoading,
   hasChecked,
-    subscribe,
+  subscribe,
+  subscribeWithKey,
     unsubscribe,
     sendTestNotification
   };

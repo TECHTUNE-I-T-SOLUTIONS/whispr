@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, LayoutDashboard } from "lucide-react"
+import { Menu, X, LayoutDashboard, MessageSquare, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
+import { useToast } from '@/hooks/use-toast'
 
 export function Header() {
   const pathname = usePathname()
@@ -16,6 +17,7 @@ export function Header() {
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     setHasMounted(true)
@@ -101,15 +103,51 @@ export function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <ThemeToggle />
-
-          {/* Quick dashboard shortcut for logged-in admin when browsing public pages */}
-          {isAdmin && !pathname?.startsWith('/admin') && (
-            <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+          {/* Admin dashboard shortcut for logged-in admins */}
+          {hasMounted && isAdmin && (
+            <Link href="/admin/dashboard" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
               <LayoutDashboard className="h-4 w-4" />
-              <span>Dashboard</span>
+              <span className="hidden lg:inline">Dashboard</span>
             </Link>
           )}
+
+          <ThemeToggle />
+
+          {/* Share button: desktop/tablet */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden md:inline-flex items-center gap-2"
+            onClick={async () => {
+              const url = typeof window !== 'undefined' ? window.location.origin : 'https://whispr.example'
+              const shareUrl = url
+              const shareText = "Whispr — bite-sized poems, spoken word, and stories that spark curiosity. Discover something unforgettable."
+              const composed = `${shareText}\n\n${shareUrl}`
+              try {
+                if (navigator.share) {
+                  // Include the composed message in the `text` field and also provide the URL separately.
+                  // Some platforms prefer the `text` payload; embedding the URL in `text` ensures recipients
+                  // receive the full precomposed message even if the target app ignores `text` when `url` is present.
+                  await navigator.share({ title: 'Whispr', text: composed, url: shareUrl })
+                  try { toast({ title: 'Thanks for sharing!', duration: 3000 }) } catch (e) {}
+                  return
+                }
+              } catch (e) {
+                // fallthrough to clipboard fallback
+              }
+
+              // Clipboard fallback: copy the full composed message (text + URL)
+              try {
+                await navigator.clipboard.writeText(composed)
+                try { toast({ title: 'Link copied to clipboard', description: 'You can now paste and share it anywhere.', duration: 3000 }) } catch (e) {}
+              } catch (err) {
+                try { toast({ title: 'Unable to share', description: 'Copy this link manually: ' + shareUrl, duration: 4000 }) } catch (e) {}
+              }
+            }}
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden lg:inline">Share</span>
+          </Button>
 
           {/* Mobile Menu Button */}
           <Button
@@ -145,7 +183,46 @@ export function Header() {
               </Link>
             ))}
             <div className="pt-4 border-t">
-              {/* Mobile-specific content can go here */}
+              {/* Mobile admin quick links */}
+                  {isAdmin && (
+                <div className="space-y-2">
+                  <Link href="/admin/messages" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>
+                    Messages
+                  </Link>
+                  <Link href="/admin/dashboard" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>
+                    Dashboard
+                  </Link>
+                </div>
+              )}
+              <div className="pt-3">
+                <button
+                  onClick={async () => {
+                    setMobileMenuOpen(false)
+                    const url = typeof window !== 'undefined' ? window.location.origin : 'https://whispr.example'
+                    const shareUrl = url
+                    const shareText = "Whispr — bite-sized poems, spoken word, and stories that spark curiosity. Discover something unforgettable."
+                    const composed = `${shareText}\n\n${shareUrl}`
+                    try {
+                      if (navigator.share) {
+                        await navigator.share({ title: 'Whispr', text: composed, url: shareUrl })
+                        try { toast({ title: 'Thanks for sharing!', duration: 3000 }) } catch (e) {}
+                        return
+                      }
+                    } catch (e) {}
+
+                    try {
+                      await navigator.clipboard.writeText(composed)
+                      try { toast({ title: 'Link copied to clipboard', description: 'You can now paste and share it anywhere.', duration: 3000 }) } catch (e) {}
+                    } catch (err) {
+                      try { toast({ title: 'Unable to share', description: 'Copy this link manually: ' + shareUrl, duration: 4000 }) } catch (e) {}
+                    }
+                  }}
+                  className="w-full text-left py-2 text-sm font-medium flex items-center gap-2"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share Whispr
+                </button>
+              </div>
             </div>
           </nav>
         </motion.div>

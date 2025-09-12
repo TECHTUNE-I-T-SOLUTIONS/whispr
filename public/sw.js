@@ -26,42 +26,55 @@ self.addEventListener('activate', (event) => {
 
 // Push event - handle incoming push notifications
 self.addEventListener('push', (event) => {
-  console.log('Push received:', event);
+  try {
+    console.log('Push received');
 
-  let data = {};
+    let data = {};
+    try {
+      if (event.data) data = event.data.json();
+    } catch (e) {
+      // Not JSON or malformed; try text
+      try { data = { body: event.data.text() } } catch (_) { data = {} }
+    }
 
-  if (event.data) {
-    data = event.data.json();
-  }
-
-  const options = {
-    body: data.body || 'You have a new notification from Whispr',
-  icon: '/logotype.png',
-  badge: '/logotype.png',
-  image: data.image || '/logotype.png',
-    tag: data.tag || 'whispr-notification',
-    requireInteraction: data.requireInteraction || false,
-    silent: data.silent || false,
-    data: {
-      url: data.url || '/',
-      type: data.type || 'general'
-    },
-    actions: data.actions || [
-      {
-        action: 'view',
-        title: 'View',
-        icon: '/logotype.png'
+    const options = {
+      body: data.body || 'You have a new notification from Whispr',
+      icon: data.icon || '/logotype.png',
+      badge: data.badge || '/logotype.png',
+      image: data.image || undefined,
+      tag: data.tag || 'whispr-notification',
+      requireInteraction: !!data.requireInteraction,
+      silent: !!data.silent,
+      data: {
+        url: data.url || '/',
+        type: data.type || 'general',
       },
-      {
-        action: 'dismiss',
-        title: 'Dismiss'
-      }
-    ]
-  };
+      actions: Array.isArray(data.actions) ? data.actions : [
+        { action: 'view', title: 'View', icon: '/logotype.png' },
+        { action: 'dismiss', title: 'Dismiss' }
+      ]
+    };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'Whispr', options)
-  );
+    event.waitUntil((async () => {
+      try {
+        await self.registration.showNotification(data.title || 'Whispr', options);
+        // Also notify any open clients (tabs) so they can update UI in realtime
+        try {
+          const allClients = await clients.matchAll({ includeUncontrolled: true, type: 'window' })
+          for (const client of allClients) {
+            try {
+              client.postMessage({ type: 'push', payload: data })
+            } catch (e) {}
+          }
+        } catch (e) {}
+      } catch (showErr) {
+        // showNotification may fail in some contexts; log and swallow
+        console.error('ServiceWorker: showNotification failed', showErr);
+      }
+    })());
+  } catch (err) {
+    console.error('ServiceWorker push handler error', err);
+  }
 });
 
 // Notification click event - handle user interaction

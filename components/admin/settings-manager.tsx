@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Settings, Palette, Bell, Shield, Database, Download } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { PushNotificationManager } from "@/components/push-notification-manager"
-import { PushNotificationTester } from "@/components/push-notification-tester"
 
 interface AppSettings {
   theme: "light" | "dark" | "system"
@@ -62,6 +61,20 @@ export function SettingsManager() {
       })
     }
   }
+
+  // Listen for push subscription changes and persist pushNotifications setting
+  React.useEffect(() => {
+    const handler = (e: any) => {
+      try {
+        const subscribed = e?.detail?.isSubscribed
+        if (typeof subscribed === 'boolean') updateSetting('pushNotifications', subscribed)
+      } catch (e) {
+        // ignore
+      }
+    }
+    window.addEventListener('push:subscription-changed', handler as EventListener)
+    return () => window.removeEventListener('push:subscription-changed', handler as EventListener)
+  }, [])
 
   const exportData = async () => {
     setIsLoading(true)
@@ -156,18 +169,9 @@ export function SettingsManager() {
                 onCheckedChange={(checked) => updateSetting("emailNotifications", checked)}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="push-notifications">Push notifications</Label>
-              <Switch
-                id="push-notifications"
-                checked={settings.pushNotifications}
-                onCheckedChange={(checked) => updateSetting("pushNotifications", checked)}
-              />
-            </div>
-
-            {/* Push Notification Manager */}
+            {/* Push Notification Manager (single source of truth) */}
             <div className="pt-4 border-t">
-              <PushNotificationManager showTestButton={true} />
+              <PushNotificationManager showTestButton={true} useAdminRealtime={true} />
             </div>
           </CardContent>
         </Card>
@@ -250,10 +254,7 @@ export function SettingsManager() {
         </Card>
       </div>
 
-      {/* Push Notification Test */}
-      <div className="mt-8">
-        <PushNotificationTester />
-      </div>
+  {/* removed PushNotificationTester for admin UI per request */}
     </div>
   )
 }

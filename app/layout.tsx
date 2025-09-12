@@ -2,12 +2,13 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Playfair_Display } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeScript } from "@/components/theme-script"
 import { Toaster } from "@/components/ui/toaster"
 import { ConditionalLayout } from "@/components/conditional-layout"
 import { FloatingNotificationBell } from "@/components/floating-notification-bell"
 import { PushNotificationScript } from "@/components/push-notification-script"
+import ErrorCatcher from '@/components/error-catcher'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           storageKey="whispr-theme"
         >
+          <ErrorCatcher />
           <PushNotificationScript />
           <ConditionalLayout>{children}</ConditionalLayout>
           <FloatingNotificationBell />

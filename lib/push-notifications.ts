@@ -17,11 +17,12 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
   try {
     const supabase = createSupabaseServer();
 
-    // Get all active subscriptions
+    // Get all active non-admin subscriptions (regular users)
     const { data: subscriptions, error } = await supabase
       .from('push_subscriptions')
       .select('*')
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .or('is_admin.is.null,is_admin.eq.false')
 
     if (error) {
       console.error('Error fetching subscriptions:', error);
@@ -32,7 +33,7 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
       return { success: true, message: 'No active subscriptions found', sent: 0 };
     }
 
-    // Send push notifications using web-push
+  // Send push notifications using web-push
     const webpush = (await import('web-push')).default;
 
     // Configure VAPID keys
@@ -47,7 +48,7 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
       return { success: false, error: 'VAPID keys not configured' };
     }
 
-    webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
+  webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
 
     const payload = {
       title: notificationData.title,

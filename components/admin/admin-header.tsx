@@ -22,6 +22,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LogoutModal } from "@/components/admin/logout-modal"
 import { Badge } from "@/components/ui/badge"
+import QuickCompose from '@/components/admin/quick-compose'
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -35,10 +36,11 @@ interface AdminHeaderProps {
     avatar_url?: string
   }
   onToggleMobileMenu: () => void
-  unreadCount: number
+  messagesUnread: number
+  notificationsUnread: number
 }
 
-export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHeaderProps) {
+export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notificationsUnread }: AdminHeaderProps) {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false)
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
@@ -98,6 +100,18 @@ export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHea
 
           {/* Right Controls */}
           <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Admin quick shortcuts */}
+            <div className="hidden md:flex items-center space-x-3">
+              <Link href="/admin/messages" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+                <MessageSquareText className="h-4 w-4" />
+                <span className="hidden lg:inline">Messages</span>
+                {messagesUnread > 0 && (
+                  <Badge className="ml-2">{messagesUnread}</Badge>
+                )}
+              </Link>
+              {/* removed 'All' per request */}
+              <QuickCompose />
+            </div>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button asChild variant="ghost" size="icon">
@@ -124,9 +138,9 @@ export function AdminHeader({ admin, onToggleMobileMenu, unreadCount }: AdminHea
                 <Button asChild variant="ghost" size="icon" className="relative hidden md:flex">
                   <Link href="/admin/notifications">
                     <Bell className="h-4 w-4" />
-                    {unreadCount > 0 && (
+                    {notificationsUnread > 0 && (
                       <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                        {unreadCount}
+                        {notificationsUnread}
                       </Badge>
                     )}
                   </Link>

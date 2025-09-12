@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { getAdminFromRequest } from '@/lib/auth-server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,8 +30,9 @@ export async function POST(request: NextRequest) {
     // Get browser info from user agent
     const browserInfo = parseUserAgent(userAgent);
 
-    // Generate user_id from IP address (since users don't sign up)
-    const userId = generateUserIdFromIp(ipAddress);
+  // Try to identify admin user from request (admin subscriptions should be linked)
+  const session = await getAdminFromRequest(request)
+  const userId = session?.admin?.id || generateUserIdFromIp(ipAddress);
 
     // Check if subscription already exists
     const { data: existingSubscription } = await supabase
@@ -69,46 +71,87 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Create new subscription
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .insert({
+        const payload = {
           endpoint: subscription.endpoint,
           p256dh: subscription.keys?.p256dh,
           auth: subscription.keys?.auth,
           user_agent: userAgent,
           ip_address: ipAddress,
           browser_info: browserInfo,
-          user_id: userId
-        });
+          user_id: userId,
+          is_active: true,
+        } as any;
 
-      if (error) {
-        console.error('Error creating subscription:', error);
-        return NextResponse.json(
-          { error: 'Failed to create subscription' },
-          { status: 500 }
-        );
+        // Try simple insert first. If a race causes a duplicate key error, fall back to update by endpoint.
+        try {
+          const { data: inserted, error: insertError } = await supabase
+            .from('push_subscriptions')
+            .insert(payload)
+            .select()
+            .maybeSingle();
+
+          if (insertError) {
+            // handle duplicate key (unique violation) by updating existing row
+            const msg = String(insertError.message || '')
+            if (insertError.code === '23505' || msg.includes('duplicate') || msg.includes('unique')) {
+              const { error: updateErr } = await supabase
+                .from('push_subscriptions')
+                .update(payload)
+                .eq('endpoint', payload.endpoint);
+              if (updateErr) {
+                console.error('Error creating subscription (update fallback failed):', updateErr);
+                return NextResponse.json({ error: 'Failed to create subscription', details: updateErr }, { status: 500 });
+              }
+            } else {
+              console.error('Error creating subscription:', insertError);
+              return NextResponse.json({ error: 'Failed to create subscription', details: insertError }, { status: 500 });
+            }
+          }
+        } catch (e: any) {
+          console.error('Unexpected error creating subscription:', e);
+          return NextResponse.json({ error: 'Failed to create subscription', details: String(e?.message || e) }, { status: 500 });
+        }
+
+      // Send a welcome notification. Use a special admin welcome if this subscription belongs to an admin.
+      try {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+        if (session?.admin?.id) {
+          // Admin-specific welcome: explain they'll receive message/unread/admin alerts
+          await fetch(`${siteUrl}/api/push/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: 'Admin notifications enabled',
+              body: `You're subscribed to admin alerts: message notifications, moderation events, and other admin updates.`,
+              url: '/admin/messages',
+              type: 'admin_welcome',
+              image: '/logotype.png',
+              endpoint: subscription.endpoint,
+              actions: [
+                { action: 'open', title: 'Open messages', icon: '/logotype.png' },
+                { action: 'settings', title: 'Notification settings' }
+              ]
+            })
+          })
+        } else {
+          // Regular welcome
+          await fetch(`${siteUrl}/api/push/welcome`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ endpoint: subscription.endpoint }),
+          });
+        }
+      } catch (welcomeError) {
+        console.error('Error sending welcome notification:', welcomeError);
+        // Don't fail the subscription if welcome notification fails
       }
 
       return NextResponse.json({
         success: true,
         message: 'Subscription created successfully'
       });
-
-      // Send welcome notification
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/push/welcome`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            endpoint: subscription.endpoint
-          }),
-        });
-      } catch (welcomeError) {
-        console.error('Error sending welcome notification:', welcomeError);
-        // Don't fail the subscription if welcome notification fails
-      }
     }
   } catch (error) {
     console.error('Error in push subscription:', error);

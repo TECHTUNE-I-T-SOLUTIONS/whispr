@@ -48,6 +48,23 @@ export async function PUT(request: NextRequest) {
   const body = await request.json()
   const supabase = createSupabaseServer()
 
+  // Normalize keys from camelCase client payload to snake_case DB columns
+  const normalize = (src: any) => {
+    if (!src || typeof src !== 'object') return src
+    return {
+      theme: src.theme,
+      auto_save: src.autoSave ?? src.auto_save,
+      email_notifications: src.emailNotifications ?? src.email_notifications,
+      push_notifications: src.pushNotifications ?? src.push_notifications,
+      two_factor_auth: src.twoFactorAuth ?? src.two_factor_auth,
+      session_timeout: src.sessionTimeout ?? src.session_timeout,
+      backup_frequency: src.backupFrequency ?? src.backup_frequency,
+      analytics_enabled: src.analyticsEnabled ?? src.analytics_enabled,
+    }
+  }
+
+  const payload = normalize(body)
+
   const { data: existing } = await supabase
     .from("settings")
     .select("id")
@@ -59,14 +76,14 @@ export async function PUT(request: NextRequest) {
   if (existing) {
     result = await supabase
       .from("settings")
-      .update({ ...body, updated_at: new Date().toISOString() })
+      .update({ ...payload, updated_at: new Date().toISOString() })
       .eq("admin_id", admin.id)
   } else {
     result = await supabase
       .from("settings")
       .insert({
         admin_id: admin.id,
-        ...body,
+        ...payload,
       })
   }
 

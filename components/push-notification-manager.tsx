@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Bell, BellOff, BellRing, Loader2 } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useToast } from '@/hooks/use-toast';
 
 interface PushNotificationManagerProps {
@@ -15,10 +16,12 @@ interface PushNotificationManagerProps {
 
 export function PushNotificationManager({
   showTestButton = false,
-  compact = false
-}: PushNotificationManagerProps) {
-  const { isSupported, isSubscribed, isLoading, subscribe, unsubscribe, sendTestNotification } = usePushNotifications();
+  compact = false,
+  useAdminRealtime = false
+}: PushNotificationManagerProps & { useAdminRealtime?: boolean }) {
+  const { isSupported, isSubscribed, isLoading, subscribe, unsubscribe, sendTestNotification, subscribeWithKey } = usePushNotifications();
   const { toast } = useToast();
+  const [showGuide, setShowGuide] = useState(false)
 
   if (!isSupported) {
     return (
@@ -84,12 +87,8 @@ export function PushNotificationManager({
           )}
           Push Notifications
         </CardTitle>
-        <CardDescription>
-          Stay updated with the latest content from Whispr
-        </CardDescription>
       </CardHeader>
-
-      <CardContent className="space-y-4">
+  <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-gray-300'}`} />
@@ -114,7 +113,20 @@ export function PushNotificationManager({
         <div className="flex gap-2">
           <Button
             variant={isSubscribed ? "outline" : "default"}
-            onClick={isSubscribed ? unsubscribe : subscribe}
+            onClick={async () => {
+              if (isSubscribed) return unsubscribe()
+              try {
+                if (useAdminRealtime && subscribeWithKey) {
+                  const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.NEXT_PUBLIC_VAPID_REALTIME_PUBLIC_KEY
+                  return await subscribeWithKey(key!)
+                }
+                return await subscribe()
+              } catch (e: any) {
+                // permission denied or blocked
+                setShowGuide(true)
+                toast({ variant: 'destructive', title: 'Subscription blocked', description: 'Push permission was blocked. Please enable notifications in your browser settings.' })
+              }
+            }}
             disabled={isLoading}
             className="flex-1"
           >
@@ -148,6 +160,26 @@ export function PushNotificationManager({
               💡 <strong>Pro tip:</strong> Make sure notifications are enabled in your browser settings for the best experience.
             </p>
           </div>
+        )}
+        {showGuide && (
+          <Dialog open={showGuide} onOpenChange={(o)=>setShowGuide(Boolean(o))}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Enable Notifications</DialogTitle>
+              </DialogHeader>
+              <div className="py-2">
+                <p className="text-sm">It looks like push notifications were blocked. Please allow notifications for this site in your browser settings. Common places to check:</p>
+                <ul className="list-disc ml-5 mt-2 text-sm text-muted-foreground">
+                  <li>Click the lock icon next to the URL and enable Notifications</li>
+                  <li>Open browser Settings → Privacy & security → Site Settings → Notifications</li>
+                  <li>After enabling, try subscribing again here</li>
+                </ul>
+              </div>
+              <DialogFooter>
+                <Button onClick={()=>setShowGuide(false)}>Close</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </CardContent>
     </Card>

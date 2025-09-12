@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useRef, useEffect, useState } from "react"
-import { Bell, Home } from "lucide-react"
+import { Bell, Home, MessageSquareText } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useTheme } from "next-themes"
@@ -13,17 +13,56 @@ interface MobileSidebarProps {
   isOpen: boolean
   onClose: () => void
   navigation: { name: string; href: string; icon: any }[]
-  unreadCount: number
+  notificationsUnread: number
 }
 
-export function MobileSidebar({ isOpen, onClose, navigation, unreadCount }: MobileSidebarProps) {
+export function MobileSidebar({ isOpen, onClose, navigation, notificationsUnread }: MobileSidebarProps) {
   const pathname = usePathname()
   const sidebarRef = useRef(null)
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
+  const [messagesUnread, setMessagesUnread] = useState(0)
 
   useEffect(() => {
     setHasMounted(true)
+    // listen for refreshed counts
+    const handler = (e: any) => {
+      try {
+        const detail = e?.detail || {}
+        if (typeof detail.unread_count === 'number') setMessagesUnread(detail.unread_count)
+      } catch (err) {}
+    }
+    window.addEventListener('conversations:refreshed', handler as EventListener)
+
+    const convReadHandler = (e: any) => {
+      try {
+        const detail = e?.detail || {}
+        const delta = Number(detail.unreadDelta) || 0
+        if (typeof detail.unread_count === 'number') {
+          setMessagesUnread(detail.unread_count)
+        } else if (delta > 0) {
+          setMessagesUnread(prev => Math.max(0, prev - delta))
+        }
+      } catch (err) {}
+    }
+    window.addEventListener('conversation:read', convReadHandler as EventListener)
+
+    const storageHandler = (e: StorageEvent) => {
+      try {
+        if (e.key === 'whispr:conversations:refreshed' && e.newValue) {
+          const payload = JSON.parse(e.newValue)
+          const data = payload.data
+          if (data && typeof data.unread_count === 'number') setMessagesUnread(data.unread_count)
+        }
+      } catch (err) {}
+    }
+    window.addEventListener('storage', storageHandler)
+
+    return () => {
+      try { window.removeEventListener('conversations:refreshed', handler as EventListener) } catch (e) {}
+      try { window.removeEventListener('conversation:read', convReadHandler as EventListener) } catch (e) {}
+      try { window.removeEventListener('storage', storageHandler) } catch (e) {}
+    }
   }, [])
 
   // Close when clicking outside
@@ -94,10 +133,19 @@ export function MobileSidebar({ isOpen, onClose, navigation, unreadCount }: Mobi
           <Link href="/admin/notifications" onClick={onClose} className="flex items-center space-x-2 text-muted-foreground hover:text-primary">
             <Bell className="h-5 w-5" />
             <span>Notifications</span>
-            {unreadCount > 0 && (
-              <Badge className="ml-auto text-xs">{unreadCount}</Badge>
+            {notificationsUnread > 0 && (
+              <Badge className="ml-auto text-xs">{notificationsUnread}</Badge>
             )}
           </Link>
+
+          {/* Messages link with synced unread count */}
+          {/* <Link href="/admin/messages" onClick={onClose} className={`flex items-center space-x-2 text-sm font-medium ${pathname === '/admin/messages' ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}>
+            <MessageSquareText className="h-5 w-5" />
+            <span>Messages</span>
+            {messagesUnread > 0 && (
+              <Badge className="ml-auto text-xs">{messagesUnread}</Badge>
+            )}
+          </Link> */}
 
           <Link href="/" onClick={onClose} className="flex items-center space-x-2 text-muted-foreground hover:text-primary">
             <Home className="h-5 w-5" />

@@ -10,6 +10,31 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Hide scrollbars: desktop only helper */
+  .lg-hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .lg-hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+
+  .animate-fade-slide {
+    animation: fadeSlideIn 320ms ease-out both;
+  }
+  /* small pulse highlight for updated conversation */
+  .conv-updated {
+  animation: convPulse 880ms ease-out both;
+  }
+  /* Safe area helper for mobile bottom inset used by the messages composer */
+  .safe-area-bottom {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .textarea-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 @layer base {
@@ -82,6 +107,51 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(8%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+}
+
+:root {
+  --conv-highlight-color: 99 102 241; /* default: indigo-500 H S L channel for rgba usage */
+  --conv-highlight-style: pulse; /* options: pulse | slide */
+}
+
+@keyframes convPulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--conv-highlight-color), 0.18); }
+  40% { box-shadow: 0 0 0 8px rgba(var(--conv-highlight-color), 0.06); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--conv-highlight-color), 0); }
+}
+
+/* slide-in indicator at the left of the conversation item */
+.conv-updated-slide {
+  position: relative;
+  overflow: visible;
+}
+.conv-updated-slide::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 12px;
+  height: calc(100% - 24px);
+  width: 6px;
+  background-color: rgba(var(--conv-highlight-color), 0.95);
+  transform: translateX(-100%);
+  border-radius: 3px;
+  animation: convSlideIn 680ms cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes convSlideIn {
+  from { transform: translateX(-100%); opacity: 0 }
+  60% { transform: translateX(8%); opacity: 1 }
+  to { transform: translateX(0%); opacity: 1 }
 }
 
 @layer base {
