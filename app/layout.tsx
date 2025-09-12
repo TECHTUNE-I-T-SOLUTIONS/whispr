@@ -7,6 +7,7 @@ import { ThemeScript } from "@/components/theme-script"
 import { Toaster } from "@/components/ui/toaster"
 import { ConditionalLayout } from "@/components/conditional-layout"
 import { FloatingNotificationBell } from "@/components/floating-notification-bell"
+import { FeedbackWidget } from '@/components/feedback-widget'
 import { PushNotificationScript } from "@/components/push-notification-script"
 import ErrorCatcher from '@/components/error-catcher'
 
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <PushNotificationScript />
           <ConditionalLayout>{children}</ConditionalLayout>
           <FloatingNotificationBell />
+          <FeedbackWidget />
           <Toaster />
         </ThemeProvider>
       </body>
