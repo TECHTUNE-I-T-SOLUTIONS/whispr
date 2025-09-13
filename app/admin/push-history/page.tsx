@@ -102,51 +102,51 @@ export default function PushHistoryPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
-            <History className="h-8 w-8 text-primary" />
-            Push Notification History
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold flex items-center gap-2">
+            <History className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <span className="truncate">Push Notification History</span>
           </h1>
-          <p className="text-muted-foreground">View all sent push notifications</p>
+          <p className="text-muted-foreground text-sm sm:text-base">View all sent push notifications</p>
         </div>
-        <Badge variant="secondary" className="text-lg px-3 py-1">
+        <Badge variant="secondary" className="text-sm sm:text-lg px-2 sm:px-3 py-1 w-fit">
           {filteredNotifications.length} notifications
         </Badge>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sent</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Sent</CardTitle>
+            <Bell className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{notifications.length}</div>
+          <CardContent className="p-0">
+            <div className="text-lg sm:text-2xl font-bold">{notifications.length}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Recipients</CardTitle>
-            <Send className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Recipients</CardTitle>
+            <Send className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {notifications.reduce((sum, n) => sum + n.sent_count, 0)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">This Month</CardTitle>
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {notifications.filter(n => {
                 const sentDate = new Date(n.created_at)
                 const now = new Date()
@@ -156,13 +156,13 @@ export default function PushHistoryPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Recipients</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Avg Recipients</CardTitle>
+            <Bell className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {notifications.length > 0
                 ? Math.round(notifications.reduce((sum, n) => sum + n.sent_count, 0) / notifications.length)
                 : 0
@@ -206,7 +206,7 @@ export default function PushHistoryPage() {
         </CardContent>
       </Card>
 
-      {/* Notifications Table */}
+      {/* Notifications - Table for Desktop/Tablet, Cards for Mobile */}
       <Card>
         <CardHeader>
           <CardTitle>Notification History</CardTitle>
@@ -215,51 +215,140 @@ export default function PushHistoryPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Recipients</TableHead>
-                <TableHead>Sent By</TableHead>
-                <TableHead>Sent At</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredNotifications.map((notification) => (
-                <TableRow key={notification.id}>
-                  <TableCell>
-                    <div className="max-w-xs">
-                      <div className="font-medium truncate">{notification.title}</div>
-                      <div className="text-sm text-muted-foreground truncate">
-                        {notification.body}
+          {/* Desktop/Tablet Table View */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Recipients</TableHead>
+                  <TableHead>Sent By</TableHead>
+                  <TableHead>Sent At</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredNotifications.map((notification) => (
+                  <TableRow key={notification.id}>
+                    <TableCell>
+                      <div className="max-w-xs">
+                        <div className="font-medium truncate">{notification.title}</div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {notification.body}
+                        </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getTypeColor(notification.type)}>
+                        {notification.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {notification.sent_count}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {notification.sent_by}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(notification.created_at)}
+                    </TableCell>
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedNotification(notification)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Notification Details</DialogTitle>
+                            <DialogDescription>
+                              Complete details of this push notification
+                            </DialogDescription>
+                          </DialogHeader>
+                          {selectedNotification && (
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-sm font-medium">Title</label>
+                                  <p className="font-medium">{selectedNotification.title}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Type</label>
+                                  <Badge variant={getTypeColor(selectedNotification.type)}>
+                                    {selectedNotification.type}
+                                  </Badge>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Recipients</label>
+                                  <p>{selectedNotification.sent_count}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Sent By</label>
+                                  <p>{selectedNotification.sent_by}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Sent At</label>
+                                  <p>{formatDate(selectedNotification.created_at)}</p>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">URL</label>
+                                  <p className="text-sm break-all">{selectedNotification.url}</p>
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">Body</label>
+                                <p className="text-sm bg-muted p-3 rounded">{selectedNotification.body}</p>
+                              </div>
+                              {selectedNotification.actions && selectedNotification.actions.length > 0 && (
+                                <div>
+                                  <label className="text-sm font-medium">Actions</label>
+                                  <div className="flex gap-2 mt-2">
+                                    {selectedNotification.actions.map((action: any, index: number) => (
+                                      <Badge key={index} variant="outline">
+                                        {action.title}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {filteredNotifications.map((notification) => (
+              <Card key={notification.id} className="p-4">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm truncate">{notification.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-1 truncate">
+                        {notification.body.length > 80 ? `${notification.body.substring(0, 80)}...` : notification.body}
+                      </p>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getTypeColor(notification.type)}>
-                      {notification.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {notification.sent_count}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {notification.sent_by}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {formatDate(notification.created_at)}
-                  </TableCell>
-                  <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedNotification(notification)}
+                          className="ml-2 flex-shrink-0"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -321,11 +410,27 @@ export default function PushHistoryPage() {
                         )}
                       </DialogContent>
                     </Dialog>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getTypeColor(notification.type)} className="text-xs">
+                        {notification.type}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {notification.sent_count} recipients
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{notification.sent_by}</span>
+                    <span>{formatDate(notification.created_at)}</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
 
           {filteredNotifications.length === 0 && (
             <div className="text-center py-8">

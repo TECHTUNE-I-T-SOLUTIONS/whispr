@@ -76,6 +76,10 @@ export default function ConversationsShell({ initialConversations, initialSelect
       const found = prev.find(p => p.id === incoming.id)
       let merged: any[]
       if (found) {
+        // Check if incoming data is newer than existing data to prevent reverting to old state
+        const incomingTime = new Date(incoming.updated_at || incoming.last_message_at || incoming.created_at || 0).getTime()
+        const existingTime = new Date(found.updated_at || found.last_message_at || found.created_at || 0).getTime()
+        if (incomingTime <= existingTime) return prev  // Don't update if incoming is not newer
         merged = prev.map(p => p.id === incoming.id ? { ...p, ...incoming } : p)
       } else {
         merged = [incoming, ...prev]
@@ -164,7 +168,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
           <DialogFooter>
             <Button onClick={async ()=>{
               try {
-                const res = await fetch('/api/admin/conversations', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: conv.id, title }) })
+                const res = await fetch('/api/admin/conversations', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: conv.id, title }), cache: 'no-cache' })
                 if (!res.ok) throw new Error('Failed')
                 const json = await res.json()
                 setConversations(prev => prev.map(p => p.id === conv.id ? { ...p, title: json.conversation?.title ?? title } : p))
@@ -196,7 +200,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
           <DialogFooter>
             <Button onClick={async ()=>{
               try {
-                const res = await fetch('/api/admin/conversations', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: conv.id }) })
+                const res = await fetch('/api/admin/conversations', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: conv.id }), cache: 'no-cache' })
                 if (!res.ok) throw new Error('Failed')
                 setConversations(prev => prev.filter(p => p.id !== conv.id))
                 if (selected === conv.id) {
@@ -220,20 +224,31 @@ export default function ConversationsShell({ initialConversations, initialSelect
     )
   }
 
-  // pick URL param first on mount
-  React.useEffect(()=>{
-    if (typeof window === 'undefined') return
-    const params = new URLSearchParams(window.location.search)
-    const cid = params.get('conversation_id')
-    if (cid) {
-      setSelected(cid)
-      // do not auto-switch to chat on mobile; keep list view on mobile load
-      if (window.innerWidth >= 1024) setMobileView('chat')
-    } else if (initialSelected && window.innerWidth >= 1024 && conversations[0]) {
-      // auto-open on desktop/tablet only
-      setSelected(initialSelected)
+  // Clear potential stale data on mount
+  React.useEffect(() => {
+    try {
+      const keys = Object.keys(localStorage)
+      keys.forEach(key => {
+        if (key.startsWith('whispr:')) {
+          const value = localStorage.getItem(key)
+          if (value) {
+            try {
+              const parsed = JSON.parse(value)
+              const age = Date.now() - (parsed.ts || 0)
+              if (age > 24 * 60 * 60 * 1000) { // Older than 24 hours
+                localStorage.removeItem(key)
+              }
+            } catch (e) {
+              // Clear invalid data
+              localStorage.removeItem(key)
+            }
+          }
+        }
+      })
+    } catch (e) {
+      // Ignore localStorage errors
     }
-  }, [conversations, initialSelected])
+  }, [])
 
   // ensure initial conversations are ordered by newest message (updated_at) on mount / when prop changes
   React.useEffect(() => {
@@ -244,7 +259,30 @@ export default function ConversationsShell({ initialConversations, initialSelect
         const tb = new Date(b.updated_at || b.last_message_at || b.created_at || 0).getTime()
         return tb - ta
       })
-      setConversations(sorted)
+      setConversations((prev) => {
+        if (prev.length === 0) return sorted
+        // merge with existing, keeping newer data to prevent reverting to old state
+        const merged = [...prev]
+        sorted.forEach((incoming) => {
+          const existing = merged.find(p => p.id === incoming.id)
+          if (existing) {
+            const incomingTime = new Date(incoming.updated_at || incoming.last_message_at || incoming.created_at || 0).getTime()
+            const existingTime = new Date(existing.updated_at || existing.last_message_at || existing.created_at || 0).getTime()
+            if (incomingTime > existingTime) {
+              const index = merged.findIndex(p => p.id === incoming.id)
+              merged[index] = incoming
+            }
+          } else {
+            merged.push(incoming)
+          }
+        })
+        merged.sort((a: any, b: any) => {
+          const ta = new Date(a.updated_at || a.created_at || 0).getTime()
+          const tb = new Date(b.updated_at || b.created_at || 0).getTime()
+          return tb - ta
+        })
+        return merged
+      })
     } catch (e) {
       // ignore
     }
@@ -282,12 +320,15 @@ export default function ConversationsShell({ initialConversations, initialSelect
 
         // If the message is from an admin (detail.from_admin true) or just any incoming message,
         // use that message as the last_message_preview so previews show newest message
-        if (incomingMsg) convUpdate.last_message_preview = incomingMsg
+        if (incomingMsg) {
+          const prefix = (detail.sender_id === sessionAdminId) ? 'You: ' : ''
+          convUpdate.last_message_preview = prefix + incomingMsg
+        }
 
         // If this conversation is currently open/selected, do not increment unread
         const shouldIncrement = selected !== cid
 
-        upsertConversation(convUpdate, { incrementUnread: shouldIncrement, incomingMessage: incomingMsg })
+        upsertConversation(convUpdate, { incrementUnread: shouldIncrement, incomingMessage: convUpdate.last_message_preview })
       } catch (err) {
         // ignore
       }
@@ -329,6 +370,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
 
         if (!convId) return
 
+        console.log('Received service worker message for conversation:', convId)
         const preview = data.body || data.data?.body || data.message || data.data?.message || ''
         const createdAt = data.data?.last_message_at || data.data?.created_at || new Date().toISOString()
         const msgDetail: any = {
@@ -361,7 +403,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
           try { window.dispatchEvent(new CustomEvent('conversation:updated', { detail: { conversation: conv } })) } catch (e) {}
         }
       } catch (err) {
-        // swallow
+        console.error('Service worker message error:', err)
       }
     }
 
@@ -373,6 +415,57 @@ export default function ConversationsShell({ initialConversations, initialSelect
       try { window.removeEventListener('message', onSWMessage as EventListener) } catch (e) {}
     }
   }, [selected])
+
+  // Service worker conflict detection and cleanup
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const checkServiceWorkerConflicts = async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.getRegistration()
+          if (registration) {
+            console.log('Service worker detected:', registration.scope)
+
+            // Check if service worker is responding
+            const testMessage = { type: 'ping', timestamp: Date.now() }
+            let responded = false
+
+            const messageHandler = (event: MessageEvent) => {
+              if (event.data?.type === 'pong') {
+                responded = true
+                console.log('Service worker is responsive')
+              }
+            }
+
+            navigator.serviceWorker.addEventListener('message', messageHandler)
+
+            // Send ping and wait for response
+            registration.active?.postMessage(testMessage)
+
+            setTimeout(() => {
+              navigator.serviceWorker.removeEventListener('message', messageHandler)
+              if (!responded) {
+                console.warn('Service worker not responding, may be causing conflicts')
+                // Force unregister if unresponsive
+                registration.unregister().then(() => {
+                  console.log('Unregistered unresponsive service worker')
+                })
+              }
+            }, 2000)
+          }
+        }
+      } catch (e) {
+        console.error('Service worker conflict check failed:', e)
+      }
+    }
+
+    // Check immediately and then periodically
+    checkServiceWorkerConflicts()
+    const interval = setInterval(checkServiceWorkerConflicts, 5 * 60 * 1000) // Check every 5 minutes
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Global realtime subscription: listen to messages inserts across all conversations so the
   // conversation list updates even when a conversation isn't open (mobile list view)
@@ -386,8 +479,15 @@ export default function ConversationsShell({ initialConversations, initialSelect
     let channel: any = null
     let isSubscribed = false
 
-    const createChannel = () => {
+    const createChannel = async () => {
       try {
+        // Check auth before creating subscription
+        const authCheck = await fetch('/api/auth/me', { cache: 'no-cache' })
+        if (!authCheck.ok) {
+          console.error('Auth check failed for global subscription:', authCheck.status)
+          return
+        }
+
         // unsubscribe previous if present
         try { channel?.unsubscribe?.() } catch (e) {}
 
@@ -401,10 +501,15 @@ export default function ConversationsShell({ initialConversations, initialSelect
               const mid = String(newMsg.id || newMsg.message_id || '')
               if (mid && seenMsgIds.has(mid)) return
               if (mid) seenMsgIds.add(mid)
-              const preview = newMsg.content || (newMsg.attachments && newMsg.attachments.length ? (newMsg.attachments[0].file_name || 'attachment') : '')
+              const preview = (newMsg.admin_id === sessionAdminId ? 'You: ' : '') + (newMsg.content || (newMsg.attachments && newMsg.attachments.length ? (newMsg.attachments[0].file_name || 'attachment') : ''))
               const conv = { id: newMsg.conversation_id, last_message_preview: preview, updated_at: newMsg.created_at, last_message_at: newMsg.created_at }
               const shouldIncrement = selected !== newMsg.conversation_id
               upsertConversation(conv, { incrementUnread: shouldIncrement, incomingMessage: preview })
+              // immediate UI update for selected conversation
+              if (selected === newMsg.conversation_id) {
+                // dispatch event to trigger message list update
+                window.dispatchEvent(new CustomEvent('message:received', { detail: { message: newMsg } }))
+              }
             } catch (e) {
               // ignore
             }
@@ -416,15 +521,20 @@ export default function ConversationsShell({ initialConversations, initialSelect
               const mid = String(msg.id || msg.message_id || '')
               if (mid && seenMsgIds.has(mid)) return
               if (mid) seenMsgIds.add(mid)
-              const preview = msg.content || (msg.attachments && msg.attachments.length ? (msg.attachments[0].file_name || 'attachment') : '')
+              const preview = (msg.admin_id === sessionAdminId ? 'You: ' : '') + (msg.content || (msg.attachments && msg.attachments.length ? (msg.attachments[0].file_name || 'attachment') : ''))
               const conv = { id: msg.conversation_id, last_message_preview: preview, updated_at: msg.created_at, last_message_at: msg.created_at }
               const shouldIncrement = selected !== msg.conversation_id
               upsertConversation(conv, { incrementUnread: shouldIncrement, incomingMessage: preview })
+              // immediate UI update for selected conversation
+              if (selected === msg.conversation_id) {
+                // dispatch event to trigger message list update
+                window.dispatchEvent(new CustomEvent('message:received', { detail: { message: msg } }))
+              }
             } catch (e) {}
           })
-          .subscribe()
-
-        isSubscribed = true
+          .subscribe((status) => {
+            console.log('Global messages subscription status:', status)
+          })
       } catch (e) {
         // ignore subscription errors
         isSubscribed = false
@@ -446,17 +556,34 @@ export default function ConversationsShell({ initialConversations, initialSelect
 
     // best-effort monitor: if channel dies, attempt a recreate after backoff
     let attempts = 0
-    const monitor = setInterval(() => {
+    const monitor = setInterval(async () => {
       try {
         const state = channel?.state || null
+        console.log('Global channel monitor check - State:', state)
         if (!state || state !== 'SUBSCRIBED') {
           attempts += 1
           const delay = Math.min(30000, 500 * Math.pow(2, attempts))
-          setTimeout(() => createChannel(), delay)
+          console.warn('Global realtime channel not subscribed, scheduling reconnect', { state, attempt: attempts, delay })
+
+          setTimeout(async () => {
+            try {
+              // Check auth before reconnecting
+              const authCheck = await fetch('/api/auth/me', { cache: 'no-cache' })
+              if (!authCheck.ok) {
+                console.error('Auth failed during global reconnection, aborting')
+                return
+              }
+              createChannel()
+            } catch (e) {
+              console.error('Global resubscribe failed', e)
+            }
+          }, delay)
         } else {
           attempts = 0
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('Global channel monitor error:', e)
+      }
     }, 3000)
 
     return () => {
@@ -562,7 +689,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
       const convObj = conversations.find((c: any) => c.id === id)
       const unreadDelta = convObj?.unread_count || 0
 
-      const res = await fetch('/api/admin/conversations/mark-read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversation_id: id }) })
+      const res = await fetch('/api/admin/conversations/mark-read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversation_id: id }), cache: 'no-cache' })
       if (res && res.ok) {
         // update local conversations list to set unread_count to 0 for the opened conversation
         setConversations(prev => prev.map(p => p.id === id ? { ...p, unread_count: 0 } : p))
@@ -659,7 +786,7 @@ export default function ConversationsShell({ initialConversations, initialSelect
                                 <div className="hidden lg:block" />
                               </div>
                             </div>
-                            <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap">{c.last_message_preview || ''}</div>
+                            <div className="text-xs text-muted-foreground mt-1 break-words whitespace-pre-wrap truncate">{c.last_message_preview ? (c.last_message_preview.length > 50 ? c.last_message_preview.slice(0, 50) + '...' : c.last_message_preview) : ''}</div>
                           </div>
                         </div>
                       </button>

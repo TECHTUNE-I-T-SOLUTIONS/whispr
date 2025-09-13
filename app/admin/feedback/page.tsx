@@ -19,7 +19,7 @@ export default async function AdminFeedbackPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Feedback</h1>
-        <Link href="/admin">Back</Link>
+        <Link href="/admin/dashboard">Back</Link>
       </div>
 
       {data?.length === 0 && <div>No feedback yet.</div>}

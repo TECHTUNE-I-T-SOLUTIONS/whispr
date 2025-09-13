@@ -249,22 +249,22 @@ export default function CreateNotificationPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
-            <Bell className="h-8 w-8 text-primary" />
-            Create Push Notification
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-2">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold flex items-center gap-2">
+            <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <span className="truncate">Create Push Notification</span>
           </h1>
-          <p className="text-muted-foreground">Send notifications to all your subscribers</p>
+          <p className="text-muted-foreground text-sm sm:text-base">Send notifications to all your subscribers</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link href="/admin/push-history">
               <History className="mr-2 h-4 w-4" />
               View History
             </Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link href="/admin/push-subscribers">
               <Eye className="mr-2 h-4 w-4" />
               View Subscribers
@@ -273,7 +273,7 @@ export default function CreateNotificationPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-2">
         {/* Notification Form */}
         <div className="space-y-6">
           <Card>
@@ -346,15 +346,16 @@ export default function CreateNotificationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="icon">Icon URL (optional)</Label>
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                   <Input
                     id="icon"
                     placeholder="https://yoursite.com/icon.png"
                     value={notification.icon || ''}
                     onChange={(e) => setNotification(prev => ({ ...prev, icon: e.target.value }))}
+                    className="flex-1"
                   />
                   <input ref={iconFileInputRef} aria-label="Upload icon" type="file" accept="image/*" onChange={handleIconFileChange} className="hidden" />
-                  <Button variant="outline" onClick={handleTriggerIconUpload} disabled={isUploading}>Upload Icon</Button>
+                  <Button variant="outline" onClick={handleTriggerIconUpload} disabled={isUploading} className="w-full sm:w-auto">Upload Icon</Button>
                 </div>
                 <div className="flex items-center gap-3 mt-2">
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -366,10 +367,10 @@ export default function CreateNotificationPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">Default icon is hardcoded for consistency. You can upload or paste a URL.</p>
                 </div>
-                <div className="mt-2 grid grid-cols-6 gap-2">
+                <div className="mt-2 grid grid-cols-4 sm:grid-cols-6 gap-2">
                   {recentImages.slice(0,12).map(img => (
-                    <button key={img.id} type="button" className="border rounded overflow-hidden" onClick={() => setNotification(prev => ({ ...prev, icon: img.file_url }))}>
-                      <img src={img.file_url} alt={img.original_name} className="h-8 w-8 object-cover" />
+                    <button key={img.id} type="button" className="border rounded overflow-hidden aspect-square" onClick={() => setNotification(prev => ({ ...prev, icon: img.file_url }))}>
+                      <img src={img.file_url} alt={img.original_name} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -377,23 +378,24 @@ export default function CreateNotificationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="image">Image URL (optional)</Label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="image"
                     placeholder="https://yoursite.com/image.jpg"
                     value={notification.image || ''}
                     onChange={(e) => setNotification(prev => ({ ...prev, image: e.target.value }))}
+                    className="flex-1"
                   />
                   <input ref={fileInputRef} aria-label="Upload image" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                  <Button variant="outline" onClick={handleTriggerUpload} disabled={isUploading}>Upload</Button>
+                  <Button variant="outline" onClick={handleTriggerUpload} disabled={isUploading} className="w-full sm:w-auto">Upload</Button>
                 </div>
-                <div className="mt-2 grid grid-cols-4 gap-2">
+                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {isLoadingImages ? (
-                    <div className="text-xs text-muted-foreground col-span-4">Loading recent images...</div>
+                    <div className="text-xs text-muted-foreground col-span-full">Loading recent images...</div>
                   ) : (
                     recentImages.slice(0,8).map(img => (
-                      <button key={img.id} type="button" className="border rounded overflow-hidden" onClick={() => handleSelectImage(img.file_url)}>
-                        <img src={img.file_url} alt={img.original_name} className="h-16 w-16 object-cover" />
+                      <button key={img.id} type="button" className="border rounded overflow-hidden aspect-square" onClick={() => handleSelectImage(img.file_url)}>
+                        <img src={img.file_url} alt={img.original_name} className="w-full h-full object-cover" />
                       </button>
                     ))
                   )}
@@ -432,11 +434,11 @@ export default function CreateNotificationPage() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={handleSendNotification}
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 w-full sm:w-auto"
             >
               {isLoading ? (
                 <>
@@ -454,6 +456,7 @@ export default function CreateNotificationPage() {
               variant="outline"
               onClick={handleSaveDraft}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               <Save className="mr-2 h-4 w-4" />
               Save Draft
@@ -474,30 +477,36 @@ export default function CreateNotificationPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-4">
                 <Button
                   variant={previewDevice === 'mobile' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setPreviewDevice('mobile')}
+                  className="flex-1 sm:flex-none"
                 >
                   <Smartphone className="h-4 w-4 mr-1" />
-                  Mobile
+                  <span className="hidden sm:inline">Mobile</span>
+                  <span className="sm:hidden">Mobile</span>
                 </Button>
                 <Button
                   variant={previewDevice === 'tablet' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setPreviewDevice('tablet')}
+                  className="flex-1 sm:flex-none"
                 >
                   <Tablet className="h-4 w-4 mr-1" />
-                  Tablet
+                  <span className="hidden sm:inline">Tablet</span>
+                  <span className="sm:hidden">Tablet</span>
                 </Button>
                 <Button
                   variant={previewDevice === 'desktop' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setPreviewDevice('desktop')}
+                  className="flex-1 sm:flex-none"
                 >
                   <Monitor className="h-4 w-4 mr-1" />
-                  Desktop
+                  <span className="hidden sm:inline">Desktop</span>
+                  <span className="sm:hidden">Desktop</span>
                 </Button>
               </div>
 
