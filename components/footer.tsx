@@ -93,7 +93,10 @@ export function Footer() {
         {/* Bottom Note */}
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
           <p className="flex items-center justify-center gap-1">
-            Made with <Heart className="h-4 w-4 text-primary" /> for lovers of art and words.
+            Made with <Heart className="h-4 w-4 text-primary" /> for all lovers of art and words.
+          </p>
+          <p className="flex items-center justify-center gap-1">
+            All files, media, poetry, blogs, elements of this website are the property of Whispr or its content creators and are protected by copyright laws. <br />Unauthorized use, reproduction, or distribution of any content from this site is strictly prohibited. Please contact us for permissions. © Whispr. All rights reserved. Do not reproduce or distribute without permission.
           </p>
           <p className="mt-2">
             © {new Date().getFullYear()} Whispr. All rights reserved.
