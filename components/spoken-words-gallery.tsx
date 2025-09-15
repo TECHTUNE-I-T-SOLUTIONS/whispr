@@ -162,38 +162,16 @@ export function SpokenWordsGallery() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {audioFiles.map((file) => (
                 <Card key={file.id} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-lg truncate" title={file.original_name}>
-                        {file.original_name}
-                      </h3>
-                      <Badge variant="outline" className="text-xs">
-                        AUDIO
-                      </Badge>
-                    </div>
-
-                    <MediaPlayer
-                      media={{
-                        ...file,
-                        file_url: getPublicUrl(file.file_path)
-                      }}
-                      showControls={true}
-                      showDownload={true}
-                      className="w-full"
-                    />
-
-                    <div className="space-y-2">
-                      {file.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2" title={file.description}>
-                          {file.description}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{formatFileSize(file.file_size)}</span>
-                        <span>{formatDate(file.created_at)}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <MediaPlayer
+                    media={{
+                      ...file,
+                      file_url: getPublicUrl(file.file_path)
+                    }}
+                    showControls={true}
+                    showDownload={false}
+                    hideMeta={true}
+                    className="w-full"
+                  />
                 </Card>
               ))}
             </div>
@@ -235,38 +213,16 @@ export function SpokenWordsGallery() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {videoFiles.map((file) => (
                 <Card key={file.id} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-lg truncate" title={file.original_name}>
-                        {file.original_name}
-                      </h3>
-                      <Badge variant="outline" className="text-xs">
-                        VIDEO
-                      </Badge>
-                    </div>
-
-                    <MediaPlayer
-                      media={{
-                        ...file,
-                        file_url: getPublicUrl(file.file_path)
-                      }}
-                      showControls={true}
-                      showDownload={true}
-                      className="w-full"
-                    />
-
-                    <div className="space-y-2">
-                      {file.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2" title={file.description}>
-                          {file.description}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{formatFileSize(file.file_size)}</span>
-                        <span>{formatDate(file.created_at)}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <MediaPlayer
+                    media={{
+                      ...file,
+                      file_url: getPublicUrl(file.file_path)
+                    }}
+                    showControls={true}
+                    showDownload={false}
+                    hideMeta={true}
+                    className="w-full"
+                  />
                 </Card>
               ))}
             </div>

@@ -34,6 +34,8 @@ interface MediaPlayerProps {
   showControls?: boolean
   autoPlay?: boolean
   showDownload?: boolean
+  // When true, hide filename, type, size, and any non-essential UI
+  hideMeta?: boolean
 }
 
 export function MediaPlayer({
@@ -41,7 +43,8 @@ export function MediaPlayer({
   className = "",
   showControls = true,
   autoPlay = false,
-  showDownload = true
+  showDownload = true,
+  hideMeta = false
 }: MediaPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
@@ -193,15 +196,16 @@ export function MediaPlayer({
   if (isImage) {
     return (
       <Card className={`overflow-hidden ${className}`}>
-        <div className="relative">
+          <div className="relative" onContextMenu={hideMeta ? (e) => e.preventDefault() : undefined}>
           <SafeImage
             src={media.file_url}
             alt={media.original_name}
             width={800}
             height={600}
             className="w-full h-auto object-cover"
+              draggable={hideMeta ? false : undefined}
           />
-          {showDownload && (
+          {showDownload && !hideMeta && (
             <div className="absolute top-2 right-2">
               <Button
                 size="sm"
@@ -222,13 +226,15 @@ export function MediaPlayer({
             </div>
           )}
         </div>
-        <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">{media.original_name}</h3>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <Badge variant="outline">{media.file_type.split("/")[1].toUpperCase()}</Badge>
-            <span>{formatFileSize(media.file_size)}</span>
+        {!hideMeta && (
+          <div className="p-4">
+            <h3 className="font-medium text-sm mb-2">{media.original_name}</h3>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <Badge variant="outline">{media.file_type.split("/")[1].toUpperCase()}</Badge>
+              <span>{formatFileSize(media.file_size)}</span>
+            </div>
           </div>
-        </div>
+        )}
       </Card>
     )
   }
@@ -256,6 +262,10 @@ export function MediaPlayer({
               controls={showControls}
               muted={!showControls} // Mute by default for previews
               preload="metadata"
+              controlsList={hideMeta ? "nodownload noplaybackrate" : undefined}
+              disablePictureInPicture={hideMeta ? true : undefined}
+              playsInline
+              onContextMenu={hideMeta ? (e) => e.preventDefault() : undefined}
             />
             {!showControls && !isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -287,6 +297,8 @@ export function MediaPlayer({
                 autoPlay={autoPlay}
                 controls={showControls}
                 preload="metadata"
+                controlsList={hideMeta ? "nodownload noplaybackrate" : undefined}
+                onContextMenu={hideMeta ? (e) => e.preventDefault() : undefined}
               />
             </div>
           </div>
@@ -375,7 +387,7 @@ export function MediaPlayer({
               </div>
 
               <div className="flex items-center gap-2">
-                {showDownload && (
+                {showDownload && !hideMeta && (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -410,13 +422,15 @@ export function MediaPlayer({
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="font-medium text-sm mb-2">{media.original_name}</h3>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <Badge variant="outline">{media.file_type.split("/")[0].toUpperCase()}</Badge>
-          <span>{formatFileSize(media.file_size)}</span>
+      {!hideMeta && (
+        <div className="p-4">
+          <h3 className="font-medium text-sm mb-2">{media.original_name}</h3>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <Badge variant="outline">{media.file_type.split("/")[0].toUpperCase()}</Badge>
+            <span>{formatFileSize(media.file_size)}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <style jsx>{`
         .slider::-webkit-slider-thumb {

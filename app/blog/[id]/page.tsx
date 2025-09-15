@@ -83,15 +83,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 key={index}
                 media={{
                   id: file.id || `media-${index}`,
-                  original_name: file.original_name || file.file_name || `Media ${index + 1}`,
-                  file_name: file.file_name || file.original_name || `media-${index}`,
-                  file_path: file.file_path || "",
                   file_url: file.file_url || "",
                   file_type: file.file_type || "application/octet-stream",
+                  original_name: file.original_name || "",
+                  file_name: file.file_name || "",
+                  file_path: file.file_path || "",
                   file_size: file.file_size || 0
                 }}
                 showControls={true}
-                showDownload={true}
+                showDownload={false}
+                hideMeta={true}
               />
             ))}
           </div>
