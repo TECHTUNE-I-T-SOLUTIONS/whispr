@@ -88,8 +88,9 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
                     file_type: file.file_type || "application/octet-stream",
                     file_size: file.file_size || 0
                   }}
-                  showControls={true}
-                  showDownload={true}
+                  showControls={false}
+                  showDownload={false}
+                  hideMeta={true}
                 />
               ))}
             </div>
