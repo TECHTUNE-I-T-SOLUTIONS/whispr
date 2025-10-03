@@ -2,28 +2,36 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, User } from "lucide-react"
+import { createSupabaseServer } from "@/lib/supabase-server"
 
 async function getFeaturedPosts() {
   try {
-<<<<<<< HEAD
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    const response = await fetch(`${baseUrl}/api/posts?featured=true&limit=3`, {
-      cache: "no-store",
-    })
-=======
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-  const response = await fetch(`${baseUrl}/api/posts?featured=true&limit=3`, {
-    next: { revalidate: 60 },
-  })
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
+    const supabase = createSupabaseServer()
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`
+        *,
+        admin (
+          full_name,
+          username
+        )
+      `)
+      .eq("status", "published")
+      .eq("featured", true)
+      .order("created_at", { ascending: false })
+      .limit(3)
 
-    if (!response.ok) {
-      console.error("Failed to fetch featured posts:", response.status, response.statusText)
+    if (error) {
+      console.error("Supabase error (featured posts):", error.message)
       return []
     }
 
-    const data = await response.json()
-    return Array.isArray(data) ? data : []
+    return (
+      data?.map((post: any) => ({
+        ...post,
+        authors: { name: post.admin?.full_name || post.admin?.username || "Prayce" },
+      })) || []
+    )
   } catch (error) {
     console.error("Error fetching featured posts:", error)
     return []
@@ -80,11 +88,7 @@ export async function FeaturedPosts() {
                   {post.authors?.name || "Prayce"}
                 </div>
                 <Link
-<<<<<<< HEAD
-                  href={`/${post.type}/${post.id}`}
-=======
                   href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read {post.type === "poem" ? "poem" : "more"} →

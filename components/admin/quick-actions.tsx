@@ -53,8 +53,6 @@ export function QuickActions() {
       hoverColor: "hover:bg-red-100 dark:hover:bg-red-900/30",
     },
     {
-<<<<<<< HEAD
-=======
       title: "Feedback",
       description: "View user feedback",
       icon: MessageCircle,
@@ -64,7 +62,6 @@ export function QuickActions() {
       hoverColor: "hover:bg-teal-100 dark:hover:bg-teal-900/30",
     },
     {
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       title: "Analytics",
       description: "View detailed stats",
       icon: BarChart3,

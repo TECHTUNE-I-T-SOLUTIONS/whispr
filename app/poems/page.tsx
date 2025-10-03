@@ -1,12 +1,7 @@
 import { Suspense } from "react"
-<<<<<<< HEAD
-import { PoemsList } from "@/components/poems-list"
-import { PoemsHero } from "@/components/poems-hero"
-=======
 import { PoemsHero } from "@/components/poems-hero"
 import { PoemsList } from "@/components/poems-list"
 import { createSupabaseServer } from "@/lib/supabase-server"
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
 export const metadata = {
   title: "Poems - Whispr | Prayce's Poetry Collection",
@@ -14,9 +9,6 @@ export const metadata = {
     "Discover Prayce's beautiful collection of poems that capture emotions, moments, and whispered thoughts in verse.",
 }
 
-<<<<<<< HEAD
-export default function PoemsPage() {
-=======
 async function getPoems() {
   const supabase = createSupabaseServer()
 
@@ -35,17 +27,12 @@ async function getPoems() {
 export default async function PoemsPage() {
   const poems = await getPoems()
 
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   return (
     <div className="whispr-gradient min-h-screen">
       <PoemsHero />
       <section className="container py-16">
         <Suspense fallback={<PoemsListSkeleton />}>
-<<<<<<< HEAD
-          <PoemsList />
-=======
           <PoemsList poems={poems} />
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
         </Suspense>
       </section>
     </div>

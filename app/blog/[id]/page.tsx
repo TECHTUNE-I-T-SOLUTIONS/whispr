@@ -2,7 +2,6 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { formatDate, markdownToHtml } from "@/lib/utils"
 import { createSupabaseServer } from "@/lib/supabase-server"
-import { SafeImage } from "@/components/SafeImage"
 import { MediaPlayer } from "@/components/media-player"
 import { Reactions } from "@/components/reactions"
 import { Comments } from "@/components/comments"
@@ -13,20 +12,23 @@ type BlogPostPageProps = {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   const { id } = await params
+  try {
+    const supabase = createSupabaseServer()
+    const { data: post } = await supabase
+      .from("posts")
+      .select("title, excerpt, seo_description, status")
+      .eq("id", id)
+      .single()
 
-  const res = await fetch(`${baseUrl}/api/posts/${id}`, {
-    cache: "no-store",
-  })
+    if (!post || post.status !== "published") return {}
 
-  if (!res.ok) return {}
-
-  const post = await res.json()
-
-  return {
-    title: `${post.title} - Whispr`,
-    description: post.seo_description || post.excerpt || "",
+    return {
+      title: `${post.title} - Whispr`,
+      description: post.seo_description || post.excerpt || "",
+    }
+  } catch {
+    return {}
   }
 }
 

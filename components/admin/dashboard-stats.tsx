@@ -1,10 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-<<<<<<< HEAD
-=======
 import { useRouter } from "next/navigation"
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Heart, MessageCircle, Eye, TrendingUp, Users, Calendar, Sparkles } from "lucide-react"
 
@@ -28,10 +25,7 @@ export function DashboardStats() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-<<<<<<< HEAD
-=======
   const router = useRouter()
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
   useEffect(() => {
     fetchStats()
@@ -189,11 +183,6 @@ export function DashboardStats() {
               Start creating content to see your analytics come to life. Your journey begins with the first post!
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
-<<<<<<< HEAD
-              <button className="text-primary hover:text-primary/80 text-sm font-medium">Create Your First Post</button>
-              <span className="text-muted-foreground text-sm">or</span>
-              <button className="text-primary hover:text-primary/80 text-sm font-medium">Write a Poem</button>
-=======
               <button
                 onClick={() => router.push("/admin/posts/new?type=blog")}
                 className="text-primary hover:text-primary/80 text-sm font-medium"
@@ -207,7 +196,6 @@ export function DashboardStats() {
               >
                 Write a Poem
               </button>
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
             </div>
           </CardContent>
         </Card>

@@ -3,10 +3,6 @@
 import { DashboardStats } from "@/components/admin/dashboard-stats"
 import { RecentActivity } from "@/components/admin/recent-activity"
 import { QuickActions } from "@/components/admin/quick-actions"
-<<<<<<< HEAD
-import { AdminHeader } from "@/components/admin/admin-header"
-=======
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { useSession } from "@/components/admin/session-provider"
 import { Loader2 } from "lucide-react"
 
@@ -27,11 +23,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-<<<<<<< HEAD
-      <AdminHeader admin={admin} />
-
-=======
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       <main className="container py-8 space-y-8">
         <div className="animate-fade-in">
           <h1 className="text-3xl font-serif font-bold mb-2">Welcome back, {admin.full_name || admin.username}! ✨</h1>

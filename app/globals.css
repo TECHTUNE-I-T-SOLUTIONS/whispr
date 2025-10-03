@@ -151,8 +151,6 @@
 .dark .bg-card\/30 {
   background-color: hsl(var(--card) / 0.5);
 }
-<<<<<<< HEAD
-=======
 
 @keyframes pulse-slow {
   0%, 100% { transform: scale(1); opacity: 0.15; }
@@ -171,4 +169,3 @@
 .animate-pulse-slower {
   animation: pulse-slower 10s ease-in-out infinite;
 }
->>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
