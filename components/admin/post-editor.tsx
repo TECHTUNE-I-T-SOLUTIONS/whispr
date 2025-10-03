@@ -1,6 +1,10 @@
 "use client"
 
 import type React from "react"
+<<<<<<< HEAD
+
+=======
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,6 +15,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+<<<<<<< HEAD
+import { Save, Eye, Upload, X, Plus, Loader2, FileText, Sparkles } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+=======
 import {
   Save,
   Eye,
@@ -35,10 +43,39 @@ import DOMPurify from "dompurify"
 import { MediaSelector } from "@/components/admin/media-selector"
 marked.setOptions({ breaks: true })
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
 interface PostEditorProps {
   type?: "blog" | "poem"
   postId?: string
+<<<<<<< HEAD
+}
+
+export function PostEditor({ type: initialType, postId }: PostEditorProps) {
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    excerpt: "",
+    type: initialType || "blog",
+    status: "draft",
+    featured: false,
+    tags: [] as string[],
+    seoTitle: "",
+    seoDescription: "",
+  })
+  const [newTag, setNewTag] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const handleSubmit = async (status: "draft" | "published") => {
+    setIsLoading(true)
+    try {
+      const response = await fetch("/api/admin/posts", {
+        method: "POST",
+=======
   initialData?: any
 }
 
@@ -141,6 +178,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
 
       const response = await fetch(url, {
         method,
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
         headers: {
           "Content-Type": "application/json",
         },
@@ -155,6 +193,14 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
         const data = await response.json()
         toast({
           variant: "success",
+<<<<<<< HEAD
+          title: `${formData.type === "poem" ? "Poem" : "Post"} ${status === "published" ? "published" : "saved"}!`,
+          description: `Your ${formData.type} has been successfully ${status === "published" ? "published" : "saved as draft"}.`,
+        })
+        router.push("/admin/posts")
+      } else {
+        throw new Error("Failed to save post")
+=======
           title: `${formData.type === "poem" ? "Poem" : "Post"} ${postId ? "updated" : status === "published" ? "published" : "saved"}!`,
           description: `Your ${formData.type} has been successfully ${postId ? "updated" : status === "published" ? "published" : "saved as draft"}.`,
         })
@@ -184,12 +230,17 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
         router.push("/admin/posts")
       } else {
         throw new Error(`Failed to ${postId ? "update" : "save"} post`)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
+<<<<<<< HEAD
+        description: "Failed to save the post. Please try again.",
+=======
         description: `Failed to ${postId ? "update" : "save"} the post. Please try again.`,
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       })
     } finally {
       setIsLoading(false)
@@ -242,7 +293,11 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   const removeTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
+<<<<<<< HEAD
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+=======
       tags: prev.tags.filter((tag: string) => tag !== tagToRemove),
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     }))
   }
 
@@ -256,6 +311,14 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
             ) : (
               <FileText className="h-8 w-8 text-primary" />
             )}
+<<<<<<< HEAD
+            Create New {formData.type === "poem" ? "Poem" : "Blog Post"}
+          </h1>
+          <p className="text-muted-foreground">
+            {formData.type === "poem"
+              ? "Compose a beautiful poem to share with your readers"
+              : "Write and publish a new blog post"}
+=======
             {postId ? "Edit" : "Create New"} {formData.type === "poem" ? "Poem" : "Blog Post"}
           </h1>
           <p className="text-muted-foreground">
@@ -264,6 +327,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
               : formData.type === "poem"
                 ? "Compose a beautiful poem to share with your readers"
                 : "Write and publish a new blog post"}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
           </p>
         </div>
         <Select
@@ -298,6 +362,11 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                 />
               </div>
 
+<<<<<<< HEAD
+              <div>
+                <Label htmlFor="content">{formData.type === "poem" ? "Poem Content" : "Post Content"}</Label>
+                <Textarea
+=======
               {/* Formatting toolbar */}
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="ghost" onClick={() => formatText("**")}>
@@ -334,16 +403,25 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                 <Label htmlFor="content">{formData.type === "poem" ? "Poem Content" : "Post Content"}</Label>
                 <Textarea
                   ref={contentRef}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   id="content"
                   value={formData.content}
                   onChange={(e) => setFormData((prev) => ({ ...prev, content: e.target.value }))}
                   placeholder={
+<<<<<<< HEAD
+                    formData.type === "poem"
+                      ? "Write your poem here...\n\nLine breaks will be preserved for poetry formatting."
+                      : "Write your blog post content here..."
+=======
                     formData.type === "poem" ? "Write your poem here..." : "Write your blog post content here..."
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   }
                   className={`min-h-[400px] resize-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                 />
               </div>
 
+<<<<<<< HEAD
+=======
               {formData.content && (
                 <div>
                   <Label className="block mt-6 mb-2">Live Preview</Label>
@@ -357,6 +435,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
               )}
 
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
               <div>
                 <Label htmlFor="excerpt">Excerpt</Label>
                 <Textarea
@@ -387,6 +466,38 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   accept="image/*,video/*,audio/*"
                   onChange={handleFileUpload}
                   className="hidden"
+<<<<<<< HEAD
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Images, Videos, or Audio
+                </Button>
+              </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
+                        {file.file_type.startsWith("image/") ? (
+                          <img
+                            src={file.file_url || "/placeholder.svg"}
+                            alt={file.original_name}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="text-center p-4">
+                            <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-xs text-muted-foreground truncate">{file.original_name}</p>
+                          </div>
+                        )}
+                      </div>
+=======
                   aria-label="Upload media files"
                 />
                 <div className="flex gap-2">
@@ -443,6 +554,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                           <p className="text-sm font-medium truncate">{file.original_name}</p>
                         </div>
                       )}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                       <Button
                         size="sm"
                         variant="destructive"
@@ -488,10 +600,17 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
+<<<<<<< HEAD
+                  {formData.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      {tag}
+                      <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">
+=======
                   {formData.tags.map((tag: string) => (
                     <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                       {tag}
                       <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive" title={`Remove ${tag}`}>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -535,7 +654,11 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
               className="w-full"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+<<<<<<< HEAD
+              Publish {formData.type === "poem" ? "Poem" : "Post"}
+=======
               {postId ? "Update" : "Publish"} {formData.type === "poem" ? "Poem" : "Post"}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
             </Button>
             <Button
               variant="outline"

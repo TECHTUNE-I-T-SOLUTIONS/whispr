@@ -2,6 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+<<<<<<< HEAD
+import { Menu, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { ThemeToggle } from "@/components/theme-toggle"
+=======
 import { Menu, X, LayoutDashboard, Share2, Twitter, Facebook, Copy, MessageSquare as WhatsAppIcon } from "lucide-react"
 import ReactDOM from 'react-dom'
 import { Button } from "@/components/ui/button"
@@ -11,10 +17,13 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useToast } from '@/hooks/use-toast'
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
 export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+<<<<<<< HEAD
+=======
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
@@ -40,11 +49,17 @@ export function Header() {
     })()
     return () => { mounted = false }
   }, [])
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
     { name: "Poems", href: "/poems" },
+<<<<<<< HEAD
+    { name: "About", href: "/about" },
+  ]
+
+=======
     { name: "Spoken Words", href: "/media" },
     { name: "About", href: "/about" },
     { name: "whispr Wall", href: "/whispr-wall" },
@@ -138,10 +153,33 @@ export function Header() {
     return ReactDOM.createPortal(content, document.body)
   }
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
+<<<<<<< HEAD
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">W</span>
+          </div>
+          <span className="font-serif text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+            Whispr
+          </span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-8">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                pathname === item.href ? "text-primary border-b-2 border-primary pb-1" : "text-muted-foreground"
+              }`}
+            >
+              {item.name}
+            </Link>
+=======
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: 'spring', stiffness: 300 }} className="h-12 w-12 relative md:h-14 md:w-14">
             <Image src={logoSrc} alt="Whispr logo" fill className="rounded-full object-cover" priority />
           </motion.div>
@@ -151,10 +189,23 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-8">
           {navigation.map((item) => (
             <Link key={item.name} href={item.href} className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary border-b-2 border-primary pb-1' : 'text-muted-foreground'}`}>{item.name}</Link>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
           ))}
         </nav>
 
         <div className="flex items-center space-x-4">
+<<<<<<< HEAD
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden h-9 w-9"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+=======
           {hasMounted && isAdmin && (
             <Link href="/admin/dashboard" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"><LayoutDashboard className="h-4 w-4" /><span className="hidden lg:inline">Dashboard</span></Link>
           )}
@@ -201,12 +252,34 @@ export function Header() {
           </div>
 
           <Button variant="ghost" size="icon" className="md:hidden h-9 w-9" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
       </div>
 
+<<<<<<< HEAD
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t bg-background/95 backdrop-blur">
+          <nav className="container py-4 space-y-2">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${
+                  pathname === item.href ? "text-primary" : "text-muted-foreground"
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+=======
       {mobileMenuOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="md:hidden border-t bg-background/95 backdrop-blur">
           <nav className="container py-4 space-y-2">
@@ -233,6 +306,7 @@ export function Header() {
       )}
 
       {MobilePreviewPortal()}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     </header>
   )
 }

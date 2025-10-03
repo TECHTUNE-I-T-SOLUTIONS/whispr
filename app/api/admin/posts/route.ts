@@ -1,13 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
+<<<<<<< HEAD
+=======
 import { sendPushNotificationToSubscribers } from "@/lib/push-notifications"
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
 export async function GET(request: NextRequest) {
   try {
     const { admin } = await requireAuthFromRequest(request)
     const supabase = createSupabaseServer()
 
+<<<<<<< HEAD
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("admin_id", admin.id)
+      .order("created_at", { ascending: false })
+=======
     // select posts and include creator/admin data for display in admin UI
     // use explicit select to join admin fields: admin(id, username, full_name, avatar_url)
     let query = supabase
@@ -20,6 +30,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await query.order("created_at", { ascending: false })
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
     if (error) {
       console.error("Database error:", error)
@@ -79,6 +90,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+<<<<<<< HEAD
+=======
     // Send push notification if post is published
     if (status === "published") {
       try {
@@ -96,6 +109,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error creating post:", error)

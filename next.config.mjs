@@ -7,6 +7,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+<<<<<<< HEAD
+    unoptimized: true,
+  },
+}
+
+export default nextConfig
+=======
     remotePatterns: [
       {
         protocol: 'https',
@@ -18,3 +25,4 @@ const nextConfig = {
 }
 
 export default nextConfig
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
