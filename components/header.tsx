@@ -106,7 +106,7 @@ export function Header() {
             <button onClick={() => setMobilePreviewOpen(false)} className="text-sm text-muted-foreground">Close</button>
           </div>
 
-          <div className="text-sm text-muted-foreground mb-2">Preview and quick-share options. Toggle tracking to add a UTM/ref to the URL.</div>
+          <div className="text-sm text-muted-foreground mb-2">Preview and quick-share options.</div>
 
           <pre className="whitespace-pre-wrap text-sm bg-muted/10 p-2 rounded mb-2 break-words">{`${"Whispr — bite-sized poems, spoken word, and stories that spark curiosity. Discover something unforgettable."}\n\n${typeof window !== 'undefined' ? window.location.href : ''}`}</pre>
 
