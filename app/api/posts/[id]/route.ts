@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 
+<<<<<<< HEAD
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+=======
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   const { id } = await params
 
   try {
@@ -22,16 +26,37 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       .eq("status", "published")
       .single()
 
+<<<<<<< HEAD
+    if (error) {
+      console.error("Database error:", error)
+      return NextResponse.json({ error: error.message }, { status: 404 })
+    }
+
+    // Transform the data to match the expected format
+    const transformedData = {
+      ...data,
+      authors: {
+        name: data.admin?.full_name || data.admin?.username || "Prayce",
+        bio: data.admin?.bio,
+        avatar_url: data.admin?.avatar_url,
+      },
+    }
+
+    // Increment view count
+=======
     if (error || !data) {
       console.error("Database error:", error)
       return NextResponse.json({ error: error?.message || "Not found" }, { status: 404 })
     }
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     await supabase
       .from("posts")
       .update({ view_count: (data.view_count || 0) + 1 })
       .eq("id", id)
 
+<<<<<<< HEAD
+=======
     const transformedData = {
       ...data,
       authors: {
@@ -41,6 +66,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       },
     }
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     return NextResponse.json(transformedData)
   } catch (error) {
     console.error("API error:", error)

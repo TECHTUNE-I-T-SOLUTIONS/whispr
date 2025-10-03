@@ -10,6 +10,8 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+<<<<<<< HEAD
+=======
 
   /* Hide scrollbars: desktop only helper */
   .lg-hide-scrollbar {
@@ -35,6 +37,7 @@ body {
   .textarea-safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 }
 
 @layer base {
@@ -109,6 +112,8 @@ body {
   }
 }
 
+<<<<<<< HEAD
+=======
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
@@ -154,6 +159,7 @@ body {
   to { transform: translateX(0%); opacity: 1 }
 }
 
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 @layer base {
   * {
     @apply border-border;

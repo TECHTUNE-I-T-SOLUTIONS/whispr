@@ -3,6 +3,25 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Clock, User, ArrowRight } from "lucide-react"
+<<<<<<< HEAD
+
+async function getRecentPosts() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const response = await fetch(`${baseUrl}/api/posts?limit=6`, {
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      console.error("Failed to fetch recent posts:", response.status, response.statusText)
+      return []
+    }
+
+    const data = await response.json()
+    return Array.isArray(data) ? data : []
+  } catch (error) {
+    console.error("Error fetching recent posts:", error)
+=======
 import { createSupabaseServer } from "@/lib/supabase-server"
 
 async function getRecentPosts() {
@@ -35,6 +54,7 @@ async function getRecentPosts() {
     })) || []
   } catch (err) {
     console.error("Error fetching recent posts:", err)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     return []
   }
 }
@@ -86,10 +106,17 @@ export async function RecentPosts() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-xs text-muted-foreground">
                   <User className="h-3 w-3 mr-1" />
+<<<<<<< HEAD
+                  {post.authors?.name || "Prayce"}
+                </div>
+                <Link
+                  href={`/${post.type}/${post.id}`}
+=======
                   {post.authors?.name}
                 </div>
                 <Link
                   href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read →
