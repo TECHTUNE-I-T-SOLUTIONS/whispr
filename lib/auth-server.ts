@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server"
+<<<<<<< HEAD
 import { createSupabaseServer } from "@/lib/supabase-server"
 
 export async function getSessionFromRequest(request: NextRequest) {
@@ -54,12 +55,43 @@ export async function getSessionFromRequest(request: NextRequest) {
     return { admin: session.admin }
   } catch (error) {
     console.error("Session check error:", error)
+=======
+
+export async function getAdminFromRequest(request: NextRequest) {
+  try {
+    const isAuthenticated = request.cookies.get("whispr-admin-auth")?.value === "true"
+    const adminDataCookie = request.cookies.get("whispr-admin-data")?.value
+
+    if (!isAuthenticated || !adminDataCookie) {
+      return null
+    }
+
+    try {
+      const decoded = decodeURIComponent(adminDataCookie)
+      const adminData = JSON.parse(decoded)
+
+      if (!adminData.is_active) {
+        return null
+      }
+
+      return { admin: adminData }
+    } catch (parseError) {
+      console.error("Error parsing admin data from cookie:", parseError)
+      return null
+    }
+  } catch (error) {
+    console.error("Auth check error:", error)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     return null
   }
 }
 
 export async function requireAuthFromRequest(request: NextRequest) {
+<<<<<<< HEAD
   const session = await getSessionFromRequest(request)
+=======
+  const session = await getAdminFromRequest(request)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   if (!session) {
     throw new Error("Authentication required")
   }

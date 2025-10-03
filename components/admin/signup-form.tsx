@@ -4,6 +4,11 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+<<<<<<< HEAD
+=======
+import Image from "next/image"
+import { useTheme } from "next-themes"
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +28,23 @@ export function SignupForm() {
   const { toast } = useToast()
   const { login } = useSession()
 
+<<<<<<< HEAD
+=======
+  const { theme } = useTheme()
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  const logoSrc = hasMounted
+    ? theme === "dark"
+      ? "/lightlogo.png"
+      : "/darklogo.png"
+    : "/darklogo.png"
+
+
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   useEffect(() => {
     fetchSecurityQuestions()
   }, [])
@@ -119,11 +141,26 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
       <CardHeader className="text-center space-y-4">
+<<<<<<< HEAD
         <div className="animate-float mx-auto">
           <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
             <Feather className="h-8 w-8 text-primary-foreground" />
           </div>
         </div>
+=======
+        <div className="animate-float mx-auto mb-2">
+          <div className="h-40 w-40 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
+            <Image
+              src={logoSrc}
+              alt="Whispr Logo"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
+
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
         <div>
           <CardTitle className="text-2xl font-serif bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
             Join Whispr

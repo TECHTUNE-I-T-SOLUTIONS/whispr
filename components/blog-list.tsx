@@ -6,9 +6,15 @@ import { formatDistanceToNow } from "date-fns"
 
 async function getBlogPosts() {
   try {
+<<<<<<< HEAD
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
     const response = await fetch(`${baseUrl}/api/posts?type=blog`, {
       cache: "no-store",
+=======
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    const response = await fetch(`${baseUrl}/api/posts?type=blog`, {
+      next: { revalidate: 60 },
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     })
 
     if (!response.ok) {
@@ -86,10 +92,17 @@ export async function BlogList() {
 
               <div className="flex items-center justify-between pt-4 border-t border-border/30">
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
+<<<<<<< HEAD
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
                     Prayce
                   </div>
+=======
+                    <div className="flex items-center gap-1">
+                    <User className="h-3 w-3" />
+                    {post.admin?.username ?? post.admin?.full_name ?? "Unknown"}
+                    </div>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {post.reading_time || 5}m

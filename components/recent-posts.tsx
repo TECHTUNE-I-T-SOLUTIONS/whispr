@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Clock, User, ArrowRight } from "lucide-react"
+<<<<<<< HEAD
 
 async function getRecentPosts() {
   try {
@@ -20,6 +21,40 @@ async function getRecentPosts() {
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.error("Error fetching recent posts:", error)
+=======
+import { createSupabaseServer } from "@/lib/supabase-server"
+
+async function getRecentPosts() {
+  try {
+    const supabase = createSupabaseServer()
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`
+        *,
+        admin (
+          full_name,
+          username,
+          avatar_url
+        )
+      `)
+      .eq("status", "published")
+      .order("created_at", { ascending: false })
+      .limit(6)
+
+    if (error) {
+      console.error("Supabase error:", error.message)
+      return []
+    }
+
+    return data?.map((post) => ({
+      ...post,
+      authors: {
+        name: post.admin?.full_name || post.admin?.username || "Prayce",
+      },
+    })) || []
+  } catch (err) {
+    console.error("Error fetching recent posts:", err)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     return []
   }
 }
@@ -71,10 +106,17 @@ export async function RecentPosts() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-xs text-muted-foreground">
                   <User className="h-3 w-3 mr-1" />
+<<<<<<< HEAD
                   {post.authors?.name || "Prayce"}
                 </div>
                 <Link
                   href={`/${post.type}/${post.id}`}
+=======
+                  {post.authors?.name}
+                </div>
+                <Link
+                  href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read →

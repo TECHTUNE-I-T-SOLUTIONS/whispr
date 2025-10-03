@@ -1,30 +1,48 @@
-# Whispr
+# Whispr 📝✨
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+**Whispr** is a modern poetry and writing platform that transforms thoughts into whispers, and whispers into words. It’s a space where creativity meets minimalism—built for poets, writers, and readers alike.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/whisprwords-7097s-projects/v0-whispr)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/RlvcttTz4tB)
+[![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://whisprwords.vercel.app)
+[![Tech Stack](https://img.shields.io/badge/Built%20with-Next.js%20%7C%20Tailwind%20%7C%20Supabase-black?style=for-the-badge)](#tech-stack)
 
-## Overview
+---
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## ✨ Features
 
-## Deployment
+- 🌙 Light/Dark theme toggle with persistent settings
+- 🖋️ Post, read, and react to poems
+- 💬 Commenting system for engagement
+- 🎨 Beautiful typography and transitions
+- 🔒 Admin dashboard with media upload, activity tracking, and secure auth
+- 📦 Supabase backend with real-time database + storage
 
-Your project is live at:
+---
 
-**[https://vercel.com/whisprwords-7097s-projects/v0-whispr](https://vercel.com/whisprwords-7097s-projects/v0-whispr)**
+## 🚀 Live Demo
 
-## Build your app
+Visit the live app:  
+🔗 [https://whisprwords.vercel.app](https://whisprwords.vercel.app)
 
-Continue building your app on:
+---
 
-**[https://v0.dev/chat/projects/RlvcttTz4tB](https://v0.dev/chat/projects/RlvcttTz4tB)**
+## 🛠 Tech Stack
 
-## How It Works
+- **Frontend:** Next.js 14 (App Router), Tailwind CSS, TypeScript
+- **Backend:** Supabase (Auth, Database, Storage)
+- **UI/UX:** ShadCN UI, Framer Motion
+- **Deployment:** Vercel
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+---
+
+## 📁 Project Structure
+
+```bash
+/
+├── app/                # Main application routes (app router)
+├── components/         # Reusable UI components
+├── lib/                # Supabase, auth, and utility functions
+├── public/             # Static files (e.g. favicon)
+├── styles/             # Global CSS (includes Tailwind layers)
+├── types/              # Centralized types from Supabase
+├── .env.local          # Environment variables
+└── README.md

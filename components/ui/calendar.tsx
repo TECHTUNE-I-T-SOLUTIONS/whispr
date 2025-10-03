@@ -53,10 +53,21 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
+<<<<<<< HEAD
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
+=======
+      components={
+        {
+          // react-day-picker types vary between versions; cast to `any` so our
+          // local icons work with the installed type definitions.
+          IconLeft: (props: any) => <ChevronLeft className="h-4 w-4" />,
+          IconRight: (props: any) => <ChevronRight className="h-4 w-4" />,
+        } as any
+      }
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       {...props}
     />
   )

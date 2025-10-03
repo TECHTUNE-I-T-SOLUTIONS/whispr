@@ -1,7 +1,13 @@
 import bcrypt from "bcryptjs"
+<<<<<<< HEAD
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { cookies } from "next/headers"
 
+=======
+import { cookies } from "next/headers"
+
+// Password utilities
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
 }
@@ -16,6 +22,7 @@ export async function generateSessionToken(): Promise<string> {
   return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")
 }
 
+<<<<<<< HEAD
 export async function createSession(adminId: string): Promise<string> {
   const supabase = createSupabaseServer()
   const sessionToken = await generateSessionToken()
@@ -74,10 +81,31 @@ export async function getSession(): Promise<{ admin: any } | null> {
     .eq("session_token", sessionToken)
 
   return { admin: session.admin }
+=======
+// Get session based on cookie-based system
+export async function getSession(): Promise<{ admin: any } | null> {
+  const cookieStore = await cookies()
+
+  const isAuthenticated = cookieStore.get("whispr-admin-auth")?.value === "true"
+  const adminDataCookie = cookieStore.get("whispr-admin-data")?.value
+
+  if (!isAuthenticated || !adminDataCookie) {
+    return null
+  }
+
+  try {
+    const adminData = JSON.parse(decodeURIComponent(adminDataCookie))
+    return { admin: adminData }
+  } catch (error) {
+    console.error("Error parsing admin data:", error)
+    return null
+  }
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 }
 
 export async function destroySession(): Promise<void> {
   const cookieStore = await cookies()
+<<<<<<< HEAD
   const sessionToken = cookieStore.get("whispr-session")?.value
 
   if (sessionToken) {
@@ -89,6 +117,13 @@ export async function destroySession(): Promise<void> {
 }
 
 export async function requireAuth() {
+=======
+  cookieStore.delete("whispr-admin-auth")
+  cookieStore.delete("whispr-admin-data")
+}
+
+export async function requireAuth(): Promise<{ admin: any }> {
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   const session = await getSession()
   if (!session) {
     throw new Error("Authentication required")

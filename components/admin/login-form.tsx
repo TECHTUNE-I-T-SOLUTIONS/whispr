@@ -1,7 +1,13 @@
 "use client"
 
 import type React from "react"
+<<<<<<< HEAD
 import { useState } from "react"
+=======
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { useTheme } from "next-themes"
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,14 +18,44 @@ import { Loader2, Lock, User, Feather, AlertTriangle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useSession } from "@/components/admin/session-provider"
 import Link from "next/link"
+<<<<<<< HEAD
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
+=======
+import { DashboardLoader } from "@/components/admin/dashboard-loader"
+
+export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [showDashboardLoader, setShowDashboardLoader] = useState(false)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   const [error, setError] = useState("")
   const [accountLocked, setAccountLocked] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+<<<<<<< HEAD
   const { refreshSession } = useSession()
+=======
+  const { refreshSession, isAuthenticated } = useSession()
+
+  const { theme } = useTheme()
+  const [hasMounted, setHasMounted] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  // No automatic session auto-login from the login page to avoid extra
+  // session checks; the manual login flow will call `refreshSession`.
+
+  const logoSrc = hasMounted
+    ? theme === "dark"
+      ? "/lightlogo.png"
+      : "/darklogo.png"
+    : "/darklogo.png"
+
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -50,19 +86,45 @@ export function LoginForm() {
       const data = await response.json()
 
       if (response.ok && data.success) {
+<<<<<<< HEAD
         // Refresh session to get the latest data
         await refreshSession()
 
+=======
+        console.log("Login successful, refreshing session...")
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
         toast({
           variant: "success",
           title: "Welcome back! 🎉",
           description: "You've successfully signed in to your dashboard.",
         })
 
+<<<<<<< HEAD
         // Small delay to ensure session is set
         setTimeout(() => {
           router.push("/admin/dashboard")
         }, 100)
+=======
+        // Show dashboard loader
+        setShowDashboardLoader(true)
+
+        // Refresh session and use the boolean result it returns to avoid
+        // relying on a possibly-stale `isAuthenticated` closure value.
+        const authenticated = await refreshSession({ timeoutMs: 5000 })
+        console.log("Authentication result from refreshSession:", authenticated)
+
+        if (authenticated) {
+          console.log("Authentication confirmed, navigating to dashboard")
+          // Keep loader visible for a moment before redirecting
+          setTimeout(() => {
+            router.push("/admin/dashboard")
+          }, 2000)
+        } else {
+          console.log("Authentication not confirmed, staying on login page")
+          setShowDashboardLoader(false)
+          setError("Session not established. Please try logging in again.")
+        }
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       } else {
         setError(data.error || "Login failed")
 
@@ -90,11 +152,34 @@ export function LoginForm() {
   }
 
   return (
+<<<<<<< HEAD
     <Card className="w-full max-w-md animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
       <CardHeader className="text-center space-y-4">
         <div className="animate-float mx-auto">
           <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
             <Feather className="h-8 w-8 text-primary-foreground" />
+=======
+    <>
+  {(showDashboardLoader || checkingSession) && (
+        <DashboardLoader
+          onComplete={() => {
+            // This will be called when the loader animation completes
+            // The redirect is already handled in the login logic above
+          }}
+        />
+      )}
+      <Card className="w-full max-w-md animate-slide-up border-0 bg-card/80 backdrop-blur shadow-2xl">
+      <CardHeader className="text-center space-y-4">
+        <div className="animate-float mx-auto mb-2">
+          <div className="h-40 w-40 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
+            <Image
+              src={logoSrc}
+              alt="Whispr Logo"
+              fill
+              className="object-cover"
+              priority
+            />
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
           </div>
         </div>
         <div>
@@ -144,7 +229,11 @@ export function LoginForm() {
           </div>
 
           {error && (
+<<<<<<< HEAD
             <Alert variant="destructive" className="animate-slide-up">
+=======
+            <Alert variant="destructive" className="animate-slide-up text-black dark:text-white">
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
               {accountLocked && <AlertTriangle className="h-4 w-4" />}
               <AlertDescription>{error}</AlertDescription>
             </Alert>
@@ -182,5 +271,9 @@ export function LoginForm() {
         </form>
       </CardContent>
     </Card>
+<<<<<<< HEAD
+=======
+    </>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
   )
 }

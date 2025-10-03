@@ -1,7 +1,10 @@
 "use client"
 
 import type React from "react"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,12 +15,40 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+<<<<<<< HEAD
 import { Save, Eye, Upload, X, Plus, Loader2, FileText, Sparkles } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+=======
+import {
+  Save,
+  Eye,
+  Upload,
+  X,
+  Plus,
+  Loader2,
+  FileText,
+  Sparkles,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+} from "lucide-react"
+import { MediaPlayer } from "@/components/media-player"
+import { marked } from "marked"
+import { useToast } from "@/hooks/use-toast"
+import DOMPurify from "dompurify"
+import { MediaSelector } from "@/components/admin/media-selector"
+marked.setOptions({ breaks: true })
+
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
 
 interface PostEditorProps {
   type?: "blog" | "poem"
   postId?: string
+<<<<<<< HEAD
 }
 
 export function PostEditor({ type: initialType, postId }: PostEditorProps) {
@@ -44,6 +75,110 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
     try {
       const response = await fetch("/api/admin/posts", {
         method: "POST",
+=======
+  initialData?: any
+}
+
+interface FormData {
+  title: string
+  content: string
+  excerpt: string
+  type: "blog" | "poem"
+  status: "draft" | "published"
+  featured: boolean
+  tags: string[]
+  seoTitle: string
+  seoDescription: string
+}
+
+export function PostEditor({ type: initialType, postId, initialData }: PostEditorProps) {
+  const [formData, setFormData] = useState<FormData>({
+    title: initialData?.title || "",
+    content: initialData?.content || "",
+    excerpt: initialData?.excerpt || "",
+    type: initialData?.type || initialType || "blog",
+    status: initialData?.status || "draft",
+    featured: initialData?.featured || false,
+    tags: initialData?.tags || [],
+    seoTitle: initialData?.seo_title || "",
+    seoDescription: initialData?.seo_description || "",
+  })
+  const [newTag, setNewTag] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>(initialData?.media_files || [])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const escapeRegExp = (string: string) =>
+    string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  const formatText = (wrap: string, prefix = wrap, suffix = wrap) => {
+    const el = contentRef.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    let selectedText = el.value.slice(start, end)
+    let before = el.value.slice(0, start)
+    let after = el.value.slice(end)
+
+    const divMatch = selectedText.match(/^<div style="text-align:(.*?)">([\s\S]*?)<\/div>$/)
+
+    if (divMatch) {
+      // If text is aligned, unwrap, apply formatting, rewrap
+      const alignment = divMatch[1]
+      const inner = divMatch[2]
+
+      const regex = new RegExp(`^${escapeRegExp(prefix)}(.*?)${escapeRegExp(suffix)}$`)
+      const newInner = regex.test(inner)
+        ? inner.replace(regex, '$1')
+        : `${prefix}${inner}${suffix}`
+
+      selectedText = `<div style="text-align:${alignment}">${newInner}</div>`
+    } else {
+      const regex = new RegExp(`^${escapeRegExp(prefix)}(.*?)${escapeRegExp(suffix)}$`)
+      selectedText = regex.test(selectedText)
+        ? selectedText.replace(regex, '$1')
+        : `${prefix}${selectedText}${suffix}`
+    }
+
+    const newText = before + selectedText + after
+    setFormData((prev) => ({ ...prev, content: newText }))
+  }
+
+
+  const handleAlignment = (type: string) => {
+    const el = contentRef.current
+    if (!el) return
+
+    const start = el.selectionStart
+    const end = el.selectionEnd
+    let selectedText = el.value.slice(start, end)
+
+    const divRegex = /^<div style="text-align:(.*?)">([\s\S]*)<\/div>$/
+    const match = selectedText.match(divRegex)
+    if (match) {
+      selectedText = match[2] // unwrap inner content only
+    }
+
+    // Apply alignment
+    const alignedText = `<div style="text-align:${type}">${selectedText}</div>`
+    const newText = el.value.slice(0, start) + alignedText + el.value.slice(end)
+
+    setFormData((prev) => ({ ...prev, content: newText }))
+  }
+
+  const handleSubmit = async (status: "draft" | "published") => {
+    setIsLoading(true)
+    try {
+      const url = postId ? `/api/admin/posts/${postId}` : "/api/admin/posts"
+      const method = postId ? "PUT" : "POST"
+
+      const response = await fetch(url, {
+        method,
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
         headers: {
           "Content-Type": "application/json",
         },
@@ -58,18 +193,54 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
         const data = await response.json()
         toast({
           variant: "success",
+<<<<<<< HEAD
           title: `${formData.type === "poem" ? "Poem" : "Post"} ${status === "published" ? "published" : "saved"}!`,
           description: `Your ${formData.type} has been successfully ${status === "published" ? "published" : "saved as draft"}.`,
         })
         router.push("/admin/posts")
       } else {
         throw new Error("Failed to save post")
+=======
+          title: `${formData.type === "poem" ? "Poem" : "Post"} ${postId ? "updated" : status === "published" ? "published" : "saved"}!`,
+          description: `Your ${formData.type} has been successfully ${postId ? "updated" : status === "published" ? "published" : "saved as draft"}.`,
+        })
+
+        // Send push notification if published and it's a new post
+        if (status === "published" && !postId) {
+          try {
+            const notificationType = formData.type === "poem" ? "poem" : "blog";
+            await fetch(`/api/push/notify/${notificationType}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: formData.title,
+                content: formData.excerpt || formData.content.substring(0, 200),
+                author: "Whispr Admin", // You can get this from user session
+                url: formData.type === "poem" ? `/poems/${data.id}` : `/blog/${data.id}`,
+              }),
+            });
+          } catch (notificationError) {
+            console.error("Failed to send push notification:", notificationError);
+            // Don't show error to user as the post was successfully created
+          }
+        }
+
+        router.push("/admin/posts")
+      } else {
+        throw new Error(`Failed to ${postId ? "update" : "save"} post`)
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
+<<<<<<< HEAD
         description: "Failed to save the post. Please try again.",
+=======
+        description: `Failed to ${postId ? "update" : "save"} the post. Please try again.`,
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
       })
     } finally {
       setIsLoading(false)
@@ -122,7 +293,11 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
   const removeTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
+<<<<<<< HEAD
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
+=======
+      tags: prev.tags.filter((tag: string) => tag !== tagToRemove),
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
     }))
   }
 
@@ -136,12 +311,23 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
             ) : (
               <FileText className="h-8 w-8 text-primary" />
             )}
+<<<<<<< HEAD
             Create New {formData.type === "poem" ? "Poem" : "Blog Post"}
           </h1>
           <p className="text-muted-foreground">
             {formData.type === "poem"
               ? "Compose a beautiful poem to share with your readers"
               : "Write and publish a new blog post"}
+=======
+            {postId ? "Edit" : "Create New"} {formData.type === "poem" ? "Poem" : "Blog Post"}
+          </h1>
+          <p className="text-muted-foreground">
+            {postId
+              ? `Update your ${formData.type === "poem" ? "poem" : "blog post"}`
+              : formData.type === "poem"
+                ? "Compose a beautiful poem to share with your readers"
+                : "Write and publish a new blog post"}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
           </p>
         </div>
         <Select
@@ -176,21 +362,80 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                 />
               </div>
 
+<<<<<<< HEAD
               <div>
                 <Label htmlFor="content">{formData.type === "poem" ? "Poem Content" : "Post Content"}</Label>
                 <Textarea
+=======
+              {/* Formatting toolbar */}
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="ghost" onClick={() => formatText("**")}>
+                  {" "}
+                  <Bold className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("_")}>
+                  {" "}
+                  <Italic className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => formatText("<u>", "<u>", "</u>")}>
+                  {" "}
+                  <Underline className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("left")}>
+                  {" "}
+                  <AlignLeft className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("center")}>
+                  {" "}
+                  <AlignCenter className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("right")}>
+                  {" "}
+                  <AlignRight className="h-4 w-4" />{" "}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => handleAlignment("justify")}>
+                  {" "}
+                  <AlignJustify className="h-4 w-4" />{" "}
+                </Button>
+              </div>
+
+              <div>
+                <Label htmlFor="content">{formData.type === "poem" ? "Poem Content" : "Post Content"}</Label>
+                <Textarea
+                  ref={contentRef}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   id="content"
                   value={formData.content}
                   onChange={(e) => setFormData((prev) => ({ ...prev, content: e.target.value }))}
                   placeholder={
+<<<<<<< HEAD
                     formData.type === "poem"
                       ? "Write your poem here...\n\nLine breaks will be preserved for poetry formatting."
                       : "Write your blog post content here..."
+=======
+                    formData.type === "poem" ? "Write your poem here..." : "Write your blog post content here..."
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                   }
                   className={`min-h-[400px] resize-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                 />
               </div>
 
+<<<<<<< HEAD
+=======
+              {formData.content && (
+                <div>
+                  <Label className="block mt-6 mb-2">Live Preview</Label>
+                  <div
+                    className="prose prose-neutral dark:prose-invert max-w-none border rounded-md p-4 bg-muted/30"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(marked.parse(formData.content) as string),
+                    }}
+                  />
+                </div>
+              )}
+
+
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
               <div>
                 <Label htmlFor="excerpt">Excerpt</Label>
                 <Textarea
@@ -221,6 +466,7 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                   accept="image/*,video/*,audio/*"
                   onChange={handleFileUpload}
                   className="hidden"
+<<<<<<< HEAD
                 />
                 <Button
                   type="button"
@@ -251,6 +497,64 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                           </div>
                         )}
                       </div>
+=======
+                  aria-label="Upload media files"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex-1"
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload New Files
+                  </Button>
+                  <MediaSelector
+                    onSelect={(selected) => setUploadedFiles(selected)}
+                    selectedMedia={uploadedFiles}
+                    trigger={
+                      <Button type="button" variant="outline" className="flex-1">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Select Existing
+                      </Button>
+                    }
+                  />
+                </div>
+              </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="relative group border rounded-lg p-4">
+                      {file.file_type?.startsWith("image/") ? (
+                        <div className="space-y-2">
+                          <img
+                            src={file.file_url || "/placeholder.svg"}
+                            alt={file.original_name}
+                            className="w-full h-32 object-cover rounded"
+                          />
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      ) : (file.file_type?.startsWith("video/") || file.file_type?.startsWith("audio/")) ? (
+                        <div className="space-y-2">
+                          <MediaPlayer
+                            media={file}
+                            showControls={true}
+                            showDownload={false}
+                            className="w-full"
+                          />
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="w-full h-32 bg-muted rounded flex items-center justify-center">
+                            <FileText className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm font-medium truncate">{file.original_name}</p>
+                        </div>
+                      )}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                       <Button
                         size="sm"
                         variant="destructive"
@@ -296,10 +600,17 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
+<<<<<<< HEAD
                   {formData.tags.map((tag) => (
                     <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                       {tag}
                       <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive">
+=======
+                  {formData.tags.map((tag: string) => (
+                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      {tag}
+                      <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-destructive" title={`Remove ${tag}`}>
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
@@ -343,7 +654,11 @@ export function PostEditor({ type: initialType, postId }: PostEditorProps) {
               className="w-full"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+<<<<<<< HEAD
               Publish {formData.type === "poem" ? "Poem" : "Post"}
+=======
+              {postId ? "Update" : "Publish"} {formData.type === "poem" ? "Poem" : "Post"}
+>>>>>>> 59f0d920bddfe9ac25a5be411ebc21f85ccff613
             </Button>
             <Button
               variant="outline"
