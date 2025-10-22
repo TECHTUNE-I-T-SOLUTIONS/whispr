@@ -1,3 +1,4 @@
+"use client";
 import { AboutHero } from "@/components/about-hero"
 import { AboutContent } from "@/components/about-content"
 import { AboutStats } from "@/components/about-stats"

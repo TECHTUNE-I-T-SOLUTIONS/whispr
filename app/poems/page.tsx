@@ -1,3 +1,4 @@
+"use client";
 import React, { Suspense, useEffect, useRef } from "react"
 import { PoemsHero } from "@/components/poems-hero"
 import { PoemsList } from "@/components/poems-list"

@@ -1,3 +1,4 @@
+"use client";
 import { Suspense, useEffect, useRef } from "react"
 import { FeaturedPosts } from "@/components/featured-posts"
 import { RecentPosts } from "@/components/recent-posts"

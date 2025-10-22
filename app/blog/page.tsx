@@ -1,3 +1,4 @@
+"use client";
 import { Suspense, useEffect, useRef } from "react"
 import { BlogList } from "@/components/blog-list"
 import { BlogHero } from "@/components/blog-hero"
