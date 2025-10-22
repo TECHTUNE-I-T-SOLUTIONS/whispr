@@ -145,9 +145,9 @@ export function Header() {
         <div className="container text-sm py-2 flex items-center justify-between">
           <div className="overflow-hidden whitespace-nowrap w-full pr-4">
             <div className="marquee inline-block animate-marquee">
-                <span className="mr-8">Want your product, brand, or project featured here? Get in touch to advertise on Whispr!</span>
-              <span className="mr-8">Want to feature your product? Email us: </span>
-              <a href="mailto:whisprwords@gmail.com" className="underline font-medium">whisprwords</a>
+                <span className="mr-8 text-xs sm:text-xs md:text-sm lg:text-xs">Get in touch to advertise on Whispr!</span>
+                <span className="mr-8 text-xs sm:text-xs md:text-sm lg:text-xs">Want to feature your product?</span>
+              {/* <a href="mailto:whisprwords@gmail.com" className="underline font-medium">advertise@whisprwords</a> */}
             </div>
           </div>
           <div className="ml-4">
