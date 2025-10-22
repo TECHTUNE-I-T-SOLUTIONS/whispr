@@ -140,6 +140,21 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Sponsored posts ticker */}
+      <div className="w-full bg-primary/5 border-b">
+        <div className="container text-sm py-2 flex items-center justify-between">
+          <div className="overflow-hidden whitespace-nowrap w-full pr-4">
+            <div className="marquee inline-block animate-marquee">
+                <span className="mr-8">Want your product, brand, or project featured here? Get in touch to advertise on Whispr!</span>
+              <span className="mr-8">Want to feature your product? Email us: </span>
+              <a href="mailto:whisprwords@gmail.com" className="underline font-medium">whisprwords</a>
+            </div>
+          </div>
+          <div className="ml-4">
+            <a href="mailto:whisprwords@gmail.com" className="inline-flex items-center px-3 py-1 rounded bg-primary text-white text-sm">Advertise</a>
+          </div>
+        </div>
+      </div>
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: 'spring', stiffness: 300 }} className="h-12 w-12 relative md:h-14 md:w-14">
