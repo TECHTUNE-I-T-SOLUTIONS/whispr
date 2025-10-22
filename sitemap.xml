@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://whisprwords.vercel.app/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://whisprwords.vercel.app/about</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://whisprwords.vercel.app/blog</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://whisprwords.vercel.app/poems</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://whisprwords.vercel.app/whispr-wall</loc>
+    <priority>0.6</priority>
+  </url>
+  <!-- Add more URLs as needed for other main pages -->
+</urlset>
