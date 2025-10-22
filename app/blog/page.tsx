@@ -2,12 +2,7 @@
 import { Suspense, useEffect, useRef } from "react"
 import { BlogList } from "@/components/blog-list"
 import { BlogHero } from "@/components/blog-hero"
-
-export const metadata = {
-  title: "Blog - Whispr | Prayce's Thoughts & Musings",
-  description:
-    "Explore Prayce's collection of thoughtful blog posts about writing, creativity, and life's quiet moments.",
-}
+import { metadata } from "./metadata"
 
 export default function BlogPage() {
   const adRef1 = useRef<HTMLDivElement>(null)

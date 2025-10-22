@@ -3,12 +3,7 @@ import React, { Suspense, useEffect, useRef } from "react"
 import { PoemsHero } from "@/components/poems-hero"
 import { PoemsList } from "@/components/poems-list"
 import { createSupabaseServer } from "@/lib/supabase-server"
-
-export const metadata = {
-  title: "Poems - Whispr | Prayce's Poetry Collection",
-  description:
-    "Discover Prayce's beautiful collection of poems that capture emotions, moments, and whispered thoughts in verse.",
-}
+import { metadata } from "./metadata"
 
 async function getPoems() {
   const supabase = createSupabaseServer()

@@ -3,12 +3,7 @@ import { AboutHero } from "@/components/about-hero"
 import { AboutContent } from "@/components/about-content"
 import { AboutStats } from "@/components/about-stats"
 import { useEffect, useRef } from "react"
-
-export const metadata = {
-  title: "About Prayce - Whispr | Meet the Writer & Poet",
-  description:
-    "Learn about Prayce, the talented writer and poet behind Whispr, her journey with words, and her passion for capturing life's quiet moments.",
-}
+import { metadata } from "./metadata"
 
 export default function AboutPage() {
   const adRef1 = useRef<HTMLDivElement>(null)
