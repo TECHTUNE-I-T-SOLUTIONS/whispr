@@ -46,7 +46,7 @@ export function ChroniclesTeaserBanner() {
                     animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                   }`}
                 >
-                  🎉 Something BIG is Coming!
+                  Something BIG is Coming!
                 </h3>
                 <p
                   className={`text-sm md:text-base text-white/90 transition-all duration-700 delay-200 ${
@@ -54,6 +54,13 @@ export function ChroniclesTeaserBanner() {
                   }`}
                 >
                   Introducing <span className="font-bold">Whispr Chronicles</span> – Your Personal Writing Platform
+                </p>
+                <p
+                  className={`text-sm md:text-base text-white/90 transition-all duration-700 delay-400 ${
+                    animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                  }`}
+                >
+                  Share your stories, connect with readers, and grow your audience—with nothing holding you back.
                 </p>
               </div>
             </div>
@@ -64,7 +71,7 @@ export function ChroniclesTeaserBanner() {
                 animate ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
               }`}
             >
-              <span>Stay Tuned</span>
+              <span>😂 Stay Tuned</span>
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
@@ -84,7 +91,7 @@ export function ChroniclesTeaserBanner() {
               animate ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            Be among the first to join our exclusive creator community. Sign up when we launch!
+            Be among the first to join our exclusive creator community. You can sign up when we launch!
           </p>
         </div>
       </div>
