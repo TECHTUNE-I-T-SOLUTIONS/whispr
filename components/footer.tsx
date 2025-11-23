@@ -92,9 +92,9 @@ export function Footer() {
 
         {/* Bottom Note */}
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          <p className="flex items-center justify-center gap-1">
+          {/* <p className="flex items-center justify-center gap-1">
             Crafted with <Heart className="h-4 w-4 text-primary" /> for the literary community.
-          </p>
+          </p> */}
           <p className="mt-3">
             All content on this site — including text, images, audio, and other media — is the intellectual property of Whispr or its respective contributors and is protected by copyright and related laws. Unauthorized reproduction, distribution, or derivative use is prohibited. For licensing or permissions, please contact us.
           </p>

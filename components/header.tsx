@@ -11,6 +11,7 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useToast } from '@/hooks/use-toast'
+import { ChroniclesTeaserBanner } from "@/components/chronicles-teaser-banner"
 
 export function Header() {
   const pathname = usePathname()
@@ -139,7 +140,9 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      <ChroniclesTeaserBanner />
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Sponsored posts ticker */}
       <div className="w-full bg-primary/5 border-b">
         <div className="container text-sm py-2 flex items-center justify-between">
@@ -249,5 +252,6 @@ export function Header() {
 
       {MobilePreviewPortal()}
     </header>
+    </>
   )
 }

@@ -8,7 +8,7 @@ import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart,
-  FileText, BarChart3, Bell
+  FileText, BarChart3, Bell, TrendingUp, Sliders, ClipboardList
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -27,12 +27,15 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
-  { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
-  { name: "Feedback", href: "/admin/feedback", icon: MessageSquareText },
-  // { name: "All", href: "/admin", icon: FileText },
+    { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
+    { name: "Feedback", href: "/admin/feedback", icon: MessageSquareText },
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
     { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
+    // Chronicles Section
+    { name: "Chronicles Analytics", href: "/admin/chronicles/analytics", icon: TrendingUp },
+    { name: "Chronicles Settings", href: "/admin/chronicles/settings", icon: Sliders },
+    { name: "Chronicles Reports", href: "/admin/chronicles/reports", icon: ClipboardList },
   ]
 
   const excludedRoutes = ["/admin/login", "/admin/signup", "/admin/forgot-password"]

@@ -1,23 +1,42 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
-import { requireAuthFromRequest } from "@/lib/auth-server"
+import { getAdminFromRequest } from "@/lib/auth-server"
 
 export async function GET(request: NextRequest) {
   try {
-    const { admin } = await requireAuthFromRequest(request)
+    const adminSession = await getAdminFromRequest(request)
+    
+    // If not authenticated, return 0 unread count instead of error
+    if (!adminSession) {
+      return NextResponse.json({ count: 0 })
+    }
+
     const supabase = createSupabaseServer()
+    const adminId = adminSession.admin?.id
 
-    const { count, error } = await supabase
-      .from("notifications")
-      .select("*", { count: "exact", head: true })
-      .or(`admin_id.eq.${admin.id},admin_id.is.null`)
-      .eq("read", false)
+    if (!adminId) {
+      return NextResponse.json({ count: 0 })
+    }
 
-    if (error) throw error
+    try {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("*", { count: "exact", head: true })
+        .eq("read", false)
+        .or(`admin_id.eq.${adminId},admin_id.is.null`)
 
-    return NextResponse.json({ count })
+      if (error) {
+        console.error("Supabase error:", error)
+        return NextResponse.json({ count: 0 })
+      }
+
+      return NextResponse.json({ count: count || 0 })
+    } catch (dbError) {
+      console.error("Database query error:", dbError)
+      return NextResponse.json({ count: 0 })
+    }
   } catch (error) {
     console.error("Error fetching unread notifications count:", error)
-    return NextResponse.json({ error: "Failed to fetch unread count" }, { status: 500 })
+    return NextResponse.json({ count: 0 })
   }
 }
