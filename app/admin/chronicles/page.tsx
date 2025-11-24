@@ -61,12 +61,37 @@ export default function AdminChroniclesControl() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('/api/chronicles/settings');
-      if (!res.ok) throw new Error('Failed to load settings');
+      setLoading(true);
+      const res = await fetch('/api/chronicles/settings', {
+        cache: 'no-store', // Ensure fresh data
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to load settings: ${res.status}`);
+      }
+      
       const data = await res.json();
-      setSettings(data);
+      console.log('Fetched settings:', data);
+      
+      // Ensure all required fields are present with proper types
+      const cleanedSettings: ChroniclesSettings = {
+        feature_enabled: data.feature_enabled === true || data.feature_enabled === 'true' ? true : false,
+        registration_open: data.registration_open === true || data.registration_open === 'true' ? true : false,
+        max_posts_per_day: parseInt(data.max_posts_per_day || '5') || 5,
+        min_content_length: parseInt(data.min_content_length || '100') || 100,
+        require_email_verification: data.require_email_verification === true || data.require_email_verification === 'true' ? true : false,
+        allow_anonymous_comments: data.allow_anonymous_comments === true || data.allow_anonymous_comments === 'true' ? true : false,
+        auto_publish_delay_seconds: parseInt(data.auto_publish_delay_seconds || '0') || 0,
+      };
+      
+      console.log('Cleaned settings:', cleanedSettings);
+      setSettings(cleanedSettings);
+      setError('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load settings');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load settings';
+      console.error('Error fetching settings:', errorMsg);
+      setError(errorMsg);
+      // Keep default settings on error
     } finally {
       setLoading(false);
     }
@@ -95,9 +120,17 @@ export default function AdminChroniclesControl() {
         body: JSON.stringify(settings),
       });
 
-      if (!res.ok) throw new Error('Failed to save settings');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to save settings');
+      }
+
+      const result = await res.json();
+      console.log('Settings saved:', result);
 
       setSuccess('Settings updated successfully');
+      // Refetch settings to confirm
+      await fetchSettings();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');

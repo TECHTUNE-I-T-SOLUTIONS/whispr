@@ -19,6 +19,7 @@ export function Header() {
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [chroniclesEnabled, setChroniclesEnabled] = useState(false)
   const { toast } = useToast()
   const [sharePreviewOpen, setSharePreviewOpen] = useState(false)
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
@@ -42,6 +43,23 @@ export function Header() {
     return () => { mounted = false }
   }, [])
 
+  // Check if Chronicles feature is enabled
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/chronicles/settings')
+        if (!mounted) return
+        if (!res.ok) return
+        const data = await res.json()
+        if (mounted && data?.feature_enabled) {
+          setChroniclesEnabled(true)
+        }
+      } catch (e) {}
+    })()
+    return () => { mounted = false }
+  }, [])
+
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
@@ -49,6 +67,7 @@ export function Header() {
     { name: "Spoken Words", href: "/media" },
     { name: "About", href: "/about" },
     { name: "whispr Wall", href: "/whispr-wall" },
+    ...(chroniclesEnabled ? [{ name: "Chronicles", href: "/chronicles" }] : []),
   ]
 
   const logoSrc = hasMounted ? (theme === 'dark' ? '/lightlogo.png' : '/darklogo.png') : '/darklogo.png'

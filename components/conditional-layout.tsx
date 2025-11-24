@@ -13,9 +13,10 @@ interface ConditionalLayoutProps {
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
   const isAdminPage = pathname.startsWith("/admin")
+  const isChroniclesPage = pathname.startsWith("/chronicles")
 
-  if (isAdminPage) {
-    // Admin pages handle their own layout
+  if (isAdminPage || isChroniclesPage) {
+    // Admin and Chronicles pages handle their own layout
     return <>{children}</>
   }
 

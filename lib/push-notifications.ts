@@ -175,3 +175,137 @@ export async function sendWelcomeNotification(endpoint: string, keys: { p256dh: 
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
+
+/**
+ * Send push notification to a specific creator
+ */
+export async function notifyCreator(
+  creatorUserId: string,
+  title: string,
+  body: string,
+  url: string = '/chronicles/dashboard'
+) {
+  try {
+    const supabase = createSupabaseServer();
+    const webpush = (await import('web-push')).default;
+
+    // Get creator's push subscriptions
+    const { data: subscriptions, error } = await supabase
+      .from('chronicles_push_subscriptions')
+      .select('subscription')
+      .eq('user_id', creatorUserId);
+
+    if (error || !subscriptions || subscriptions.length === 0) {
+      console.log('No push subscriptions found for creator:', creatorUserId);
+      return { success: false, message: 'No subscriptions' };
+    }
+
+    const vapidKeys = {
+      subject: process.env.VAPID_SUBJECT,
+      publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.VAPID_PUBLIC_KEY,
+      privateKey: process.env.VAPID_PRIVATE_KEY,
+    };
+
+    if (!vapidKeys.publicKey || !vapidKeys.privateKey) {
+      throw new Error('VAPID keys not configured');
+    }
+
+    webpush.setVapidDetails(
+      vapidKeys.subject || 'mailto:admin@whispr.com',
+      vapidKeys.publicKey,
+      vapidKeys.privateKey
+    );
+
+    const payload = {
+      title,
+      body,
+      url,
+      icon: '/logotype.png',
+      type: 'creator_notification',
+    };
+
+    let sent = 0;
+    for (const sub of subscriptions) {
+      try {
+        await webpush.sendNotification(
+          sub.subscription,
+          JSON.stringify(payload)
+        );
+        sent++;
+      } catch (error) {
+        console.error('Error sending creator notification:', error);
+      }
+    }
+
+    return { success: true, sent };
+  } catch (error) {
+    console.error('Error notifying creator:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
+ * Send push notification to all admins
+ */
+export async function notifyAdmins(
+  title: string,
+  body: string,
+  url: string = '/admin'
+) {
+  try {
+    const supabase = createSupabaseServer();
+    const webpush = (await import('web-push')).default;
+
+    // Get admin push subscriptions
+    const { data: subscriptions, error } = await supabase
+      .from('admin_push_subscriptions')
+      .select('subscription');
+
+    if (error || !subscriptions || subscriptions.length === 0) {
+      console.log('No admin push subscriptions found');
+      return { success: false, message: 'No subscriptions' };
+    }
+
+    const vapidKeys = {
+      subject: process.env.VAPID_SUBJECT,
+      publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.VAPID_PUBLIC_KEY,
+      privateKey: process.env.VAPID_PRIVATE_KEY,
+    };
+
+    if (!vapidKeys.publicKey || !vapidKeys.privateKey) {
+      throw new Error('VAPID keys not configured');
+    }
+
+    webpush.setVapidDetails(
+      vapidKeys.subject || 'mailto:admin@whispr.com',
+      vapidKeys.publicKey,
+      vapidKeys.privateKey
+    );
+
+    const payload = {
+      title: `[ADMIN] ${title}`,
+      body,
+      url,
+      icon: '/logotype.png',
+      type: 'admin_alert',
+    };
+
+    let sent = 0;
+    for (const sub of subscriptions) {
+      try {
+        await webpush.sendNotification(
+          sub.subscription,
+          JSON.stringify(payload)
+        );
+        sent++;
+      } catch (error) {
+        console.error('Error sending admin notification:', error);
+      }
+    }
+
+    return { success: true, sent };
+  } catch (error) {
+    console.error('Error notifying admins:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}

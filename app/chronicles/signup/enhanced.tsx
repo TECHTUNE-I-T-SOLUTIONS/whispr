@@ -160,26 +160,71 @@ export default function EnhancedChroniclesSignup() {
 
     setLoading(true);
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('password', formData.password);
-      formDataToSend.append('penName', formData.penName);
-      formDataToSend.append('bio', formData.bio);
-      formDataToSend.append('contentType', formData.contentType);
-      formDataToSend.append('categories', JSON.stringify(formData.categories));
       if (formData.profileImage) {
-        formDataToSend.append('profileImage', formData.profileImage);
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const base64Image = event.target?.result as string;
+          
+          const jsonData = {
+            email: formData.email,
+            password: formData.password,
+            penName: formData.penName,
+            displayName: formData.penName,
+            bio: formData.bio,
+            profileImage: base64Image,
+            contentType: formData.contentType,
+            preferredCategories: formData.categories,
+            profileVisibility: 'public',
+            socialLinks: {},
+            pushNotifications: true,
+            emailDigest: true,
+            emailOnEngagement: true,
+          };
+
+          const res = await fetch('/api/chronicles/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jsonData),
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Failed to create account');
+
+          // Wait a moment for session to be established
+          await new Promise(resolve => setTimeout(resolve, 500));
+          router.push('/chronicles/dashboard');
+        };
+        reader.readAsDataURL(formData.profileImage);
+      } else {
+        const jsonData = {
+          email: formData.email,
+          password: formData.password,
+          penName: formData.penName,
+          displayName: formData.penName,
+          bio: formData.bio,
+          profileImage: null,
+          contentType: formData.contentType,
+          preferredCategories: formData.categories,
+          profileVisibility: 'public',
+          socialLinks: {},
+          pushNotifications: true,
+          emailDigest: true,
+          emailOnEngagement: true,
+        };
+
+        const res = await fetch('/api/chronicles/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonData),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create account');
+
+        // Wait a moment for session to be established
+        await new Promise(resolve => setTimeout(resolve, 500));
+        router.push('/chronicles/dashboard');
       }
-
-      const res = await fetch('/api/chronicles/auth/signup', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create account');
-
-      router.push('/chronicles/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setLoading(false);

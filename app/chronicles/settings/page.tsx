@@ -24,10 +24,10 @@ interface CreatorProfile {
   id: string;
   pen_name: string;
   bio: string;
-  profile_picture_url?: string;
+  profile_image_url?: string;
   email: string;
   content_type: 'blog' | 'poem' | 'both';
-  categories: string[];
+  preferred_categories: string[];
   social_links: {
     twitter?: string;
     linkedin?: string;
@@ -53,7 +53,7 @@ export default function CreatorSettings() {
     bio: '',
     email: '',
     content_type: 'blog',
-    categories: [],
+    preferred_categories: [],
     social_links: {},
     profile_visibility: 'public',
     push_notifications_enabled: false,
@@ -125,7 +125,7 @@ export default function CreatorSettings() {
       if (!res.ok) throw new Error('Upload failed');
 
       const data = await res.json();
-      setProfile({ ...profile, profile_picture_url: data.url });
+      setProfile({ ...profile, profile_image_url: data.url });
       setSuccess('Profile picture updated');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -164,6 +164,31 @@ export default function CreatorSettings() {
           const permission = await Notification.requestPermission();
           if (permission !== 'granted') {
             setError('Notification permission denied');
+            setSaving(false);
+            return;
+          }
+        }
+
+        // Register service worker and subscribe to push notifications
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+          try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+            });
+
+            // Send subscription to server
+            await fetch('/api/chronicles/creator/push-subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(subscription),
+            });
+
+            console.log('Push subscription successful:', subscription);
+          } catch (pushError) {
+            console.error('Push subscription error:', pushError);
+            setError('Failed to enable push notifications');
             setSaving(false);
             return;
           }
@@ -253,9 +278,9 @@ export default function CreatorSettings() {
               <label className="block text-sm font-medium mb-3">Profile Picture</label>
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
-                  {profile.profile_picture_url ? (
+                  {profile.profile_image_url ? (
                     <Image
-                      src={profile.profile_picture_url}
+                      src={profile.profile_image_url}
                       alt="Profile"
                       width={80}
                       height={80}
@@ -331,13 +356,13 @@ export default function CreatorSettings() {
                     <button
                       key={cat}
                       onClick={() => {
-                        const cats = profile.categories.includes(cat)
-                          ? profile.categories.filter((c) => c !== cat)
-                          : [...profile.categories, cat];
-                        setProfile({ ...profile, categories: cats });
+                        const cats = profile.preferred_categories.includes(cat)
+                          ? profile.preferred_categories.filter((c) => c !== cat)
+                          : [...profile.preferred_categories, cat];
+                        setProfile({ ...profile, preferred_categories: cats });
                       }}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        profile.categories.includes(cat)
+                        profile.preferred_categories.includes(cat)
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-200 dark:bg-slate-800 text-foreground hover:bg-gray-300 dark:hover:bg-slate-700'
                       }`}

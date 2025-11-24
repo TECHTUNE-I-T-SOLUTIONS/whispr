@@ -43,8 +43,22 @@ export default function PublicPostPage() {
 
   const fetchPost = async () => {
     try {
-      // In production, this would fetch from `/api/chronicles/posts/[slug]`
-      // For now, this is a placeholder
+      setLoading(true);
+      const response = await fetch(`/api/chronicles/posts/${slug}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Post not found');
+        } else {
+          setError('Failed to load post');
+        }
+        setLoading(false);
+        return;
+      }
+      
+      const data = await response.json();
+      setPost(data.post);
+      setEngagementCount(data.post.engagement_count);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load post');

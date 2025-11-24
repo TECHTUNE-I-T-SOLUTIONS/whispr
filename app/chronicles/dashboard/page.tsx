@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+// import ChroniclesDashboardLayout from '@/components/chronicles-dashboard-layout';
 import {
   BarChart3,
   BookOpen,
   Flame,
   Award,
   Plus,
-  Settings,
   Loader2,
-  LogOut,
   Edit,
   Trash2,
   Eye,
+  TrendingUp,
 } from 'lucide-react';
 
 interface CreatorStats {
@@ -25,6 +25,9 @@ interface CreatorStats {
   longestStreak: number;
   points: number;
   badges: string[];
+  totalFollowers: number;
+  penName: string;
+  bio?: string;
 }
 
 interface Post {
@@ -39,16 +42,34 @@ interface Post {
   publishedAt?: string;
 }
 
-export default function ChroniclesDashboard() {
+function DashboardContent() {
   const router = useRouter();
   const [stats, setStats] = useState<CreatorStats | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'analytics'>('overview');
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   useEffect(() => {
-    fetchDashboardData();
+    checkAuthAndFetchData();
   }, []);
+
+  const checkAuthAndFetchData = async () => {
+    try {
+      // Check if user is authenticated
+      const sessionRes = await fetch('/api/session');
+      if (!sessionRes.ok) {
+        // Not authenticated, redirect to login
+        router.push('/chronicles/login');
+        return;
+      }
+
+      setIsAuthChecked(true);
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Auth check error:', error);
+      router.push('/chronicles/login');
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -58,164 +79,139 @@ export default function ChroniclesDashboard() {
         fetch('/api/chronicles/creator/posts'),
       ]);
 
-      if (!statsRes.ok || !postsRes.ok) {
-        throw new Error('Failed to fetch data');
+      if (!statsRes.ok) {
+        console.error('Stats error:', statsRes.status);
+        if (statsRes.status === 401) {
+          router.push('/chronicles/login');
+          return;
+        }
+        throw new Error(`Stats failed: ${statsRes.status}`);
+      }
+
+      if (!postsRes.ok) {
+        console.error('Posts error:', postsRes.status);
+        if (postsRes.status === 401) {
+          router.push('/chronicles/login');
+          return;
+        }
+        throw new Error(`Posts failed: ${postsRes.status}`);
       }
 
       const statsData = await statsRes.json();
       const postsData = await postsRes.json();
 
       setStats(statsData);
-      setPosts(postsData.posts || []);
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
+      setPosts(Array.isArray(postsData) ? postsData : postsData.posts || []);
+    } catch (error) {
+      console.error('Dashboard error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/chronicles/auth/logout', { method: 'POST' });
-      router.push('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  };
-
-  if (loading) {
+  // Show loading while checking auth
+  if (!isAuthChecked) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-center h-64">
+      // <ChroniclesDashboardLayout>
+        <div className="flex items-center justify-center py-20 p-4">
           <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         </div>
-      </main>
+      // </ChroniclesDashboardLayout>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    // <ChroniclesDashboardLayout>
+      <div className="space-y-8 p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
+            <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
             <p className="text-muted-foreground">Manage your stories and track your growth</p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/chronicles/write">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                <Plus className="w-4 h-4 mr-2" /> New Post
-              </Button>
-            </Link>
-            <Link href="/chronicles/settings">
-              <Button variant="outline">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="w-4 h-4" />
+          <Link href="/chronicles/write">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+              <Plus className="w-4 h-4 mr-2" /> New Post
             </Button>
-          </div>
+          </Link>
         </div>
 
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {/* Total Posts */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Total Posts</h3>
-                <BookOpen className="w-5 h-5 text-purple-600" />
-              </div>
-              <p className="text-3xl font-bold">{stats.totalPosts}</p>
-            </div>
-
-            {/* Engagement */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Engagement</h3>
-                <BarChart3 className="w-5 h-5 text-pink-600" />
-              </div>
-              <p className="text-3xl font-bold">{stats.totalEngagement}</p>
-            </div>
-
-            {/* Current Streak */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Current Streak</h3>
-                <Flame className="w-5 h-5 text-orange-600" />
-              </div>
-              <p className="text-3xl font-bold">{stats.currentStreak}</p>
-              <p className="text-xs text-muted-foreground mt-1">Longest: {stats.longestStreak}</p>
-            </div>
-
-            {/* Points */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Points</h3>
-                <Award className="w-5 h-5 text-blue-600" />
-              </div>
-              <p className="text-3xl font-bold">{stats.points}</p>
-            </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>
-        )}
+        ) : (
+          <>
+            {/* Stats Cards */}
+            {stats && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total Posts */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Total Posts</h3>
+                    <BookOpen className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <p className="text-3xl font-bold">{stats.totalPosts}</p>
+                </div>
 
-        {/* Badges */}
-        {stats && stats.badges.length > 0 && (
-          <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6 mb-8">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Award className="w-5 h-5" /> Your Badges
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {stats.badges.map((badge) => (
-                <span
-                  key={badge}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium"
-                >
-                  ✨ {badge}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+                {/* Engagement */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Engagement</h3>
+                    <TrendingUp className="w-5 h-5 text-pink-600" />
+                  </div>
+                  <p className="text-3xl font-bold">{stats.totalEngagement}</p>
+                </div>
 
-        {/* Tabs */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 mb-8">
-          <div className="flex border-b border-gray-200 dark:border-slate-800">
-            {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'posts', label: 'Your Posts', icon: BookOpen },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex-1 px-6 py-4 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition ${
-                    activeTab === tab.id
-                      ? 'border-purple-600 text-purple-600'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" /> {tab.label}
-                </button>
-              );
-            })}
-          </div>
+                {/* Current Streak */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Current Streak</h3>
+                    <Flame className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <p className="text-3xl font-bold">{stats.currentStreak}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Longest: {stats.longestStreak}</p>
+                </div>
 
-          <div className="p-6">
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-bold mb-4">Quick Stats</h3>
-                  <p className="text-muted-foreground">Keep writing consistently to build your streak and earn badges!</p>
+                {/* Points */}
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Points</h3>
+                    <Award className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <p className="text-3xl font-bold">{stats.points}</p>
                 </div>
               </div>
             )}
 
-            {activeTab === 'posts' && (
-              <div>
+            {/* Badges */}
+            {stats && stats.badges.length > 0 && (
+              <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5" /> Your Badges
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {stats.badges.map((badge) => (
+                    <span
+                      key={badge}
+                      className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium"
+                    >
+                      ✨ {badge}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Posts Section */}
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden">
+              <div className="p-6 border-b border-gray-200 dark:border-slate-800">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" /> Your Posts
+                </h2>
+              </div>
+
+              <div className="p-6">
                 {posts.length === 0 ? (
                   <div className="text-center py-12">
                     <BookOpen className="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-4" />
@@ -234,14 +230,16 @@ export default function ChroniclesDashboard() {
                         key={post.id}
                         className="flex items-center justify-between p-4 border border-gray-200 dark:border-slate-800 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition"
                       >
-                        <div className="flex-1">
-                          <h4 className="font-bold mb-1">{post.title}</h4>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              post.status === 'published'
-                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                            }`}>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold mb-1 truncate">{post.title}</h4>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                post.status === 'published'
+                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                  : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                              }`}
+                            >
                               {post.status}
                             </span>
                             <span>{post.likesCount} likes</span>
@@ -249,7 +247,7 @@ export default function ChroniclesDashboard() {
                             <span>{post.sharesCount} shares</span>
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 ml-4 flex-shrink-0">
                           <Link href={`/chronicles/posts/${post.slug}`}>
                             <Button size="sm" variant="ghost">
                               <Eye className="w-4 h-4" />
@@ -269,10 +267,12 @@ export default function ChroniclesDashboard() {
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </>
+        )}
       </div>
-    </main>
+    // </ChroniclesDashboardLayout>
   );
 }
+
+export default DashboardContent;

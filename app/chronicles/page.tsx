@@ -17,10 +17,16 @@ export default function ChroniclesLanding() {
 
   const checkFeatureStatus = async () => {
     try {
-      const res = await fetch('/api/chronicles/settings');
+      const res = await fetch('/api/chronicles/settings', {
+        cache: 'no-store',
+      });
       if (res.ok) {
         const data = await res.json();
-        setFeatureEnabled(data?.featureEnabled === true);
+        console.log('Chronicles settings:', data);
+        // Check for both camelCase and snake_case
+        const enabled = data?.feature_enabled === true || data?.feature_enabled === 'true' || data?.featureEnabled === true;
+        console.log('Feature enabled:', enabled);
+        setFeatureEnabled(enabled);
       }
     } catch (e) {
       console.error('Failed to check feature status:', e);

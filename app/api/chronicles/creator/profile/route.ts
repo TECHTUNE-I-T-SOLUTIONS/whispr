@@ -1,20 +1,25 @@
-import { createSupabaseServer } from '@/lib/supabase-server';
+import { createSupabaseServerClient } from '@/lib/supabase-server-client';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET creator profile
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
+    const supabase = await createSupabaseServerClient();
 
-    if (!userId) {
+    // Get current user from session
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { data: creator, error } = await supabase
       .from('chronicles_creators')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .single();
 
     if (error) throw error;
@@ -32,18 +37,24 @@ export async function GET(req: NextRequest) {
 // PUT update creator profile
 export async function PUT(req: NextRequest) {
   try {
-    const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
-    const updates = await req.json();
+    const supabase = await createSupabaseServerClient();
 
-    if (!userId) {
+    // Get current user from session
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const updates = await req.json();
 
     const { data: creator, error } = await supabase
       .from('chronicles_creators')
       .update(updates)
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .select()
       .single();
 
