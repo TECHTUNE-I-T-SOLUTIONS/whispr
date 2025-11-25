@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Heart } from "lucide-react"
+import { Heart, FileText, Shield } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
@@ -27,7 +27,7 @@ export function Footer() {
   return (
     <footer className="border-t bg-background/95 backdrop-blur">
       <div className="container py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div>
             <Link href="/" className="flex items-center space-x-2 mb-4">
@@ -87,6 +87,31 @@ export function Footer() {
               Follow the whispers and stay updated with new writings.
             </p>
             {isSubscribed && <PushNotificationManager compact={true} />}
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="font-semibold mb-4">Legal</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link 
+                  href="/terms" 
+                  className="hover:text-primary transition-colors flex items-center gap-2 group"
+                >
+                  <FileText className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/privacy" 
+                  className="hover:text-primary transition-colors flex items-center gap-2 group"
+                >
+                  <Shield className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  Privacy Policy
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
