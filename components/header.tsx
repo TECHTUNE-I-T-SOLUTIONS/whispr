@@ -196,6 +196,20 @@ export function Header() {
             <Link href="/admin/dashboard" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"><LayoutDashboard className="h-4 w-4" /><span className="hidden lg:inline">Dashboard</span></Link>
           )}
 
+          {chroniclesEnabled && (
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild className="text-xs">
+                <Link href="/chronicles/feed">Chronicles Feed</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild className="text-xs">
+                <Link href="/auth/login">Chronicles Login</Link>
+              </Button>
+              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
+                <Link href="/auth/signup">Join Chronicles</Link>
+              </Button>
+            </div>
+          )}
+
           <ThemeToggle />
 
           <div className="relative">
@@ -252,6 +266,13 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            {chroniclesEnabled && (
+              <div className="py-2 border-t mt-2 space-y-2">
+                <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
+                <Link href="/auth/login" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Login</Link>
+                <Link href="/auth/signup" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
+              </div>
+            )}
             <div className="pt-4 border-t">
               {isAdmin && (
                 <div className="space-y-2">

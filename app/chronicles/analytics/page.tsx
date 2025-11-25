@@ -47,7 +47,7 @@ interface Analytics {
     id: string;
     title: string;
     slug: string;
-    view_count: number;
+    views_count: number;
     likes_count: number;
     comments_count: number;
     shares_count: number;
@@ -357,10 +357,10 @@ export default function AnalyticsPage() {
                       {post.title}
                     </h3>
                     <div className="flex gap-4 mt-1 text-xs text-gray-600 dark:text-gray-400">
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {post.view_count} views
-                      </span>
+                    <span className="flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      {post.views_count} views
+                    </span>
                       <span className="flex items-center gap-1">
                         <Heart className="w-3 h-3" />
                         {post.likes_count} likes

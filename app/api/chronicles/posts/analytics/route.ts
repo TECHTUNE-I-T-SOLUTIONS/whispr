@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const draftPosts = posts?.filter((p) => p.status === 'draft') || [];
 
     // Calculate engagement metrics
-    const totalViews = publishedPosts.reduce((sum, p) => sum + (p.view_count || 0), 0);
+    const totalViews = publishedPosts.reduce((sum, p) => sum + (p.views_count || 0), 0);
     const totalLikes = publishedPosts.reduce((sum, p) => sum + (p.likes_count || 0), 0);
     const totalComments = publishedPosts.reduce((sum, p) => sum + (p.comments_count || 0), 0);
     const totalShares = publishedPosts.reduce((sum, p) => sum + (p.shares_count || 0), 0);
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         };
       }
       dailyAnalytics[date].posts += 1;
-      dailyAnalytics[date].views += post.view_count || 0;
+      dailyAnalytics[date].views += post.views_count || 0;
       dailyAnalytics[date].engagement +=
         (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0);
     });
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         };
       }
       categoryBreakdown[category].count += 1;
-      categoryBreakdown[category].views += post.view_count || 0;
+      categoryBreakdown[category].views += post.views_count || 0;
       categoryBreakdown[category].engagement +=
         (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0);
     });

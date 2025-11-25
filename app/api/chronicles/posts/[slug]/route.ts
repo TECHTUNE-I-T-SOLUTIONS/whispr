@@ -35,7 +35,7 @@ export async function GET(
     // Increment view count
     await supabase
       .from('chronicles_posts')
-      .update({ view_count: (post.view_count || 0) + 1 })
+      .update({ views_count: (post.views_count || 0) + 1 })
       .eq('id', post.id)
       .throwOnError();
 

@@ -1,32 +1,37 @@
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { FeaturedPosts } from "@/components/featured-posts"
 import { RecentPosts } from "@/components/recent-posts"
 import { HeroSection } from "@/components/hero-section"
 import { DailyPoemModal } from "@/components/daily-poem-modal"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
+import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
 
-  export default function HomePage() {
-    return (
-      <div className="whispr-gradient min-h-screen">
-        <DailyPoemModal />
-        <HeroSection />
+export default function HomePage() {
 
-        <section className="container py-16">
-          <Suspense fallback={<div>Loading featured content...</div>}>
-            <FeaturedPosts />
-          </Suspense>
-        </section>
+  return (
+    <div className="whispr-gradient min-h-screen">
+      <DailyPoemModal />
+      <HeroSection />
 
-        <section className="container py-16">
-          <Suspense fallback={<div>Loading recent posts...</div>}>
-            <RecentPosts />
-          </Suspense>
-        </section>
+      {/* Chronicles Feature Section */}
+      <ChroniclesFeatureSection />
 
-        {/* Adsterra banners below main content */}
-        <AdsterraBanner />
-      </div>
-    );
-  }
+      <section className="container py-16">
+        <Suspense fallback={<div>Loading featured content...</div>}>
+          <FeaturedPosts />
+        </Suspense>
+      </section>
+
+      <section className="container py-16">
+        <Suspense fallback={<div>Loading recent posts...</div>}>
+          <RecentPosts />
+        </Suspense>
+      </section>
+
+      {/* Adsterra banners below main content */}
+      <AdsterraBanner />
+    </div>
+  );
+}
 
 

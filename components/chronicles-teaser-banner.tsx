@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { ChevronRight, Sparkles, Zap, BookOpen } from 'lucide-react';
 import styles from './chronicles-teaser-banner.module.css';
 
@@ -17,11 +18,11 @@ export function ChroniclesTeaserBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-red-500">
+    <div className="relative w-full overflow-hidden bg-gradient-to-r from-gray-600 to-primary dark:from-gray-800 dark:to-primary">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></motion.div>
+        <motion.div animate={{ rotate: -360 }} transition={{ duration: 25, repeat: Infinity, ease: 'linear' }} className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></motion.div>
       </div>
 
       {/* Main banner content */}
