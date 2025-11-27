@@ -131,7 +131,7 @@ export function ChroniclesAnimatedStats() {
             The Future Awaits
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Chronicles is being carefully crafted to revolutionize how creators share their stories. We\'re building something special for you.
+            Chronicles is being carefully crafted to revolutionize how creators share their stories. We're building something special for you.
           </p>
         </motion.div>
 

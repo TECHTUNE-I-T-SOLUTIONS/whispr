@@ -1,4 +1,5 @@
-import { Suspense, useState } from "react"
+import { Suspense } from "react"
+import { CookieConsentModal } from "@/components/CookieConsentModal"
 import { FeaturedPosts } from "@/components/featured-posts"
 import { RecentPosts } from "@/components/recent-posts"
 import { HeroSection } from "@/components/hero-section"
@@ -10,6 +11,10 @@ export default function HomePage() {
 
   return (
     <div className="whispr-gradient min-h-screen">
+      {/* Cookie Consent Modal */}
+      <Suspense fallback={null}>
+        <CookieConsentModal />
+      </Suspense>
       <DailyPoemModal />
       <HeroSection />
 

@@ -194,8 +194,8 @@ export default function PublicPostPage() {
         </div>
 
         {/* Content */}
-        <div className="prose dark:prose-invert max-w-none mb-8 leading-relaxed">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="prose prose-purple dark:prose-invert max-w-none mb-8 leading-relaxed">
+          <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(marked.parse(post.content || ''))) }} />
         </div>
 
         {/* Tags */}

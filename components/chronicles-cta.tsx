@@ -56,7 +56,7 @@ export function ChroniclesCTA({ onOpenModal }: ChronicleCTAProps) {
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/40 mb-6"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/40 dark:bg-primary/30 border border-primary/90 dark:border-primary/40 mb-6"
         >
           <Sparkles className="w-4 h-4 text-primary" />
           <span className="text-sm font-semibold text-primary">
@@ -107,7 +107,7 @@ export function ChroniclesCTA({ onOpenModal }: ChronicleCTAProps) {
             <Button
               asChild
               size="lg"
-              className="bg-gradient-to-r from-foreground to-primary hover:shadow-xl text-white font-semibold px-8 shadow-lg transition-all"
+              className="bg-gradient-to-r from-gray-800 to-primary hover:shadow-xl text-white font-semibold px-8 shadow-lg transition-all"
             >
               <Link href="/auth/signup" className="flex items-center gap-2">
                 <Zap className="w-5 h-5" />

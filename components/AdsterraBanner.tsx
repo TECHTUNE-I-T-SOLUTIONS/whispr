@@ -1,11 +1,20 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function AdsterraBanner() {
   const adRef1 = useRef<HTMLDivElement>(null);
   const adRef2 = useRef<HTMLDivElement>(null);
+  const [showAds, setShowAds] = useState<boolean | null>(null);
 
   useEffect(() => {
+    fetch("/api/ads-settings")
+      .then((res) => res.json())
+      .then((data) => setShowAds(data?.show_ads ?? false))
+      .catch(() => setShowAds(false));
+  }, []);
+
+  useEffect(() => {
+    if (!showAds) return;
     // Adsterra iframe banner
     if (adRef1.current) {
       const script1 = document.createElement('script');
@@ -36,8 +45,9 @@ export function AdsterraBanner() {
       div.id = 'container-595afd21b56559223443ca3b653978bd';
       adRef2.current.appendChild(div);
     }
-  }, []);
+  }, [showAds]);
 
+  if (!showAds) return null;
   return (
     <div className="flex flex-col items-center gap-6 py-8">
       <div ref={adRef1} />

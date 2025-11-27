@@ -60,7 +60,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-gradient-to-r from-foreground to-primary dark:from-gray-600 dark:to-primary"
+          className="relative overflow-hidden bg-gradient-to-r from-foreground to-primary dark:from-gray-600 dark:to-primary opacity-5 rounded-2xl"
         >
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">

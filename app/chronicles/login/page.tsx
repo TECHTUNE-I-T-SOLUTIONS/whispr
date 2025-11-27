@@ -103,7 +103,7 @@ export default function ChroniclesLogin() {
                 className="object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-primary bg-clip-text text-transparent dark:bg-gradient-to-r dark:from-gray-200 dark:to-primary">
               Chronicles
             </h1>
           </div>
@@ -172,7 +172,7 @@ export default function ChroniclesLogin() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2.5 rounded-lg transition-all"
+              className="w-full bg-gradient-to-r from-gray-600 to-primary hover:from-gray-700 hover:to-primary text-white font-medium py-2.5 rounded-lg transition-all"
             >
               {loading ? (
                 <>

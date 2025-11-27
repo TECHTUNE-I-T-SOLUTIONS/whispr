@@ -1,6 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon, Image } from 'lucide-react';
+import { marked } from 'marked';
+// Use marked.parse for synchronous parsing (ensure string output)
+const parseMarkdown = (md: string) => typeof marked.parse === 'function' ? marked.parse(md) : '';
+import DOMPurify from 'dompurify';
+import dynamic from 'next/dynamic';
+// Dynamically import React Quill for SSR compatibility
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+// import 'react-quill/dist/quill.snow.css';
+// import { Modal } from '@/components/chronicles-feature-modal';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,10 +25,38 @@ interface PostData {
   content: string;
   category: string;
   tags: string[];
-  coverImageUrl?: string;
+  cover_image_url?: string;
+  post_type: 'blog' | 'poem';
+  status?: 'draft' | 'published' | 'archived' | 'scheduled';
 }
 
 export default function ChroniclesWrite() {
+    const [imagePreview, setImagePreview] = useState<string>('');
+    const [fetchedImage, setFetchedImage] = useState<string>('');
+    const [fetchingImage, setFetchingImage] = useState(false);
+    // Fetch image from URL and show preview
+    const handleFetchImage = async () => {
+      if (!postData.cover_image_url) return;
+      setFetchingImage(true);
+      setFetchedImage('');
+      try {
+        // Simple check for image URL
+        const res = await fetch(postData.cover_image_url);
+        if (!res.ok) throw new Error('Image not found');
+        setFetchedImage(postData.cover_image_url);
+      } catch (err) {
+        setFetchedImage('');
+      } finally {
+        setFetchingImage(false);
+      }
+    };
+    const [showPreviewModal, setShowPreviewModal] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+    // Formatting toolbar state
+    const [showLinkDialog, setShowLinkDialog] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
+    const [linkText, setLinkText] = useState('');
+    const [showPreview, setShowPreview] = useState(false);
   const router = useRouter();
   const params = useParams();
   const postId = params?.id as string | undefined;
@@ -34,7 +72,9 @@ export default function ChroniclesWrite() {
     content: '',
     category: '',
     tags: [],
-    coverImageUrl: '',
+    cover_image_url: '',
+    post_type: 'blog',
+    status: 'draft',
   });
   const [tagInput, setTagInput] = useState('');
 
@@ -51,7 +91,10 @@ export default function ChroniclesWrite() {
       const res = await fetch(`/api/chronicles/creator/posts/${postId}`);
       if (!res.ok) throw new Error('Failed to load post');
       const data = await res.json();
-      setPostData(data);
+      setPostData({
+        ...data,
+        cover_image_url: data.cover_image_url || '',
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load post');
     } finally {
@@ -104,7 +147,15 @@ export default function ChroniclesWrite() {
       const res = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...postData, status: 'draft' }),
+        body: JSON.stringify({
+          ...postData,
+          status: 'draft',
+          post_type: postData.post_type,
+          category: postData.category,
+          tags: postData.tags,
+          excerpt: postData.excerpt,
+          cover_image_url: postData.cover_image_url,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to save draft');
@@ -135,7 +186,15 @@ export default function ChroniclesWrite() {
       const res = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...postData, status: 'published' }),
+        body: JSON.stringify({
+          ...postData,
+          status: 'published',
+          post_type: postData.post_type,
+          category: postData.category,
+          tags: postData.tags,
+          excerpt: postData.excerpt,
+          cover_image_url: postData.cover_image_url,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to publish');
@@ -157,7 +216,25 @@ export default function ChroniclesWrite() {
     );
   }
 
-  return (
+  // Image preview logic
+  useEffect(() => {
+    if (postData.cover_image_url && postData.cover_image_url.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)) {
+      setImagePreview(postData.cover_image_url);
+    } else {
+      setImagePreview('');
+    }
+  }, [postData.cover_image_url]);
+
+  // Rich text formatting functions
+  const exec = (command: string, value?: string) => {
+    contentRef.current?.focus();
+    try {
+      document.execCommand(command, false, value);
+    } catch (e) {}
+    setPostData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || '' }));
+  };
+
+  return ( 
     <main className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -189,17 +266,46 @@ export default function ChroniclesWrite() {
           </div>
         )}
 
+        <div className="mb-2 align-middle flex justify-end gap-2">
+          <select
+            value={postData.post_type}
+            onChange={e => setPostData(prev => ({ ...prev, post_type: e.target.value as 'blog' | 'poem' }))}
+            className="px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-base"
+            aria-label="Post type"
+          >
+            <option value="blog">📝 Blog Post</option>
+            <option value="poem">✨ Poem</option>
+          </select>
+          <select
+            value={postData.category}
+            onChange={e => setPostData(prev => ({ ...prev, category: e.target.value }))}
+            className="px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-base"
+            aria-label="Category"
+            required
+          >
+            <option value="">Select category</option>
+            <option value="fiction">Fiction</option>
+            <option value="technology">Technology</option>
+            <option value="lifestyle">Lifestyle</option>
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+            <option value="education">Education</option>
+            <option value="other">Other</option>
+          </select>          
+        </div>
         {/* Editor */}
         <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-8">
           {/* Title */}
           <div className="mb-6">
-            <Input
-              type="text"
-              placeholder="Enter your post title..."
-              value={postData.title}
-              onChange={handleTitleChange}
-              className="text-3xl font-bold border-0 p-0 focus:ring-0 focus:outline-none placeholder:text-gray-300 dark:placeholder:text-slate-600"
-            />
+            <div className="flex flex-col md:flex-row gap-4 items-center mb-2">
+              <Input
+                type="text"
+                placeholder={postData.post_type === 'poem' ? 'Enter poem title...' : 'Enter your post title...'}
+                value={postData.title}
+                onChange={handleTitleChange}
+                className={`text-3xl font-bold border-2 p-2 focus:ring-0 focus:outline-none placeholder:text-gray-300 dark:placeholder:text-slate-600 ${postData.post_type === 'poem' ? 'font-serif text-center' : ''}`}
+              />
+            </div>
             <p className="text-sm text-muted-foreground mt-2">Slug: {postData.slug}</p>
           </div>
 
@@ -211,9 +317,24 @@ export default function ChroniclesWrite() {
             <Input
               type="text"
               placeholder="https://example.com/image.jpg"
-              value={postData.coverImageUrl || ''}
-              onChange={(e) => setPostData({ ...postData, coverImageUrl: e.target.value })}
+              value={postData.cover_image_url || ''}
+              onChange={(e) => setPostData({ ...postData, cover_image_url: e.target.value })}
             />
+            <Button type="button" variant="outline" className="mt-2" onClick={handleFetchImage} disabled={!postData.cover_image_url || fetchingImage}>
+              {fetchingImage ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Fetch Image
+            </Button>
+            {imagePreview && (
+              <div className="mt-3">
+                <img src={imagePreview} alt="Preview" className="h-24 rounded shadow border" />
+              </div>
+            )}
+            {fetchedImage && (
+              <div className="mt-3">
+                <img src={fetchedImage} alt="Fetched Preview" className="h-24 rounded shadow border" />
+                <p className="text-xs text-muted-foreground mt-1">Fetched image preview</p>
+              </div>
+            )}
           </div>
 
           {/* Excerpt */}
@@ -229,24 +350,66 @@ export default function ChroniclesWrite() {
 
           {/* Category */}
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Category *</label>
-            <select
-              value={postData.category}
-              onChange={(e) => setPostData({ ...postData, category: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800"
-            >
-              <option value="">Select a category</option>
-              <option value="fiction">Fiction</option>
-              <option value="technology">Technology</option>
-              <option value="lifestyle">Lifestyle</option>
-              <option value="personal">Personal</option>
-              <option value="business">Business</option>
-              <option value="education">Education</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+            <label className="block text-sm font-medium mb-2">Content *</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('bold')}><Bold className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('italic')}><Italic className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('underline')}><Underline className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyLeft')}><AlignLeft className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyCenter')}><AlignCenter className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyRight')}><AlignRight className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyFull')}><AlignJustify className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowLinkDialog(true)}><LinkIcon className="h-4 w-4" /></Button>
+              {/* Add image button logic if needed */}
+            </div>
+            <div className="relative">
+              <div
+                ref={contentRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={() => setPostData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || '' }))}
+                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-slate-900 text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-purple-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
+                aria-label="Post content editor"
+              />
+              {(!postData.content || postData.content === '<p><br></p>') && (
+                <span className={`absolute top-4 left-4 text-muted-foreground pointer-events-none select-none ${postData.post_type === 'poem' ? 'w-full text-center' : ''}`}>{postData.post_type === 'poem' ? 'Write your poem here...' : 'Write your story here...'}</span>
+              )}
+            </div>
 
-          {/* Tags */}
+            {/* Link dialog */}
+            {showLinkDialog && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg max-w-sm w-full p-6 relative">
+                  <Button variant="ghost" className="absolute top-2 right-2" onClick={() => setShowLinkDialog(false)}>Close</Button>
+                  <h3 className="text-lg font-bold mb-2">Insert Link</h3>
+                  <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://example.com" className="mb-2" />
+                  <Input value={linkText} onChange={(e) => setLinkText(e.target.value)} placeholder="Link text (optional)" className="mb-2" />
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setShowLinkDialog(false)}>Cancel</Button>
+                    <Button onClick={() => {
+                      setShowLinkDialog(false);
+                      setTimeout(() => {
+                        contentRef.current?.focus();
+                        if (linkText) {
+                          exec('insertHTML', `<a href='${linkUrl}' target='_blank' rel='noopener noreferrer'>${linkText}</a>`);
+                        } else {
+                          exec('createLink', linkUrl);
+                        }
+                      }, 0);
+                    }}>Insert</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">Your content has {postData.content.replace(/<[^>]+>/g, '').length} characters</p>
+            {/* Live Preview
+            {postData.content && (
+              <div>
+                <label className="block mt-6 mb-2 font-medium">Live Preview</label>
+                <div className="prose prose-purple dark:prose-invert max-w-none border rounded-md p-4 bg-muted/30" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(postData.content) }} />
+              </div>
+            )} */}
+          </div>
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2">Tags</label>
             <div className="flex gap-2 mb-3">
@@ -279,21 +442,93 @@ export default function ChroniclesWrite() {
           <hr className="my-6 border-gray-200 dark:border-slate-800" />
 
           {/* Content Editor */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label className="block text-sm font-medium mb-2">Content *</label>
-            <Textarea
-              placeholder="Write your story here..."
-              value={postData.content}
-              onChange={(e) => setPostData({ ...postData, content: e.target.value })}
-              className="w-full min-h-96 p-4 border border-gray-300 dark:border-slate-700 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-            />
-            <p className="text-xs text-muted-foreground mt-2">{postData.content.length} characters</p>
-          </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('bold')}><Bold className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('italic')}><Italic className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('underline')}><Underline className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyLeft')}><AlignLeft className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyCenter')}><AlignCenter className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyRight')}><AlignRight className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => exec('justifyFull')}><AlignJustify className="h-4 w-4" /></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowLinkDialog(true)}><LinkIcon className="h-4 w-4" /></Button>
+            </div> */}
+            {/* <div className="relative">
+              <div
+                ref={contentRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={() => setPostData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || '' }))}
+                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-slate-900 text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-purple-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
+                aria-label="Post content editor"
+              />
+              {(!postData.content || postData.content === '<p><br></p>') && (
+                <span className={`absolute top-4 left-4 text-muted-foreground pointer-events-none select-none ${postData.post_type === 'poem' ? 'w-full text-center' : ''}`}>{postData.post_type === 'poem' ? 'Write your poem here...' : 'Write your story here...'}</span>
+              )}
+            </div> */}
+            {/* Link dialog */}
+            {/* {showLinkDialog && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg max-w-sm w-full p-6 relative">
+                  <Button variant="ghost" className="absolute top-2 right-2" onClick={() => setShowLinkDialog(false)}>Close</Button>
+                  <h3 className="text-lg font-bold mb-2">Insert Link</h3>
+                  <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://example.com" className="mb-2" />
+                  <Input value={linkText} onChange={(e) => setLinkText(e.target.value)} placeholder="Link text (optional)" className="mb-2" />
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setShowLinkDialog(false)}>Cancel</Button>
+                    <Button onClick={() => {
+                      setShowLinkDialog(false);
+                      setTimeout(() => {
+                        contentRef.current?.focus();
+                        if (linkText) {
+                          exec('insertHTML', `<a href='${linkUrl}' target='_blank' rel='noopener noreferrer'>${linkText}</a>`);
+                        } else {
+                          exec('createLink', linkUrl);
+                        }
+                      }, 0);
+                    }}>Insert</Button>
+                  </div>
+                </div>
+              </div>
+            )} */}
+            {/* <p className="text-xs text-muted-foreground mt-2">{postData.content.replace(/<[^>]+>/g, '').length} characters</p> */}
+            {/* Live Preview */}
+            {/*  */}
 
           {/* Preview Button (optional) */}
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" type="button" onClick={() => setShowPreviewModal(true)}>
             Preview Post
           </Button>
+          {/* Modal for post preview */}
+          {showPreviewModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative border border-gray-200 dark:border-slate-800">
+                <Button variant="ghost" className="absolute top-4 right-4 p-2" onClick={() => setShowPreviewModal(false)}>
+                  <span className="sr-only">Close</span>
+                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </Button>
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-3xl font-extrabold mb-2 text-purple-700 dark:text-purple-300">{postData.title}</h2>
+                  {(fetchedImage || imagePreview) && (
+                    <img src={fetchedImage || imagePreview} alt="Preview" className="h-40 w-full object-cover rounded-lg shadow border mb-4" />
+                  )}
+                  <p className="text-base text-muted-foreground mb-2 italic">{postData.excerpt}</p>
+                  <div className="flex gap-4 mb-2">
+                    <span className="font-semibold">Category:</span> <span>{postData.category}</span>
+                  </div>
+                  <div className="flex gap-4 mb-2">
+                    <span className="font-semibold">Tags:</span> <span>{postData.tags.join(', ')}</span>
+                  </div>
+                  <hr className="my-4" />
+                  <div
+                    className="prose prose-purple dark:prose-invert max-w-none text-lg"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(parseMarkdown(postData.content || ''))) }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </main>

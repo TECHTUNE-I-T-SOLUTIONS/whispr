@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         post_type: body.post_type,
         category: body.category,
         tags: body.tags || [],
-        cover_image_url: body.coverImageUrl,
+        cover_image_url: body.cover_image_url,
         formatting_data: body.formatting_data || {},
         status: body.status || 'draft',
       })

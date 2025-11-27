@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Sparkles, BookOpen, Users, Zap, PenTool, MessageSquare, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ArrowRight, PartyPopper, BookOpen, Users, Zap, PenTool, MessageSquare, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -108,7 +108,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
                         >
                           <Icon className="w-6 h-6" />
                         </motion.div>
-                        <Sparkles className="w-5 h-5 text-purple-500 animate-pulse" />
+                        <PartyPopper className="w-5 h-5 text-purple-500 animate-pulse" />
                       </div>
                       <h2 className="text-3xl md:text-4xl font-bold mb-2">{currentFeature.title}</h2>
                       <p className="text-lg text-muted-foreground">{currentFeature.subtitle}</p>
@@ -219,7 +219,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
                   <Button
                     asChild
                     size="lg"
-                    className="flex-1 bg-gradient-to-r from-foreground to-primary text-white hover:shadow-lg transition-shadow"
+                    className="flex-1 bg-gradient-to-r from-foreground to-primary text-white hover:shadow-lg transition-shadow p-2"
                   >
                     <Link href="/auth/signup" className="flex items-center gap-2">
                       Get Started
@@ -230,7 +230,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
                     asChild
                     size="lg"
                     variant="outline"
-                    className="flex-1"
+                    className="flex-1 p-2"
                   >
                     <Link href="/chronicles/feed">
                       Explore Feed

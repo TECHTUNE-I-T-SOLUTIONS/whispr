@@ -52,9 +52,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Session is automatically set by createSupabaseServerClient via cookies
-    // Return success response
-    return NextResponse.json(
+    // Build response with creator info
+    const response = NextResponse.json(
       {
         success: true,
         creator: {
@@ -67,6 +66,27 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
+    // Set Supabase session cookies
+    const { access_token, refresh_token } = authData.session;
+    response.cookies.set('sb-access-token', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    response.cookies.set('sb-refresh-token', refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    // Optionally set headers for creator info
+    response.headers.set('x-creator-id', creator.id);
+    response.headers.set('x-creator-email', creator.email);
+    response.headers.set('x-creator-pen-name', creator.pen_name);
+    response.headers.set('x-creator-display-name', creator.display_name);
+    response.headers.set('x-creator-profile-image', creator.profile_image_url);
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

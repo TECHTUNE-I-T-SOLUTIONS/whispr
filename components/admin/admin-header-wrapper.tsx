@@ -32,6 +32,8 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
     { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
+    // Ads Control Section
+    { name: "Ads Control", href: "/admin/ads-control", icon: Sliders },
     // Chronicles Section
     { name: "Chronicles Analytics", href: "/admin/chronicles/analytics", icon: TrendingUp },
     { name: "Chronicles Settings", href: "/admin/chronicles/settings", icon: Sliders },
