@@ -3,7 +3,7 @@ import { CookieConsentModal } from "@/components/CookieConsentModal"
 import { FeaturedPosts } from "@/components/featured-posts"
 import { RecentPosts } from "@/components/recent-posts"
 import { HeroSection } from "@/components/hero-section"
-import { DailyPoemModal } from "@/components/daily-poem-modal"
+import DailyPoemModal from "@/components/daily-poem-modal"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
 

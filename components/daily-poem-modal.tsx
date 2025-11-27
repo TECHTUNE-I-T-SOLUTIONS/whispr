@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { generateRemixedPoem } from "@/utils/poemRemixer"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -161,7 +162,7 @@ function getDailyPoem(list: Poem[], today = new Date()): Poem {
   return list[index]
 }
 
-export function DailyPoemModal() {
+export default function DailyPoemModal() {
   const [open, setOpen] = useState(false)
   const [typed, setTyped] = useState("")
   const [done, setDone] = useState(false)
@@ -174,6 +175,18 @@ export function DailyPoemModal() {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   // For vivid backgrounds per request, ignore reduced motion for background layers
   const bgAnimEnabled = true
+  // Remixed poem state
+  const [remixedPoem, setRemixedPoem] = useState<string>("");
+  const [showRemix, setShowRemix] = useState(false);
+  // Generate a remixed poem on demand
+  const handleRemix = async () => {
+    const poem = await generateRemixedPoem();
+    setRemixedPoem(poem);
+    setShowRemix(true);
+  };
+  const handleCloseRemix = () => {
+    setShowRemix(false);
+  };
 
   // Load poems from a single JSON file in public folder
   useEffect(() => {
@@ -296,12 +309,16 @@ export function DailyPoemModal() {
     setOpen(false)
   }
 
-  const seeAnother = () => {
+  const seeAnother = async () => {
     setOffset(prev => {
       const next = prev + 1
       try { localStorage.setItem(offsetKey, String(next)) } catch {}
       return next
-    })
+    });
+    // Automatically generate a remixed poem when seeing another
+    const poem = await generateRemixedPoem();
+    setRemixedPoem(poem);
+    setShowRemix(true);
   }
 
   const changeBg = (mode: typeof bgMode) => {
@@ -335,93 +352,31 @@ export function DailyPoemModal() {
   }, [open, ambientOn])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-xl md:max-w-2xl p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
-        <div className="relative rounded-lg overflow-hidden">
-          {/* Water background layer */}
-          <div aria-hidden className={`absolute inset-0 ${bgMode === 'none' ? '' : 'opacity-95'}`}>
-            {bgAnimEnabled && bgMode === 'river' && (
-              <div className="absolute inset-0">
-                <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="riverGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.35"/>
-                      <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.15"/>
-                    </linearGradient>
-                  </defs>
-                  <g>
-                    <path d="M0,300 C150,260 250,340 400,300 C550,260 650,340 800,300 L800,600 L0,600 Z" fill="url(#riverGrad)" className="animate-[flow1_12s_ease-in-out_infinite]"/>
-                    <path d="M0,320 C160,280 240,360 400,320 C560,280 640,360 800,320 L800,600 L0,600 Z" fill="#22d3ee22" className="animate-[flow2_16s_ease-in-out_infinite]"/>
-                    <path d="M0,340 C140,300 260,380 400,340 C540,300 660,380 800,340 L800,600 L0,600 Z" fill="#38bdf833" className="animate-[flow3_20s_ease-in-out_infinite]"/>
-                  </g>
-                </svg>
-              </div>
-            )}
-            {bgAnimEnabled && bgMode === 'beach' && (
-              <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-sky-200/50 via-sky-100/40 to-amber-100/40" />
-                <div className="absolute bottom-0 w-full h-2/3">
-                  <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="none">
-                    <path d="M0,420 C120,440 220,400 400,430 C580,460 680,420 800,440 L800,600 L0,600 Z" fill="#bae6fd66" className="animate-[wave1_9s_ease-in-out_infinite]" />
-                    <path d="M0,450 C160,470 240,430 400,460 C560,490 640,450 800,470 L800,600 L0,600 Z" fill="#7dd3fc55" className="animate-[wave2_12s_ease-in-out_infinite]" />
-                    <path d="M0,480 C140,500 260,460 400,490 C540,520 660,480 800,500 L800,600 L0,600 Z" fill="#60a5fa44" className="animate-[wave3_15s_ease-in-out_infinite]" />
-                  </svg>
-                </div>
-              </div>
-            )}
-            {bgAnimEnabled && bgMode === 'waves' && (
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-800/60">
-                <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,#7dd3fc_0%,transparent_25%),radial-gradient(circle_at_80%_30%,#60a5fa_0%,transparent_22%),radial-gradient(circle_at_40%_70%,#22d3ee_0%,transparent_18%)] animate-[drift_30s_linear_infinite]" />
-              </div>
-            )}
-            {bgAnimEnabled && bgMode === 'night' && (
-              <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900" />
-                {/* stars */}
-                <div className="absolute inset-0 opacity-60 [background:radial-gradient(2px_2px_at_10%_20%,#ffffff88_50%,transparent_51%),radial-gradient(1.5px_1.5px_at_30%_40%,#ffffff66_50%,transparent_51%),radial-gradient(2px_2px_at_70%_30%,#ffffff88_50%,transparent_51%),radial-gradient(1.5px_1.5px_at_85%_60%,#ffffff66_50%,transparent_51%)] animate-[drift_60s_linear_infinite]" />
-                {/* moon */}
-                <div className="absolute top-6 right-8 w-10 h-10 rounded-full bg-white/90 shadow-[0_0_30px_#ffffff66]" />
-                {/* dark sea waves */}
-                <svg className="absolute bottom-0 w-full h-1/2" viewBox="0 0 800 400" preserveAspectRatio="none">
-                  <path d="M0,260 C140,240 260,280 400,260 C540,240 660,280 800,260 L800,400 L0,400 Z" fill="#0b102055" className="animate-[wave1_12s_ease-in-out_infinite]" />
-                  <path d="M0,290 C160,270 240,310 400,290 C560,270 640,310 800,290 L800,400 L0,400 Z" fill="#0b122266" className="animate-[wave2_16s_ease-in-out_infinite]" />
-                  <path d="M0,320 C140,300 260,340 400,320 C540,300 660,340 800,320 L800,400 L0,400 Z" fill="#0b142277" className="animate-[wave3_20s_ease-in-out_infinite]" />
-                </svg>
-              </div>
-            )}
-            {bgAnimEnabled && bgMode === 'lake' && (
-              <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-sky-300/40 via-slate-200/40 to-slate-300/50" />
-                {/* mist layers */}
-                <div className="absolute inset-x-0 top-8 h-24 bg-gradient-to-b from-white/50 to-transparent blur-xl opacity-70 animate-[mist_30s_linear_infinite]" />
-                <div className="absolute inset-x-0 top-20 h-24 bg-gradient-to-b from-white/40 to-transparent blur-xl opacity-60 animate-[mist_40s_linear_infinite_reverse]" />
-                {/* gentle ripples */}
-                <svg className="absolute bottom-0 w-full h-1/2" viewBox="0 0 800 400" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="lakeGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.35"/>
-                      <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.2"/>
-                    </linearGradient>
-                  </defs>
-                  <circle cx="100" cy="320" r="60" fill="none" stroke="url(#lakeGrad)" strokeWidth="2" className="animate-[ripple_5s_ease-in-out_infinite]" />
-                  <circle cx="100" cy="320" r="90" fill="none" stroke="url(#lakeGrad)" strokeWidth="2" className="animate-[ripple_7s_ease-in-out_infinite]" />
-                  <circle cx="600" cy="300" r="50" fill="none" stroke="url(#lakeGrad)" strokeWidth="2" className="animate-[ripple_6s_ease-in-out_infinite]" />
-                </svg>
-              </div>
-            )}
-            {/* CSS-only particle overlays */}
-            {bgAnimEnabled && bgMode === 'river' && (
-              <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute inset-x-0 bottom-0 h-full [background:radial-gradient(4px_4px_at_10%_90%,#a5f3fc_80%,transparent_71%),radial-gradient(3px_3px_at_30%_95%,#67e8f9_80%,transparent_71%),radial-gradient(3px_3px_at_60%_98%,#22d3ee_80%,transparent_71%),radial-gradient(4px_4px_at_80%_92%,#67e8f9_80%,transparent_71%)] animate-[bubble-rise-layer_12s_linear_infinite] opacity-90" />
-                <div className="absolute inset-x-0 bottom-0 h-full [background:radial-gradient(3px_3px_at_20%_95%,#a5f3fc_70%,transparent_71%),radial-gradient(4px_4px_at_50%_92%,#67e8f9_70%,transparent_71%),radial-gradient(3px_3px_at_70%_96%,#22d3ee_70%,transparent_71%),radial-gradient(3px_3px_at_90%_93%,#67e8f9_70%,transparent_71%)] animate-[bubble-rise-layer_18s_linear_infinite_reverse] opacity-80" />
-              </div>
-            )}
-            {bgAnimEnabled && bgMode === 'beach' && (
-              <div aria-hidden className="absolute inset-0 pointer-events-none">
+    <>
+      {/* Remixed Poem Modal */}
+      {showRemix && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 max-w-md w-full text-center">
+            <h2 className="text-lg font-semibold mb-2">AI-Remixed Poem</h2>
+            <pre className="mb-4 text-sm whitespace-pre-line text-gray-700 dark:text-gray-300">{remixedPoem}</pre>
+            <button
+              className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
+              onClick={handleCloseRemix}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      {/* ...existing modal code... */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-xl md:max-w-2xl p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+          <div className="relative rounded-lg overflow-hidden">
+            {/* Water background layer */}
+            <div aria-hidden className={`absolute inset-0 ${bgMode === 'none' ? '' : 'opacity-95'}`}>
                 <div className="absolute inset-x-0 bottom-0 h-1/2 [background:radial-gradient(6px_3px_at_10%_20%,#ffffff_60%,transparent_41%),radial-gradient(7px_3px_at_40%_15%,#ffffff_60%,transparent_41%),radial-gradient(5px_3px_at_70%_25%,#ffffff_60%,transparent_41%)] opacity-90 animate-[foam-drift-layer_10s_ease-in-out_infinite]" />
                 <div className="absolute inset-x-0 bottom-8 h-1/2 [background:radial-gradient(4px_2px_at_20%_30%,#ffffff_50%,transparent_41%),radial-gradient(4px_2px_at_55%_20%,#ffffff_50%,transparent_41%),radial-gradient(3px_2px_at_80%_35%,#ffffff_50%,transparent_41%)] opacity-80 animate-[foam-drift-layer_16s_ease-in-out_infinite_reverse]" />
               </div>
-            )}
             {bgAnimEnabled && bgMode === 'waves' && (
               <div aria-hidden className="absolute inset-0 pointer-events-none">
                 <div className="absolute inset-0 opacity-60 [background:radial-gradient(3px_3px_at_15%_30%,#7dd3fc_80%,transparent_61%),radial-gradient(3px_3px_at_55%_70%,#38bdf8_70%,transparent_61%),radial-gradient(4px_4px_at_85%_50%,#22d3ee_70%,transparent_61%)] animate-[mote-drift-layer_20s_linear_infinite]" />
@@ -496,34 +451,34 @@ export function DailyPoemModal() {
               </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
-      {/* Cursor blink keyframes */}
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <style jsx global>{`
-        @keyframes blink {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
-        }
-        @keyframes flow1 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-6px) } }
-        @keyframes flow2 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
-        @keyframes flow3 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-14px) } }
-        @keyframes wave1 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(-10px) } }
-        @keyframes wave2 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(8px) } }
-        @keyframes wave3 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(-6px) } }
-        @keyframes drift { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(10px,-8px,0) } 100% { transform: translate3d(0,0,0) } }
-        @keyframes mist { 0% { transform: translateX(-10%) } 50% { transform: translateX(10%) } 100% { transform: translateX(-10%) } }
-        @keyframes ripple { 0% { opacity: 0.6; transform: scale(1) } 50% { opacity: 0.25; transform: scale(1.2) } 100% { opacity: 0.6; transform: scale(1) } }
-        @keyframes bubble-rise { 0% { transform: translateY(20%); opacity: 0 } 10% { opacity: 0.7 } 100% { transform: translateY(-90%); opacity: 0 } }
-        @keyframes foam-drift { 0% { transform: translateX(0) } 50% { transform: translateX(20px) } 100% { transform: translateX(-10px) } }
-        @keyframes star-twinkle { 0%,100% { opacity: 0.2 } 50% { opacity: 0.9 } }
-        @keyframes mote-drift { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(-12px,-8px,0) } 100% { transform: translate3d(0,0,0) } }
-        /* Layered animation variants for CSS-only particle overlays */
-        @keyframes bubble-rise-layer { 0% { transform: translateY(10%); opacity: .3 } 20% { opacity: .95 } 100% { transform: translateY(-90%); opacity: 0 } }
-        @keyframes foam-drift-layer { 0% { transform: translateX(0) } 50% { transform: translateX(25px) } 100% { transform: translateX(-20px) } }
-        @keyframes mote-drift-layer { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(-24px,-16px,0) } 100% { transform: translate3d(0,0,0) } }
-        @keyframes star-twinkle-layer { 0% { opacity: .6 } 50% { opacity: 1 } 100% { opacity: .6 } }
-      `}</style>
-    </Dialog>
+        </DialogContent>
+        {/* Cursor blink keyframes */}
+        {/* eslint-disable-next-line @next/next/no-css-tags */}
+        <style jsx global>{`
+          @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+          @keyframes flow1 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-6px) } }
+          @keyframes flow2 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
+          @keyframes flow3 { 0%,100% { transform: translateY(0px) } 50% { transform: translateY(-14px) } }
+          @keyframes wave1 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(-10px) } }
+          @keyframes wave2 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(8px) } }
+          @keyframes wave3 { 0%,100% { transform: translateX(0px) } 50% { transform: translateX(-6px) } }
+          @keyframes drift { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(10px,-8px,0) } 100% { transform: translate3d(0,0,0) } }
+          @keyframes mist { 0% { transform: translateX(-10%) } 50% { transform: translateX(10%) } 100% { transform: translateX(-10%) } }
+          @keyframes ripple { 0% { opacity: 0.6; transform: scale(1) } 50% { opacity: 0.25; transform: scale(1.2) } 100% { opacity: 0.6; transform: scale(1) } }
+          @keyframes bubble-rise { 0% { transform: translateY(20%); opacity: 0 } 10% { opacity: 0.7 } 100% { transform: translateY(-90%); opacity: 0 } }
+          @keyframes foam-drift { 0% { transform: translateX(0) } 50% { transform: translateX(20px) } 100% { transform: translateX(-10px) } }
+          @keyframes star-twinkle { 0%,100% { opacity: 0.2 } 50% { opacity: 0.9 } }
+          @keyframes mote-drift { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(-12px,-8px,0) } 100% { transform: translate3d(0,0,0) } }
+          /* Layered animation variants for CSS-only particle overlays */
+          @keyframes bubble-rise-layer { 0% { transform: translateY(10%); opacity: .3 } 20% { opacity: .95 } 100% { transform: translateY(-90%); opacity: 0 } }
+          @keyframes foam-drift-layer { 0% { transform: translateX(0) } 50% { transform: translateX(25px) } 100% { transform: translateX(-20px) } }
+          @keyframes mote-drift-layer { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(-24px,-16px,0) } 100% { transform: translate3d(0,0,0) } }
+          @keyframes star-twinkle-layer { 0% { opacity: .6 } 50% { opacity: 1 } 100% { opacity: .6 } }
+        `}</style>
+      </Dialog>
+    </>
   )
 }

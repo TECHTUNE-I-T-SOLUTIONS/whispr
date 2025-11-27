@@ -2,11 +2,6 @@ import { NextRequest } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { getAdminFromRequest } from '@/lib/auth-server'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  }
-}
 
 export async function POST(req: NextRequest) {
   const supabase = createSupabaseServer()
