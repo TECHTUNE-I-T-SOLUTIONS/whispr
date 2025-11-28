@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Welcome to Whispr</title>
+  <meta name="description" content="Whispr — poems, chronicles, audio & video whispers. A compact preview page." />
+  <style>
+    :root{
+      --bg:#946666; /* primary background (kept your dark warm tone) */
+      --bg2:#EF4342; /* secondary background (a lighter accent) */
+      --accent1:#EF4342;
+      --accent2:#06b6d4;
+      --muted:#E2E2E2FF;
+      --card: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;min-height:100vh}
+    .wrap{max-width:1100px;margin:0 auto;padding:36px}
+    header{display:flex;align-items:center;gap:18px}
+    header img{height:56px;width:auto;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6))}
+    h1{font-size:36px;margin:0}
+    p.lead{color:var(--muted);margin-top:6px;max-width:760px}
+
+    .hero-card{position:relative;margin-top:22px;border-radius:14px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));overflow:hidden}
+    .canvas-wrap{position:relative;height:340px;border-radius:12px;overflow:hidden}
+    canvas{display:block;width:100%;height:100%}
+
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn-cta{display:inline-block;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#051124;text-decoration:none;font-weight:700}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+    .card{background:var(--card);padding:18px;border-radius:12px}
+    .muted{color:var(--muted)}
+
+    .share-row{margin-top:14px;display:flex;gap:12px;align-items:center}
+    .share-btn{background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+
+    /* subtle shapes */
+    .shape-blob{position:absolute;right:-10%;top:-8%;width:420px;height:420px;filter:blur(36px);opacity:0.55;transform:rotate(14deg);pointer-events:none}
+
+    @media (max-width:640px){h1{font-size:28px}.wrap{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="/lightlogo.png" alt="Whispr" loading="eager" />
+      <div>
+        <h1>Whispr — Small voices, wide echoes</h1>
+        <p class="lead muted">Read poems, explore chronicles, listen to audio & video whispers, or add your own short whispr. A tiny preview for sharing and marketing.</p>
+      </div>
+    </header>
+
+    <div class="hero-card">
+      <div class="canvas-wrap">
+        <canvas id="p"></canvas>
+        <svg class="shape-blob" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <g transform="translate(300,300)">
+            <path d="M120,-150C160,-110,180,-60,190,-10C200,40,200,90,170,120C140,150,80,160,30,150C-20,140,-40,110,-80,90C-120,70,-180,60,-200,20C-220,-20,-200,-80,-160,-120C-120,-160,-60,-180,0,-180C60,-180,120,-170,120,-150Z" fill="url(#g)" opacity="0.9"></path>
+            <defs>
+              <linearGradient id="g" x1="0%" x2="100%">
+                <stop offset="0%" stop-color="var(--accent1)" />
+                <stop offset="100%" stop-color="var(--accent2)" />
+              </linearGradient>
+            </defs>
+          </g>
+        </svg>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn-cta" href="/chronicles">Explore Chronicles</a>
+        <a class="btn-cta" href="/poems">Read Poems</a>
+        <a class="btn-cta" href="/whispr-wall">Whispr Wall</a>
+        <div style="flex:1"></div>
+        <div class="share-row">
+          <button id="shareBtn" class="share-btn">Share this preview</button>
+          <a class="muted" href="/welcome.html" id="staticLink">/welcome.html</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><h3>Poems</h3><p class="muted">Daily poems and remixed creative pieces — discover new lines every day.</p></div>
+      <div class="card"><h3>Chronicles</h3><p class="muted">In-depth feature pieces and practical guides for writers and readers.</p></div>
+      <div class="card"><h3>Audio & Video</h3><p class="muted">Short audio and video whisprs — listen to voices from the community.</p></div>
+    </div>
+
+    <p class="muted" style="margin-top:18px;">Share this preview widely: copy the link or use your device's share dialog.</p>
+  </div>
+
+  <script>
+    // Particle field with organic motion
+    const canvas = document.getElementById('p');
+    const ctx = canvas.getContext('2d');
+    function resize(){canvas.width=canvas.clientWidth;canvas.height=canvas.clientHeight}
+    window.addEventListener('resize',resize);resize();
+
+    const N = Math.max(40, Math.floor(canvas.width / 12));
+    const particles = Array.from({length:N}).map(()=>({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*8+2,
+      dx:(Math.random()-0.5)*0.6,
+      dy:(Math.random()-0.5)*0.6,
+      hue: 200 + Math.random()*80
+    }))
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(const p of particles){
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x < -50) p.x = canvas.width+50; if(p.x > canvas.width+50) p.x = -50;
+        if(p.y < -50) p.y = canvas.height+50; if(p.y > canvas.height+50) p.y = -50;
+
+        const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*6);
+        g.addColorStop(0, `hsla(${p.hue},70%,60%,0.95)`);
+        g.addColorStop(0.4, `hsla(${p.hue},70%,50%,0.45)`);
+        g.addColorStop(1, `hsla(${p.hue},70%,30%,0.02)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(p.x,p.y,p.r*6,p.r*3,0,0,Math.PI*2); ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // Share button behavior (Web Share API + clipboard fallback)
+    const shareBtn = document.getElementById('shareBtn');
+    const staticLink = document.getElementById('staticLink');
+    shareBtn.addEventListener('click', async ()=>{
+      const url = new URL(staticLink.getAttribute('href'), location.href).toString();
+      if(navigator.share){
+        try{ await navigator.share({ title: 'Welcome to Whispr', url }); return; }catch(e){}
+      }
+      try{ await navigator.clipboard.writeText(url); shareBtn.textContent = 'Link copied'; setTimeout(()=>shareBtn.textContent='Share this preview',2000);}catch(e){ alert('Copy this link: ' + url) }
+    })
+  </script>
+</body>
+</html>
