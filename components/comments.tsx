@@ -14,6 +14,7 @@ import { MessageCircle, Send, Heart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useCommentCache } from "@/hooks/use-comment-cache"
 
+// Comment type definition
 interface Comment {
   id: string
   content: string
