@@ -46,6 +46,7 @@
     "@tanstack/react-table": "latest",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "latest",
+    "caniuse-lite": "^1.0.30001762",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
@@ -53,6 +54,7 @@
     "convex": "latest",
     "date-fns": "latest",
     "dompurify": "^3.2.6",
+    "elevenlabs": "^1.59.0",
     "embla-carousel-react": "latest",
     "file-saver": "^2.0.5",
     "framer-motion": "latest",
@@ -81,12 +83,14 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/caniuse-lite": "^1",
     "@types/file-saver": "^2.0.7",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3",
+    "baseline-browser-mapping": "^2.9.11",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"

@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useRef, useState } from "react"
 import { notFound } from "next/navigation"
 import { Comments } from "@/components/comments"
 import { Reactions } from "@/components/reactions"
@@ -11,6 +11,7 @@ import { Calendar, Clock, User, BookOpen } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { SafeImage } from "@/components/SafeImage"
 import { MediaPlayer } from "@/components/media-player"
+import AdvancedFeaturesModal from "@/components/advanced-features-modal"
 
 interface PoemClientPageProps {
   poem: any
@@ -18,6 +19,8 @@ interface PoemClientPageProps {
 
 export default function PoemClientPage({ poem }: PoemClientPageProps) {
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/poems/${poem.id}`
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [autoScrollMode, setAutoScrollMode] = useState(false)
 
   return (
     <div className="whispr-gradient min-h-screen">
@@ -98,8 +101,33 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
 
           {/* Poem Content */}
           <Card className="mb-8">
-            <CardContent className="p-8">
-              <div className="prose poem-content" dangerouslySetInnerHTML={{ __html: poem.content }} />
+            <CardHeader className="flex flex-row items-center justify-between">
+              <span className="text-sm text-muted-foreground">Advanced Reading Features</span>
+              <AdvancedFeaturesModal text={poem.content.replace(/<[^>]*>/g, '')} contentRef={contentRef} onAutoScrollChange={setAutoScrollMode} />
+            </CardHeader>
+            <CardContent className={autoScrollMode ? 'p-0' : 'p-8'}>
+              {autoScrollMode ? (
+                <div className="h-96 overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg">
+                  <div 
+                    ref={contentRef}
+                    className="h-full overflow-y-auto flex flex-col items-center justify-end px-4 py-8"
+                  >
+                    <div className="pt-96 text-center space-y-4 w-full">
+                      <div dangerouslySetInnerHTML={{ 
+                        __html: poem.content.replace(/<p>/g, '<div class="text-xl md:text-2xl font-light leading-relaxed text-slate-800 dark:text-slate-200 mb-4">').replace(/<\/p>/g, '</div>')
+                      }} />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-8">
+                  <div 
+                    ref={contentRef}
+                    className="prose poem-content" 
+                    dangerouslySetInnerHTML={{ __html: poem.content }} 
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 

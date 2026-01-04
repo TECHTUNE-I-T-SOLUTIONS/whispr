@@ -4,9 +4,9 @@ import { createSupabaseServer } from "@/lib/supabase-server"
 import { markdownToHtml } from "@/lib/utils" // ✅ import the utility
 
 interface PoemPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function getPoem(id: string) {
@@ -23,7 +23,8 @@ async function getPoem(id: string) {
 }
 
 export async function generateMetadata({ params }: PoemPageProps) {
-  const poem = await getPoem(params.id)
+  const { id } = await params
+  const poem = await getPoem(id)
 
   if (!poem) {
     return {
@@ -52,7 +53,8 @@ export async function generateMetadata({ params }: PoemPageProps) {
 }
 
 export default async function PoemPage({ params }: PoemPageProps) {
-  const poem = await getPoem(params.id)
+  const { id } = await params
+  const poem = await getPoem(id)
 
   if (!poem) {
     return notFound()

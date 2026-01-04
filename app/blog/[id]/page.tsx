@@ -6,6 +6,7 @@ import { MediaPlayer } from "@/components/media-player"
 import { Reactions } from "@/components/reactions"
 import { Comments } from "@/components/comments"
 import { ShareButtons } from "@/components/share-buttons"
+import { BlogClientPage } from "./blog-client-page"
 
 type BlogPostPageProps = {
   params: Promise<{ id: string }>
@@ -101,9 +102,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         )}
 
         {/* Content */}
-        <div className="prose prose-lg dark:prose-invert">
-          <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-        </div>
+        <BlogClientPage htmlContent={htmlContent} plainText={post.content || htmlContent.replace(/<[^>]*>/g, '')} />
 
         {/* Reactions */}
         <div className="border-t pt-6">
