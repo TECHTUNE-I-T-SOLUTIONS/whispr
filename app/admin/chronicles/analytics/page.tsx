@@ -76,8 +76,8 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-md font-bold">Analytics</h1>
+          <p className="text-muted-foreground text-xs">
             {data?.dateRange.start} to {data?.dateRange.end}
           </p>
         </div>
@@ -87,12 +87,12 @@ export default function AnalyticsPage() {
             onClick={() => fetchAnalytics(dateRange)}
             disabled={loading}
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+            <RefreshCw className="w-4 h-4" />
+            {/* Refresh */}
           </Button>
           <Button onClick={downloadReport}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
+            <Download className="w-4 h-4" />
+            {/* Export */}
           </Button>
         </div>
       </div>

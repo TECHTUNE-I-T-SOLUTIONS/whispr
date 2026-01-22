@@ -370,7 +370,7 @@ export default function DailyPoemModal() {
       )}
       {/* ...existing modal code... */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl md:max-w-2xl p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+        <DialogContent className="max-w-xl md:max-w-2xl p-4 overflow-hidden border-0 bg-secondary/30 shadow-2xl">
           <div className="relative rounded-lg overflow-hidden">
             {/* Water background layer */}
             <div aria-hidden className={`absolute inset-0 ${bgMode === 'none' ? '' : 'opacity-95'}`}>
@@ -400,7 +400,7 @@ export default function DailyPoemModal() {
             <div className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(var(--tw-gradient-stops))] from-fuchsia-500 via-sky-500 to-violet-600 opacity-25 blur-[6px] animate-[spin_14s_linear_infinite]" />
           </div>
 
-          <div className="relative p-6 md:p-8 bg-background/70 backdrop-blur-xl">
+          <div className="relative p-6 md:p-8 bg-transparent backdrop-blur-sm">
             <DialogHeader className="space-y-1">
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs uppercase tracking-wider">
@@ -415,7 +415,7 @@ export default function DailyPoemModal() {
             </DialogHeader>
 
             <div className="mt-4">
-              <ScrollArea ref={scrollAreaRef} className="h-64 md:h-80 rounded-md border bg-background/30">
+              <ScrollArea ref={scrollAreaRef} className="h-64 md:h-80 rounded-md border bg-background/60">
                 <div className="p-4 md:p-6 font-mono text-[0.95rem] leading-7 whitespace-pre-wrap">
                   {typed}
                   <span className="ml-0.5 inline-block h-5 align-[-2px] w-[2px] bg-foreground animate-[blink_1s_steps(2,start)_infinite]" />

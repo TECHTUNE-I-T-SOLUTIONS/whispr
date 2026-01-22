@@ -141,7 +141,7 @@ export default function AdminWhisprWallPage() {
   return (
     <div className="max-w-5xl mx-auto py-8 space-y-6 px-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold mb-4 font-serif">🧱 Whispr Wall — Admin View</h1>
+        <h1 className="text-md font-bold mb-4 font-serif">🧱 Whispr Wall — Admin</h1>
         <Button variant="outline" size="sm" onClick={exportToCSV}>Export CSV</Button>
       </div>
 
@@ -192,6 +192,7 @@ export default function AdminWhisprWallPage() {
                 defaultValue={post.response || ""}
                 onBlur={(e) => respondToPost(post.id, e.target.value)}
                 disabled={loading}
+                className="text-xs"
               />
               {post.updated_at && (
                 <span className="text-[10px] text-muted-foreground block">Edited: {new Date(post.updated_at).toLocaleString()}</span>
@@ -215,7 +216,7 @@ export default function AdminWhisprWallPage() {
                         placeholder="Admin reply to comment..."
                         defaultValue={c.admin_response || ""}
                         onBlur={(e) => respondToComment(c.id, e.target.value)}
-                        className="mt-2"
+                        className="mt-2 text-xs"
                       />
                       {c.admin_response_updated_at && (
                         <span className="block text-[10px] text-muted-foreground">Edited: {new Date(c.admin_response_updated_at).toLocaleString()}</span>

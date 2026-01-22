@@ -24,13 +24,13 @@ export default async function AdminFeedbackPage() {
 
       {data?.length === 0 && <div>No feedback yet.</div>}
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {data?.map((f: any) => (
-          <div key={f.id} className="border rounded p-3 bg-background">
+          <div key={f.id} className="border rounded p-3 bg-background rounded-md shadow-md">
             <div className="text-xs text-muted-foreground">{new Date(f.created_at).toLocaleString()}</div>
-            <div className="mt-2 whitespace-pre-wrap">{f.message}</div>
+            <div className="mt-2 whitespace-pre-wrap text-sm">{f.message}</div>
             {f.page_url && <div className="text-sm text-muted-foreground mt-2">Page: <a className="underline" href={f.page_url} target="_blank" rel="noreferrer">{f.page_url}</a></div>}
-            {f.user_agent && <div className="text-sm text-muted-foreground mt-1">UA: {f.user_agent}</div>}
+            {f.user_agent && <div className="text-xs text-muted-foreground mt-1">UA: {f.user_agent}</div>}
           </div>
         ))}
       </div>

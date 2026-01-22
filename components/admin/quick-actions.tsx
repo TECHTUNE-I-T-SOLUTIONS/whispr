@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PenTool, FileText, ImageIcon, MessageCircle, BarChart3, Plus, Sparkles } from "lucide-react"
+import { PenTool, FileText, ImageIcon, MessageCircle, BarChart3, Plus, Sparkles, Bell, User } from "lucide-react"
 
 export function QuickActions() {
   const actions = [
@@ -70,6 +70,96 @@ export function QuickActions() {
       bgColor: "bg-indigo-50 dark:bg-indigo-900/20",
       hoverColor: "hover:bg-indigo-100 dark:hover:bg-indigo-900/30",
     },
+    {
+      title: "View Messages",
+      description: "Check admin messages",
+      icon: MessageCircle,
+      href: "/admin/messages",
+      color: "text-pink-600",
+      bgColor: "bg-pink-50 dark:bg-pink-900/20",
+      hoverColor: "hover:bg-pink-100 dark:hover:bg-pink-900/30",
+    },
+    {
+      title: "Notifications",
+      description: "Manage notifications",
+      icon: Bell,
+      href: "/admin/notifications",
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
+      hoverColor: "hover:bg-yellow-100 dark:hover:bg-yellow-900/30",
+    },
+    {
+      title: "Profile",
+      description: "View and edit your profile",
+      icon: User,
+      href: "/admin/profile",
+      color: "text-gray-600",
+      bgColor: "bg-gray-50 dark:bg-gray-900/20",
+      hoverColor: "hover:bg-gray-100 dark:hover:bg-gray-900/30",
+    },
+    {
+      title: "Push Notifications History",
+      description: "View past push notifications",
+      icon: Bell,
+      href: "/admin/push-history",
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-50 dark:bg-cyan-900/20",
+      hoverColor: "hover:bg-cyan-100 dark:hover:bg-cyan-900/30",
+    },
+    {
+      title: "Send Push Notification",
+      description: "Create and send a new push notification",
+      icon: Bell,
+      href: "/admin/create-notifications",
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-50 dark:bg-cyan-900/20",
+      hoverColor: "hover:bg-cyan-100 dark:hover:bg-cyan-900/30",
+    },
+    {
+      title: "Manage Push Subscriptions",
+      description: "View and manage push subscriptions",
+      icon: Bell,
+      href: "/admin/push-subscribers",
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-50 dark:bg-cyan-900/20",
+      hoverColor: "hover:bg-cyan-100 dark:hover:bg-cyan-900/30",
+    },
+    {
+      title: "Admin Settings",
+      description: "Configure admin settings",
+      icon: User,
+      href: "/admin/settings",
+      color: "text-gray-600",
+      bgColor: "bg-gray-50 dark:bg-gray-900/20",
+      hoverColor: "hover:bg-gray-100 dark:hover:bg-gray-900/30",
+    },
+    {
+      title: "Manage Spoken Words",
+      description: "View and edit spoken word entries",
+      icon: Sparkles,
+      href: "/admin/spoken-words",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50 dark:bg-purple-900/20",
+      hoverColor: "hover:bg-purple-100 dark:hover:bg-purple-900/30",
+    },
+    {
+      title: "Whispr Wall",
+      description: "View and manage Whispr wall posts",
+      icon: MessageCircle,
+      href: "/admin/whispr-wall",
+      color: "text-pink-600",
+      bgColor: "bg-pink-50 dark:bg-pink-900/20",
+      hoverColor: "hover:bg-pink-100 dark:hover:bg-pink-900/30",
+    },
+    {
+      title: "Manage Whispr Chronicles",
+      description: "View and edit Whispr Chronicles entries",
+      icon: FileText,
+      href: "/admin/chronicles",
+      color: "text-green-600",
+      bgColor: "bg-green-50 dark:bg-green-900/20",
+      hoverColor: "hover:bg-green-100 dark:hover:bg-green-900/30",
+    }
   ]
 
   return (

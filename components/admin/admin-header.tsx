@@ -159,7 +159,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={admin.avatar_url || "/placeholder.svg"} alt={admin.full_name || admin.username} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                       {(admin.full_name || admin.username).charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -169,7 +169,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
                 <div className="flex items-center gap-2 p-2">
                   <div className="flex flex-col">
                     <p className="font-medium">{admin.full_name || admin.username}</p>
-                    <p className="text-sm text-muted-foreground truncate w-48">{admin.email}</p>
+                    <p className="text-xs text-muted-foreground truncate w-48 break-words">{admin.email}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />

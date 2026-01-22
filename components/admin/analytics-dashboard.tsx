@@ -155,7 +155,7 @@ export function AnalyticsDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
+          <h1 className="text-xs font-serif font-bold flex items-center gap-2">
             <BarChart3 className="h-8 w-8 text-primary" />
             Analytics Dashboard
           </h1>

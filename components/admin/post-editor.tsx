@@ -643,7 +643,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
+          <h1 className="text-ml font-serif font-bold flex items-center gap-2">
             {formData.type === "poem" ? (
               <Sparkles className="h-8 w-8 text-primary" />
             ) : (
@@ -674,12 +674,12 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           <Card className="border-0 bg-card/50 backdrop-blur">
             <CardHeader>
               <CardTitle>Content</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <div>
                 <Label htmlFor="title">Title</Label>
                 <Input
@@ -738,7 +738,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   contentEditable
                   suppressContentEditableWarning
                   onInput={() => setFormData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || "" }))}
-                  className={`min-h-[400px] p-3 border rounded prose max-w-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
+                  className={`min-h-[400px] p-3 text-black dark:text-white border rounded prose max-w-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                   aria-label={formData.type === "poem" ? "Poem content editor" : "Post content editor"}
                 />
                   {/* Floating figure toolbar (positioned via CSS variables set on the editor container) */}
@@ -935,7 +935,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   className="hidden"
                   aria-label="Upload media files"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   <Button
                     type="button"
                     variant="outline"
@@ -943,7 +943,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                     className="flex-1"
                   >
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload New Files
+                    New
                   </Button>
                   <MediaSelector
                     onSelect={(selected) => setUploadedFiles(selected)}

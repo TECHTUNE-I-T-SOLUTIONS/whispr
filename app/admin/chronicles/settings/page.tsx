@@ -138,20 +138,20 @@ export default function SettingsPage() {
     <div className="space-y-8 p-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Settings className="w-8 h-8" />
+        <h1 className="text-md font-bold flex items-center gap-2">
+          <Settings className="w-4 h-4" />
           Settings
         </h1>
-        <p className="text-muted-foreground mt-1">Manage Chronicles platform settings and configuration</p>
+        <p className="text-muted-foreground text-xs mt-1">Manage Chronicles platform settings and configuration</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b">
+      <div className="flex gap-1 border-b text-sm">
         {['system', 'monetization', 'policies', 'categories'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            className={`px-2 py-2 font-medium border-b-2 transition-colors ${
               activeTab === tab
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -181,11 +181,11 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Feature Toggles</CardTitle>
-              <CardDescription>Enable or disable platform features</CardDescription>
+              <CardTitle className="text-sm">Feature Toggles</CardTitle>
+              <CardDescription className="text-xs">Enable or disable platform features</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded">
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 rounded">
                 <div>
                   <p className="font-medium">Enable Chronicles Feature</p>
                   <p className="text-sm text-muted-foreground">Allow access to the platform</p>
@@ -200,7 +200,7 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded">
+              <div className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 rounded">
                 <div>
                   <p className="font-medium">Open Registration</p>
                   <p className="text-sm text-muted-foreground">Allow new creators to register</p>
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded">
+              <div className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 rounded">
                 <div>
                   <p className="font-medium">Require Email Verification</p>
                   <p className="text-sm text-muted-foreground">Verify email on registration</p>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded">
+              <div className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800 rounded">
                 <div>
                   <p className="font-medium">Allow Anonymous Comments</p>
                   <p className="text-sm text-muted-foreground">Users can comment without account</p>
@@ -249,10 +249,10 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Content Limits</CardTitle>
-              <CardDescription>Set restrictions on content creation</CardDescription>
+              <CardTitle className="text-sm">Content Limits</CardTitle>
+              <CardDescription className="text-xs">Set restrictions on content creation</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <div>
                 <label className="block text-sm font-medium mb-2">Max Posts Per Day</label>
                 <Input
@@ -286,7 +286,7 @@ export default function SettingsPage() {
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                Save System Settings
+                Save Settings
               </>
             )}
           </Button>

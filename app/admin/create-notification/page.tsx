@@ -248,11 +248,11 @@ export default function CreateNotificationPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-2">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold flex items-center gap-2">
-            <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+          <h1 className="text-md sm:text-3xl font-serif font-bold flex items-center gap-2">
+            <Bell className="h-4 w-4 sm:h-8 sm:w-8 text-primary" />
             <span className="truncate">Create Push Notification</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">Send notifications to all your subscribers</p>
@@ -273,18 +273,18 @@ export default function CreateNotificationPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2">
         {/* Notification Form */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Details</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-sm font-medium">Notification Details</CardTitle>
+              <CardDescription className="text-sm">
                 Configure your push notification content
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="title">Title *</Label>
                 <Input
                   id="title"
@@ -298,7 +298,7 @@ export default function CreateNotificationPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="body">Body *</Label>
                 <Textarea
                   id="body"
@@ -313,7 +313,7 @@ export default function CreateNotificationPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="url">URL</Label>
                 <Input
                   id="url"
@@ -412,8 +412,8 @@ export default function CreateNotificationPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-sm font-medium">Actions</CardTitle>
+              <CardDescription className="text-sm">
                 Add action buttons to your notification
               </CardDescription>
             </CardHeader>

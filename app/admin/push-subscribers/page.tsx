@@ -80,7 +80,7 @@ export default function PushSubscribersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
       </div>
     )
   }
@@ -89,13 +89,13 @@ export default function PushSubscribersPage() {
     <div className="space-y-6 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
-            <Users className="h-8 w-8 text-primary" /> Push Subscribers
+          <h1 className="text-md font-serif font-bold flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" /> Push Subscribers
           </h1>
-          <p className="text-muted-foreground">Manage your push notification subscribers</p>
+          <p className="text-muted-foreground text-sm">Manage your push notification subscribers</p>
         </div>
 
-        <Badge variant="secondary" className="text-lg px-3 py-1">
+        <Badge variant="secondary" className="text-xs px-2 py-1">
           {filteredSubscribers.length} subscribers
         </Badge>
       </div>
@@ -108,7 +108,7 @@ export default function PushSubscribersPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{subscribers.length}</div>
+            <div className="text-md font-bold">{subscribers.length}</div>
           </CardContent>
         </Card>
 
@@ -118,7 +118,7 @@ export default function PushSubscribersPage() {
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{subscribers.filter((s) => s.is_active).length}</div>
+            <div className="text-md font-bold">{subscribers.filter((s) => s.is_active).length}</div>
           </CardContent>
         </Card>
 
@@ -128,7 +128,7 @@ export default function PushSubscribersPage() {
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-md font-bold">
               {subscribers.filter((s) => {
                 if (!s.subscribed_at) return false
                 const subDate = new Date(s.subscribed_at)
@@ -143,10 +143,10 @@ export default function PushSubscribersPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
+          <CardTitle className="text-sm font-medium">Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -170,24 +170,24 @@ export default function PushSubscribersPage() {
       {/* Subscriber list: cards on mobile, table on desktop */}
       <Card>
         <CardHeader>
-          <CardTitle>Subscribers List</CardTitle>
-          <CardDescription>Detailed information about all push notification subscribers</CardDescription>
+          <CardTitle className="text-sm font-medium">Subscribers List</CardTitle>
+          <CardDescription className="text-sm">Detailed information about all push notification subscribers</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Mobile: stacked cards */}
-          <div className="space-y-4 md:hidden">
+          <div className="space-y-2 md:hidden">
             {filteredSubscribers.map((subscriber) => (
-              <div key={subscriber.id} className="border rounded-lg p-4 bg-background">
-                <div className="flex items-start justify-between gap-4">
+              <div key={subscriber.id} className="border rounded-lg p-2 bg-background">
+                <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="flex-shrink-0">{getDeviceIcon(subscriber.browser_info?.device)}</div>
                       <div>
                         <div className="font-medium">{subscriber.browser_info?.browser || 'Unknown'}</div>
                         <div className="text-xs text-muted-foreground">{subscriber.browser_info?.os || 'Unknown OS'}</div>
                       </div>
                     </div>
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                       <div>
                         <div className="text-muted-foreground text-xs">IP</div>
                         <div className="font-mono break-words">{subscriber.ip_address || 'N/A'}</div>

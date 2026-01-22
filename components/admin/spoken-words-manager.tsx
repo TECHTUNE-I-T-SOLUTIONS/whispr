@@ -569,18 +569,18 @@ export function SpokenWordsManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
+          <h1 className="text-md font-serif font-bold flex items-center gap-2">
             <Volume2 className="h-8 w-8 text-primary" />
             Spoken Words Manager
           </h1>
-          <p className="text-muted-foreground">Manage your audio and video spoken words content</p>
+          <p className="text-muted-foreground text-sm">Manage your audio and video spoken words content</p>
         </div>
 
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button size="sm" className="text-sm">
               <Plus className="mr-2 h-4 w-4" />
-              Add Spoken Word
+              Spoken Word
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">

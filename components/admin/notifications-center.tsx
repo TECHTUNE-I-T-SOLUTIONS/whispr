@@ -138,7 +138,7 @@ export function NotificationsCenter() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-md font-bold flex items-center gap-2">
             <Bell /> Notifications {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
           </h1>
           <span className="text-sm text-muted-foreground">{isRefreshing ? 'Refreshing…' : `${notifications.length} total`}</span>
@@ -150,7 +150,7 @@ export function NotificationsCenter() {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {isLoading ? (
           <Card>
             <CardContent>Loading...</CardContent>
@@ -165,10 +165,10 @@ export function NotificationsCenter() {
               <CardContent className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-3">
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getNotificationBg(n.type)}`}>
+                    <div className={`mt-2 h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getNotificationBg(n.type)}`}>
                       {getNotificationIcon(n.type)}
                     </div>
-                    <div className="min-w-0 mt-2">
+                    <div className="min-w-0 mt-3">
                       <div className="font-medium text-sm leading-tight break-words">{n.title}</div>
                       <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words mb-1 max-w-[60ch]">{n.message}</div>
                       <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}</div>

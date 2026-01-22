@@ -105,7 +105,7 @@ export default function PushHistoryPage() {
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold flex items-center gap-2">
+          <h1 className="text-md sm:text-3xl font-serif font-bold flex items-center gap-2">
             <History className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             <span className="truncate">Push Notification History</span>
           </h1>
@@ -175,10 +175,10 @@ export default function PushHistoryPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
+          <CardTitle className="text-sm font-medium">Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -209,8 +209,8 @@ export default function PushHistoryPage() {
       {/* Notifications - Table for Desktop/Tablet, Cards for Mobile */}
       <Card>
         <CardHeader>
-          <CardTitle>Notification History</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-sm font-medium">Notification History</CardTitle>
+          <CardDescription className="text-sm">
             Complete history of all sent push notifications
           </CardDescription>
         </CardHeader>
@@ -331,9 +331,9 @@ export default function PushHistoryPage() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden space-y-4">
+          <div className="md:hidden space-y-2">
             {filteredNotifications.map((notification) => (
-              <Card key={notification.id} className="p-4">
+              <Card key={notification.id} className="p-2">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">

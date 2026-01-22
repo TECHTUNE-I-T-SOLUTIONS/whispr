@@ -186,16 +186,16 @@ export function CommentsManager() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold flex items-center gap-2">
+          <h1 className="text-md font-serif font-bold flex items-center gap-2">
             <MessageCircle className="h-8 w-8 text-primary" />
             Comments Management
           </h1>
-          <p className="text-muted-foreground">Moderate and respond to reader comments</p>
+          <p className="text-muted-foreground text-sm">Moderate and respond to reader comments</p>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -342,7 +342,7 @@ export function CommentsManager() {
 
                     <Button size="sm" variant="outline" onClick={() => setReplyingTo(comment.id)}>
                       <Reply className="mr-1 h-3 w-3" />
-                      {comment.admin_reply ? "Edit Reply" : "Reply"}
+                      {comment.admin_reply ? "Edit" : "Reply"}
                     </Button>
 
                     <Button
@@ -352,7 +352,7 @@ export function CommentsManager() {
                       className="text-red-600 hover:text-red-700"
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
-                      Delete
+                      Del
                     </Button>
                   </div>
                 )}

@@ -37,15 +37,15 @@ export default async function AdminMessagesPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                <MessageSquare className="h-5 w-5" />
+              <div className="flex h-6 w-6 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                <MessageSquare className="h-4 w-4" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold tracking-tight text-sidebar-foreground">Team Messages</h1>
+                <h1 className="text-md font-semibold tracking-tight text-sidebar-foreground">Team Messages</h1>
                 <p className="text-sm text-muted-foreground">Stay connected with your team</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Badge variant="outline" className="text-xs">
                 {json.conversations?.length || 0} conversations
               </Badge>
