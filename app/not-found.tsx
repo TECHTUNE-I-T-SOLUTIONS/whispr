@@ -136,7 +136,7 @@ const NotFound: React.FC = () => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-lg text-muted-foreground mb-8 max-w-md mx-auto"
         >
-          The page you're looking for seems to have wandered off into the digital wilderness.
+          The page you're looking for seems to have wandered off into the digital wilderness.😉
           Let's get you back on track!
         </motion.p>
 
@@ -199,7 +199,7 @@ const NotFound: React.FC = () => {
           className="text-center"
         >
           <p className="text-sm text-muted-foreground italic">
-            "Not all who wander are lost... but this page definitely is! 🗺️"
+            "Not all who wander are lost... but this page definitely is! 😊"
           </p>
         </motion.div>
 
