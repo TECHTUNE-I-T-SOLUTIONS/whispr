@@ -11,6 +11,7 @@ import { FeedbackWidget } from '@/components/feedback-widget'
 import { PushNotificationScript } from "@/components/push-notification-script"
 import { TooltipProvider } from '@/components/ui/tooltip'
 import ErrorCatcher from '@/components/error-catcher'
+import MaintenanceBanner from '@/components/maintenance-banner'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" })
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           storageKey="whispr-theme"
         >
           <ErrorCatcher />
+          <MaintenanceBanner />
           <PushNotificationScript />
           <TooltipProvider>
             <ConditionalLayout>{children}</ConditionalLayout>

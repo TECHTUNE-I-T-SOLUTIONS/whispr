@@ -161,7 +161,7 @@ export function Header() {
   return (
     <>
       <ChroniclesTeaserBanner />
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky header-top-offset z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Sponsored posts ticker */}
       <div className="w-full bg-primary/5 border-b">
         <div className="container text-sm py-2 flex items-center justify-between">

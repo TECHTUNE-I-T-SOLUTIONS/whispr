@@ -14,6 +14,8 @@ interface SystemSettings {
   min_content_length: number;
   allow_anonymous_comments: boolean;
   require_email_verification: boolean;
+  maintenance_mode?: boolean;
+  maintenance_message?: string | null;
 }
 
 interface MonetizationSettings {
@@ -89,14 +91,21 @@ export default function SettingsPage() {
     setSuccess('');
 
     try {
+      // Send the full system object to server; server will split to the proper tables
       const res = await fetch('/api/chronicles/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'system', data: systemSettings }),
       });
 
-      if (!res.ok) throw new Error('Failed to save settings');
+      const payload = await res.json();
+      if (!res.ok || payload?.success === false) {
+        throw new Error(payload?.error || 'Failed to save settings');
+      }
+
       setSuccess('System settings updated successfully!');
+      // Refresh local settings to ensure we display stored values
+      fetchSettings();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
@@ -192,6 +201,7 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Enable Chronicles Feature"
                   checked={systemSettings.feature_enabled}
                   onChange={(e) =>
                     setSystemSettings({ ...systemSettings, feature_enabled: e.target.checked })
@@ -207,6 +217,7 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Open Registration"
                   checked={systemSettings.registration_open}
                   onChange={(e) =>
                     setSystemSettings({ ...systemSettings, registration_open: e.target.checked })
@@ -222,6 +233,7 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Require Email Verification"
                   checked={systemSettings.require_email_verification}
                   onChange={(e) =>
                     setSystemSettings({ ...systemSettings, require_email_verification: e.target.checked })
@@ -237,12 +249,43 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Allow Anonymous Comments"
                   checked={systemSettings.allow_anonymous_comments}
                   onChange={(e) =>
                     setSystemSettings({ ...systemSettings, allow_anonymous_comments: e.target.checked })
                   }
                   className="w-5 h-5"
                 />
+              </div>
+
+              <div className="flex flex-col gap-3 mt-4 p-3 bg-slate-50 dark:bg-slate-800 rounded">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Maintenance Mode</p>
+                    <p className="text-sm text-muted-foreground">Show a maintenance banner site-wide</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    aria-label="Maintenance Mode"
+                    checked={!!systemSettings.maintenance_mode}
+                    onChange={(e) =>
+                      setSystemSettings({ ...systemSettings, maintenance_mode: e.target.checked })
+                    }
+                    className="w-5 h-5"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Maintenance Message (optional)</label>
+                  <Textarea
+                    aria-label="Maintenance Message"
+                    value={systemSettings.maintenance_message ?? ''}
+                    onChange={(e) => setSystemSettings({ ...systemSettings, maintenance_message: e.target.value })}
+                    placeholder="Optional message shown in the maintenance banner"
+                    className="min-h-20"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Add a brief message for users when maintenance mode is active</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -356,6 +399,7 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Enable Tipping"
                   checked={monetizationSettings.enable_tipping}
                   onChange={(e) =>
                     setMonetizationSettings({ ...monetizationSettings, enable_tipping: e.target.checked })
@@ -371,6 +415,7 @@ export default function SettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  aria-label="Enable Subscriptions"
                   checked={monetizationSettings.enable_subscriptions}
                   onChange={(e) =>
                     setMonetizationSettings({

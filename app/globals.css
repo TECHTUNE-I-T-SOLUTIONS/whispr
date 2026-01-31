@@ -29,6 +29,12 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --maintenance-banner-height: 0px; /* dynamic height set by client when banner is visible */
+  }
+
+  /* ensure page content moves down when maintenance banner is active */
+  body {
+    @apply bg-background text-foreground;
   }
 
   .dark {
@@ -77,8 +83,14 @@
     animation: fadeIn 0.6s ease-in-out;
   }
 
+  /* Slide up animation (used in some small interactions) */
   .animate-slide-up {
     animation: slideUp 0.8s ease-out;
+  }
+
+  /* Slide down (for fixed top banner entrance) */
+  .animate-slide-down {
+    animation: slideDown 0.35s ease-out;
   }
 
   .animate-float {
@@ -105,6 +117,44 @@
     transform: translateY(0);
   }
 }
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Marquee animation for long maintenance messages */
+.marquee-track {
+  display: inline-block;
+  animation: marquee var(--marquee-duration, 10s) linear infinite;
+  will-change: transform;
+  white-space: nowrap;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(var(--marquee-distance, -100%)); }
+}
+
+/* Helper to offset sticky header when a non-fixed banner is present */
+.header-top-offset {
+  top: var(--maintenance-banner-height, 0px) !important;
+}
+
+/* gap element used between duplicated marquee contents */
+.marquee-gap {
+  display: inline-block;
+  margin-left: var(--marquee-gap, 48px);
+  width: var(--marquee-gap, 48px);
+  height: 1px;
+}
+
 
 @keyframes float {
   0%,
