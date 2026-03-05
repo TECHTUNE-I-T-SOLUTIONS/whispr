@@ -164,7 +164,7 @@ export default function PublicPostPage() {
                 )}
               </div>
               <div className="flex-1">
-                <Link href={`/chronicles/creators/${post.creator.id}`}>
+                <Link href={`/chronicles/portfolio/${post.creator.pen_name}`}>
                   <p className="font-semibold hover:text-purple-600 cursor-pointer">
                     {post.creator.pen_name}
                   </p>

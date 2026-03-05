@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PenTool, FileText, ImageIcon, MessageCircle, BarChart3, Plus, Sparkles, Bell, User } from "lucide-react"
+import { PenTool, FileText, ImageIcon, MessageCircle, BookOpen, Trash2, BarChart3, Plus, Sparkles, Bell, User } from "lucide-react"
 
 export function QuickActions() {
   const actions = [
@@ -159,6 +159,24 @@ export function QuickActions() {
       color: "text-green-600",
       bgColor: "bg-green-50 dark:bg-green-900/20",
       hoverColor: "hover:bg-green-100 dark:hover:bg-green-900/30",
+    },
+    {
+      title: "Writing Chains",
+      description: "View and manage writing chains",
+      icon: BookOpen,
+      href: "/admin/chronicles/chains",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50 dark:bg-indigo-900/20",
+      hoverColor: "hover:bg-indigo-100 dark:hover:bg-indigo-900/30",
+    },
+    {
+      title: "Chain Moderation",
+      description: "Approve or remove chain entries",
+      icon: Trash2,
+      href: "/admin/chronicles/chains/moderation",
+      color: "text-red-600",
+      bgColor: "bg-red-50 dark:bg-red-900/20",
+      hoverColor: "hover:bg-red-100 dark:hover:bg-red-900/30",
     }
   ]
 

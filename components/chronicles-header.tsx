@@ -16,6 +16,7 @@ import {
   User,
   ChevronDown,
   AlertTriangle,
+  TrendingUp,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -100,7 +101,10 @@ export default function ChroniclesHeader({
   }, []);
 
   const navigationItems = [
-    { label: 'Dashboard', href: '/chronicles/dashboard', icon: Home },
+    { label: 'Feed', href: '/chronicles/feed', icon: Home },
+    { label: 'Posts', href: '/chronicles/posts', icon: BookOpen },
+    { label: 'Chains', href: '/chronicles/chains', icon: BarChart3 },
+    { label: 'Dashboard', href: '/chronicles/dashboard', icon: TrendingUp },
     { label: 'Write Post', href: '/chronicles/write', icon: BookOpen },
     { label: 'Analytics', href: '/chronicles/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/chronicles/settings', icon: Settings },
@@ -109,11 +113,32 @@ export default function ChroniclesHeader({
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      await fetch('/api/chronicles/auth/logout', { method: 'POST' });
-      router.push('/chronicles/login');
+      
+      // Call logout API and wait for response
+      const response = await fetch('/api/chronicles/auth/logout', { 
+        method: 'POST',
+        credentials: 'include', // Include cookies in the request
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      // Close the modal
+      setLogoutModalOpen(false);
+      
+      // Clear any client-side storage (if using localStorage/sessionStorage)
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Force a hard page reload to the login page
+      // Using window.location ensures the browser clears all cached data
+      window.location.href = '/auth/login';
     } catch (error) {
       console.error('Logout error:', error);
       setIsLoggingOut(false);
+      // Still redirect even if logout API fails
+      window.location.href = '/auth/login';
     }
   };
 
@@ -222,6 +247,16 @@ export default function ChroniclesHeader({
                     <User className="w-4 h-4" />
                     Profile
                   </Link>
+                  {profile?.pen_name && (
+                    <Link
+                      href={`/chronicles/portfolio/${profile.pen_name}`}
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      Portfolio
+                    </Link>
+                  )}
                   <hr className="my-1 border-gray-200 dark:border-slate-700" />
                   <button
                     onClick={() => {

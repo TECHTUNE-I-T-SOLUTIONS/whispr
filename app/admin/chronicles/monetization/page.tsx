@@ -143,7 +143,7 @@ export default function AdminMonetizationPage() {
 
       // Fetch transactions for this creator
       const res = await fetch(
-        `/api/chronicles/monetization?creator_id=${creatorId}&include_transactions=true`
+        `/api/chronicles/admin/monetization?creator_id=${creatorId}&include_transactions=true`
       );
       if (!res.ok) throw new Error('Failed to fetch transactions');
 
@@ -221,6 +221,7 @@ export default function AdminMonetizationPage() {
               <div>
                 <label className="text-sm font-medium mb-2 block">Status</label>
                 <select
+                  title="Filter status"
                   value={filters.status}
                   onChange={(e) =>
                     setFilters({ ...filters, status: e.target.value })
@@ -238,6 +239,7 @@ export default function AdminMonetizationPage() {
               <div>
                 <label className="text-sm font-medium mb-2 block">Sort</label>
                 <select
+                  title="Sort by"
                   value={filters.sort}
                   onChange={(e) =>
                     setFilters({ ...filters, sort: e.target.value })

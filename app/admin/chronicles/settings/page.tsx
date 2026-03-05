@@ -302,7 +302,10 @@ export default function SettingsPage() {
                   type="number"
                   value={systemSettings.max_posts_per_day}
                   onChange={(e) =>
-                    setSystemSettings({ ...systemSettings, max_posts_per_day: parseInt(e.target.value) })
+                    setSystemSettings({
+                      ...systemSettings,
+                      max_posts_per_day: parseInt(e.target.value) || 0,
+                    })
                   }
                 />
               </div>
@@ -313,7 +316,10 @@ export default function SettingsPage() {
                   type="number"
                   value={systemSettings.min_content_length}
                   onChange={(e) =>
-                    setSystemSettings({ ...systemSettings, min_content_length: parseInt(e.target.value) })
+                    setSystemSettings({
+                      ...systemSettings,
+                      min_content_length: parseInt(e.target.value) || 0,
+                    })
                   }
                 />
               </div>
@@ -356,7 +362,7 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setMonetizationSettings({
                       ...monetizationSettings,
-                      ad_revenue_share_percentage: parseFloat(e.target.value),
+                      ad_revenue_share_percentage: parseFloat(e.target.value) || 0,
                     })
                   }
                 />
@@ -375,7 +381,7 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setMonetizationSettings({
                       ...monetizationSettings,
-                      payout_threshold: parseFloat(e.target.value),
+                      payout_threshold: parseFloat(e.target.value) || 0,
                     })
                   }
                 />

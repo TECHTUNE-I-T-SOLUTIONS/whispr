@@ -10,6 +10,7 @@ import {
   Zap,
   User,
   Clock,
+  FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -60,7 +61,8 @@ export default function AdminLeaderboardPage() {
       if (!res.ok) throw new Error('Failed to fetch leaderboard');
 
       const data = await res.json();
-      setEntries(data.entries || []);
+      // server returns an array of entries
+      setEntries(Array.isArray(data) ? data : data.entries || []);
       setError('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
@@ -80,7 +82,7 @@ export default function AdminLeaderboardPage() {
         );
         if (res.ok) {
           const data = await res.json();
-          const categoryEntries = data.entries || [];
+          const categoryEntries = Array.isArray(data) ? data : data.entries || [];
 
           if (categoryEntries.length > 0) {
             stats.push({
@@ -336,7 +338,3 @@ export default function AdminLeaderboardPage() {
   );
 }
 
-// Add missing import
-const FileText = ({ className }: { className: string }) => (
-  <div className={className}>📄</div>
-);

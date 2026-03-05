@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const reportType = searchParams.get('type'); // all, analytics, monetization, engagement, creator_performance
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
+    const includeTemplates = searchParams.get('includeTemplates') === 'true';
 
     // Default empty reports if table doesn't exist
     const defaultResponse = {
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(defaultResponse);
       }
 
-      return NextResponse.json({
+      const responseObj: any = {
         success: true,
         data: data || [],
         pagination: {
@@ -52,7 +53,19 @@ export async function GET(request: NextRequest) {
           offset,
           hasMore: (offset + limit) < (count || 0),
         },
-      });
+      };
+
+      // optionally include templates
+      if (includeTemplates) {
+        const { data: templates, error: templErr } = await supabase
+          .from('chronicles_report_templates')
+          .select('*')
+          .eq('is_active', true);
+        responseObj.templates = templates || [];
+        if (templErr) console.error('Error fetching templates', templErr);
+      }
+
+      return NextResponse.json(responseObj);
     } catch (dbError) {
       console.error('Database error fetching reports:', dbError);
       return NextResponse.json(defaultResponse);
@@ -91,14 +104,38 @@ export async function POST(request: NextRequest) {
 
     try {
       // Get template
-      const { data: template, error: templateError } = await supabase
-        .from('chronicles_report_templates')
-        .select('*')
-        .eq('id', templateId)
-        .single();
+      // templateId might be the slug if frontend fetched names, try to resolve
+      let template: any = null;
+      if (templateId) {
+        // if templateId looks like a uuid use it, otherwise try slug lookup
+        const uuidRegex = /^[0-9a-fA-F\-]{36}$/;
+        if (uuidRegex.test(templateId)) {
+          const { data: t, error: templateError } = await supabase
+            .from('chronicles_report_templates')
+            .select('*')
+            .eq('id', templateId)
+            .single();
+          if (templateError) {
+            console.error('Template fetch error by id:', templateError);
+            return NextResponse.json(defaultReport);
+          }
+          template = t;
+        } else {
+          const { data: t, error: slugError } = await supabase
+            .from('chronicles_report_templates')
+            .select('*')
+            .ilike('slug', templateId)
+            .single();
+          if (slugError) {
+            console.error('Template fetch error by slug:', slugError);
+            return NextResponse.json(defaultReport);
+          }
+          template = t;
+        }
+      }
 
-      if (templateError) {
-        console.error('Template fetch error:', templateError);
+      if (!template) {
+        console.error('No template found for', templateId);
         return NextResponse.json(defaultReport);
       }
 

@@ -30,6 +30,7 @@ interface ReportTemplate {
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
+  const [templates, setTemplates] = useState<ReportTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -37,39 +38,9 @@ export default function ReportsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [dateRange, setDateRange] = useState('30');
 
-  const templates: ReportTemplate[] = [
-    {
-      id: '1',
-      name: 'Executive Summary',
-      slug: 'executive-summary',
-      description: 'High-level platform performance overview',
-      report_type: 'analytics',
-    },
-    {
-      id: '2',
-      name: 'Creator Performance',
-      slug: 'creator-performance',
-      description: 'Detailed creator metrics and rankings',
-      report_type: 'creator_performance',
-    },
-    {
-      id: '3',
-      name: 'Monetization Report',
-      slug: 'monetization-report',
-      description: 'Revenue and earnings analysis',
-      report_type: 'monetization',
-    },
-    {
-      id: '4',
-      name: 'Engagement Analytics',
-      slug: 'engagement-analytics',
-      description: 'User interaction and engagement metrics',
-      report_type: 'engagement',
-    },
-  ];
-
   useEffect(() => {
     fetchReports();
+    fetchTemplates();
   }, []);
 
   const fetchReports = async () => {
@@ -84,6 +55,17 @@ export default function ReportsPage() {
       setError(err instanceof Error ? err.message : 'Failed to load reports');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTemplates = async () => {
+    try {
+      const res = await fetch('/api/chronicles/admin/reports?includeTemplates=true');
+      if (!res.ok) throw new Error('Could not load templates');
+      const result = await res.json();
+      setTemplates(result.templates || []);
+    } catch (err) {
+      console.error('Template fetch error', err);
     }
   };
 
@@ -182,7 +164,8 @@ export default function ReportsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Report Template</label>
-              <select
+                      <select
+                title="Report template"
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md bg-background"
@@ -199,6 +182,7 @@ export default function ReportsPage() {
             <div>
               <label className="block text-sm font-medium mb-2">Date Range</label>
               <select
+                title="Date range"
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md bg-background"
