@@ -216,7 +216,7 @@ export default function ChroniclesLogin() {
 
         {/* Bottom Info */}
         <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>Chronicles is your creative platform for sharing stories and building community.</p>
+          <p>Whispr Chronicles is your creative platform for sharing stories and building community.</p>
         </div>
       </div>
     </div>
