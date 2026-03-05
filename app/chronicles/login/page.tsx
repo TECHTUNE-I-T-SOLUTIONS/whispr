@@ -213,7 +213,6 @@ export default function ChroniclesLogin() {
             </p>
           </div>
         </div>
-
         {/* Bottom Info */}
         <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>Whispr Chronicles is your creative platform for sharing stories and building community.</p>
