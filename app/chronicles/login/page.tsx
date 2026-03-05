@@ -208,7 +208,7 @@ export default function ChroniclesLogin() {
             <p className="text-gray-600 dark:text-gray-400">
               Need help?{' '}
               <Link href="/" className="text-purple-600 dark:text-purple-400 hover:underline font-medium">
-                Back to Home
+                Go back to Home
               </Link>
             </p>
           </div>
