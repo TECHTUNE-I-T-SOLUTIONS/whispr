@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import type { Metadata } from "next"
 import { formatDate, markdownToHtml } from "@/lib/utils"
 import { createSupabaseServer } from "@/lib/supabase-server"
@@ -60,6 +61,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="whispr-gradient min-h-screen py-10">
       <article className="container max-w-3xl space-y-6">
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <span>←</span>
+          <span>Back to Blog</span>
+        </Link>
+
         <h1 className="text-4xl font-bold">{post.title}</h1>
 
         <p className="text-muted-foreground text-sm">

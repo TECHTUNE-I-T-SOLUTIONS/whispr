@@ -52,7 +52,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build response with creator info
+    // Get tokens from session
+    const { access_token, refresh_token } = authData.session;
+
+    // Build response with creator info and tokens
     const response = NextResponse.json(
       {
         success: true,
@@ -63,11 +66,12 @@ export async function POST(request: NextRequest) {
           displayName: creator.display_name,
           profileImage: creator.profile_image_url,
         },
+        access_token: access_token,
+        refresh_token: refresh_token,
       },
       { status: 200 }
     );
     // Set Supabase session cookies
-    const { access_token, refresh_token } = authData.session;
     response.cookies.set('sb-access-token', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

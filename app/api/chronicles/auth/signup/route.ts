@@ -224,6 +224,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 8. Sign in the user to establish session
+    let accessToken: string | null = null;
+    let refreshToken: string | null = null;
     try {
       const signInResult = await supabase.auth.signInWithPassword({
         email,
@@ -233,6 +235,8 @@ export async function POST(request: NextRequest) {
         userId: signInResult.data?.user?.id,
         email: signInResult.data?.user?.email,
       });
+      accessToken = signInResult.data?.session?.access_token || null;
+      refreshToken = signInResult.data?.session?.refresh_token || null;
     } catch (signInError) {
       console.error("Sign in error after signup:", signInError);
       // Continue - signup is successful even if auto-signin fails
@@ -252,6 +256,8 @@ export async function POST(request: NextRequest) {
           preferred_categories: creator.preferred_categories,
           profile_visibility: creator.profile_visibility,
         },
+        access_token: accessToken,
+        refresh_token: refreshToken,
       },
       { status: 201 }
     );

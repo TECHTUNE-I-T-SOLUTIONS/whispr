@@ -1,9 +1,30 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server-client';
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    let supabase;
+
+    // Check for Authorization header (for mobile app)
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      );
+    } else {
+      // Fallback to cookie-based auth for web
+      supabase = await createSupabaseServerClient();
+    }
 
     // Get current user from session
     const {
@@ -19,8 +40,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || 'all';
 
-    // Get creator ID
-    const { data: creator, error: creatorError } = await supabase
+    // Get creator ID using service role key if available (for better data access)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const accessClient = serviceRoleKey 
+      ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey)
+      : supabase;
+
+    const { data: creator, error: creatorError } = await accessClient
       .from('chronicles_creators')
       .select('id')
       .eq('user_id', user.id)
@@ -31,8 +58,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
     }
 
-    // Fetch posts
-    let query = supabase
+    // Fetch posts using service role for proper data access
+    let query = accessClient
       .from('chronicles_posts')
       .select('*')
       .eq('creator_id', creator.id)
@@ -46,21 +73,25 @@ export async function GET(req: NextRequest) {
 
     if (postsError) throw postsError;
 
+    console.log('Fetched posts for creator:', creator.id, 'Post count:', posts?.length || 0);
+
     return NextResponse.json({
       posts: (posts || []).map((post) => ({
         id: post.id,
         title: post.title,
+        type: post.post_type,
         slug: post.slug,
         excerpt: post.excerpt,
+        content: post.content,
         status: post.status,
         likesCount: post.likes_count || 0,
         commentsCount: post.comments_count || 0,
         sharesCount: post.shares_count || 0,
-        viewsCount: post.views_count || 0,
+        viewCount: post.views_count || 0,
         createdAt: post.created_at,
         publishedAt: post.published_at,
-        post_type: post.post_type,
         category: post.category,
+        coverImageUrl: post.cover_image_url,
       })),
     });
   } catch (error) {
@@ -74,52 +105,125 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    let authUser: any;
 
-    // Get current user from session
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      console.log('Auth error in POST posts:', userError);
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Check for Authorization header (for mobile app)
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      const clientSupabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      );
+      const { data, error } = await clientSupabase.auth.getUser();
+      if (error || !data.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      authUser = data.user;
+    } else {
+      // Fallback to cookie-based auth for web
+      const clientSupabase = await createSupabaseServerClient();
+      const { data, error } = await clientSupabase.auth.getUser();
+      if (error || !data.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      authUser = data.user;
     }
 
     const body = await req.json();
+
+    // Get service role key - try multiple env var names
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    
+    console.log('Service Role Key available:', !!serviceRoleKey);
+    console.log('Using service role:', !!serviceRoleKey);
+
+    // Always use service role if available, otherwise use anon key (RLS will still enforce)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+          },
+        },
+      }
+    );
 
     // Get creator ID from user ID
     const { data: creator, error: creatorError } = await supabase
       .from('chronicles_creators')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', authUser.id)
       .single();
 
     if (creatorError || !creator) {
+      console.error('Creator fetch error:', creatorError);
       return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
     }
 
-    // Create post
+    console.log('Creator fetched:', creator);
+    console.log('Creating post with creator_id:', creator.id);
+
+    if (!creator.id) {
+      console.error('Creator ID is empty or undefined');
+      return NextResponse.json(
+        { error: 'Creator ID validation failed' },
+        { status: 400 }
+      );
+    }
+
+    // Generate slug from title if not provided
+    const generateSlug = (title: string) => {
+      return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .substring(0, 100);
+    };
+
+    const slug = body.slug || generateSlug(body.title);
+
+    // Build insert object carefully
+    const postData = {
+      creator_id: creator.id,
+      title: body.title,
+      slug: slug,
+      excerpt: body.excerpt || null,
+      content: body.content,
+      post_type: body.post_type || 'blog',
+      category: body.category || null,
+      tags: body.tags || [],
+      cover_image_url: body.cover_image_url || null,
+      formatting_data: body.formatting_data || {},
+      status: body.status || 'draft',
+      published_at: body.status === 'published' ? new Date().toISOString() : null,
+    };
+
+    console.log('Post data to insert:', postData);
+
+    // Create post using service role client to bypass RLS
     const { data: post, error: postError } = await supabase
       .from('chronicles_posts')
-      .insert({
-        creator_id: creator.id,
-        title: body.title,
-        slug: body.slug,
-        excerpt: body.excerpt,
-        content: body.content,
-        post_type: body.post_type,
-        category: body.category,
-        tags: body.tags || [],
-        cover_image_url: body.cover_image_url,
-        formatting_data: body.formatting_data || {},
-        status: body.status || 'draft',
-      })
+      .insert(postData)
       .select()
       .single();
 
-    if (postError) throw postError;
+    if (postError) {
+      console.error('Post insert error:', postError);
+      throw postError;
+    }
 
     return NextResponse.json(post, { status: 201 });
   } catch (error) {

@@ -1,10 +1,31 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server-client';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET creator profile
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    let supabase;
+
+    // Check for Authorization header (for mobile app)
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      );
+    } else {
+      // Fallback to cookie-based auth for web
+      supabase = await createSupabaseServerClient();
+    }
 
     // Get current user from session
     const {
@@ -37,7 +58,27 @@ export async function GET(req: NextRequest) {
 // PUT update creator profile
 export async function PUT(req: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    let supabase;
+
+    // Check for Authorization header (for mobile app)
+    const authHeader = req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      );
+    } else {
+      // Fallback to cookie-based auth for web
+      supabase = await createSupabaseServerClient();
+    }
 
     // Get current user from session
     const {

@@ -23,9 +23,12 @@ export default function NewChainPage() {
       const json = await res.json();
       if (json.success && json.data) {
         router.push(`/chronicles/chains/${json.data.id}`);
+      } else {
+        alert(json.error || 'Failed to create chain');
       }
     } catch (e) {
       console.error(e);
+      alert('Failed to create chain');
     } finally {
       setLoading(false);
     }

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const fileExtension = file.name.split(".").pop()
     const fileName = `avatar-${admin.id}-${timestamp}.${fileExtension}`
-    const filePath = `avatars/${fileName}`
+    const filePath = `${fileName}`
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = new Uint8Array(arrayBuffer)
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       try {
         const oldFileName = admin.avatar_url.split("/").pop()
         if (oldFileName?.startsWith("avatar-")) {
-          await supabase.storage.from("avatars").remove([`avatars/${oldFileName}`])
+          await supabase.storage.from("avatars").remove([oldFileName])
         }
       } catch (error) {
         console.warn("Could not delete old avatar:", error)

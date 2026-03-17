@@ -1,14 +1,39 @@
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { createSupabaseServerClient } from '@/lib/supabase-server-client';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+
+// Helper to get authenticated supabase client
+function getAuthenticatedSupabase(req: NextRequest) {
+  const authHeader = req.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
+  }
+  // Fallback to server-side auth for web
+  return createSupabaseServer();
+}
 
 // POST to subscribe or update push notification settings
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
+    const supabase = getAuthenticatedSupabase(req);
     const { enabled, subscription } = await req.json();
 
-    if (!userId) {
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -16,7 +41,7 @@ export async function POST(req: NextRequest) {
     const { data: creator, error: creatorError } = await supabase
       .from('chronicles_creators')
       .select('id')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .single();
 
     if (creatorError || !creator) {
@@ -60,17 +85,19 @@ export async function POST(req: NextRequest) {
 // GET push notification settings
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
+    const supabase = getAuthenticatedSupabase(req);
 
-    if (!userId) {
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { data: creator, error } = await supabase
       .from('chronicles_creators')
       .select('push_notifications_enabled')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .single();
 
     if (error) throw error;
