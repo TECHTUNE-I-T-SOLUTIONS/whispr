@@ -2,11 +2,26 @@ import { NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import bcrypt from "bcryptjs"
 
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 })
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return response
+}
+
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json()
     if (!username || !password) {
-      return NextResponse.json({ error: "Username and password are required" }, { status: 400 })
+      return NextResponse.json({ error: "Username and password are required" }, {
+        status: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     const supabase = createSupabaseServer()
@@ -18,18 +33,39 @@ export async function POST(request: Request) {
       .single()
 
     if (error || !admin) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return NextResponse.json({ error: "Invalid credentials" }, {
+        status: 401,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     if (!admin.is_active) {
-      return NextResponse.json({ error: "Account is deactivated. Please contact support." }, { status: 401 })
+      return NextResponse.json({ error: "Account is deactivated. Please contact support." }, {
+        status: 401,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     if (admin.locked_until && new Date(admin.locked_until) > new Date()) {
       return NextResponse.json({
         error: "Account is locked due to multiple failed login attempts.",
         accountLocked: true,
-      }, { status: 423 })
+      }, {
+        status: 423,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     const isValidPassword = await bcrypt.compare(password, admin.password_hash)
@@ -47,7 +83,14 @@ export async function POST(request: Request) {
           ? "Account locked. Use forgot password to reset."
           : "Invalid credentials",
         accountLocked: failedAttempts >= 5,
-      }, { status: 423 })
+      }, {
+        status: 423,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     await supabase.from("admin").update({
@@ -69,7 +112,13 @@ export async function POST(request: Request) {
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
-    const response = NextResponse.json({ success: true, admin: adminData })
+    const response = NextResponse.json({ success: true, admin: adminData }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
 
     response.cookies.set("whispr-admin-auth", "true", {
       httpOnly: true,
@@ -90,6 +139,13 @@ export async function POST(request: Request) {
     return response
   } catch (error) {
     console.error("Login error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error" }, {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 }

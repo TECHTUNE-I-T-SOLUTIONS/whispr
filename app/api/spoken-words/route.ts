@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 })
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return response
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createSupabaseServer()
@@ -41,7 +49,14 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error fetching spoken words:", error)
-      return NextResponse.json({ error: "Failed to fetch spoken words" }, { status: 500 })
+      return NextResponse.json({ error: "Failed to fetch spoken words" }, {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
+      })
     }
 
     return NextResponse.json({
@@ -52,9 +67,22 @@ export async function GET(request: NextRequest) {
         total: count || 0,
         hasMore: (spokenWords?.length || 0) === limit
       }
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
     })
   } catch (error) {
     console.error("Error in GET /api/spoken-words:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error" }, {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 }

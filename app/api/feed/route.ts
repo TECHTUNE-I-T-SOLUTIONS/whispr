@@ -26,6 +26,14 @@ function getPublicAvatarUrl(avatarUrl: string | null, bucket: string): string | 
   }
 }
 
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 })
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return response
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createSupabaseServer()
@@ -280,15 +288,23 @@ export async function GET(request: NextRequest) {
 
     console.log("Feed API response:", { success: true, posts: postsWithReactions.slice(0, 20) })
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       posts: postsWithReactions.slice(0, 20)
     })
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    return response
   } catch (error) {
     console.error("Feed API error:", error)
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "Failed to fetch feed", success: false },
       { status: 500 }
     )
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    return response
   }
 }

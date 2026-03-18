@@ -2,6 +2,14 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { getAvatarProxyUrlWithBucket } from "@/lib/avatar-proxy"
 
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 })
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return response
+}
+
 export async function GET(req: NextRequest) {
   const supabase = createSupabaseServer()
 
@@ -15,7 +23,14 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
 
   if (wallError) {
-    return NextResponse.json({ error: wallError.message, success: false }, { status: 500 })
+    return NextResponse.json({ error: wallError.message, success: false }, {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 
   // Get wall comments with admin responses
@@ -90,6 +105,12 @@ export async function GET(req: NextRequest) {
     total_posts: processedPosts.length,
     total_comments: wallComments?.length || 0,
     total_reactions: wallReactions?.length || 0
+  }, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
   })
 }
 
@@ -98,7 +119,14 @@ export async function POST(req: NextRequest) {
   const { content } = await req.json()
 
   if (!content) {
-    return NextResponse.json({ error: "Content is required" }, { status: 400 })
+    return NextResponse.json({ error: "Content is required" }, {
+      status: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 
   const { data, error } = await supabase
@@ -108,7 +136,14 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 
   // Create a notification for the admin
@@ -118,7 +153,13 @@ export async function POST(req: NextRequest) {
     message: content.slice(0, 200) + "...",
   })
 
-  return NextResponse.json(data)
+  return NextResponse.json(data, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
+  })
 }
 
 // Handle responses to wall posts
@@ -127,7 +168,14 @@ export async function PUT(req: NextRequest) {
   const { postId, content, isAdmin = false, adminId } = await req.json()
 
   if (!postId || !content) {
-    return NextResponse.json({ error: "Post ID and content are required" }, { status: 400 })
+    return NextResponse.json({ error: "Post ID and content are required" }, {
+      status: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 
   // Update the wall post with the response
@@ -150,7 +198,14 @@ export async function PUT(req: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    })
   }
 
   // Process the response - use avatar proxy for reliable loading
@@ -167,5 +222,11 @@ export async function PUT(req: NextRequest) {
     } : null
   }
 
-  return NextResponse.json(processedData)
+  return NextResponse.json(processedData, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
+  })
 }
