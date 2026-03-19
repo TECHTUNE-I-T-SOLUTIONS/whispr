@@ -4,8 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 // GET details or POST new entry
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ chainId: string }> }) {
   try {
+    const { chainId } = await params;
+    if (!chainId) return NextResponse.json({ error: 'Missing chainId' }, { status: 400 });
+
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
                           process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
     
@@ -22,42 +25,40 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const id = request.nextUrl.pathname.split('/').pop();
-    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-
     const { data, error } = await supabase
       .from('chronicles_writing_chains')
       .select(`
         *,
         entries:chronicles_chain_entries(
           id,
-          post_id,
-          chain_id,
           sequence,
           added_at,
           added_by,
-          post:chronicles_posts(
+          chain_entry_post:chronicles_chain_entry_posts(
             id,
             title,
-            slug,
-            excerpt,
             content,
-            post_type,
+            excerpt,
             category,
             tags,
             cover_image_url,
-            published_at,
             status,
+            creator_id,
             likes_count,
             comments_count,
             shares_count,
             views_count,
-            creator_id,
-            created_at
+            published_at,
+            created_at,
+            creator:chronicles_creators!chronicles_chain_entry_posts_creator_id_fkey(
+              id,
+              pen_name,
+              profile_image_url
+            )
           )
         )
       `)
-      .eq('id', id)
+      .eq('id', chainId)
       .single();
 
     if (error) {
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
       throw error;
     }
     
-    console.log('Chain fetched:', id, 'with entries:', data?.entries?.length || 0);
+    console.log('Chain fetched:', chainId, 'with entries:', data?.entries?.length || 0);
     return NextResponse.json({ success: true, data });
   } catch (err) {
     console.error('Chain detail error', err);
@@ -73,8 +74,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest, { params }: { params: { chainId: string } }) {
   try {
+    const { chainId } = params;
+    if (!chainId) return NextResponse.json({ error: 'Missing chainId' }, { status: 400 });
+
     let authUser: any;
 
     // Check for Authorization header (for mobile app)
@@ -126,9 +130,6 @@ export async function POST(request: NextRequest) {
       }
       authUser = data.user;
     }
-
-    const id = request.nextUrl.pathname.split('/').pop();
-    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
     const body = await request.json();
     const { title, content, excerpt, post_type = 'poem', category, tags = [], status = 'published' } = body;
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate slug from title
+    // Generate slug from title (for potential future use, not stored in new table)
     const slug = title
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
@@ -190,56 +191,85 @@ export async function POST(request: NextRequest) {
       .replace(/-+/g, '-')
       .trim();
 
-    // Create post using service role client to bypass RLS
-    const { data: post, error: postError } = await supabase
-      .from('chronicles_posts')
-      .insert({
-        creator_id: creator.id,
-        title,
-        slug,
-        excerpt,
-        content,
-        post_type,
-        category,
-        tags,
-        status,
-        formatting_data: {},
-      })
-      .select()
-      .single();
-
-    if (postError) {
-      console.error('Post insert error:', postError);
-      throw postError;
-    }
-
     // Get the next sequence number for the chain
-    const { data: existingEntries, error: entriesError } = await supabase
+    const { data: existingEntries, error: sequenceError } = await supabase
       .from('chronicles_chain_entries')
       .select('sequence')
-      .eq('chain_id', id)
+      .eq('chain_id', chainId)
       .order('sequence', { ascending: false })
       .limit(1);
 
-    if (entriesError) {
-      console.error('Entries fetch error:', entriesError);
-      throw entriesError;
+    if (sequenceError) {
+      console.error('Sequence fetch error:', sequenceError);
+      throw sequenceError;
     }
 
     const nextSequence = existingEntries && existingEntries.length > 0
       ? existingEntries[0].sequence + 1
       : 1;
 
-    // Add entry to chain using service role client
+    // Create entry post in chronicles_chain_entry_posts table
+    const { data: entryPost, error: postError } = await supabase
+      .from('chronicles_chain_entry_posts')
+      .insert({
+        chain_id: chainId,
+        creator_id: creator.id,
+        title,
+        content,
+        excerpt: excerpt || content.substring(0, 200),
+        category,
+        tags: tags || [],
+        status,
+        sequence: nextSequence,
+        added_by: creator.id,
+        formatting_data: {},
+        likes_count: 0,
+        comments_count: 0,
+        shares_count: 0,
+        views_count: 0,
+      })
+      .select()
+      .single();
+
+    if (postError) {
+      console.error('Chain entry post insert error:', postError);
+      throw postError;
+    }
+
+    // Link entry to chain
     const { data: entry, error: entryError } = await supabase
       .from('chronicles_chain_entries')
       .insert({
-        chain_id: id,
-        post_id: post.id,
+        chain_id: chainId,
+        chain_entry_post_id: entryPost.id,
         sequence: nextSequence,
         added_by: creator.id
       })
-      .select()
+      .select(
+        `
+          id,
+          sequence,
+          added_at,
+          added_by,
+          chain_entry_post:chronicles_chain_entry_posts(
+            id,
+            title,
+            content,
+            excerpt,
+            category,
+            tags,
+            cover_image_url,
+            status,
+            creator_id,
+            likes_count,
+            comments_count,
+            shares_count,
+            views_count,
+            published_at,
+            created_at
+          )
+        `
+      )
       .single();
 
     if (entryError) {
@@ -247,7 +277,10 @@ export async function POST(request: NextRequest) {
       throw entryError;
     }
 
-    return NextResponse.json({ success: true, data: { post, entry } });
+    return NextResponse.json({ 
+      success: true, 
+      data: entry 
+    });
   } catch (err) {
     console.error('Chain entry creation error', err);
     return NextResponse.json({ success: false, error: 'Failed to create entry' }, { status: 500 });
