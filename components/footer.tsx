@@ -77,6 +77,11 @@ export function Footer() {
                   About
                 </Link>
               </li>
+              <li>
+                <Link href="/download" className="hover:text-primary transition-colors font-semibold text-[#911A1B] dark:text-red-500">
+                  📱 Download App
+                </Link>
+              </li>
             </ul>
           </div>
 

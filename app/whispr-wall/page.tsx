@@ -19,7 +19,15 @@ export default function WhisprWallPage() {
   useEffect(() => {
     fetch("/api/wall")
       .then((res) => res.json())
-      .then(async (postsData) => {
+      .then(async (response) => {
+        // Handle the response correctly - it returns { success: true, posts: [...] }
+        const postsData = Array.isArray(response) ? response : response?.posts || []
+        
+        if (!Array.isArray(postsData) || postsData.length === 0) {
+          setPosts([])
+          return
+        }
+
         const postsWithDetails = await Promise.all(
           postsData.map(async (post: any) => {
             const [commentsRes, reactionsRes] = await Promise.all([
@@ -40,6 +48,10 @@ export default function WhisprWallPage() {
         )
 
         setPosts(postsWithDetails)
+      })
+      .catch((error) => {
+        console.error("Failed to fetch wall posts:", error)
+        setPosts([])
       })
 
   }, [])
