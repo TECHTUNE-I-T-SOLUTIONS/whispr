@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Sparkles, Zap, BookOpen } from 'lucide-react';
+import { ChevronRight, Smartphone, Sparkles, Zap } from 'lucide-react';
+import Link from 'next/link';
 import styles from './chronicles-teaser-banner.module.css';
 
 export function ChroniclesTeaserBanner() {
@@ -18,7 +19,7 @@ export function ChroniclesTeaserBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-r from-gray-600 to-primary dark:from-gray-800 dark:to-primary">
+    <div className="relative w-full overflow-hidden bg-gradient-to-r from-[#911A1B] to-red-700 dark:from-[#6B1415] dark:to-red-900">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></motion.div>
@@ -36,8 +37,8 @@ export function ChroniclesTeaserBanner() {
                   animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                 }`}
               >
-                <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white animate-bounce" />
-                <BookOpen className="w-6 h-6 md:w-7 md:h-7 text-white animate-bounce animation-delay-200" />
+                <Smartphone className="w-6 h-6 md:w-7 md:h-7 text-white animate-bounce" />
+                <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white animate-bounce animation-delay-200" />
                 <Zap className="w-6 h-6 md:w-7 md:h-7 text-white animate-bounce animation-delay-400" />
               </div>
 
@@ -47,41 +48,42 @@ export function ChroniclesTeaserBanner() {
                     animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                   }`}
                 >
-                  Something BIG is Coming!
+                  Whispr Mobile App is Here!
                 </h3>
                 <p
                   className={`text-sm md:text-base text-white/90 transition-all duration-700 delay-200 ${
                     animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                   }`}
                 >
-                  Introducing <span className="font-bold">Whispr Chronicles</span> – Your Personal Writing Platform
+                  Write, share, and connect <span className="font-bold">on the go</span>
                 </p>
                 <p
                   className={`text-sm md:text-base text-white/90 transition-all duration-700 delay-400 ${
                     animate ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
                   }`}
                 >
-                  Share your stories, connect with readers, and grow your audience—with nothing holding you back.
+                  Download the Whispr app for iOS and Android. Create chronicles anytime, anywhere.
                 </p>
               </div>
             </div>
 
             {/* Right CTA */}
-            <div
-              className={`flex items-center gap-2 text-white text-sm md:text-base font-semibold cursor-pointer hover:gap-3 transition-all duration-500 group ${
+            <Link
+              href="/download"
+              className={`flex items-center gap-2 text-white text-sm md:text-base font-semibold cursor-pointer hover:gap-3 transition-all duration-500 group bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg ${
                 animate ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
               }`}
             >
-              <span>😂 Stay Tuned</span>
+              <span>Download Now</span>
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </div>
+            </Link>
           </div>
 
           {/* Animated progress bar */}
           <div className="mt-3 md:mt-4 h-1 bg-white/20 rounded-full overflow-hidden">
             <div
               className={`h-full bg-white/80 rounded-full transition-all duration-1000 ${
-                animate ? 'w-3/4' : 'w-0'
+                animate ? 'w-full' : 'w-0'
               } ${styles.shimmer}`}
             ></div>
           </div>
@@ -92,7 +94,7 @@ export function ChroniclesTeaserBanner() {
               animate ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            Be among the first to join our exclusive creator community. You can sign up when we launch!
+            Join our creator community. Start writing your chronicles today!
           </p>
         </div>
       </div>
