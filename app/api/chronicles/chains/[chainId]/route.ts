@@ -67,16 +67,45 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     
     console.log('Chain fetched:', chainId, 'with entries:', data?.entries?.length || 0);
-    return NextResponse.json({ success: true, data });
+    // Transform the response to a flatter structure that the app expects
+    const transformedEntries = data?.entries?.map((entry: any) => ({
+      id: entry.id,
+      sequence: entry.sequence,
+      added_at: entry.added_at,
+      added_by: entry.added_by,
+      post: entry.chain_entry_post ? {
+        id: entry.chain_entry_post.id,
+        title: entry.chain_entry_post.title,
+        content: entry.chain_entry_post.content,
+        slug: entry.chain_entry_post.id, // Use ID as slug
+        excerpt: entry.chain_entry_post.excerpt,
+        category: entry.chain_entry_post.category,
+        tags: entry.chain_entry_post.tags,
+        published_at: entry.chain_entry_post.published_at,
+        likes_count: entry.chain_entry_post.likes_count,
+        comments_count: entry.chain_entry_post.comments_count,
+        shares_count: entry.chain_entry_post.shares_count,
+        cover_image_url: entry.chain_entry_post.cover_image_url,
+        creator: entry.chain_entry_post.creator,
+      } : null,
+    })) || [];
+
+    return NextResponse.json({ 
+      success: true, 
+      data: {
+        ...data,
+        entries: transformedEntries,
+      }
+    });
   } catch (err) {
     console.error('Chain detail error', err);
     return NextResponse.json({ success: false, error: 'Failed to fetch chain' }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { chainId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ chainId: string }> }) {
   try {
-    const { chainId } = params;
+    const { chainId } = await params;
     if (!chainId) return NextResponse.json({ error: 'Missing chainId' }, { status: 400 });
 
     let authUser: any;
@@ -132,7 +161,7 @@ export async function POST(request: NextRequest, { params }: { params: { chainId
     }
 
     const body = await request.json();
-    const { title, content, excerpt, post_type = 'poem', category, tags = [], status = 'published' } = body;
+    const { title, content, excerpt, cover_image_url, post_type = 'poem', category, tags = [], status = 'published' } = body;
 
     if (!title || !content) {
       return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
@@ -217,6 +246,7 @@ export async function POST(request: NextRequest, { params }: { params: { chainId
         title,
         content,
         excerpt: excerpt || content.substring(0, 200),
+        cover_image_url: cover_image_url || null,
         category,
         tags: tags || [],
         status,
@@ -266,7 +296,12 @@ export async function POST(request: NextRequest, { params }: { params: { chainId
             shares_count,
             views_count,
             published_at,
-            created_at
+            created_at,
+            creator:chronicles_creators!chronicles_chain_entry_posts_creator_id_fkey(
+              id,
+              pen_name,
+              profile_image_url
+            )
           )
         `
       )

@@ -5,14 +5,28 @@ import { Download, Apple, Smartphone, Calendar, Package, Check, Loader } from 'l
 import Image from 'next/image';
 
 interface BuildInfo {
-  iosDownloadUrl?: string;
-  androidDownloadUrl?: string;
-  iosVersion?: string;
-  androidVersion?: string;
+  version?: string;
   releaseDate?: string;
+  buildTime?: string;
   changelog?: string;
   buildNumber?: string;
-  status?: string;
+  buildStatus?: string;
+  androidDownloadUrl?: string;
+  artifacts?: {
+    apk?: {
+      name: string;
+      url: string;
+      size: number;
+      sizeFormatted: string;
+    };
+    aab?: {
+      name: string;
+      url: string;
+      size: number;
+      sizeFormatted: string;
+    };
+  };
+  releaseName?: string;
 }
 
 export default function DownloadPage() {
@@ -63,66 +77,10 @@ export default function DownloadPage() {
               <h2 className="text-2xl font-bold">iOS</h2>
             </div>
             <div className="p-8">
-              {loading ? (
-                <div className="flex justify-center items-center h-64">
-                  <Loader className="w-8 h-8 animate-spin text-blue-600" />
-                </div>
-              ) : error ? (
-                <div className="text-red-600 dark:text-red-400 text-center py-8">
-                  <p>{error}</p>
-                </div>
-              ) : builds?.iosDownloadUrl ? (
-                <>
-                  <div className="space-y-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <Package className="w-5 h-5 text-[#911A1B]" />
-                      <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Version</p>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {builds.iosVersion || 'v1.0.0'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-[#911A1B]" />
-                      <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Release Date</p>
-                        <p className="font-semibold text-gray-900 dark:text-white">
-                          {builds.releaseDate
-                            ? new Date(builds.releaseDate).toLocaleDateString()
-                            : 'Recently'}
-                        </p>
-                      </div>
-                    </div>
-                    {builds.changelog && (
-                      <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          What's New
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 text-sm">
-                          {builds.changelog}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <a
-                    href={builds.iosDownloadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-gradient-to-r from-[#911A1B] to-red-700 hover:from-red-800 hover:to-red-900 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-300"
-                  >
-                    <Download className="w-5 h-5" />
-                    Download for iOS
-                  </a>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                    Available on App Store
-                  </p>
-                </>
-              ) : (
-                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                  <p>Coming Soon</p>
-                </div>
-              )}
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <p className="text-lg font-semibold mb-2">Coming Soon</p>
+                <p className="text-sm">iOS builds will be available after TestFlight setup</p>
+              </div>
             </div>
           </div>
 
@@ -149,25 +107,71 @@ export default function DownloadPage() {
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Version</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {builds.androidVersion || 'v1.0.0'}
+                          v{builds.version || 'Unknown'}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Calendar className="w-5 h-5 text-[#911A1B]" />
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Release Date</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Build Date</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {builds.releaseDate
-                            ? new Date(builds.releaseDate).toLocaleDateString()
+                          {builds.buildTime
+                            ? new Date(builds.buildTime).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric'
+                              })
                             : 'Recently'}
                         </p>
                       </div>
                     </div>
+
+                    {/* Download Options */}
+                    <div className="border-t pt-4 mt-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-semibold">
+                        Download Options
+                      </p>
+                      <div className="space-y-2">
+                        {builds.artifacts?.apk && (
+                          <a
+                            href={builds.artifacts.apk.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                          >
+                            <div>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">APK</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {builds.artifacts.apk.sizeFormatted}
+                              </p>
+                            </div>
+                            <Download className="w-4 h-4 text-[#911A1B]" />
+                          </a>
+                        )}
+                        {builds.artifacts?.aab && (
+                          <a
+                            href={builds.artifacts.aab.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                          >
+                            <div>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">AAB (Bundle)</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {builds.artifacts.aab.sizeFormatted}
+                              </p>
+                            </div>
+                            <Download className="w-4 h-4 text-[#911A1B]" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
                     {builds.changelog && (
-                      <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          What's New
+                      <div className="border-t pt-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-semibold">
+                          Build Info
                         </p>
                         <p className="text-gray-700 dark:text-gray-300 text-sm">
                           {builds.changelog}
@@ -182,15 +186,16 @@ export default function DownloadPage() {
                     className="w-full bg-gradient-to-r from-[#911A1B] to-red-700 hover:from-red-800 hover:to-red-900 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-300"
                   >
                     <Download className="w-5 h-5" />
-                    Download for Android
+                    Quick Download (APK)
                   </a>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                    Available on Google Play
+                    Direct download from Whispr Servers • Choose APK or AAB above for more options
                   </p>
                 </>
               ) : (
                 <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                  <p>Coming Soon</p>
+                  <p className="text-lg font-semibold mb-2">No builds available</p>
+                  <p className="text-sm">Check back soon for the first build</p>
                 </div>
               )}
             </div>
