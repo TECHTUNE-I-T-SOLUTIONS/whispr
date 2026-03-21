@@ -107,7 +107,25 @@ export async function GET() {
     const buildId = latestBuild.id;
     const buildTime = latestBuild.finishedAt || latestBuild.buildStartedTime;
     const buildNumber = latestBuild.buildNumber || latestBuild.issueNumber || 'Latest Build';
-    const appVersion = latestBuild.appVersion || '1.0.0';
+    
+    // Extract version from git tag (e.g., v1.0.1 -> 1.0.1) - most reliable source
+    let appVersion = '1.0.0';
+    
+    // Try tag first (most reliable)
+    if (latestBuild.tags && Array.isArray(latestBuild.tags) && latestBuild.tags.length > 0) {
+      const versionTag = latestBuild.tags[0];
+      if (versionTag && typeof versionTag === 'string') {
+        appVersion = versionTag.replace(/^v/, '').trim();
+        console.log(`✓ Version extracted from tag: ${appVersion}`);
+      }
+    } 
+    // Fallback to appVersion
+    else if (latestBuild.appVersion) {
+      appVersion = latestBuild.appVersion;
+      console.log(`✓ Version extracted from appVersion: ${appVersion}`);
+    } else {
+      console.log(`⚠ Using default version: ${appVersion}`);
+    }
 
     // Extract artifact URLs (CodeMagic uses "artefacts" spelling)
     const artifacts = (latestBuild.artefacts || []) as any[];
