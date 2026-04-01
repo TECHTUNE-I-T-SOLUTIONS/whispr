@@ -12,6 +12,7 @@ import { formatDate } from "@/lib/utils"
 import { SafeImage } from "@/components/SafeImage"
 import { MediaPlayer } from "@/components/media-player"
 import AdvancedFeaturesModal from "@/components/advanced-features-modal"
+import { AppBanner } from "@/components/app-banner"
 
 interface PoemClientPageProps {
   poem: any
@@ -150,6 +151,11 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
           <Suspense fallback={<CommentsSkeleton />}>
             <Comments postId={poem.id} />
           </Suspense>
+
+          {/* App Banner for Mobile Users */}
+          <div className="mt-12">
+            <AppBanner postId={poem.id} postType="post" />
+          </div>
         </div>
       </div>
 

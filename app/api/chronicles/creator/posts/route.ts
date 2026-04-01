@@ -143,18 +143,25 @@ export async function POST(req: NextRequest) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
                           process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
     
-    console.log('Service Role Key available:', !!serviceRoleKey);
-    console.log('Using service role:', !!serviceRoleKey);
+    if (!serviceRoleKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY not found in environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error: missing service role key' },
+        { status: 500 }
+      );
+    }
 
-    // Always use service role if available, otherwise use anon key (RLS will still enforce)
+    console.log('Service Role Key available:', !!serviceRoleKey);
+    console.log('Using service role:', true);
+
+    // Create Supabase client with service role key - this bypasses RLS
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      serviceRoleKey,
       {
-        global: {
-          headers: {
-            Authorization: `Bearer ${serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-          },
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
         },
       }
     );
@@ -222,6 +229,34 @@ export async function POST(req: NextRequest) {
 
     if (postError) {
       console.error('Post insert error:', postError);
+      console.error('Error code:', postError.code);
+      console.error('Error message:', postError.message);
+      console.error('Error details:', postError.details);
+      console.error('Full error object:', JSON.stringify(postError, null, 2));
+      
+      // If it's a field-not-found error, try without select() to see if insert actually worked
+      if (postError.code === '42703' && postError.message.includes('creator_id')) {
+        console.log('Attempting fallback insert without select...');
+        const { error: fallbackError } = await supabase
+          .from('chronicles_posts')
+          .insert(postData);
+        
+        if (fallbackError) {
+          console.error('Fallback insert also failed:', fallbackError);
+        } else {
+          console.log('Fallback insert succeeded! Fetching the record...');
+          const { data: fetchedPost, error: fetchError } = await supabase
+            .from('chronicles_posts')
+            .select('*')
+            .eq('slug', postData.slug)
+            .single();
+          
+          if (fetchError) {
+            return NextResponse.json({ error: 'Post created but failed to fetch' }, { status: 500 });
+          }
+          return NextResponse.json(fetchedPost, { status: 201 });
+        }
+      }
       throw postError;
     }
 

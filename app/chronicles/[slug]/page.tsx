@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Share2, Loader2, AlertCircle } from 'lucide-react';
+import { AppBanner } from '@/components/app-banner';
 
 interface Post {
   id: string;
@@ -237,6 +238,11 @@ export default function PublicPostPage() {
         <div className="max-w-2xl">
           <h2 className="text-2xl font-bold mb-6">Comments</h2>
           <p className="text-muted-foreground">Comments coming soon</p>
+        </div>
+
+        {/* App Banner for Mobile Users */}
+        <div className="mt-12">
+          <AppBanner postId={post.id} postType="chronicles" />
         </div>
       </article>
     </main>

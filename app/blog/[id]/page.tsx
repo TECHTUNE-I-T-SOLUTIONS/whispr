@@ -8,6 +8,7 @@ import { Reactions } from "@/components/reactions"
 import { Comments } from "@/components/comments"
 import { ShareButtons } from "@/components/share-buttons"
 import { BlogClientPage } from "./blog-client-page"
+import { AppBanner } from "@/components/app-banner"
 
 type BlogPostPageProps = {
   params: Promise<{ id: string }>
@@ -130,6 +131,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Comments */}
         <div className="border-t pt-6">
           <Comments postId={post.id} />
+        </div>
+
+        {/* App Banner for Mobile Users */}
+        <div className="border-t pt-6 mb-8">
+          <AppBanner postId={post.id} postType="post" />
         </div>
       </article>
     </div>

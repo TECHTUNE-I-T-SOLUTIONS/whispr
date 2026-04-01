@@ -12,6 +12,7 @@
     "@auth0/auth0-react": "latest",
     "@clerk/clerk-react": "latest",
     "@emotion/is-prop-valid": "latest",
+    "@google/genai": "^1.0.0",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
@@ -81,6 +82,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
     "web-push": "^3.6.7",
+    "ws": "^8.14.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
