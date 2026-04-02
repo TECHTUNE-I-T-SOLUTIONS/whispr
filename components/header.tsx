@@ -185,19 +185,19 @@ export function Header() {
           <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="font-serif text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Whispr</motion.span>
         </Link>
 
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-6">
           {navigation.map((item) => (
             <Link key={item.name} href={item.href} className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary border-b-2 border-primary pb-1' : 'text-muted-foreground'}`}>{item.name}</Link>
           ))}
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           {hasMounted && isAdmin && (
-            <Link href="/admin/dashboard" className="hidden md:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"><LayoutDashboard className="h-4 w-4" /><span className="hidden lg:inline">Dashboard</span></Link>
+            <Link href="/admin/dashboard" className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"><LayoutDashboard className="h-4 w-4" /><span className="hidden xl:inline">Dashboard</span></Link>
           )}
 
           {chroniclesEnabled && (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden sm:flex md:hidden lg:flex items-center gap-1 md:gap-2">
               <Button variant="outline" size="sm" asChild className="text-xs">
                 <Link href="/chronicles/feed">Chronicles Feed</Link>
               </Button>
@@ -213,9 +213,9 @@ export function Header() {
           <ThemeToggle />
 
           <div className="relative">
-            <Button variant="ghost" size="sm" className="hidden md:inline-flex items-center gap-2" onClick={() => setSharePreviewOpen((v) => !v)}>
+            <Button variant="ghost" size="sm" className="hidden lg:inline-flex items-center gap-2" onClick={() => setSharePreviewOpen((v) => !v)}>
               <Share2 className="w-4 h-4" />
-              <span className="hidden lg:inline">Share</span>
+              <span className="hidden xl:inline">Share</span>
             </Button>
 
             {sharePreviewOpen && (

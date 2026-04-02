@@ -162,6 +162,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Prompt cannot be empty' }, { status: 400 });
     }
 
+    // Rule 1: Require minimum user input (10 characters)
+    if (prompt.length < 10) {
+      return NextResponse.json(
+        { success: false, error: 'Please write at least 10 characters. The AI will continue from your writing!' },
+        { status: 400 }
+      );
+    }
+
     const geminiKey = process.env.GEMINI_API_KEY;
     if (!geminiKey) {
       return NextResponse.json({ success: false, error: 'AI key not configured' }, { status: 500 });
@@ -174,6 +182,34 @@ export async function POST(request: NextRequest) {
 
     // Use service role for DB side effects.
     const adminSupabase = await getSupabaseClientWithServiceRole();
+
+    // Rule 2: Check daily limit (5 AI-generated contents per day)
+    if (user?.id) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const { data: aiPostsToday, error: countError } = await adminSupabase
+        .from('chronicles_posts')
+        .select('id', { count: 'exact' })
+        .eq('creator_id', user.id)
+        .eq('source', 'ai-generated')
+        .gte('created_at', today.toISOString())
+        .lt('created_at', tomorrow.toISOString());
+
+      if (!countError) {
+        const dailyCount = aiPostsToday?.length || 0;
+        if (dailyCount >= 5) {
+          console.warn(`User ${user.id} has reached daily AI limit (${dailyCount}/5)`);
+          return NextResponse.json(
+            { success: false, error: 'You have reached your daily limit of 5 AI-generated contents. Come back tomorrow!' },
+            { status: 429 }
+          );
+        }
+        console.log(`User ${user.id}: AI contents today: ${dailyCount}/5`);
+      }
+    }
 
     let activeSessionId = sessionId;
 
@@ -225,10 +261,32 @@ export async function POST(request: NextRequest) {
       message_type: 'text',
     });
 
-    // AI generation
+    // AI generation with enhanced system prompt
+    const systemPrompt = `You are an intelligent creative writing assistant. Your role is to:
+1. Help users continue and expand their creative writing (poems, stories, chronicles)
+2. If the user hasn't provided meaningful initial content, politely ask them to write something first
+3. Only continue from where the user's input stops - don't create from scratch
+4. Be encouraging and constructive
+
+IMPORTANT: If the user's input is:
+- Just placeholders like "test", "hello", "ok", "123", "asdf"
+- Too vague or not actual writing content
+- Asking for content creation without their own input
+
+Then respond with encouragement asking them to:
+- Share their poem idea, story concept, or thoughts
+- Write at least a few sentences about what they want to write
+- Give you something to continue from
+
+Mode: ${mode}
+Action: ${outputType}
+
+User's input:
+${prompt}`;
+
     const textResponse = await aiClient.models.generateContent({
       model: GEMINI_MODEL,
-      contents: `Mode: ${mode}\nAction: ${outputType}\n\n${prompt}`,
+      contents: systemPrompt,
       config: {
         temperature: 0.8,
         maxOutputTokens: 512,
@@ -303,6 +361,7 @@ export async function POST(request: NextRequest) {
               creator_id: postCreatorId,
               title: `AI-generated Chronicle`,
               content: generatedText,
+              source: 'ai-generated',
               status: outputType === 'publish' ? 'published' : 'draft',
               post_type: 'poem',
             })

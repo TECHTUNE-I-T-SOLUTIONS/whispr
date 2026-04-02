@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/hero-section"
 import DailyPoemModal from "@/components/daily-poem-modal"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
+import { AIIntroductorySection } from "@/components/ai-introductory-section"
 
 export default function HomePage() {
 
@@ -17,6 +18,9 @@ export default function HomePage() {
       </Suspense>
       <DailyPoemModal />
       <HeroSection />
+
+      {/* AI Introductory Section */}
+      <AIIntroductorySection />
 
       {/* Chronicles Feature Section */}
       <ChroniclesFeatureSection />
