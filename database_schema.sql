@@ -52,6 +52,31 @@ CREATE TABLE public.ads_settings (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT ads_settings_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.ai_chat_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  session_id uuid NOT NULL,
+  sender text NOT NULL CHECK (sender = ANY (ARRAY['user'::text, 'assistant'::text])),
+  content text NOT NULL,
+  message_type text NOT NULL DEFAULT 'text'::text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_chat_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_chat_messages_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.ai_chat_sessions(id)
+);
+CREATE TABLE public.ai_chat_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid,
+  chain_id uuid,
+  mode text NOT NULL DEFAULT 'chronicles'::text,
+  output_type text NOT NULL DEFAULT 'draft'::text,
+  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'archived'::text, 'closed'::text, 'pending'::text])),
+  title text,
+  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_chat_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_chat_sessions_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES public.chronicles_writing_chains(id),
+  CONSTRAINT ai_chat_sessions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
 CREATE TABLE public.chronicles_achievements (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   badge_id text NOT NULL UNIQUE,
@@ -205,14 +230,77 @@ CREATE TABLE public.chronicles_category_settings (
 CREATE TABLE public.chronicles_chain_entries (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   chain_id uuid NOT NULL,
-  post_id uuid NOT NULL,
+  post_id uuid,
   sequence integer NOT NULL,
   added_by uuid,
   added_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  chain_entry_post_id uuid,
   CONSTRAINT chronicles_chain_entries_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_chain_entries_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES public.chronicles_writing_chains(id),
-  CONSTRAINT chronicles_chain_entries_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
-  CONSTRAINT chronicles_chain_entries_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.chronicles_creators(id)
+  CONSTRAINT chronicles_chain_entries_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_chain_entries_chain_entry_post_id_fkey FOREIGN KEY (chain_entry_post_id) REFERENCES public.chronicles_chain_entry_posts(id)
+);
+CREATE TABLE public.chronicles_chain_entry_post_comment_reactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  comment_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  reaction_type text DEFAULT 'like'::text CHECK (reaction_type = ANY (ARRAY['like'::text, 'helpful'::text, 'love'::text, 'funny'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_chain_entry_post_comment_reactions_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_chain_entry_post_comment_reactions_comment_id_fkey FOREIGN KEY (comment_id) REFERENCES public.chronicles_chain_entry_post_comments(id),
+  CONSTRAINT chronicles_chain_entry_post_comment_reactions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_chain_entry_post_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chain_entry_post_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  likes_count integer DEFAULT 0,
+  replies_count integer DEFAULT 0,
+  status text DEFAULT 'approved'::text CHECK (status = ANY (ARRAY['approved'::text, 'pending'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_chain_entry_post_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_chain_entry_post_comments_entry_post_id_fkey FOREIGN KEY (chain_entry_post_id) REFERENCES public.chronicles_chain_entry_posts(id),
+  CONSTRAINT chronicles_chain_entry_post_comments_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_chain_entry_post_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.chronicles_chain_entry_post_comments(id)
+);
+CREATE TABLE public.chronicles_chain_entry_post_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chain_entry_post_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  reaction_type text DEFAULT 'like'::text CHECK (reaction_type = ANY (ARRAY['like'::text, 'love'::text, 'wow'::text, 'haha'::text, 'sad'::text, 'angry'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_chain_entry_post_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_chain_entry_post_likes_entry_post_id_fkey FOREIGN KEY (chain_entry_post_id) REFERENCES public.chronicles_chain_entry_posts(id),
+  CONSTRAINT chronicles_chain_entry_post_likes_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_chain_entry_posts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chain_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  title text NOT NULL,
+  content text NOT NULL,
+  excerpt text,
+  cover_image_url text,
+  category text,
+  tags ARRAY DEFAULT ARRAY[]::text[],
+  status text DEFAULT 'published'::text CHECK (status = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  formatting_data jsonb DEFAULT '{}'::jsonb,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  shares_count integer DEFAULT 0,
+  views_count integer DEFAULT 0,
+  sequence integer NOT NULL,
+  added_by uuid,
+  published_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_chain_entry_posts_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_chain_entry_posts_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES public.chronicles_writing_chains(id),
+  CONSTRAINT chronicles_chain_entry_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_chain_entry_posts_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.chronicles_creators(id)
 );
 CREATE TABLE public.chronicles_comment_reactions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -729,6 +817,27 @@ CREATE TABLE public.chronicles_post_collaborators (
   CONSTRAINT chronicles_post_collaborators_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
   CONSTRAINT chronicles_post_collaborators_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
 );
+CREATE TABLE public.chronicles_post_reactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  post_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  reaction_type text NOT NULL DEFAULT 'like'::text CHECK (reaction_type = ANY (ARRAY['like'::text, 'love'::text, 'wow'::text, 'haha'::text, 'sad'::text, 'angry'::text])),
+  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_post_reactions_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_post_reactions_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
+  CONSTRAINT chronicles_post_reactions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_post_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  post_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  shared_to text NOT NULL DEFAULT 'unknown'::text CHECK (shared_to = ANY (ARRAY['email'::text, 'social'::text, 'link'::text, 'unknown'::text])),
+  share_metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_post_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_post_shares_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
+  CONSTRAINT chronicles_post_shares_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
 CREATE TABLE public.chronicles_posts (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL,
@@ -1147,7 +1256,7 @@ CREATE TABLE public.push_subscriptions (
   ip_address inet,
   browser_info jsonb,
   subscribed_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
-  last_active_at timestamp with time zone DEFAULT timezone('utc'::text, now()()),
+  last_active_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
   is_active boolean DEFAULT true,
   user_id uuid,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
@@ -1157,12 +1266,14 @@ CREATE TABLE public.push_subscriptions (
 CREATE TABLE public.reactions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   post_id uuid,
-  user_ip character varying NOT NULL,
+  user_ip character varying,
   user_agent text,
   reaction_type character varying NOT NULL CHECK (reaction_type::text = ANY (ARRAY['like'::character varying::text, 'love'::character varying::text, 'wow'::character varying::text, 'haha'::character varying::text, 'sad'::character varying::text, 'angry'::character varying::text])),
   created_at timestamp with time zone DEFAULT now(),
+  user_id uuid,
   CONSTRAINT reactions_pkey PRIMARY KEY (id),
-  CONSTRAINT reactions_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
+  CONSTRAINT reactions_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id),
+  CONSTRAINT reactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.settings (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

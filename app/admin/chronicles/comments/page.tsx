@@ -83,7 +83,7 @@ export default function AdminCommentsPage() {
       }
       params.append('limit', '100');
 
-      const res = await fetch(`/api/chronicles/comments?${params}`);
+      const res = await fetch(`/api/admin/chronicles/comments?${params}`);
       if (!res.ok) throw new Error('Failed to fetch comments');
 
       const data = await res.json();
@@ -125,7 +125,7 @@ export default function AdminCommentsPage() {
     newStatus: 'approved' | 'pending' | 'rejected' | 'hidden'
   ) => {
     try {
-      const res = await fetch(`/api/chronicles/comments/${commentId}`, {
+      const res = await fetch(`/api/admin/chronicles/comments/${commentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -147,7 +147,7 @@ export default function AdminCommentsPage() {
     if (!confirm('Are you sure you want to delete this comment?')) return;
 
     try {
-      const res = await fetch(`/api/chronicles/comments/${commentId}`, {
+      const res = await fetch(`/api/admin/chronicles/comments/${commentId}`, {
         method: 'DELETE',
       });
 

@@ -44,7 +44,7 @@ export default function MaintenanceBanner() {
     }
 
     fetchState()
-    timer = window.setInterval(fetchState, 3000)
+    timer = window.setInterval(fetchState, 100000)
 
     return () => {
       mounted = false

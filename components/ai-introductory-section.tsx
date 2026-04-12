@@ -31,7 +31,7 @@ export function AIIntroductorySection() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
+      transition: { duration: 0.6 },
     },
   }
 
@@ -41,25 +41,28 @@ export function AIIntroductorySection() {
   const textAccent = theme === 'dark' ? '#F14144' : '#911A1B'
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
+    <section className="relative py-20 md:py-32 overflow-hidden max-w-full">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -z-10" style={{
-          backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.3)' : 'rgba(145, 26, 27, 0.15)'
-        }} />
-        <div className="absolute bottom-1/4 right-0 w-80 h-80 rounded-full blur-3xl opacity-15 -z-10" style={{
-          backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.2)' : 'rgba(145, 26, 27, 0.1)'
-        }} />
-      </div>
+      {hasMounted && (
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/4 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -z-10" style={{
+            backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.3)' : 'rgba(145, 26, 27, 0.15)'
+          }} />
+          <div className="absolute bottom-1/4 right-0 w-80 h-80 rounded-full blur-3xl opacity-15 -z-10" style={{
+            backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.2)' : 'rgba(145, 26, 27, 0.1)'
+          }} />
+        </div>
+      )}
 
       <div className="container">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="max-w-4xl mx-auto"
-        >
+        {hasMounted && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="max-w-4xl mx-auto"
+          >
           {/* Section header */}
           <motion.div variants={itemVariants} className="text-center mb-12 md:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{
@@ -72,7 +75,7 @@ export function AIIntroductorySection() {
 
             <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 leading-tight">
               Elevate Your Creativity,{" "}
-              <span style={{ color: textAccent }}>Not Replace It</span>
+              <span style={{ color: textAccent }}>Don't Replace It</span>
             </h2>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -108,7 +111,7 @@ export function AIIntroductorySection() {
                   className={`p-6 md:p-8 rounded-lg border-2 transition-all duration-300 hover:shadow-lg`}
                   style={{
                     backgroundColor: theme === 'dark' 
-                      ? 'rgba(15, 15, 15, 0.5)' 
+                      ? 'rgba(15, 15, 15, 0.95)' 
                       : 'rgba(253, 253, 253, 0.5)',
                     borderColor: `${textAccent}40`,
                   }}
@@ -166,7 +169,7 @@ export function AIIntroductorySection() {
                     ))}
                   </ul>
                   <p className="pt-2">
-                    <strong>The key difference?</strong> Whispr AI asks you questions, offers alternatives, and challenges your thinking—
+                    <strong>The key difference?</strong> Whispr AI asks you questions, offers alternatives, and challenges your thinking —
                     so you become a better writer, not just faster.
                   </p>
                 </div>
@@ -222,7 +225,8 @@ export function AIIntroductorySection() {
               💡 <span>Are you ready to discover what you can create when AI amplifies your creativity?</span>
             </p>
           </motion.div>
-        </motion.div>
+          </motion.div>
+        )}
       </div>
     </section>
   )

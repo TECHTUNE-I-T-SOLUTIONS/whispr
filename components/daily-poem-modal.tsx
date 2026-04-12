@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { generateRemixedPoem } from "@/utils/poemRemixer"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -175,18 +174,6 @@ export default function DailyPoemModal() {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   // For vivid backgrounds per request, ignore reduced motion for background layers
   const bgAnimEnabled = true
-  // Remixed poem state
-  const [remixedPoem, setRemixedPoem] = useState<string>("");
-  const [showRemix, setShowRemix] = useState(false);
-  // Generate a remixed poem on demand
-  const handleRemix = async () => {
-    const poem = await generateRemixedPoem();
-    setRemixedPoem(poem);
-    setShowRemix(true);
-  };
-  const handleCloseRemix = () => {
-    setShowRemix(false);
-  };
 
   // Load poems from a single JSON file in public folder
   useEffect(() => {
@@ -309,16 +296,12 @@ export default function DailyPoemModal() {
     setOpen(false)
   }
 
-  const seeAnother = async () => {
+  const seeAnother = () => {
     setOffset(prev => {
       const next = prev + 1
       try { localStorage.setItem(offsetKey, String(next)) } catch {}
       return next
     });
-    // Automatically generate a remixed poem when seeing another
-    const poem = await generateRemixedPoem();
-    setRemixedPoem(poem);
-    setShowRemix(true);
   }
 
   const changeBg = (mode: typeof bgMode) => {
@@ -353,22 +336,6 @@ export default function DailyPoemModal() {
 
   return (
     <>
-      {/* Remixed Poem Modal */}
-      {showRemix && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 max-w-md w-full text-center">
-            <h2 className="text-lg font-semibold mb-2">AI-Remixed Poem</h2>
-            <pre className="mb-4 text-sm whitespace-pre-line text-gray-700 dark:text-gray-300">{remixedPoem}</pre>
-            <button
-              className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
-              onClick={handleCloseRemix}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-      {/* ...existing modal code... */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-xl md:max-w-2xl p-4 overflow-hidden border-0 bg-secondary/30 shadow-2xl">
           <div className="relative rounded-lg overflow-hidden">

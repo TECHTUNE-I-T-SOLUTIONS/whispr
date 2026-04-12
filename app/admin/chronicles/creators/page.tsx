@@ -61,6 +61,8 @@ export default function AdminCreatorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+  const [creatorPosts, setCreatorPosts] = useState<any[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
 
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
@@ -77,6 +79,59 @@ export default function AdminCreatorsPage() {
     }, 60000);
     return () => clearInterval(interval);
   }, [filters]);
+
+  // Fetch posts when a creator is selected
+  useEffect(() => {
+    if (selectedCreator) {
+      fetchCreatorPosts(selectedCreator.id);
+    }
+  }, [selectedCreator]);
+
+  const fetchCreatorPosts = async (creatorId: string) => {
+    try {
+      setPostsLoading(true);
+      const url = `/api/chronicles/creators/${creatorId}/posts?limit=100`;
+      console.log("Fetching from URL:", url);
+      
+      const res = await fetch(url);
+      console.log("Response status:", res.status);
+      
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Posts fetch failed:', res.status, text);
+        setCreatorPosts([]);
+        return;
+      }
+      
+      const data = await res.json();
+      console.log("Received data:", data);
+      
+      let posts: any[] = [];
+      
+      // Handle both array and object responses
+      if (Array.isArray(data)) {
+        posts = data;
+        console.log("Data is array with", posts.length, "posts");
+      } else if (data.posts && Array.isArray(data.posts)) {
+        posts = data.posts;
+        console.log("Data has posts property with", posts.length, "posts");
+        console.log("First few posts:", posts.slice(0, 3).map((p: any) => ({ 
+          title: p.title,
+          type: p.post_type,
+          created: p.created_at 
+        })));
+      } else {
+        console.log("Data structure:", Object.keys(data));
+      }
+      
+      setCreatorPosts(posts);
+    } catch (err) {
+      console.error('Failed to fetch creator posts:', err);
+      setCreatorPosts([]);
+    } finally {
+      setPostsLoading(false);
+    }
+  };
 
   const fetchCreators = async () => {
     try {
@@ -424,91 +479,189 @@ export default function AdminCreatorsPage() {
           </div>
         </div>
 
-        {/* Creator Detail */}
-        <div>
+        {/* Creator Detail and Posts */}
+        <div className="space-y-4">
           {selectedCreator ? (
-            <div className="bg-white border rounded-lg p-4 sticky top-6">
-              <h3 className="font-semibold mb-4">Creator Details</h3>
+            <>
+              {/* Creator Info */}
+              <div className="bg-white border rounded-lg p-4">
+                <h3 className="font-semibold mb-4">Creator Details</h3>
 
-              {selectedCreator.profile_image_url && (
-                <img
-                  src={selectedCreator.profile_image_url}
-                  alt={selectedCreator.pen_name}
-                  className="w-full h-32 rounded-lg object-cover mb-4"
-                />
-              )}
+                {selectedCreator.profile_image_url && (
+                  <img
+                    src={selectedCreator.profile_image_url}
+                    alt={selectedCreator.pen_name}
+                    className="w-full h-32 rounded-lg object-cover mb-4"
+                  />
+                )}
 
-              <div className="space-y-4 text-sm">
-                <div>
-                  <div className="text-xs text-gray-600 font-medium">Name</div>
-                  <div className="font-semibold">{selectedCreator.pen_name}</div>
-                </div>
+                <div className="space-y-4 text-sm">
+                  <div>
+                    <div className="text-xs text-gray-600 font-medium">Name</div>
+                    <div className="font-semibold">{selectedCreator.pen_name}</div>
+                  </div>
 
-                <div>
-                  <div className="text-xs text-gray-600 font-medium">Status</div>
-                  <div className="capitalize">
-                    {selectedCreator.is_banned
-                      ? '🚫 Banned'
-                      : selectedCreator.is_verified
-                      ? '✅ Verified'
-                      : '⭐ Active'}
+                  <div>
+                    <div className="text-xs text-gray-600 font-medium">Status</div>
+                    <div className="capitalize">
+                      {selectedCreator.is_banned
+                        ? '🚫 Banned'
+                        : selectedCreator.is_verified
+                        ? '✅ Verified'
+                        : '⭐ Active'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-600 font-medium">Posts</div>
+                    <div>{selectedCreator.total_posts}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-600 font-medium">Engagement</div>
+                    <div>{selectedCreator.total_engagement}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-600 font-medium">Joined</div>
+                    <div>{new Date(selectedCreator.created_at).toLocaleDateString()}</div>
+                  </div>
+
+                  <div className="border-t pt-4 space-y-2">
+                    {!selectedCreator.is_verified && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleVerifyCreator(selectedCreator.id)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Verify
+                      </Button>
+                    )}
+
+                    {!selectedCreator.is_banned && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleBanCreator(selectedCreator.id)}
+                      >
+                        <Lock className="w-4 h-4 mr-2" />
+                        Ban Creator
+                      </Button>
+                    )}
+
+                    {selectedCreator.is_banned && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleUnbanCreator(selectedCreator.id)}
+                      >
+                        <Unlock className="w-4 h-4 mr-2" />
+                        Unban
+                      </Button>
+                    )}
                   </div>
                 </div>
-
-                <div>
-                  <div className="text-xs text-gray-600 font-medium">Posts</div>
-                  <div>{selectedCreator.total_posts}</div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-600 font-medium">Engagement</div>
-                  <div>{selectedCreator.total_engagement}</div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-600 font-medium">Joined</div>
-                  <div>{new Date(selectedCreator.created_at).toLocaleDateString()}</div>
-                </div>
-
-                <div className="border-t pt-4 space-y-2">
-                  {!selectedCreator.is_verified && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleVerifyCreator(selectedCreator.id)}
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Verify
-                    </Button>
-                  )}
-
-                  {!selectedCreator.is_banned && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleBanCreator(selectedCreator.id)}
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      Ban Creator
-                    </Button>
-                  )}
-
-                  {selectedCreator.is_banned && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleUnbanCreator(selectedCreator.id)}
-                    >
-                      <Unlock className="w-4 h-4 mr-2" />
-                      Unban
-                    </Button>
-                  )}
-                </div>
               </div>
-            </div>
+
+              {/* Creator Posts */}
+              <div className="bg-white border rounded-lg p-4">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Creator Posts ({creatorPosts.length})
+                </h3>
+                
+                {postsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="w-5 h-5 animate-spin text-gray-400" />
+                  </div>
+                ) : creatorPosts.length === 0 ? (
+                  <div className="text-center py-6 text-gray-500">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                    <p className="text-sm">No posts yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {creatorPosts.map((post: any) => (
+                      <div 
+                        key={post.id} 
+                        className="border-l-4 border-blue-500 pl-3 py-2 hover:bg-gray-50 rounded transition-colors"
+                      >
+                        <div className="font-medium text-sm line-clamp-1">{post.title}</div>
+                        
+                        {/* Badge row */}
+                        <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-2">
+                          {/* Post type badge */}
+                          <span className={`inline-block px-2 py-0.5 rounded font-medium ${
+                            post.post_type === 'chain_entry'
+                              ? 'bg-purple-100 text-purple-800'
+                              : post.post_type === 'poem'
+                              ? 'bg-pink-100 text-pink-800'
+                              : post.post_type === 'blog'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {post.post_type === 'chain_entry' ? 'Chain' : post.post_type || 'Post'}
+                          </span>
+                          
+                          {/* Status badge */}
+                          <span className={`inline-block px-2 py-0.5 rounded font-medium ${
+                            post.status === 'published'
+                              ? 'bg-green-100 text-green-800'
+                              : post.status === 'draft'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {post.status}
+                          </span>
+                        </div>
+                        
+                        {/* Chain info if applicable */}
+                        {post.post_type === 'chain_entry' && post.chain_info && (
+                          <div className="text-xs text-purple-600 font-medium mt-1">
+                            📚 {post.chain_info.title}
+                          </div>
+                        )}
+                        
+                        {/* Engagement stats */}
+                        <div className="text-xs text-gray-600 mt-2 flex gap-4">
+                          <span className="flex items-center gap-1">
+                            <span>👍</span>
+                            <span>{post.likes_count || 0}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>💬</span>
+                            <span>{post.comments_count || 0}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>🔗</span>
+                            <span>{post.shares_count || 0}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span>👁️</span>
+                            <span>{post.views_count || 0}</span>
+                          </span>
+                        </div>
+                        
+                        {/* Date */}
+                        {post.published_at && (
+                          <div className="text-xs text-gray-500 mt-2">
+                            📅 {new Date(post.published_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <div className="bg-gray-50 border border-dashed rounded-lg p-4 text-center text-gray-500">
               <Users className="w-8 h-8 mx-auto mb-2 opacity-20" />

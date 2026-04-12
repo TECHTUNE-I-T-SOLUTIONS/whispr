@@ -251,21 +251,21 @@ export default function AdminNotificationsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 dark:bg-black border border-blue-200 rounded-lg p-4">
             <div className="text-sm text-blue-600 font-medium">Total</div>
             <div className="text-2xl font-bold text-blue-900">{notifications.length}</div>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="bg-red-50 dark:bg-black border border-red-200 rounded-lg p-4">
             <div className="text-sm text-red-600 font-medium">Unread</div>
             <div className="text-2xl font-bold text-red-900">{unreadCount}</div>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="bg-orange-50 dark:bg-black border border-orange-200 rounded-lg p-4">
             <div className="text-sm text-orange-600 font-medium">Critical</div>
             <div className="text-2xl font-bold text-orange-900">
               {notifications.filter((n) => n.priority === 'critical').length}
             </div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-green-50 dark:bg-black border border-green-200 rounded-lg p-4">
             <div className="text-sm text-green-600 font-medium">Actioned</div>
             <div className="text-2xl font-bold text-green-900">
               {notifications.filter((n) => n.action_taken).length}
@@ -275,14 +275,14 @@ export default function AdminNotificationsPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div className="bg-red-50 dark:bg-black border border-red-200 rounded-lg p-4 mb-4">
           <AlertCircle className="w-4 h-4 text-red-600 inline mr-2" />
           {error}
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white border rounded-lg p-4 mb-6">
+      <div className="bg-white dark:bg-black border rounded-lg p-4 mb-6">
         <div className="grid grid-cols-4 gap-4">
           <div>
             <label className="text-sm font-medium mb-2 block">Priority</label>
@@ -352,7 +352,7 @@ export default function AdminNotificationsPage() {
       {/* Notifications List */}
       <div className="space-y-3">
         {filteredNotifications.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-200">
             <Bell className="w-12 h-12 mx-auto mb-4 opacity-20" />
             <p>No notifications</p>
           </div>
@@ -384,7 +384,7 @@ export default function AdminNotificationsPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold">{notification.title}</h3>
                         {!notification.read && (
-                          <div className="w-2 h-2 bg-red-500 rounded-full" />
+                          <div className="w-2 h-2 bg-red-500 dark:bg-red-800 rounded-full" />
                         )}
                         <span className="text-xs opacity-70">
                           {notification.notification_type}
@@ -410,7 +410,7 @@ export default function AdminNotificationsPage() {
                           {new Date(notification.created_at).toLocaleString()}
                         </span>
                         {notification.read_at && (
-                          <span className="flex items-center gap-1 text-green-600">
+                          <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
                             <CheckCircle className="w-3 h-3" />
                             Read:{' '}
                             {new Date(notification.read_at).toLocaleString()}
