@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Send, Paperclip, X, FileText, Download } from "lucide-react"
+import { AdminAvatarDisplay } from "./admin-avatar-display"
 
 export function MessagesManager({
   conversationId,
@@ -937,13 +938,12 @@ export function MessagesManager({
             return (
               <div key={m?.id || index} className={`flex gap-3 group ${isOwn ? 'justify-end' : ''}`}>
                 {!isOwn && (
-                  <Avatar className="w-8 h-8 flex-shrink-0">
-                    {m?.admin && m.admin.avatar_url ? (
-                      <AvatarImage src={m.admin.avatar_url} alt={senderName} />
-                    ) : (
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">{initial}</AvatarFallback>
-                    )}
-                  </Avatar>
+                  <AdminAvatarDisplay
+                    adminId={m?.admin?.id}
+                    adminName={m?.admin?.full_name}
+                    username={m?.admin?.username || m?.sender_name}
+                    size="sm"
+                  />
                 )}
 
                 <div className={`min-w-0 ${isOwn ? 'text-right' : ''}`}>

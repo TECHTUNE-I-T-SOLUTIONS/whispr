@@ -4,6 +4,7 @@ import { SessionProvider } from "@/components/admin/session-provider"
 import { RouteGuard } from "@/components/admin/route-guard"
 import AdminHeaderWrapper from "@/components/admin/admin-header-wrapper"
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from "@/components/ui/toaster"
 import ErrorBoundary from "@/components/admin/error-boundary"
 import SetAdminId from '@/components/admin/set-admin-id'
 
@@ -22,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <SetAdminId />
               <AdminHeaderWrapper>{children}</AdminHeaderWrapper>
             </div>
+            <Toaster />
           </TooltipProvider>
         </ErrorBoundary>
       </RouteGuard>

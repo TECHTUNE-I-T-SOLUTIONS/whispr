@@ -33,21 +33,39 @@ interface Chain {
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/chronicles/chains/${params.id}`);
-  const json = await res.json();
-  if (!json.success || !json.data) {
-    return { title: 'Chain not found' };
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${params.id}`);
+    if (!res.ok) {
+      return { title: 'Chain not found' };
+    }
+    const json = await res.json();
+    if (!json.success || !json.data) {
+      return { title: 'Chain not found' };
+    }
+    return { title: json.data.title + ' – Writing Chain' };
+  } catch (e) {
+    console.error('Error generating metadata:', e);
+    return { title: 'Writing Chain' };
   }
-  return { title: json.data.title + ' – Writing Chain' };
 }
 
 export default async function ChainDetailPage({ params }: { params: { id: string } }) {
-  const res = await fetch(`/api/chronicles/chains/${params.id}`);
-  const json = await res.json();
-  if (!json.success || !json.data) {
-    notFound();
-  }
-  const chain: Chain = json.data;
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${params.id}`);
+    if (!res.ok) {
+      return notFound();
+    }
+    const json = await res.json();
+    if (!json.success || !json.data) {
+      return notFound();
+    }
+    const chain: Chain = json.data;
+    
+    // Filter out null entries
+    const validEntries = (chain.entries || []).filter((entry) => entry.post !== null);
+    chain.entries = validEntries;
 
   return (
     <div className="whispr-gradient min-h-screen py-10">
@@ -137,4 +155,8 @@ export default async function ChainDetailPage({ params }: { params: { id: string
       </div>
     </div>
   );
+  } catch (e) {
+    console.error('Error loading chain:', e);
+    return notFound();
+  }
 }

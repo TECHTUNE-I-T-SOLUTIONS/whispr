@@ -1,14 +1,11 @@
 import { createSupabaseServer } from '@/lib/supabase-server';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id: postId } = await params
     const supabase = createSupabaseServer();
     const userId = req.headers.get('x-user-id');
-    const postId = params.id;
-
-    // Get creator ID if authenticated
-    let creatorId = null;
     if (userId) {
       const { data: creator } = await supabase
         .from('chronicles_creators')
@@ -42,11 +39,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id: postId } = await params
     const supabase = createSupabaseServer();
     const userId = req.headers.get('x-user-id');
-    const postId = params.id;
     const updates = await req.json();
 
     if (!userId) {
@@ -95,12 +92,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const supabase = createSupabaseServer();
+    const { id: postId } = await params
     const userId = req.headers.get('x-user-id');
-    const postId = params.id;
-
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

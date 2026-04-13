@@ -30,19 +30,44 @@ export default function ErrorCatcher() {
     }
 
     const onError = (msg: string | Event, url?: string, line?: number, col?: number, err?: Error) => {
-      const eObj = err instanceof Error ? err : new Error(String(msg))
-      setError(eObj)
-      setHasError(true)
-      reportToServer(eObj, 'onerror')
+      try {
+        let eObj: Error
+        
+        if (err instanceof Error) {
+          eObj = err
+        } else if (msg instanceof ErrorEvent) {
+          // Handle ErrorEvent object properly
+          eObj = msg.error instanceof Error ? msg.error : new Error(msg.message || 'Unknown error')
+        } else {
+          eObj = new Error(String(msg))
+        }
+        
+        setError(eObj)
+        setHasError(true)
+        reportToServer(eObj, 'onerror')
+      } catch (e) {
+        console.error('Error in onError handler:', e)
+      }
       return false
     }
 
     const onUnhandledRejection = (ev: PromiseRejectionEvent) => {
-      const err = ev?.reason
-      const eObj = err instanceof Error ? err : new Error(String(err))
-      setError(eObj)
-      setHasError(true)
-      reportToServer(eObj, 'unhandledrejection')
+      try {
+        const err = ev?.reason
+        let eObj: Error
+        
+        if (err instanceof Error) {
+          eObj = err
+        } else {
+          eObj = new Error(String(err) || 'Unhandled promise rejection')
+        }
+        
+        setError(eObj)
+        setHasError(true)
+        reportToServer(eObj, 'unhandledrejection')
+      } catch (e) {
+        console.error('Error in onUnhandledRejection handler:', e)
+      }
     }
 
     window.addEventListener('error', onError as EventListener)

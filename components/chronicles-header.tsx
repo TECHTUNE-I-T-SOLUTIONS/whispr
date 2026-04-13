@@ -204,7 +204,7 @@ export default function ChroniclesHeader({
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
               >
                 {mounted && (profile?.profile_image_url || profileImage) && (
                   <Image
@@ -226,6 +226,16 @@ export default function ChroniclesHeader({
                   {profile?.pen_name || creatorName}
                 </span>
                 <ChevronDown className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+              </button>
+              
+              {/* Mobile/Tablet menu icon for user dropdown */}
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                title="User menu"
+                aria-label="User menu"
+              >
+                <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
 
               {/* Dropdown Menu */}

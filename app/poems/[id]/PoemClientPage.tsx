@@ -49,7 +49,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                <span className="text-sm font-medium">Prayce</span>
+                <span className="text-sm font-medium">Admin</span>
               </div>
               {poem.tags && poem.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -108,15 +108,19 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
             </CardHeader>
             <CardContent className={autoScrollMode ? 'p-0' : 'p-8'}>
               {autoScrollMode ? (
-                <div className="h-96 overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg">
+                <div className="h-96 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg overflow-hidden">
                   <div 
                     ref={contentRef}
-                    className="h-full overflow-y-auto flex flex-col items-center justify-end px-4 py-8"
+                    className="h-full overflow-y-scroll px-4 py-8 text-center scroll-smooth"
+                    style={{ scrollBehavior: 'auto' }}
                   >
-                    <div className="pt-96 text-center space-y-4 w-full">
-                      <div dangerouslySetInnerHTML={{ 
-                        __html: poem.content.replace(/<p>/g, '<div class="text-xl md:text-2xl font-light leading-relaxed text-slate-800 dark:text-slate-200 mb-4">').replace(/<\/p>/g, '</div>')
-                      }} />
+                    <div className="space-y-4 w-full pb-96">
+                      <div 
+                        dangerouslySetInnerHTML={{ 
+                          __html: poem.content.replace(/<p>/g, '<div class="text-xl md:text-2xl font-light leading-relaxed text-slate-800 dark:text-slate-200 mb-4">').replace(/<\/p>/g, '</div>')
+                        }}
+                        suppressHydrationWarning
+                      />
                     </div>
                   </div>
                 </div>
@@ -124,8 +128,9 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
                 <div className="p-8">
                   <div 
                     ref={contentRef}
-                    className="prose poem-content" 
-                    dangerouslySetInnerHTML={{ __html: poem.content }} 
+                    className="prose prose-invert poem-content" 
+                    dangerouslySetInnerHTML={{ __html: poem.content }}
+                    suppressHydrationWarning
                   />
                 </div>
               )}
@@ -163,9 +168,14 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
       <style jsx global>{`
         .poem-content {
           white-space: pre-wrap;
-          line-height: 1.8;
+          line-height: 1.0;
           font-size: 1.1rem;
           word-break: break-word;
+          color: #000000;
+        }
+
+        .dark .poem-content {
+          color: #ffffff;
         }
 
         .poem-content strong {
@@ -174,8 +184,9 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
         }
 
         .poem-content p {
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.5rem;
           text-align: left;
+          color: inherit;
         }
             
         .poem-content blockquote {
@@ -186,6 +197,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
           background: hsl(var(--muted) / 0.3);
           padding: 1rem;
           border-radius: 0.5rem;
+          color: inherit;
         }
         
         .poem-content h1,
@@ -203,7 +215,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
         
         .poem-content strong {
           font-weight: 600;
-          color: hsl(var(--foreground));
+          color: inherit;
         }
       `}</style>
     </div>

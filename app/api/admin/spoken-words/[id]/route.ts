@@ -4,9 +4,10 @@ import { requireAuth } from "@/lib/auth"
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await requireAuth()
     const supabase = createSupabaseServer()
     const body = await request.json()
@@ -26,7 +27,7 @@ export async function PUT(
         media_id,
         updated_at: new Date().toISOString()
       })
-      .eq("id", params.id)
+      .eq("id", id)
       .select(`
         *,
         media_file:media (
@@ -55,16 +56,17 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await requireAuth()
     const supabase = createSupabaseServer()
 
     const { error } = await supabase
       .from("spoken_words")
       .delete()
-      .eq("id", params.id)
+      .eq("id", id)
 
     if (error) {
       console.error("Error deleting spoken word:", error)

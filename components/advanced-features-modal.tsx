@@ -40,23 +40,48 @@ export default function AdvancedFeaturesModal({ text, contentRef, onAutoScrollCh
 
   // Auto-start voice when auto-scroll is enabled
   useEffect(() => {
-    if (isAutoScrollActive && !isSpeaking) {
-      speak(text)
+    if (isAutoScrollActive && !isSpeaking && text) {
+      try {
+        speak(text)
+      } catch (error) {
+        console.error('Error starting text-to-speech:', error)
+      }
     }
-  }, [isAutoScrollActive])
+  }, [isAutoScrollActive, text, isSpeaking, speak])
+
+  // Cleanup when component unmounts or mode changes
+  useEffect(() => {
+    return () => {
+      if (isAutoScrollActive) {
+        stopScroll()
+        stopSpeak()
+      }
+    }
+  }, [isAutoScrollActive, stopScroll, stopSpeak])
 
   const handleAutoScrollToggle = () => {
-    const newState = !isAutoScrollActive
-    setIsAutoScrollActive(newState)
-    onAutoScrollChange?.(newState)
-    
-    if (newState) {
-      // Start reading when auto-scroll is enabled
-      setTimeout(() => speak(text), 100)
-    } else {
-      // Stop both scroll and speech
-      stopScroll()
-      stopSpeak()
+    try {
+      const newState = !isAutoScrollActive
+      setIsAutoScrollActive(newState)
+      onAutoScrollChange?.(newState)
+      
+      if (newState && text) {
+        // Start reading when auto-scroll is enabled
+        setTimeout(() => {
+          try {
+            speak(text)
+          } catch (error) {
+            console.error('Error during auto-scroll speak:', error)
+          }
+        }, 100)
+      } else {
+        // Stop both scroll and speech
+        stopScroll()
+        stopSpeak()
+      }
+    } catch (error) {
+      console.error('Error in handleAutoScrollToggle:', error)
+      setIsAutoScrollActive(false)
     }
   }
 

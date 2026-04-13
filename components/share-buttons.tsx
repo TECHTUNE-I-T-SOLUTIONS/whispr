@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,7 +15,13 @@ interface ShareButtonsProps {
 
 export function ShareButtons({ url, title, description = "" }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
+  const [supportsShare, setSupportsShare] = useState(false)
   const { toast } = useToast()
+
+  // Check for native share support after hydration
+  useEffect(() => {
+    setSupportsShare(typeof navigator !== "undefined" && !!navigator.share)
+  }, [])
 
   const copyToClipboard = async () => {
     try {
@@ -103,7 +109,7 @@ export function ShareButtons({ url, title, description = "" }: ShareButtonsProps
         </div>
 
         {/* Native Share API (if supported) */}
-        {typeof navigator !== "undefined" && navigator.share && (
+        {supportsShare && (
           <Button
             variant="outline"
             onClick={() => {

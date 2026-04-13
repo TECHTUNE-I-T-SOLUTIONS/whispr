@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, MessageCircle, Loader2 } from "lucide-react"
+import { AdminAvatarDisplay } from "./admin-avatar-display"
 
 export default function StartConversation({ admins }: { admins: any[] }) {
   const [selected, setSelected] = useState<string[]>([])
@@ -66,15 +67,12 @@ export default function StartConversation({ admins }: { admins: any[] }) {
                   className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <div className="flex items-center space-x-2 flex-1">
-                  <Avatar className="h-8 w-8">
-                    {admin.avatar_url ? (
-                      <AvatarImage className="object-cover" src={admin.avatar_url} alt={admin.full_name || admin.username} />
-                    ) : (
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                        {(admin.full_name || admin.email || admin.username)?.charAt(0)?.toUpperCase()}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
+                  <AdminAvatarDisplay
+                    adminId={admin.id}
+                    adminName={admin.full_name}
+                    username={admin.username}
+                    size="sm"
+                  />
                   <Label htmlFor={admin.id} className="text-sm font-medium cursor-pointer flex-1 text-card-foreground">
                     {admin.full_name || admin.email || admin.username}
                   </Label>

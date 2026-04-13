@@ -251,7 +251,7 @@ export function Header() {
             )}
           </div>
 
-          <Button variant="ghost" size="icon" className="md:hidden h-9 w-9" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             <span className="sr-only">Toggle menu</span>
           </Button>
@@ -259,7 +259,7 @@ export function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="md:hidden border-t bg-background/95 backdrop-blur">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="lg:hidden border-t bg-background/95 backdrop-blur">
           <nav className="container py-4 space-y-2">
             {navigation.map((item) => (
               <Link key={item.name} href={item.href} className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`} onClick={() => setMobileMenuOpen(false)}>

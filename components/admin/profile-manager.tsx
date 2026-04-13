@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,8 +16,10 @@ import { useSession } from "@/components/admin/session-provider"
 
 export function ProfileManager() {
   const [admin, setAdmin] = useState<any>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string>("/placeholder.svg")
   const [isLoading, setIsLoading] = useState(false)
   const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
@@ -35,16 +38,24 @@ export function ProfileManager() {
     confirmPassword: "",
   })
 
+  // Log when avatarUrl changes
+  useEffect(() => {
+    console.log("🎨 avatarUrl state changed to:", avatarUrl)
+  }, [avatarUrl])
+
   // ✅ Fetch Admin profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        console.log("🔵 Fetching admin profile...")
         const res = await fetch("/api/admin/profile")
         const data = await res.json()
 
         if (!res.ok) throw new Error(data.error || "Failed to fetch profile")
 
         setAdmin(data.admin)
+        console.log("✅ Profile loaded - avatar_url:", data.admin.avatar_url)
+        
         setFormData({
           username: data.admin.username || "",
           email: data.admin.email || "",
@@ -54,6 +65,7 @@ export function ProfileManager() {
           date_of_birth: data.admin.date_of_birth || "",
         })
       } catch (err) {
+        console.error("❌ Profile fetch error:", err)
         toast({
           variant: "destructive",
           title: "Error",
@@ -62,7 +74,30 @@ export function ProfileManager() {
       }
     }
 
+    // Fetch avatar URL separately
+    const fetchAvatarUrl = async () => {
+      try {
+        console.log("🔵 Fetching avatar URL...")
+        const avatarRes = await fetch("/api/admin/avatar")
+        if (!avatarRes.ok) throw new Error("Avatar fetch failed")
+        
+        const avatarData = await avatarRes.json()
+        console.log("✅ Avatar endpoint response:", avatarData)
+        
+        // Ensure URL is clean and properly formatted
+        let url = avatarData.avatar_url || "/placeholder.svg"
+        url = url.trim() // Remove whitespace
+        
+        console.log("✅ Setting avatarUrl to:", url)
+        setAvatarUrl(url)
+      } catch (err) {
+        console.error("❌ Avatar fetch error:", err)
+        setAvatarUrl("/placeholder.svg")
+      }
+    }
+
     fetchProfile()
+    fetchAvatarUrl()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,31 +145,48 @@ export function ProfileManager() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    setIsUploadingAvatar(true)
     const formData = new FormData()
     formData.append("avatar", file)
 
     try {
+      console.log("Uploading avatar:", file.name, file.size, file.type)
       const response = await fetch("/api/admin/profile/avatar", {
         method: "POST",
         body: formData,
       })
 
-      if (!response.ok) throw new Error("Upload failed")
-
       const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || "Upload failed")
+      }
+
+      console.log("Avatar uploaded successfully - new URL:", result.admin.avatar_url)
       setAdmin(result.admin)
+
+      // Fetch the properly formatted avatar URL
+      const avatarRes = await fetch("/api/admin/avatar")
+      if (avatarRes.ok) {
+        const avatarData = await avatarRes.json()
+        console.log("Updated avatar URL:", avatarData.avatar_url)
+        setAvatarUrl(avatarData.avatar_url || "/placeholder.svg")
+      }
 
       toast({
         variant: "success",
         title: "Avatar updated",
         description: "Your profile picture has been updated.",
       })
-    } catch {
+    } catch (err) {
+      console.error("Avatar upload error:", err)
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to upload avatar.",
+        description: err instanceof Error ? err.message : "Failed to upload avatar.",
       })
+    } finally {
+      setIsUploadingAvatar(false)
     }
   }
 
@@ -210,16 +262,56 @@ export function ProfileManager() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-32 w-32">
-                <AvatarImage src={admin.avatar_url || "/placeholder.svg"} alt={admin.full_name || admin.username} />
-                <AvatarFallback className="text-2xl">
-                  {(admin.full_name || admin.username).charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
-              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
+              <div className="relative w-32 h-32">
+                {avatarUrl && avatarUrl !== "/placeholder.svg" ? (
+                  <Image 
+                    src={avatarUrl}
+                    alt={admin?.full_name || admin?.username || "Avatar"}
+                    fill
+                    className="rounded-full object-cover"
+                    unoptimized
+                    onError={(e) => {
+                      console.error("❌ Avatar image failed to load from:", avatarUrl)
+                    }}
+                    onLoadingComplete={() => {
+                      console.log("✅ Avatar image loaded successfully from:", avatarUrl)
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                    {(admin?.full_name || admin?.username || "W").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border border-white border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
+              {admin?.avatar_url && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Stored: {admin.avatar_url.split("/").pop()}
+                </p>
+              )}
+              {!admin?.avatar_url && (
+                <p className="text-xs text-muted-foreground">No picture set yet</p>
+              )}
+              <input 
+                ref={fileInputRef} 
+                type="file" 
+                accept="image/*" 
+                onChange={handleAvatarUpload} 
+                className="hidden"
+                disabled={isUploadingAvatar}
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => fileInputRef.current?.click()} 
+                className="w-full"
+                disabled={isUploadingAvatar}
+              >
                 <Upload className="mr-2 h-4 w-4" />
-                Upload New Picture
+                {isUploadingAvatar ? "Uploading..." : "Upload New Picture"}
               </Button>
             </div>
           </CardContent>

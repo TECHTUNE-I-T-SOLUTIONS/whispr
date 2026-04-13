@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { useState } from "react"
+import { AdminAvatarDisplay } from "./admin-avatar-display"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -64,12 +65,15 @@ export const PostsList = ({ data = [], currentAdminId = null }: PostsListProps) 
         const post = row.original as any
         const admin = post.admin || {}
         const name = admin.full_name || admin.username || 'Unknown'
-        const avatar = admin.avatar_url || null
 
         return (
           <div className="flex items-center gap-2">
-            {/* use initials avatar fallback component */}
-            <img src={avatar || '/placeholder-user.jpg'} alt={name} className="w-8 h-8 rounded-full object-cover" />
+            <AdminAvatarDisplay
+              adminId={admin.id}
+              adminName={admin.full_name}
+              username={admin.username}
+              size="md"
+            />
             <div className="text-sm">{name}</div>
           </div>
         )

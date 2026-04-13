@@ -41,13 +41,42 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notificationsUnread }: AdminHeaderProps) {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string>("/placeholder.svg")
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
     setHasMounted(true)
+    // Fetch proper avatar URL from dedicated endpoint
+    const fetchAvatarUrl = async () => {
+      try {
+        console.log("🔵 AdminHeader: Fetching avatar URL...")
+        const res = await fetch("/api/admin/avatar")
+        if (res.ok) {
+          const data = await res.json()
+          console.log("✅ AdminHeader: Avatar endpoint response:", data)
+          
+          // Ensure URL is clean and properly formatted
+          let url = data.avatar_url || "/placeholder.svg"
+          url = url.trim() // Remove whitespace
+          
+          console.log("✅ AdminHeader: Setting avatarUrl to:", url)
+          setAvatarUrl(url)
+        } else {
+          console.error("❌ AdminHeader: Avatar endpoint returned status:", res.status)
+        }
+      } catch (err) {
+        console.error("❌ AdminHeader: Failed to fetch avatar URL:", err)
+      }
+    }
+    fetchAvatarUrl()
   }, [])
+
+  // Log when avatarUrl changes
+  useEffect(() => {
+    console.log("🎨 AdminHeader: avatarUrl state changed to:", avatarUrl)
+  }, [avatarUrl])
 
   const logoSrc = hasMounted
     ? theme === "dark"
@@ -63,57 +92,34 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
-  { name: "Feedback", href: "/admin/feedback", icon: MessageCircle },
+    { name: "Feedback", href: "/admin/feedback", icon: MessageCircle },
   ]
 
   return (
     <TooltipProvider>
       <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex items-center justify-between h-16 px-2 md:px-4">
+        <div className="flex items-center justify-between h-16 px-2 md:px-3 lg:px-4 gap-2">
           {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <Link href="/admin/dashboard" className="flex items-center space-x-2">
-              <div className="h-12 w-12 relative rounded-full overflow-hidden shadow-lg shadow-primary/20">
+          <div className="flex-shrink-0 flex items-center space-x-2 sm:space-x-4 min-w-0">
+            <Link href="/admin/dashboard" className="flex items-center space-x-2 min-w-0">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 relative rounded-full overflow-hidden shadow-lg shadow-primary/20 flex-shrink-0">
                 <Image src={logoSrc} alt="Whispr Logo" fill className="object-cover" priority />
               </div>
-              <span className="hidden sm:inline font-serif text-xl font-bold">Whispr Admin</span>
+              <span className="hidden sm:inline font-serif text-lg sm:text-xl font-bold truncate">Whispr Admin</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            {navigation.map((item) => (
-              <Tooltip key={item.name}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center space-x-1 px-2 py-1 text-sm font-medium ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="hidden lg:inline">{item.name}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>{item.name}</TooltipContent>
-              </Tooltip>
-            ))}
+          <nav className="hidden lg:flex items-center space-x-2 flex-1 justify-center">
+            {/* Additional desktop nav items can go here if needed */}
           </nav>
 
-          {/* Right Controls */}
-          <div className="flex items-center space-x-2 md:space-x-4">
-            {/* Admin quick shortcuts */}
-            <div className="hidden md:flex items-center space-x-3">
-              <Link href="/admin/messages" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
-                <MessageSquareText className="h-4 w-4" />
-                <span className="hidden lg:inline">Messages</span>
-                {messagesUnread > 0 && (
-                  <Badge className="ml-2">{messagesUnread}</Badge>
-                )}
-              </Link>
-              {/* QuickCompose removed from desktop header per request */}
-            </div>
+          {/* Right Controls - Optimized for tablet */}
+          <div className="flex items-center space-x-1 md:space-x-2 lg:space-x-3 ml-auto gap-1">
+            {/* Home Button - Always visible */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button asChild variant="ghost" size="icon">
+                <Button asChild variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
                   <Link href="/">
                     <Home className="h-4 w-4" />
                   </Link>
@@ -122,19 +128,10 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
               <TooltipContent>View Site</TooltipContent>
             </Tooltip>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="icon" onClick={onToggleMobileMenu}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </Button>
-            </div>
-
-            {/* Notifications */}
+            {/* Notifications - Hide on small tablets, show on larger tablets + desktop */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button asChild variant="ghost" size="icon" className="relative hidden md:flex">
+                <Button asChild variant="ghost" size="icon" className="relative hidden sm:flex h-8 w-8 sm:h-9 sm:w-9">
                   <Link href="/admin/notifications">
                     <Bell className="h-4 w-4" />
                     {notificationsUnread > 0 && (
@@ -148,21 +145,44 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
               <TooltipContent>Notifications</TooltipContent>
             </Tooltip>
 
-            {/* Theme Toggle */}
-            <div className="hidden md:flex">
+            {/* Theme Toggle - Hide on small tablets */}
+            <div className="hidden lg:flex">
               <ThemeToggle />
             </div>
+
+            {/* Mobile/Tablet Menu Button - Show on md and below */}
+            <Button variant="ghost" size="icon" onClick={onToggleMobileMenu} className="lg:hidden h-8 w-8 sm:h-9 sm:w-9">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </Button>
 
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={admin.avatar_url || "/placeholder.svg"} alt={admin.full_name || admin.username} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                      {(admin.full_name || admin.username).charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full p-0 flex-shrink-0">
+                  {avatarUrl && avatarUrl !== "/placeholder.svg" ? (
+                    <Image 
+                      src={avatarUrl}
+                      alt={admin.full_name || admin.username}
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        console.error("❌ Header avatar failed to load from:", avatarUrl)
+                      }}
+                      onLoadingComplete={() => {
+                        console.log("✅ Header avatar loaded successfully from:", avatarUrl)
+                      }}
+                    />
+                  ) : (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                        {(admin.full_name || admin.username).charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>

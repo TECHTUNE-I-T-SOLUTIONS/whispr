@@ -53,7 +53,7 @@ export default function DownloadPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-black dark:to-gray-800/20 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -71,7 +71,7 @@ export default function DownloadPage() {
         {/* Main Content */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* iOS */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white dark:bg-black border border-[#911A1B] dark:border-red-900 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 dark:hover:shadow-red-900/50">
             <div className="bg-gradient-to-br from-[#911A1B] to-red-900 p-8 text-white flex flex-col items-center justify-center h-48">
               <Apple className="w-20 h-20 mb-4" />
               <h2 className="text-2xl font-bold">iOS</h2>
@@ -85,7 +85,7 @@ export default function DownloadPage() {
           </div>
 
           {/* Android */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white dark:bg-black border border-[#911A1B] dark:border-red-900 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 dark:hover:shadow-red-900/50">
             <div className="bg-gradient-to-br from-[#911A1B] to-red-800 p-8 text-white flex flex-col items-center justify-center h-48">
               <Smartphone className="w-20 h-20 mb-4" />
               <h2 className="text-2xl font-bold">Android</h2>
@@ -138,7 +138,7 @@ export default function DownloadPage() {
                             href={builds.artifacts.apk.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black/60 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                           >
                             <div>
                               <p className="text-sm font-semibold text-gray-900 dark:text-white">APK</p>
@@ -154,7 +154,7 @@ export default function DownloadPage() {
                             href={builds.artifacts.aab.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black/60 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                           >
                             <div>
                               <p className="text-sm font-semibold text-gray-900 dark:text-white">AAB (Bundle)</p>
@@ -203,7 +203,7 @@ export default function DownloadPage() {
         </div>
 
         {/* Features */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+        <div className="bg-white dark:bg-black border border-[#911A1B] dark:border-red-900 rounded-2xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
             Why Download Whispr?
           </h2>
@@ -230,7 +230,7 @@ export default function DownloadPage() {
         </div>
 
         {/* Requirements */}
-        <div className="bg-red-50 dark:bg-gray-800 rounded-2xl p-8 border border-[#911A1B] dark:border-red-900">
+        <div className="bg-red-50 dark:bg-black rounded-2xl p-8 border border-[#911A1B] dark:border-red-900">
           <h3 className="text-lg font-semibold text-[#911A1B] dark:text-red-500 mb-4">
             Requirements
           </h3>

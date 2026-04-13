@@ -2,13 +2,14 @@
 
 import { useSession } from "@/components/admin/session-provider"
 import { AdminHeader } from "@/components/admin/admin-header"
+import { DesktopSidebar } from "@/components/admin/desktop-sidebar"
 import { Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart,
-  FileText, BarChart3, Bell, TrendingUp, Sliders, ClipboardList
+  FileText, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -28,10 +29,13 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
     { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
-    { name: "Feedback", href: "/admin/feedback", icon: MessageSquareText },
+    { name: "Feedback", href: "/admin/feedback", icon: MessageCircle },
+    { name: "Notifications", href: "/admin/notifications", icon: Bell },
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
     { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
+    { name: "Flagged Content", href: "/admin/chronicles/flagged-content", icon: ClipboardList },
+    { name: "Error Logs", href: "/admin/error-logs", icon: AlertTriangle },
     // Ads Control Section
     { name: "Ads Control", href: "/admin/ads-control", icon: Sliders },
     // Chronicles Section
@@ -150,13 +154,20 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
         messagesUnread={messagesUnread}
         notificationsUnread={notificationsUnread}
       />
+      <DesktopSidebar
+        navigation={navigation}
+        messagesUnread={messagesUnread}
+        notificationsUnread={notificationsUnread}
+      />
       <MobileSidebar
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
         navigation={navigation}
         notificationsUnread={notificationsUnread}
       />
-      {children}
+      <div className="lg:ml-64 pt-16">
+        {children}
+      </div>
     </>
   )
 }

@@ -5,9 +5,9 @@ import { requireAuthFromRequest } from "@/lib/auth-server"
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = context.params.id
+  const { id } = await params
 
   if (!id) {
     return NextResponse.json({ error: "Media ID is required" }, { status: 400 })

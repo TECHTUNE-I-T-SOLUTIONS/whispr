@@ -90,43 +90,56 @@ export default function AdminCreatorsPage() {
   const fetchCreatorPosts = async (creatorId: string) => {
     try {
       setPostsLoading(true);
+      console.log("=== ADMIN PAGE: Fetching creator posts ===");
+      console.log("Creator ID:", creatorId);
+      console.log("Creator ID type:", typeof creatorId);
+      
       const url = `/api/chronicles/creators/${creatorId}/posts?limit=100`;
       console.log("Fetching from URL:", url);
       
       const res = await fetch(url);
       console.log("Response status:", res.status);
+      console.log("Response ok:", res.ok);
       
       if (!res.ok) {
         const text = await res.text();
-        console.error('Posts fetch failed:', res.status, text);
+        console.error('❌ Posts fetch failed:', res.status, text);
         setCreatorPosts([]);
         return;
       }
       
       const data = await res.json();
-      console.log("Received data:", data);
+      console.log("Received response object keys:", Object.keys(data));
+      console.log("Full response:", data);
       
       let posts: any[] = [];
       
       // Handle both array and object responses
       if (Array.isArray(data)) {
         posts = data;
-        console.log("Data is array with", posts.length, "posts");
+        console.log("✅ Data is array with", posts.length, "posts");
       } else if (data.posts && Array.isArray(data.posts)) {
         posts = data.posts;
-        console.log("Data has posts property with", posts.length, "posts");
-        console.log("First few posts:", posts.slice(0, 3).map((p: any) => ({ 
-          title: p.title,
-          type: p.post_type,
-          created: p.created_at 
-        })));
+        console.log("✅ Data has posts property with", posts.length, "posts");
+        console.log("Posts array:", posts);
+        if (posts.length > 0) {
+          console.log("First few posts:", posts.slice(0, 3).map((p: any) => ({ 
+            id: p.id,
+            title: p.title,
+            type: p.post_type,
+            created: p.created_at,
+            status: p.status,
+          })));
+        }
       } else {
-        console.log("Data structure:", Object.keys(data));
+        console.log("⚠️ Data structure:", data);
+        console.log("Data keys:", Object.keys(data));
       }
       
       setCreatorPosts(posts);
+      console.log("Set creator posts to:", posts.length, "items");
     } catch (err) {
-      console.error('Failed to fetch creator posts:', err);
+      console.error('❌ Failed to fetch creator posts:', err);
       setCreatorPosts([]);
     } finally {
       setPostsLoading(false);

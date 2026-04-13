@@ -50,6 +50,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Parse query parameters
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const offset = parseInt(searchParams.get('offset') || '0')
+    const type = searchParams.get('type') || 'all'
+
     // Get unread notifications count
     const { count: unreadCount, error: countError } = await supabase
       .from('chronicles_notifications')
@@ -65,13 +71,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get recent notifications (last 10)
-    const { data: notifications, error: notificationsError } = await supabase
+    // Build query for notifications
+    let query = supabase
       .from('chronicles_notifications')
-      .select('*')
+      .select('*', { count: 'exact' })
       .eq('creator_id', creator.id)
       .order('created_at', { ascending: false })
-      .limit(10);
+
+    // Filter by type if specified
+    if (type !== 'all') {
+      query = query.eq('type', type)
+    }
+
+    // Get paginated notifications
+    const { data: notifications, error: notificationsError, count: totalCount } = await query
+      .range(offset, offset + limit - 1)
 
     if (notificationsError) {
       console.error('Error fetching notifications:', notificationsError);
@@ -82,9 +96,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      unreadCount: unreadCount || 0,
+      success: true,
+      unread_count: unreadCount || 0,
       notifications: notifications || [],
-      totalCount: unreadCount || 0,
+      total: totalCount || 0,
     });
   } catch (error) {
     console.error('Notifications endpoint error:', error);
@@ -95,7 +110,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Mark notifications as read
+// Mark notifications as read or update
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -110,30 +125,93 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { notificationIds } = await request.json();
+    const body = await request.json();
+    const { notificationIds, notificationId, all, read } = body;
 
-    if (!notificationIds || !Array.isArray(notificationIds)) {
+    // Get creator
+    const { data: creator, error: creatorError } = await supabase
+      .from('chronicles_creators')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (creatorError || !creator) {
       return NextResponse.json(
-        { error: 'Invalid request' },
-        { status: 400 }
+        { error: 'Creator not found' },
+        { status: 404 }
       );
     }
 
-    // Update notifications to read
-    const { error: updateError } = await supabase
-      .from('chronicles_notifications')
-      .update({ read: true, read_at: new Date().toISOString() })
-      .in('id', notificationIds);
+    // Mark all as read
+    if (all === true && read === true) {
+      const { error: updateError } = await supabase
+        .from('chronicles_notifications')
+        .update({
+          read: true,
+          read_at: new Date().toISOString(),
+        })
+        .eq('creator_id', creator.id)
+        .eq('read', false);
 
-    if (updateError) {
-      console.error('Error updating notifications:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to update notifications' },
-        { status: 500 }
-      );
+      if (updateError) {
+        console.error('Error marking all as read:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update notifications' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true, message: 'All notifications marked as read' });
     }
 
-    return NextResponse.json({ success: true });
+    // Mark multiple as read (legacy support)
+    if (notificationIds && Array.isArray(notificationIds)) {
+      const { error: updateError } = await supabase
+        .from('chronicles_notifications')
+        .update({ read: true, read_at: new Date().toISOString() })
+        .in('id', notificationIds)
+        .eq('creator_id', creator.id);
+
+      if (updateError) {
+        console.error('Error updating notifications:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update notifications' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true, message: 'Notifications marked as read' });
+    }
+
+    // Mark single as read
+    if (notificationId) {
+      const unreadIds = read === false
+        ? { read: false }
+        : { read: true, read_at: new Date().toISOString() };
+
+      const { data: notification, error: updateError } = await supabase
+        .from('chronicles_notifications')
+        .update(unreadIds)
+        .eq('id', notificationId)
+        .eq('creator_id', creator.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Error updating notification:', updateError);
+        return NextResponse.json(
+          { error: 'Notification not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ success: true, notification });
+    }
+
+    return NextResponse.json(
+      { error: 'Missing notificationIds, notificationId, or all parameter' },
+      { status: 400 }
+    );
   } catch (error) {
     console.error('Notifications update error:', error);
     return NextResponse.json(

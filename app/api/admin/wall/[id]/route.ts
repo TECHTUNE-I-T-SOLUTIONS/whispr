@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
 
-export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
-  const { params } = context
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const { admin } = await requireAuthFromRequest(req)
   const supabase = createSupabaseServer()
 
@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest, context: { params: { id: string } 
   const { error } = await supabase
     .from("whispr_wall")
     .update({ response, admin_id: admin.id })
-    .eq("id", params.id)
+    .eq("id", id)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

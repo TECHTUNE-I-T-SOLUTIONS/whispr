@@ -70,7 +70,7 @@ export function AIIntroductorySection() {
               border: `1px solid ${textAccent}20`
             }}>
               <Sparkles className="w-4 h-4" style={{ color: textAccent }} />
-              <span className="text-sm font-medium" style={{ color: textAccent }}>Introducing Whispr AI</span>
+              <span className="text-sm font-medium" style={{ color: textAccent }}>Whispr AI</span>
             </div>
 
             <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 leading-tight">
@@ -192,7 +192,7 @@ export function AIIntroductorySection() {
                     e.currentTarget.style.backgroundColor = textAccent
                   }}
                 >
-                  <Link href="/chronicles" className="inline-flex items-center gap-2">
+                  <Link href="/download" className="inline-flex items-center gap-2">
                     Try Whispr AI Now
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>

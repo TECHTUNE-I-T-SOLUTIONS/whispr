@@ -144,7 +144,7 @@ CREATE TABLE public.chronicles_admin_notification_settings (
 );
 CREATE TABLE public.chronicles_admin_notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['creator_signup'::text, 'creator_milestone'::text, 'post_viral'::text, 'post_reported'::text, 'comment_flagged'::text, 'high_engagement'::text, 'low_quality_post'::text, 'creator_banned'::text, 'revenue_milestone'::text, 'subscriber_milestone'::text, 'admin_action_needed'::text, 'system_alert'::text])),
+  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['creator_signup'::text, 'creator_milestone'::text, 'post_viral'::text, 'post_reported'::text, 'post_flagged'::text, 'comment_flagged'::text, 'high_engagement'::text, 'low_quality_post'::text, 'creator_banned'::text, 'revenue_milestone'::text, 'subscriber_milestone'::text, 'admin_action_needed'::text, 'system_alert'::text])),
   title character varying NOT NULL,
   message text NOT NULL,
   creator_id uuid,
@@ -578,6 +578,36 @@ CREATE TABLE public.chronicles_feed_preferences (
   CONSTRAINT chronicles_feed_preferences_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_feed_preferences_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
 );
+CREATE TABLE public.chronicles_flagged_reviews (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  post_id uuid,
+  chain_entry_post_id uuid,
+  flagged_by uuid NOT NULL,
+  reason text NOT NULL CHECK (reason = ANY (ARRAY['inappropriate_content'::text, 'spam'::text, 'copyright_violation'::text, 'misinformation'::text, 'hate_speech'::text, 'explicit_content'::text, 'harassment'::text, 'other'::text])),
+  description text,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'resolved'::text, 'dismissed'::text])),
+  resolution text,
+  resolved_by uuid,
+  resolved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_flagged_reviews_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_flagged_reviews_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
+  CONSTRAINT chronicles_flagged_reviews_chain_entry_post_id_fkey FOREIGN KEY (chain_entry_post_id) REFERENCES public.chronicles_chain_entry_posts(id),
+  CONSTRAINT chronicles_flagged_reviews_flagged_by_fkey FOREIGN KEY (flagged_by) REFERENCES public.admin(id),
+  CONSTRAINT chronicles_flagged_reviews_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.chronicles_followers (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  follower_id uuid NOT NULL,
+  follows_id uuid NOT NULL,
+  is_following boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_followers_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_followers_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_followers_follows_id_fkey FOREIGN KEY (follows_id) REFERENCES public.chronicles_creators(id)
+);
 CREATE TABLE public.chronicles_gamification_settings (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   points_per_post integer DEFAULT 10,
@@ -760,7 +790,7 @@ CREATE TABLE public.chronicles_notification_settings (
 CREATE TABLE public.chronicles_notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL,
-  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text])),
+  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text, 'post_flagged_for_review'::text, 'chain_created'::text, 'chain_entry_added'::text, 'post_added_to_chain'::text])),
   title character varying NOT NULL,
   message text NOT NULL,
   related_post_id uuid,

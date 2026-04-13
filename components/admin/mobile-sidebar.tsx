@@ -89,7 +89,7 @@ export function MobileSidebar({ isOpen, onClose, navigation, notificationsUnread
       {/* Fullscreen Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9998] bg-black/50 md:hidden"
+          className="fixed inset-0 z-[9998] bg-black/50 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -97,64 +97,46 @@ export function MobileSidebar({ isOpen, onClose, navigation, notificationsUnread
       {/* Slide-in Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 z-[9999] w-64 h-full bg-background shadow-lg transform transition-transform duration-300 md:hidden ${
+        className={`fixed top-16 left-0 z-[9999] w-64 h-[calc(100vh-4rem)] bg-background shadow-lg transform transition-transform duration-300 lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Logo/Header */}
-        <div className="flex items-center px-4 py-5 border-b space-x-3">
-          <div className="relative h-10 w-10 rounded-full overflow-hidden shadow-md">
-            <Image
-              src={logoSrc}
-              alt="Whispr Logo"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <span className="font-serif text-lg font-semibold">Whispr Admin</span>
-        </div>
-
         {/* Navigation */}
-        <div className="flex flex-col p-4 space-y-4">
+        <div className="flex flex-col p-4 space-y-2 overflow-y-auto h-full">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center space-x-2 text-sm font-medium ${
-                pathname === item.href ? "text-primary" : "text-muted-foreground"
-              } hover:text-primary`}
+              className={`flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                pathname === item.href
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+              }`}
             >
-              <item.icon className="h-5 w-5" />
-              <span>{item.name}</span>
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span className="flex-1">{item.name}</span>
+              {item.href === '/admin/messages' && messagesUnread > 0 && (
+                <Badge className="ml-auto text-xs">{messagesUnread}</Badge>
+              )}
+              {item.href === '/admin/notifications' && notificationsUnread > 0 && (
+                <Badge className="ml-auto text-xs">{notificationsUnread}</Badge>
+              )}
             </Link>
           ))}
 
-          <Link href="/admin/notifications" onClick={onClose} className="flex items-center space-x-2 text-muted-foreground hover:text-primary">
-            <Bell className="h-5 w-5" />
-            <span>Notifications</span>
-            {notificationsUnread > 0 && (
-              <Badge className="ml-auto text-xs">{notificationsUnread}</Badge>
-            )}
-          </Link>
+          {/* Divider */}
+          <div className="my-2 border-t" />
 
-          {/* Messages link with synced unread count */}
-          {/* <Link href="/admin/messages" onClick={onClose} className={`flex items-center space-x-2 text-sm font-medium ${pathname === '/admin/messages' ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}>
-            <MessageSquareText className="h-5 w-5" />
-            <span>Messages</span>
-            {messagesUnread > 0 && (
-              <Badge className="ml-auto text-xs">{messagesUnread}</Badge>
-            )}
-          </Link> */}
-
-          <Link href="/" onClick={onClose} className="flex items-center space-x-2 text-muted-foreground hover:text-primary">
-            <Home className="h-5 w-5" />
+          {/* Additional Links */}
+          <Link href="/" onClick={onClose} className="flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+            <Home className="h-5 w-5 flex-shrink-0" />
             <span>View Site</span>
           </Link>
 
-          <div className="flex items-center">
+          <div className="flex items-center space-x-3 px-3 py-2">
             <ThemeToggle />
-            <span className="ml-2 text-sm">Toggle Theme</span>
+            <span className="text-sm">Toggle Theme</span>
           </div>
         </div>
       </div>

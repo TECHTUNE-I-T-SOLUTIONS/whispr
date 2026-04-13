@@ -9,6 +9,7 @@ import { MoreVertical, X, ChevronLeft } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { Plus } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { AdminAvatarDisplay } from './admin-avatar-display'
 import MessagesClient from '@/components/admin/messages-client'
 import ErrorBoundary from '@/components/admin/error-boundary'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
@@ -755,13 +756,12 @@ export default function ConversationsShell({ initialConversations, initialSelect
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
                             {isDirect ? (
-                              <Avatar className="h-8 w-8">
-                                {other?.admin?.avatar_url ? (
-                                  <AvatarImage src={other.admin.avatar_url} alt={other.admin.full_name || other.admin.username} />
-                                ) : (
-                                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">{(other?.admin?.full_name||other?.admin?.username||'A').charAt(0)}</AvatarFallback>
-                                )}
-                              </Avatar>
+                              <AdminAvatarDisplay
+                                adminId={other?.admin?.id}
+                                adminName={other?.admin?.full_name}
+                                username={other?.admin?.username}
+                                size="md"
+                              />
                             ) : (
                               <div className="flex items-center -space-x-2">
                                 {members.slice(0,2).map((a: any, i:number) => (

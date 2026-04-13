@@ -67,6 +67,15 @@ export async function POST(request: NextRequest) {
     const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath)
     const avatarUrl = urlData.publicUrl
 
+    if (!avatarUrl) {
+      console.error("Failed to generate public URL for avatar")
+      await supabase.storage.from("avatars").remove([filePath])
+      return NextResponse.json({ error: "Failed to generate public URL" }, { status: 500 })
+    }
+
+    console.log("✅ Avatar uploaded successfully to:", filePath)
+    console.log("✅ Public URL generated:", avatarUrl)
+
     const { data: updatedAdmin, error: updateError } = await supabase
       .from("admin")
       .update({

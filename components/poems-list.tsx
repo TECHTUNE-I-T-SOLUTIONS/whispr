@@ -81,7 +81,7 @@ export const PoemsList: React.FC<PoemsListProps> = ({ poems }) => {
 
             <CardContent className="space-y-4">
               <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
-                {poem.excerpt || poem.content}
+                {poem.excerpt || poem.content.replace(/<[^>]*>/g, '').trim().substring(0, 150)}
               </p>
 
               {poem.tags && poem.tags.length > 0 && (

@@ -9,14 +9,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
+    // Query chronicles_chain_entry_posts directly instead of chain_entries
     let query = supabase
-      .from('chronicles_chain_entries')
+      .from('chronicles_chain_entry_posts')
       .select(`*,
         chain:chronicles_writing_chains(id,title),
-        post:chronicles_posts(id,title,slug),
-        added:chronicles_creators(id,pen_name)`
+        creator:chronicles_creators!chronicles_chain_entry_posts_creator_id_fkey(id,pen_name)`
       )
-      .order('added_at', { ascending: false })
+      .order('published_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (chainId) {
@@ -40,7 +40,7 @@ export async function DELETE(request: NextRequest) {
     if (!entryId) return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 });
 
     const { error } = await supabase
-      .from('chronicles_chain_entries')
+      .from('chronicles_chain_entry_posts')
       .delete()
       .eq('id', entryId);
 
