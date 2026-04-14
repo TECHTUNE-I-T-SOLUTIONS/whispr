@@ -35,11 +35,13 @@ interface Chain {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
     const { id } = await params;
-    const res = await fetch(`/api/chronicles/chains/${id}`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      console.warn('NEXT_PUBLIC_BASE_URL not set');
+      return { title: 'Writing Chain' };
+    }
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
     if (!res.ok) {
       return { title: 'Chain not found' };
@@ -58,11 +60,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ChainDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const res = await fetch(`/api/chronicles/chains/${id}`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      console.error('Error loading chain: NEXT_PUBLIC_BASE_URL not configured');
+      return notFound();
+    }
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
     if (!res.ok) {
       return notFound();

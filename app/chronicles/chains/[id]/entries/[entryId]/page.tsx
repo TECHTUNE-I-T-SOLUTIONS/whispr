@@ -38,11 +38,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { entryId } = await params;
-    const res = await fetch(`/api/chronicles/chains/entries/${entryId}`, {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      console.warn('NEXT_PUBLIC_BASE_URL not set for metadata generation');
+      return { title: 'Writing Chain Entry' };
+    }
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/entries/${entryId}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
 
     if (!res.ok) {
@@ -72,13 +74,15 @@ export default async function ChainEntryPage({
 }) {
   try {
     const { id, entryId } = await params;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      console.error('Error loading entry: NEXT_PUBLIC_BASE_URL not configured');
+      return notFound();
+    }
 
     // Fetch entry
-    const entryRes = await fetch(`/api/chronicles/chains/entries/${entryId}`, {
+    const entryRes = await fetch(`${baseUrl}/api/chronicles/chains/entries/${entryId}`, {
       cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
 
     if (!entryRes.ok) {
@@ -95,11 +99,8 @@ export default async function ChainEntryPage({
     // Fetch chain for title
     let chainTitle = 'Writing Chain';
     try {
-      const chainRes = await fetch(`/api/chronicles/chains/${id}`, {
+      const chainRes = await fetch(`${baseUrl}/api/chronicles/chains/${id}`, {
         cache: 'no-store',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
       if (chainRes.ok) {
         const chainJson = await chainRes.json();
