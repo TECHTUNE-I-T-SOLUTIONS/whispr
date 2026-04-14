@@ -17,6 +17,8 @@ import {
   ChevronDown,
   AlertTriangle,
   TrendingUp,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -34,7 +36,7 @@ export default function ChroniclesHeader({
 }: ChroniclesHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, resolvedTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -108,6 +110,7 @@ export default function ChroniclesHeader({
     { label: 'Write Post', href: '/chronicles/write', icon: BookOpen },
     { label: 'Analytics', href: '/chronicles/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/chronicles/settings', icon: Settings },
+    { label: 'Whispr AI', href: '/chronicles/whispr-ai', icon: Settings },
   ];
 
   const handleLogout = async () => {
@@ -147,7 +150,7 @@ export default function ChroniclesHeader({
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800">
+      <header className="sticky top-0 z-40 bg-white dark:bg-black border-b border-gray-200 dark:border-slate-800">
         <div className="flex items-center justify-between h-16 px-4 md:px-6">
           {/* Logo & Branding */}
           <Link href="/chronicles" className="flex items-center gap-2 flex-shrink-0">
@@ -299,11 +302,11 @@ export default function ChroniclesHeader({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-30 ${
+        className={`hidden lg:fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-30 overflow-y-auto flex flex-col ${
           sidebarOpen ? 'translate-x-0' : 'translate-x-0'
         }`}
       >
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-2 flex-1">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
@@ -319,6 +322,23 @@ export default function ChroniclesHeader({
             </Link>
           ))}
         </nav>
+        
+        {/* Theme Toggle at Bottom of Sidebar */}
+        <div className="p-4 border-t border-gray-200 dark:border-slate-700">
+          <button
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            className="w-full px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+          >
+            {mounted && resolvedTheme === 'light' ? (
+              <Moon className="w-5 h-5 flex-shrink-0" />
+            ) : (
+              <Sun className="w-5 h-5 flex-shrink-0" />
+            )}
+            <span className="font-medium">
+              {mounted && resolvedTheme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Sidebar */}
@@ -329,17 +349,17 @@ export default function ChroniclesHeader({
         >
           <div 
             ref={sidebarRef}
-            className="w-64 h-full bg-white dark:bg-slate-900 shadow-lg animate-slideIn"
+            className="w-64 h-full bg-white dark:bg-black border border-gray-200 dark:border-slate-700 dark:shadow-2xl dark:shadow-white/40 shadow-lg animate-slideIn flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <nav className="p-4 space-y-2">
+            <nav className="p-4 space-y-2 flex-1">
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
                     isActive(item.href)
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                   }`}
                   onClick={() => setSidebarOpen(false)}
@@ -348,6 +368,23 @@ export default function ChroniclesHeader({
                   <span className="font-medium">{item.label}</span>
                 </Link>
               ))}
+            </nav>
+            <div className="p-4 space-y-2 border-t border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => {
+                  setTheme(theme === 'light' ? 'dark' : 'light');
+                }}
+                className="w-full px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
+              >
+                {mounted && resolvedTheme === 'light' ? (
+                  <Moon className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <Sun className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span className="font-medium">
+                  {mounted && resolvedTheme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </span>
+              </button>
               <hr className="my-2 border-gray-200 dark:border-slate-700" />
               <button
                 onClick={() => {
@@ -359,7 +396,7 @@ export default function ChroniclesHeader({
                 <LogOut className="w-5 h-5 flex-shrink-0" />
                 <span className="font-medium">Logout</span>
               </button>
-            </nav>
+            </div>
           </div>
         </div>
       )}
