@@ -170,7 +170,7 @@ export default function ChainEntryDetail({
   }, [entryId, supabase]);
 
   const handleLike = async () => {
-    if (!session?.user) {
+    if (!authUser) {
       alert('Please log in to like this entry');
       return;
     }

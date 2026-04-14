@@ -6,10 +6,10 @@ import { cookies } from 'next/headers';
 // GET comments for a chain entry post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { chainId: string; entryId: string } }
+  { params }: { params: Promise<{ chainId: string; entryId: string }> }
 ) {
   try {
-    const { entryId } = params;
+    const { entryId } = await params;
     if (!entryId) {
       return NextResponse.json({ error: 'Missing entry ID' }, { status: 400 });
     }
@@ -69,10 +69,10 @@ export async function GET(
 // POST new comment on a chain entry post
 export async function POST(
   request: NextRequest,
-  { params }: { params: { chainId: string; entryId: string } }
+  { params }: { params: Promise<{ chainId: string; entryId: string }> }
 ) {
   try {
-    const { entryId } = params;
+    const { entryId } = await params;
     if (!entryId) {
       return NextResponse.json({ error: 'Missing entry ID' }, { status: 400 });
     }

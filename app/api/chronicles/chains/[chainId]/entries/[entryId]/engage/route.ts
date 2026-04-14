@@ -6,10 +6,10 @@ import { cookies } from 'next/headers';
 // POST engagement action (like, share, view)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { chainId: string; entryId: string } }
+  { params }: { params: Promise<{ chainId: string; entryId: string }> }
 ) {
   try {
-    const { entryId } = params;
+    const { entryId } = await params;
     if (!entryId) {
       return NextResponse.json({ error: 'Missing entry ID' }, { status: 400 });
     }
