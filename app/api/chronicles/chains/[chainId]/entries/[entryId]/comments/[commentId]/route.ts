@@ -6,10 +6,10 @@ import { cookies } from 'next/headers';
 // DELETE a comment
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { chainId: string; entryId: string; commentId: string } }
+  { params }: { params: Promise<{ chainId: string; entryId: string; commentId: string }> }
 ) {
   try {
-    const { entryId, commentId } = params;
+    const { entryId, commentId } = await params;
     if (!entryId || !commentId) {
       return NextResponse.json({ error: 'Missing entry or comment ID' }, { status: 400 });
     }
@@ -79,8 +79,8 @@ export async function DELETE(
 
     // Verify the comment belongs to the current user
     const { data: comment, error: fetchError } = await supabase
-      .from('chronicles_comments')
-      .select('creator_id, post_id')
+      .from('chronicles_chain_entry_post_comments')
+      .select('creator_id, chain_entry_post_id')
       .eq('id', commentId)
       .single();
 
@@ -107,7 +107,7 @@ export async function DELETE(
 
     // Delete the comment
     const { error: deleteError } = await supabase
-      .from('chronicles_comments')
+      .from('chronicles_chain_entry_post_comments')
       .delete()
       .eq('id', commentId);
 

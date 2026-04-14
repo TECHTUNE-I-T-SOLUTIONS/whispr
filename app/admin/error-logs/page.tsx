@@ -178,7 +178,7 @@ export default function ErrorLogsPage() {
                       </div>
                       <div className="text-sm text-muted-foreground space-y-1">
                         <p>Source: <span className="font-mono text-xs">{error.source}</span></p>
-                        <p>URL: <span className="font-mono text-xs break-words">{error.url}</span></p>
+                        <p>URL: <span className="font-mono text-xs truncate break-words">{error.url}</span></p>
                         <p>Occurred: {formatDistanceToNow(new Date(error.created_at))} ago</p>
                         {error.occurrence_count > 1 && (
                           <p>Occurrences: <span className="font-bold">{error.occurrence_count}×</span></p>

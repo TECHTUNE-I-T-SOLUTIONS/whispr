@@ -29,12 +29,9 @@ export async function GET(
       }
     );
 
-    // Get the chain entry post first to get the actual post_id
-    // Note: In the new schema, we need to get chain_entry_post_id from chronicles_chain_entries
-    // But we're storing comments on the chain_entry_posts table directly
-
+    // Get comments from chain entry post comments table
     const { data: comments, error } = await supabase
-      .from('chronicles_comments')
+      .from('chronicles_chain_entry_post_comments')
       .select(`
         id,
         content,
@@ -50,7 +47,7 @@ export async function GET(
           profile_image_url
         )
       `)
-      .eq('post_id', entryId)
+      .eq('chain_entry_post_id', entryId)
       .is('parent_comment_id', null)
       .order('created_at', { ascending: false });
 
@@ -161,11 +158,11 @@ export async function POST(
       );
     }
 
-    // Create comment
+    // Create comment in chain entry post comments table
     const { data: comment, error: commentError } = await supabase
-      .from('chronicles_comments')
+      .from('chronicles_chain_entry_post_comments')
       .insert({
-        post_id: entryId,
+        chain_entry_post_id: entryId,
         creator_id: creator.id,
         content: content.trim(),
         parent_comment_id: parentCommentId || null,

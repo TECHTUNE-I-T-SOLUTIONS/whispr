@@ -103,24 +103,23 @@ export async function POST(
     let updateData: any = {};
 
     if (action === 'like') {
-      // Record the like using comment reactions (since we're using comments table for engagement)
-      // But for chain entry posts, we'll directly update the likes_count
+      // Record the like for chain entry posts
       
       // Check if already liked
       const { data: existing } = await supabase
-        .from('chronicles_comment_reactions')
+        .from('chronicles_chain_entry_post_likes')
         .select('id')
         .eq('creator_id', creator.id)
-        .eq('comment_id', entryId) // Using as post_id equivalent
+        .eq('chain_entry_post_id', entryId)
         .eq('reaction_type', 'like')
         .single();
 
       if (!existing) {
         // Add like reaction
         await supabase
-          .from('chronicles_comment_reactions')
+          .from('chronicles_chain_entry_post_likes')
           .insert({
-            comment_id: entryId,
+            chain_entry_post_id: entryId,
             creator_id: creator.id,
             reaction_type: 'like',
           });
