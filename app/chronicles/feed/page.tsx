@@ -123,6 +123,11 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black pt-20 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link href="/chronicles/dashboard" className="inline-block mb-8">
+          <Button variant="outline">
+            Back to Dashboard
+          </Button>
+        </Link>
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Chronicles Feed</h1>
           <p className="text-gray-600 dark:text-gray-400">Latest posts from creators and admins</p>
@@ -228,7 +233,7 @@ export default function FeedPage() {
                       </span>
                       
                       <Link href={detailUrl} className="ml-auto">
-                        <Button size="sm" variant="default" className="bg-purple-600 hover:bg-purple-700">
+                        <Button size="sm" variant="default" className="bg-red-600 hover:bg-red-700">
                           Read Full Post
                         </Button>
                       </Link>

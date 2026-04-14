@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Sun,
   Moon,
+  Bot,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -110,7 +111,7 @@ export default function ChroniclesHeader({
     { label: 'Write Post', href: '/chronicles/write', icon: BookOpen },
     { label: 'Analytics', href: '/chronicles/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/chronicles/settings', icon: Settings },
-    { label: 'Whispr AI', href: '/chronicles/whispr-ai', icon: Settings },
+    { label: 'Whispr AI', href: '/chronicles/whispr-ai', icon: Bot },
   ];
 
   const handleLogout = async () => {

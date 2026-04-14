@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Download, Apple, Smartphone, Package, Calendar, Lock, Zap, Smartphone as MobileIcon } from 'lucide-react';
+import { Download, Apple, Smartphone, Package, Calendar, Lock, Bot, Smartphone as MobileIcon, Zap } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 
@@ -76,7 +76,7 @@ export default function WhisprAIPage() {
             {/* Icon */}
             <div className="mb-8 inline-block">
               <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/30">
-                <Zap className="w-10 h-10 text-white" />
+                <Bot className="w-10 h-10 text-white" />
               </div>
             </div>
 
@@ -125,11 +125,11 @@ export default function WhisprAIPage() {
             {/* Feature 1 */}
             <div className={`p-6 rounded-2xl transition-all duration-300 ${
               mounted && resolvedTheme === 'dark'
-                ? 'bg-gray-900 border border-gray-800 hover:border-red-600/50'
+                ? 'bg-black border border-gray-800 hover:border-red-600/50'
                 : 'bg-white border border-gray-200 hover:border-red-600/50'
             }`}>
               <div className="w-12 h-12 bg-red-600/10 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-red-600" />
+                <Bot className="w-6 h-6 text-red-600" />
               </div>
               <h3 className={`text-xl font-bold mb-3 transition-colors ${
                 mounted && resolvedTheme === 'dark'
@@ -150,7 +150,7 @@ export default function WhisprAIPage() {
             {/* Feature 2 */}
             <div className={`p-6 rounded-2xl transition-all duration-300 ${
               mounted && resolvedTheme === 'dark'
-                ? 'bg-gray-900 border border-gray-800 hover:border-red-600/50'
+                ? 'bg-black border border-gray-800 hover:border-red-600/50'
                 : 'bg-white border border-gray-200 hover:border-red-600/50'
             }`}>
               <div className="w-12 h-12 bg-red-600/10 rounded-lg flex items-center justify-center mb-4">
@@ -175,7 +175,7 @@ export default function WhisprAIPage() {
             {/* Feature 3 */}
             <div className={`p-6 rounded-2xl transition-all duration-300 ${
               mounted && resolvedTheme === 'dark'
-                ? 'bg-gray-900 border border-gray-800 hover:border-red-600/50'
+                ? 'bg-black border border-gray-800 hover:border-red-600/50'
                 : 'bg-white border border-gray-200 hover:border-red-600/50'
             }`}>
               <div className="w-12 h-12 bg-red-600/10 rounded-lg flex items-center justify-center mb-4">
@@ -238,7 +238,7 @@ export default function WhisprAIPage() {
             {/* iOS */}
             <div className={`rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl ${
               mounted && resolvedTheme === 'dark'
-                ? 'bg-gray-900 border border-gray-800'
+                ? 'bg-black border border-gray-800'
                 : 'bg-white border border-gray-200'
             }`}>
               <div className="bg-gradient-to-br from-gray-900 to-black p-8 text-white flex flex-col items-center justify-center h-48">
@@ -268,10 +268,10 @@ export default function WhisprAIPage() {
             {/* Android */}
             <div className={`rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl ${
               mounted && resolvedTheme === 'dark'
-                ? 'bg-gray-900 border border-gray-800'
+                ? 'bg-black border border-gray-800'
                 : 'bg-white border border-gray-200'
             }`}>
-              <div className="bg-gradient-to-br from-red-600 to-[#911A1B] p-8 text-white flex flex-col items-center justify-center h-48">
+              <div className="bg-gradient-to-br from-red-600 to-[#000000] p-8 text-white flex flex-col items-center justify-center h-48">
                 <Smartphone className="w-20 h-20 mb-4" />
                 <h3 className="text-2xl font-bold">Android</h3>
               </div>
@@ -349,7 +349,7 @@ export default function WhisprAIPage() {
                               rel="noopener noreferrer"
                               className={`flex items-center justify-between p-3 rounded-lg transition-all hover:shadow-md ${
                                 mounted && resolvedTheme === 'dark'
-                                  ? 'bg-gray-800 hover:bg-gray-700'
+                                  ? 'bg-black border border-gray-700 hover:bg-gray-700'
                                   : 'bg-gray-50 hover:bg-gray-100'
                               }`}
                             >
@@ -377,7 +377,7 @@ export default function WhisprAIPage() {
                               rel="noopener noreferrer"
                               className={`flex items-center justify-between p-3 rounded-lg transition-all hover:shadow-md ${
                                 mounted && resolvedTheme === 'dark'
-                                  ? 'bg-gray-800 hover:bg-gray-700'
+                                  ? 'bg-black border border-gray-700 hover:bg-gray-700'
                                   : 'bg-gray-50 hover:bg-gray-100'
                               }`}
                             >
@@ -427,7 +427,7 @@ export default function WhisprAIPage() {
           {/* Additional Info */}
           <div className={`mt-12 p-8 rounded-2xl transition-colors ${
             mounted && resolvedTheme === 'dark'
-              ? 'bg-gray-900 border border-gray-800'
+              ? 'bg-black border border-gray-800'
               : 'bg-gray-50 border border-gray-200'
           }`}>
             <h3 className={`text-xl font-bold mb-4 transition-colors ${

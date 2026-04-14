@@ -122,7 +122,7 @@ function DashboardContent() {
 
   return (
     // <ChroniclesDashboardLayout>
-      <div className="space-y-8 p-4">
+      <div className="space-y-8 p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -146,7 +146,7 @@ function DashboardContent() {
             {stats && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Posts */}
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Total Posts</h3>
                     <BookOpen className="w-5 h-5 text-purple-600" />
@@ -155,7 +155,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Engagement */}
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Engagement</h3>
                     <TrendingUp className="w-5 h-5 text-pink-600" />
@@ -164,7 +164,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Current Streak */}
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Current Streak</h3>
                     <Flame className="w-5 h-5 text-orange-600" />
@@ -174,7 +174,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Points */}
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Points</h3>
                     <Award className="w-5 h-5 text-blue-600" />
@@ -186,7 +186,7 @@ function DashboardContent() {
 
             {/* Badges */}
             {stats && stats.badges.length > 0 && (
-              <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6">
+              <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <Award className="w-5 h-5" /> Your Badges
                 </h2>
@@ -204,7 +204,7 @@ function DashboardContent() {
             )}
 
             {/* Posts Section */}
-            <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden">
               <div className="p-6 border-b border-gray-200 dark:border-slate-800">
                 <h2 className="text-lg font-bold flex items-center gap-2">
                   <BookOpen className="w-5 h-5" /> Your Posts
