@@ -162,6 +162,8 @@ export async function GET(request: NextRequest) {
         comments_count: p.comments_count,
         shares_count: p.shares_count,
         engagement: (p.likes_count || 0) + (p.comments_count || 0) + (p.shares_count || 0),
+        type: (p as any).type || 'regular',
+        chain_id: (p as any).chain_id,
       }))
       .sort((a, b) => b.engagement - a.engagement)
       .slice(0, 5);

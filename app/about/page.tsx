@@ -6,7 +6,7 @@ import { AdsterraBanner } from "@/components/AdsterraBanner"
 
   export default function AboutPage() {
     return (
-      <div className="whispr-gradient min-h-screen">
+      <div className="whispr-gradient min-h-screen w-full">
         <AboutHero />
         <AboutContent />
         <AboutStats />

@@ -52,6 +52,8 @@ interface Analytics {
     comments_count: number;
     shares_count: number;
     engagement: number;
+    type?: string;
+    chain_id?: string;
   }>;
   dailyAnalytics: Array<{
     date: string;
@@ -357,10 +359,10 @@ export default function AnalyticsPage() {
                       {post.title}
                     </h3>
                     <div className="flex gap-4 mt-1 text-xs text-gray-600 dark:text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-3 h-3" />
-                      {post.views_count} views
-                    </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {post.views_count} views
+                      </span>
                       <span className="flex items-center gap-1">
                         <Heart className="w-3 h-3" />
                         {post.likes_count} likes
@@ -371,15 +373,6 @@ export default function AnalyticsPage() {
                       </span>
                     </div>
                   </div>
-                  <Link href={`/chronicles/${post.slug}`}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-4 flex-shrink-0"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
                 </div>
               ))}
             </div>

@@ -235,16 +235,16 @@ export default function ChroniclesHeader({
               {/* Mobile/Tablet menu icon for user dropdown */}
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-red-600 transition-colors"
                 title="User menu"
                 aria-label="User menu"
               >
-                <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
                   <Link
                     href="/chronicles/settings"
                     className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
