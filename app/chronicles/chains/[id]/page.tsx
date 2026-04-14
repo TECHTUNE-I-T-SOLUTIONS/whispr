@@ -35,8 +35,12 @@ interface Chain {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
     const { id } = await params;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`);
+    const res = await fetch(`/api/chronicles/chains/${id}`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (!res.ok) {
       return { title: 'Chain not found' };
     }
@@ -54,8 +58,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ChainDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`);
+    const res = await fetch(`/api/chronicles/chains/${id}`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (!res.ok) {
       return notFound();
     }

@@ -38,9 +38,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { entryId } = await params;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/chronicles/chains/entries/${entryId}`, {
+    const res = await fetch(`/api/chronicles/chains/entries/${entryId}`, {
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!res.ok) {
@@ -70,11 +72,13 @@ export default async function ChainEntryPage({
 }) {
   try {
     const { id, entryId } = await params;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     // Fetch entry
-    const entryRes = await fetch(`${baseUrl}/api/chronicles/chains/entries/${entryId}`, {
+    const entryRes = await fetch(`/api/chronicles/chains/entries/${entryId}`, {
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!entryRes.ok) {
@@ -91,8 +95,11 @@ export default async function ChainEntryPage({
     // Fetch chain for title
     let chainTitle = 'Writing Chain';
     try {
-      const chainRes = await fetch(`${baseUrl}/api/chronicles/chains/${id}`, {
+      const chainRes = await fetch(`/api/chronicles/chains/${id}`, {
         cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       if (chainRes.ok) {
         const chainJson = await chainRes.json();
