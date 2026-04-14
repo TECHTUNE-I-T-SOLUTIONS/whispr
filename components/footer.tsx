@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Heart, FileText, Shield } from "lucide-react"
+import { Heart, FileText, Shield, Github } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
@@ -114,6 +114,15 @@ export function Footer() {
                 >
                   <Shield className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/changelog" 
+                  className="hover:text-primary transition-colors flex items-center gap-2 group"
+                >
+                  <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  Changelog
                 </Link>
               </li>
             </ul>

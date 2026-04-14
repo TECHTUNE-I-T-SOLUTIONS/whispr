@@ -23,6 +23,9 @@ interface Entry {
     views_count?: number;
   };
   added_at: string;
+  isFlagged?: boolean;
+  flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
+  flagReason?: string;
 }
 interface Chain {
   id: string;
@@ -125,7 +128,7 @@ export default async function ChainDetailPage({ params }: { params: Promise<{ id
                 className="block p-6 bg-card border border-border rounded-lg hover:border-primary transition-colors"
               >
                 <div className="flex items-start justify-between gap-4 mb-3">
-                  <div>
+                  <div className="flex-1">
                     <h2 className="text-xl font-semibold text-foreground hover:text-primary transition-colors">
                       {entry.post.title}
                     </h2>
@@ -135,8 +138,28 @@ export default async function ChainDetailPage({ params }: { params: Promise<{ id
                       </p>
                     )}
                   </div>
-                  <div className="badge bg-primary/10 text-primary text-base font-semibold px-3 py-1 rounded whitespace-nowrap ml-auto">
-                    #{entry.sequence}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {entry.isFlagged && entry.flagStatus && (
+                      <span
+                        className={`badge text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${
+                          entry.flagStatus === 'pending'
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                            : entry.flagStatus === 'under_review'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            : entry.flagStatus === 'resolved'
+                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+                            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                        }`}
+                      >
+                        {entry.flagStatus === 'pending' && '⚠️ Flagged'}
+                        {entry.flagStatus === 'under_review' && '⏳ Under Review'}
+                        {entry.flagStatus === 'resolved' && '⚠️ Resolved'}
+                        {entry.flagStatus === 'dismissed' && '✓ Dismissed'}
+                      </span>
+                    )}
+                    <div className="badge bg-primary/10 text-primary text-base font-semibold px-3 py-1 rounded whitespace-nowrap">
+                      #{entry.sequence}
+                    </div>
                   </div>
                 </div>
 

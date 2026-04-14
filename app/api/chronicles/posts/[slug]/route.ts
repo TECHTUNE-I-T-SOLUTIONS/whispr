@@ -27,6 +27,29 @@ export async function GET(
         )
       : await createSupabaseServerClient();
 
+    // Get current user for ownership check
+    let currentUserId: string | null = null;
+    let currentCreatorId: string | null = null;
+    
+    try {
+      const authClient = await createSupabaseServerClient();
+      const { data: { user } } = await authClient.auth.getUser();
+      if (user) {
+        currentUserId = user.id;
+        // Get the creator_id for this user
+        const { data: creatorData } = await authClient
+          .from('chronicles_creators')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        if (creatorData) {
+          currentCreatorId = creatorData.id;
+        }
+      }
+    } catch (err) {
+      // User not authenticated, that's fine for public posts
+    }
+
     let query = supabase
       .from('chronicles_posts')
       .select(`
@@ -52,11 +75,20 @@ export async function GET(
       query = query.eq('slug', slug);
     }
 
-    const { data: post, error: postError } = await query
-      .eq('status', 'published')
-      .single();
+    const { data: post, error: postError } = await query.single();
 
     if (postError || !post) {
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if post is viewable: must be published OR user must own it
+    const isPublished = post.status === 'published';
+    const isOwner = currentCreatorId && post.creator_id === currentCreatorId;
+    
+    if (!isPublished && !isOwner) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
@@ -68,6 +100,15 @@ export async function GET(
       .from('chronicles_posts')
       .update({ views_count: (post.views_count || 0) + 1 })
       .eq('id', post.id);
+
+    // Fetch flag status
+    const { data: flaggedReview } = await supabase
+      .from('chronicles_flagged_reviews')
+      .select('status, reason')
+      .eq('post_id', post.id)
+      .in('status', ['pending', 'under_review', 'resolved', 'dismissed'])
+      .limit(1)
+      .single();
 
     // Format response for Flutter
     const formattedPost = {
@@ -89,6 +130,9 @@ export async function GET(
       createdAt: post.created_at,
       publishedAt: post.published_at,
       updatedAt: post.updated_at,
+      flagged_for_review: !!flaggedReview,
+      flagStatus: flaggedReview?.status || null,
+      flagReason: flaggedReview?.reason || null,
       author: post.creator ? {
         id: post.creator.id,
         name: post.creator.display_name || post.creator.pen_name,

@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
+import { Edit2 } from 'lucide-react';
+
+const EditChainEntryModal = dynamic(
+  () => import('@/components/edit-chain-entry-modal')
+);
 
 interface Entry {
   id: string;
@@ -43,6 +49,7 @@ export default function ChainEntryDetail({
 }) {
   const [entry, setEntry] = useState<Entry>(initial_entry);
   const [creator, setCreator] = useState<Creator | null>(null);
+  const [currentCreator, setCurrentCreator] = useState<any>(null);
   const [liked, setLiked] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [comments, setComments] = useState<any[]>([]);
@@ -50,6 +57,8 @@ export default function ChainEntryDetail({
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const supabase = createSupabaseBrowser();
 
@@ -58,6 +67,19 @@ export default function ChainEntryDetail({
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setAuthUser(session?.user || null);
+
+      // Fetch current creator
+      if (session?.user?.id) {
+        const { data } = await supabase
+          .from('chronicles_creators')
+          .select('id, pen_name, profile_image_url')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (data) {
+          setCurrentCreator(data);
+        }
+      }
     };
     getSession();
   }, [supabase]);
@@ -289,6 +311,44 @@ export default function ChainEntryDetail({
     }
   };
 
+  const handleSaveEdit = async (updatedData: Partial<Entry>) => {
+    if (!authUser) {
+      alert('You must be logged in to edit');
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      const token = await supabase.auth.getSession().then(s => s.data.session?.access_token);
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(
+        `/api/chronicles/chains/entries/${entryId}/update`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify(updatedData),
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to update entry');
+      }
+
+      const { data: updatedEntry } = await res.json();
+      setEntry(updatedEntry);
+      setIsEditModalOpen(false);
+      alert('Entry updated successfully!');
+    } catch (err) {
+      console.error('Failed to save edit:', err);
+      throw err;
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
   return (
     <div className="whispr-gradient min-h-screen py-10">
       <div className="container max-w-3xl">
@@ -325,6 +385,16 @@ export default function ChainEntryDetail({
                   <p className="text-muted-foreground text-sm">Category: {entry.category}</p>
                 )}
               </div>
+              {currentCreator?.id === entry.creator_id && (
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors whitespace-nowrap"
+                  title="Edit this entry"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Edit</span>
+                </button>
+              )}
             </div>
 
             {/* Creator Info */}
@@ -488,6 +558,15 @@ export default function ChainEntryDetail({
             )}
           </div>
         </article>
+
+        {/* Edit Modal */}
+        <EditChainEntryModal
+          isOpen={isEditModalOpen}
+          entry={entry}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveEdit}
+          isLoading={isSavingEdit}
+        />
       </div>
     </div>
   );

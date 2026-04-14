@@ -100,7 +100,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-20">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black pt-20">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
           <p className="text-gray-600 dark:text-gray-400">Loading analytics...</p>
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-20">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black pt-20">
         <div className="flex flex-col items-center gap-4">
           <AlertCircle className="w-12 h-12 text-red-600" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{error}</p>
@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
   const { summary, trendingPosts, dailyAnalytics, categoryBreakdown } = analytics;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 pt-20 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-black pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -142,7 +142,7 @@ export default function AnalyticsPage() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
               <BookOpen className="w-5 h-5 text-blue-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Published</span>
@@ -155,7 +155,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
               <Eye className="w-5 h-5 text-purple-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Total Views</span>
@@ -168,7 +168,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
               <Heart className="w-5 h-5 text-red-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Likes</span>
@@ -181,7 +181,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
               <MessageCircle className="w-5 h-5 text-green-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Comments</span>
@@ -194,7 +194,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-5 h-5 text-orange-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Total Engagement</span>
@@ -211,7 +211,7 @@ export default function AnalyticsPage() {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Daily Engagement Chart */}
-          <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="lg:col-span-2 bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               Engagement Trend (Last 30 Days)
             </h2>
@@ -253,7 +253,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Category Breakdown Pie Chart */}
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               Posts by Category
             </h2>
@@ -286,7 +286,7 @@ export default function AnalyticsPage() {
 
         {/* Category Details */}
         {categoryBreakdown.length > 0 && (
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800 mb-8">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800 mb-8">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               Category Performance
             </h2>
@@ -342,7 +342,7 @@ export default function AnalyticsPage() {
 
         {/* Trending Posts */}
         {trendingPosts.length > 0 && (
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               Top Performing Posts
             </h2>
@@ -350,7 +350,7 @@ export default function AnalyticsPage() {
               {trendingPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-black/50 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 dark:text-white truncate">

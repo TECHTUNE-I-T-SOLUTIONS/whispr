@@ -75,6 +75,20 @@ export async function GET(req: NextRequest) {
 
     console.log('Fetched posts for creator:', creator.id, 'Post count:', posts?.length || 0);
 
+    // Fetch flagged reviews for all posts in parallel (all active statuses)
+    const postIds = (posts || []).map(p => p.id);
+    const { data: flaggedReviews } = await accessClient
+      .from('chronicles_flagged_reviews')
+      .select('post_id, status, reason')
+      .in('post_id', postIds)
+      .in('status', ['pending', 'under_review', 'resolved', 'dismissed']);
+
+    // Create a map of flagged reviews by post_id
+    const flaggedReviewsMap = new Map();
+    flaggedReviews?.forEach(review => {
+      flaggedReviewsMap.set(review.post_id, review);
+    });
+
     return NextResponse.json({
       posts: (posts || []).map((post) => ({
         id: post.id,
@@ -92,6 +106,9 @@ export async function GET(req: NextRequest) {
         publishedAt: post.published_at,
         category: post.category,
         coverImageUrl: post.cover_image_url,
+        isFlagged: flaggedReviewsMap.has(post.id),
+        flagStatus: flaggedReviewsMap.get(post.id)?.status || null,
+        flagReason: flaggedReviewsMap.get(post.id)?.reason || null,
       })),
     });
   } catch (error) {

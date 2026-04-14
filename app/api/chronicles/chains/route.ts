@@ -46,10 +46,33 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
     if (error) throw error;
 
+    // Get service role client for flagged reviews access
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const accessClient = serviceRoleKey 
+      ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey)
+      : supabase;
+
+    // Fetch flagged reviews for chain entries
+    const chainIds = (data || []).map(c => c.id);
+    const { data: flaggedEntries } = await accessClient
+      .from('chronicles_flagged_reviews')
+      .select('chain_entry_post_id')
+      .in('chain_entry_post_id', 
+        (await accessClient
+          .from('chronicles_chain_entries')
+          .select('id')
+          .in('chain_id', chainIds)).data?.map(e => e.id) || []
+      )
+      .in('status', ['pending', 'under_review']);
+
+    const flaggedEntryIds = new Set(flaggedEntries?.map(r => r.chain_entry_post_id) || []);
+
     // Transform entries count from nested structure to flat property
     const transformedData = (data || []).map((chain: any) => ({
       ...chain,
       entries_count: chain.entries?.[0]?.count || 0,
+      hasFlaggedEntries: [...flaggedEntryIds].some(id => id) && flaggedEntryIds.size > 0,
       entries: undefined, // Remove the nested entries array
     }));
 

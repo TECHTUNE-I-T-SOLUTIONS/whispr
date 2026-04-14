@@ -61,7 +61,7 @@ export default function MyPostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 pt-20 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-black pt-20 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Posts</h1>
@@ -76,7 +76,7 @@ export default function MyPostsPage() {
           )}
 
           {posts.map((post) => (
-            <article key={post.id} className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
+            <article key={post.id} className="bg-white dark:bg-black rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 dark:hover:shadow-white dark:hover:shadow-sm overflow-hidden">
               <div className="md:flex">
                 {post.cover_image_url && (
                   <div className="md:w-1/3 relative h-44 md:h-auto">

@@ -67,29 +67,53 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     
     console.log('Chain fetched:', chainId, 'with entries:', data?.entries?.length || 0);
-    // Transform the response to a flatter structure that the app expects
-    const transformedEntries = data?.entries?.map((entry: any) => ({
-      id: entry.id,
-      sequence: entry.sequence,
-      added_at: entry.added_at,
-      added_by: entry.added_by,
-      post: entry.chain_entry_post ? {
-        id: entry.chain_entry_post.id,
-        title: entry.chain_entry_post.title,
-        content: entry.chain_entry_post.content,
-        slug: entry.chain_entry_post.id, // Use ID as slug
-        excerpt: entry.chain_entry_post.excerpt,
-        category: entry.chain_entry_post.category,
-        tags: entry.chain_entry_post.tags,
-        published_at: entry.chain_entry_post.published_at,
-        likes_count: entry.chain_entry_post.likes_count,
-        comments_count: entry.chain_entry_post.comments_count,
-        shares_count: entry.chain_entry_post.shares_count,
-        cover_image_url: entry.chain_entry_post.cover_image_url,
-        creator: entry.chain_entry_post.creator,
-      } : null,
-    })) || [];
+    
+    // Fetch flagged reviews for chain entries
+    const entryPostIds = (data?.entries || [])
+      .map((entry: any) => entry.chain_entry_post?.id)
+      .filter(Boolean);
+    
+    const { data: flaggedReviews } = await supabase
+      .from('chronicles_flagged_reviews')
+      .select('chain_entry_post_id, status, reason')
+      .in('chain_entry_post_id', entryPostIds)
+      .in('status', ['pending', 'under_review', 'resolved', 'dismissed']);
 
+    // Create a map of flagged reviews by entry post ID
+    const flaggedReviewsMap = new Map();
+    flaggedReviews?.forEach(review => {
+      flaggedReviewsMap.set(review.chain_entry_post_id, review);
+    });
+
+    // Transform the response to a flatter structure that the app expects
+    const transformedEntries = data?.entries?.map((entry: any) => {
+      const flagged = flaggedReviewsMap.get(entry.chain_entry_post?.id);
+      return {
+        id: entry.id,
+        sequence: entry.sequence,
+        added_at: entry.added_at,
+        added_by: entry.added_by,
+        isFlagged: !!flagged,
+        flagStatus: flagged?.status || null,
+        flagReason: flagged?.reason || null,
+        post: entry.chain_entry_post ? {
+          id: entry.chain_entry_post.id,
+          title: entry.chain_entry_post.title,
+          content: entry.chain_entry_post.content,
+          slug: entry.chain_entry_post.id, // Use ID as slug
+          excerpt: entry.chain_entry_post.excerpt,
+          category: entry.chain_entry_post.category,
+          tags: entry.chain_entry_post.tags,
+          published_at: entry.chain_entry_post.published_at,
+          likes_count: entry.chain_entry_post.likes_count,
+          comments_count: entry.chain_entry_post.comments_count,
+          shares_count: entry.chain_entry_post.shares_count,
+          cover_image_url: entry.chain_entry_post.cover_image_url,
+          creator: entry.chain_entry_post.creator,
+        } : null,
+      };
+    }) || [];
+    
     return NextResponse.json({ 
       success: true, 
       data: {

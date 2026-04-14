@@ -119,15 +119,15 @@ export default function NotificationsPage() {
       case 'badge_earned':
         return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800';
       default:
-        return 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700';
+        return 'bg-gray-50 dark:bg-black border-gray-200 dark:border-slate-700';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-red-600" />
           <p className="text-gray-600 dark:text-gray-400">Loading notifications...</p>
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function NotificationsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <div className="flex flex-col items-center gap-4">
           <AlertCircle className="w-12 h-12 text-red-600" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{error}</p>
@@ -151,13 +151,13 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 pt-20 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-black pt-20 pb-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bell className="w-8 h-8 text-purple-600" />
+              <Bell className="w-8 h-8 text-red-600" />
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Notifications
               </h1>
@@ -192,7 +192,7 @@ export default function NotificationsPage() {
                 key={notification.id}
                 className={`p-4 rounded-lg border transition-all ${getNotificationColor(
                   notification.type
-                )} ${!notification.read ? 'ring-2 ring-purple-400' : ''}`}
+                )} ${!notification.read ? 'ring-2 ring-red-400' : ''}`}
               >
                 <div className="flex items-start gap-4">
                   <div className="text-2xl flex-shrink-0">
@@ -205,7 +205,7 @@ export default function NotificationsPage() {
                         {notification.title}
                       </h3>
                       {!notification.read && (
-                        <Badge variant="secondary" className="bg-purple-600 text-white">
+                        <Badge variant="secondary" className="bg-red-600 text-white">
                           New
                         </Badge>
                       )}
@@ -226,7 +226,7 @@ export default function NotificationsPage() {
                           onClick={() => handleMarkAsRead(notification.id)}
                           variant="ghost"
                           size="sm"
-                          className="text-purple-600 hover:text-purple-700"
+                          className="text-red-600 hover:text-red-700"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                         </Button>

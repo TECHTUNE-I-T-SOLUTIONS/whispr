@@ -10,6 +10,7 @@ interface Chain {
   description?: string;
   created_at: string;
   entries_count: number;
+  hasFlaggedEntries?: boolean;
 }
 
 export default function ChainsListPage() {
@@ -55,14 +56,23 @@ export default function ChainsListPage() {
               href={`/chronicles/chains/${chain.id}`}
               className="block p-4 bg-white dark:bg-black border border-border rounded-lg shadow hover:shadow-lg transition dark:hover:shadow-white/10"
             >
-              <h2 className="text-xl font-semibold">{chain.title}</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {chain.description}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                {chain.entries_count} entries • created{' '}
-                {new Date(chain.created_at).toLocaleDateString()}
-              </p>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold">{chain.title}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {chain.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {chain.entries_count} entries • created{' '}
+                    {new Date(chain.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                {chain.hasFlaggedEntries && (
+                  <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 whitespace-nowrap">
+                    ⚠️ Flagged Entry
+                  </span>
+                )}
+              </div>
             </Link>
           ))}
         </div>

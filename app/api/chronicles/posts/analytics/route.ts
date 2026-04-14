@@ -1,6 +1,21 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server-client';
 import { NextRequest, NextResponse } from 'next/server';
 
+interface PostData {
+  id: string;
+  title: string;
+  slug?: string;
+  category?: string;
+  published_at?: string;
+  created_at?: string;
+  status: string;
+  views_count: number;
+  likes_count: number;
+  comments_count: number;
+  shares_count: number;
+  type: 'regular' | 'chain';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -29,25 +44,105 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get all posts for this creator
-    const { data: posts, error: postsError } = await supabase
+    const creatorId = creator.id;
+
+    // Fetch regular posts
+    const { data: regularPosts, error: postsError } = await supabase
       .from('chronicles_posts')
       .select('*')
-      .eq('creator_id', creator.id)
+      .eq('creator_id', creatorId)
       .order('published_at', { ascending: false });
 
     if (postsError) {
-      console.error('Error fetching posts:', postsError);
-      return NextResponse.json(
-        { error: 'Failed to fetch posts' },
-        { status: 500 }
-      );
+      console.error('Error fetching regular posts:', postsError);
     }
 
-    // Calculate analytics
-    const totalPosts = posts?.length || 0;
-    const publishedPosts = posts?.filter((p) => p.status === 'published') || [];
-    const draftPosts = posts?.filter((p) => p.status === 'draft') || [];
+    // Fetch chain entry posts
+    const { data: chainPosts, error: chainError } = await supabase
+      .from('chronicles_chain_entry_posts')
+      .select('*')
+      .eq('creator_id', creatorId)
+      .order('published_at', { ascending: false });
+
+    if (chainError) {
+      console.error('Error fetching chain posts:', chainError);
+    }
+
+    // Get actual engagement counts from tables for regular posts
+    const postsWithActualCounts = await Promise.all(
+      (regularPosts || []).map(async (post) => {
+        const [
+          { count: likesCount },
+          { count: commentsCount },
+        ] = await Promise.all([
+          supabase
+            .from('chronicles_engagement')
+            .select('id', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+            .eq('engagement_type', 'like'),
+          supabase
+            .from('chronicles_comments')
+            .select('id', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+            .eq('status', 'approved'),
+        ]);
+
+        return {
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          category: post.category || 'Uncategorized',
+          published_at: post.published_at || post.created_at,
+          status: post.status,
+          views_count: post.views_count || 0,
+          likes_count: likesCount || post.likes_count || 0,
+          comments_count: commentsCount || post.comments_count || 0,
+          shares_count: post.shares_count || 0,
+          type: 'regular' as const,
+        };
+      })
+    );
+
+    // Get actual engagement counts from tables for chain posts
+    const chainPostsWithActualCounts = await Promise.all(
+      (chainPosts || []).map(async (post) => {
+        const [
+          { count: likesCount },
+          { count: commentsCount },
+        ] = await Promise.all([
+          supabase
+            .from('chronicles_chain_entry_post_likes')
+            .select('id', { count: 'exact', head: true })
+            .eq('chain_entry_post_id', post.id),
+          supabase
+            .from('chronicles_chain_entry_post_comments')
+            .select('id', { count: 'exact', head: true })
+            .eq('chain_entry_post_id', post.id)
+            .eq('status', 'approved'),
+        ]);
+
+        return {
+          id: post.id,
+          title: post.title,
+          slug: `chain-${post.id}`,
+          category: post.category || 'Uncategorized',
+          published_at: post.published_at || post.created_at,
+          status: post.status,
+          views_count: post.views_count || 0,
+          likes_count: likesCount || post.likes_count || 0,
+          comments_count: commentsCount || post.comments_count || 0,
+          shares_count: post.shares_count || 0,
+          type: 'chain' as const,
+        };
+      })
+    );
+
+    // Combine all posts
+    const allPosts: PostData[] = [...postsWithActualCounts, ...chainPostsWithActualCounts];
+    
+    // Filter published posts
+    const publishedPosts = allPosts.filter((p) => p.status === 'published');
+    const draftPosts = allPosts.filter((p) => p.status === 'draft');
 
     // Calculate engagement metrics
     const totalViews = publishedPosts.reduce((sum, p) => sum + (p.views_count || 0), 0);
@@ -59,7 +154,13 @@ export async function GET(request: NextRequest) {
     // Calculate trending posts (most engaged)
     const trendingPosts = publishedPosts
       .map((p) => ({
-        ...p,
+        id: p.id,
+        title: p.title,
+        slug: p.slug || p.id,
+        views_count: p.views_count,
+        likes_count: p.likes_count,
+        comments_count: p.comments_count,
+        shares_count: p.shares_count,
         engagement: (p.likes_count || 0) + (p.comments_count || 0) + (p.shares_count || 0),
       }))
       .sort((a, b) => b.engagement - a.engagement)
@@ -70,12 +171,12 @@ export async function GET(request: NextRequest) {
     last30Days.setDate(last30Days.getDate() - 30);
 
     const recentPosts = publishedPosts.filter(
-      (p) => new Date(p.published_at) > last30Days
+      (p) => new Date(p.published_at!) > last30Days
     );
 
     const dailyAnalytics: Record<string, any> = {};
     recentPosts.forEach((post) => {
-      const date = new Date(post.published_at).toLocaleDateString('en-US');
+      const date = new Date(post.published_at!).toLocaleDateString('en-US');
       if (!dailyAnalytics[date]) {
         dailyAnalytics[date] = {
           posts: 0,
@@ -108,7 +209,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       summary: {
-        totalPosts,
+        totalPosts: allPosts.length,
         publishedPosts: publishedPosts.length,
         draftPosts: draftPosts.length,
         totalViews,

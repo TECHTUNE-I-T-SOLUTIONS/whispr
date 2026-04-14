@@ -40,6 +40,9 @@ interface Post {
   sharesCount: number;
   createdAt: string;
   publishedAt?: string;
+  isFlagged?: boolean;
+  flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
+  flagReason?: string;
 }
 
 function DashboardContent() {
@@ -122,7 +125,7 @@ function DashboardContent() {
 
   return (
     // <ChroniclesDashboardLayout>
-      <div className="space-y-8 p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800">
+      <div className="space-y-8 p-4 bg-white dark:bg-black">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -242,18 +245,36 @@ function DashboardContent() {
                             >
                               {post.status}
                             </span>
+                            {post.isFlagged && post.flagStatus && (
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                  post.flagStatus === 'pending'
+                                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                                    : post.flagStatus === 'under_review'
+                                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                    : post.flagStatus === 'resolved'
+                                    ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+                                    : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                }`}
+                              >
+                                {post.flagStatus === 'pending' && '⚠️ Flagged'}
+                                {post.flagStatus === 'under_review' && '⏳ Under Review'}
+                                {post.flagStatus === 'resolved' && '⚠️ Resolved'}
+                                {post.flagStatus === 'dismissed' && '✓ Dismissed'}
+                              </span>
+                            )}
                             <span>{post.likesCount} likes</span>
                             <span>{post.commentsCount} comments</span>
                             <span>{post.sharesCount} shares</span>
                           </div>
                         </div>
                         <div className="flex gap-2 ml-4 flex-shrink-0">
-                          <Link href={`/chronicles/posts/${post.slug}`}>
+                          <Link href={`/chronicles/${post.slug}`}>
                             <Button size="sm" variant="ghost">
                               <Eye className="w-4 h-4" />
                             </Button>
                           </Link>
-                          <Link href={`/chronicles/write/${post.id}`}>
+                          <Link href={`/chronicles/write?id=${post.id}`}>
                             <Button size="sm" variant="ghost">
                               <Edit className="w-4 h-4" />
                             </Button>

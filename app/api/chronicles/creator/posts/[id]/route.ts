@@ -1,11 +1,29 @@
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: postId } = await params
     const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
+    
+    // Extract user ID from Authorization header
+    let userId: string | undefined = undefined;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      // Verify token and get user
+      const client = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await client.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+      }
+    }
+    
+    let creatorId: string | undefined = undefined;
     if (userId) {
       const { data: creator } = await supabase
         .from('chronicles_creators')
@@ -24,8 +42,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (error) throw error;
 
-    // Check authorization for draft posts
-    if (post.status === 'draft' && post.creator_id !== creatorId) {
+    // Check authorization for draft/flagged posts
+    if ((post.status === 'draft' || post.flagged_for_review) && post.creator_id !== creatorId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -43,7 +61,23 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id: postId } = await params
     const supabase = createSupabaseServer();
-    const userId = req.headers.get('x-user-id');
+    
+    // Extract user ID from Authorization header
+    let userId: string | undefined = undefined;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      // Verify token and get user
+      const client = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await client.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+      }
+    }
+    
     const updates = await req.json();
 
     if (!userId) {
@@ -72,6 +106,29 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
+    // If trying to publish, check if post is flagged with active review
+    if (updates.status === 'published') {
+      const { data: flaggedReview } = await supabase
+        .from('chronicles_flagged_reviews')
+        .select('status')
+        .eq('post_id', postId)
+        .in('status', ['pending', 'under_review'])
+        .limit(1)
+        .single();
+
+      if (flaggedReview) {
+        return NextResponse.json(
+          { error: 'Cannot publish while post is under review. Status: ' + flaggedReview.status },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Update post - if editing a flagged post, clear the flag and set to draft for re-review
+    if (updates.status !== 'published') {
+      updates.flagged_for_review = false;
+    }
+    
     // Update post
     const { data: updatedPost, error: updateError } = await supabase
       .from('chronicles_posts')
@@ -95,7 +152,24 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: postId } = await params
-    const userId = req.headers.get('x-user-id');
+    const supabase = createSupabaseServer();
+    
+    // Extract user ID from Authorization header
+    let userId: string | undefined = undefined;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      // Verify token and get user
+      const client = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await client.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+      }
+    }
+    
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

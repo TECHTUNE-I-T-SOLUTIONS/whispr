@@ -219,19 +219,19 @@ export default function CreatorSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4">
+    <main className="min-h-screen bg-gray-50 dark:bg-black py-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-purple-600" />
+            <Settings className="w-8 h-8 text-red-600" />
             <h1 className="text-3xl font-bold">Creator Settings</h1>
           </div>
           <p className="text-muted-foreground">Manage your profile and preferences</p>
@@ -245,7 +245,7 @@ export default function CreatorSettings() {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                 activeTab === tab
-                  ? 'border-purple-600 text-purple-600'
+                  ? 'border-red-600 text-red-600'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -272,12 +272,12 @@ export default function CreatorSettings() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="space-y-6 bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="space-y-6 bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             {/* Profile Picture */}
             <div>
               <label className="block text-sm font-medium mb-3">Profile Picture</label>
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
+                <div className="w-20 h-20 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
                   {profile.profile_image_url ? (
                     <Image
                       src={profile.profile_image_url}
@@ -299,7 +299,7 @@ export default function CreatorSettings() {
                       disabled={uploadingImage}
                       className="hidden"
                     />
-                    <span className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors disabled:opacity-50">
+                    <span className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg cursor-pointer inline-flex items-center gap-2 text-sm font-medium transition-colors disabled:opacity-50">
                       {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {uploadingImage ? 'Uploading...' : 'Upload'}
                     </span>
@@ -323,7 +323,7 @@ export default function CreatorSettings() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
-                <Input type="email" value={profile.email} disabled className="bg-gray-50 dark:bg-slate-800" />
+                <Input type="email" value={profile.email} disabled className="bg-gray-50 dark:bg-black" />
               </div>
 
               <div>
@@ -341,7 +341,7 @@ export default function CreatorSettings() {
                 <select
                   value={profile.content_type}
                   onChange={(e) => setProfile({ ...profile, content_type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-black"
                 >
                   <option value="blog">Blog Posts</option>
                   <option value="poem">Poems</option>
@@ -363,8 +363,8 @@ export default function CreatorSettings() {
                       }}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         profile.preferred_categories.includes(cat)
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-200 dark:bg-slate-800 text-foreground hover:bg-gray-300 dark:hover:bg-slate-700'
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-200 dark:bg-black text-foreground hover:bg-gray-300 dark:hover:bg-slate-700'
                       }`}
                     >
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -380,7 +380,7 @@ export default function CreatorSettings() {
 
               {Object.entries(profile.social_links).map(([platform, url]) => (
                 <div key={platform} className="flex items-center gap-2 mb-2">
-                  <Input value={url} disabled className="bg-gray-50 dark:bg-slate-800" />
+                  <Input value={url} disabled className="bg-gray-50 dark:bg-black" />
                   <button
                     onClick={() => handleRemoveSocialLink(platform)}
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
@@ -394,10 +394,10 @@ export default function CreatorSettings() {
                 <select
                   value={newSocialLink.platform}
                   onChange={(e) => setNewSocialLink({ ...newSocialLink, platform: e.target.value })}
-                  className="px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 flex-shrink-0"
+                  className="px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-black flex-shrink-0"
                 >
                   <option value="">Select platform</option>
-                  <option value="twitter">Twitter</option>
+                  <option value="twitter">X</option>
                   <option value="linkedin">LinkedIn</option>
                   <option value="website">Website</option>
                   <option value="instagram">Instagram</option>
@@ -423,8 +423,8 @@ export default function CreatorSettings() {
 
         {/* Notifications Tab */}
         {activeTab === 'notifications' && (
-          <div className="space-y-6 bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
-            <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg">
+          <div className="space-y-6 bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+            <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-black/50 rounded-lg">
               <div>
                 <p className="font-medium flex items-center gap-2">
                   <Bell className="w-4 h-4" /> Push Notifications
@@ -438,7 +438,7 @@ export default function CreatorSettings() {
                 disabled={saving}
                 className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                   profile.push_notifications_enabled
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                    ? 'bg-gradient-to-r from-red-600 to-pink-600'
                     : 'bg-gray-300 dark:bg-slate-700'
                 }`}
               >
@@ -451,7 +451,7 @@ export default function CreatorSettings() {
             </div>
 
             {profile.push_notifications_enabled && (
-              <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-900/30 rounded-lg space-y-3">
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg space-y-3">
                 <p className="text-sm font-medium">Notification Preferences</p>
                 <label className="flex items-center gap-3">
                   <input type="checkbox" defaultChecked className="w-4 h-4 rounded" />
@@ -476,11 +476,11 @@ export default function CreatorSettings() {
 
         {/* Privacy Tab */}
         {activeTab === 'privacy' && (
-          <div className="space-y-6 bg-white dark:bg-slate-900 rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+          <div className="space-y-6 bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div>
               <label className="block text-sm font-medium mb-3">Profile Visibility</label>
               <div className="space-y-3">
-                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-black/50">
                   <input
                     type="radio"
                     name="visibility"
@@ -496,7 +496,7 @@ export default function CreatorSettings() {
                   </div>
                 </label>
 
-                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-black/50">
                   <input
                     type="radio"
                     name="visibility"
@@ -530,7 +530,7 @@ export default function CreatorSettings() {
               Cancel
             </Button>
             <Button
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
               onClick={handleSave}
               disabled={saving}
             >

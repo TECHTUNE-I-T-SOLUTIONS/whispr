@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Share2, Loader2, AlertCircle, LogIn, X, Send } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Loader2, AlertCircle, LogIn, X, Send, Edit2 } from 'lucide-react';
 import { AppBanner } from '@/components/app-banner';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
+
+const EditPostModal = dynamic(() => import('@/components/edit-post-modal'));
 
 interface Post {
   id: string;
@@ -24,6 +27,9 @@ interface Post {
   commentsCount?: number;
   sharesCount?: number;
   publishedAt: string;
+  flagged_for_review?: boolean;
+  flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
+  flagReason?: string;
   author?: {
     id: string;
     name: string;
@@ -65,6 +71,10 @@ export default function PublicPostPage() {
   const [sharesCount, setSharesCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [flagStatus, setFlagStatus] = useState<'pending' | 'under_review' | 'resolved' | 'dismissed' | null>(null);
+  const [flagReason, setFlagReason] = useState<string>('');
 
   useEffect(() => {
     if (slug) {
@@ -143,6 +153,12 @@ export default function PublicPostPage() {
       setPost(postData);
       setEngagementCount(postData.likesCount || 0);
       setSharesCount(postData.sharesCount || 0);
+      
+      // Set flag status from post data (already included in API response)
+      if (postData.flagStatus) {
+        setFlagStatus(postData.flagStatus);
+        setFlagReason(postData.flagReason || '');
+      }
       
       // Fetch comments for the post
       await fetchComments(postData.id);
@@ -382,6 +398,39 @@ export default function PublicPostPage() {
     }
   };
 
+  const handleSaveEdit = async (updates: any) => {
+    if (!post) return Promise.reject(new Error('No post found'));
+
+    setIsSavingEdit(true);
+    try {
+      const res = await fetch(`/api/chronicles/posts/${post.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const updatedPost = data.data || data.post;
+        setPost(updatedPost);
+        setIsEditModalOpen(false);
+        return Promise.resolve();
+      } else {
+        const error = await res.json();
+        console.error('Failed to save post:', error);
+        return Promise.reject(new Error(error.message || 'Failed to save post'));
+      }
+    } catch (err) {
+      console.error('Save edit error:', err);
+      return Promise.reject(err);
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
@@ -475,13 +524,31 @@ export default function PublicPostPage() {
 
         {/* Post Header */}
         <div className="mb-8">
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4 flex-wrap">
             <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
               {post.type === 'poem' ? '📝 Poem' : '📖 Blog Post'}
             </span>
             {post.category && (
               <span className="px-3 py-1 bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium">
                 {post.category}
+              </span>
+            )}
+            {flagStatus && (
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  flagStatus === 'pending'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                    : flagStatus === 'under_review'
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    : flagStatus === 'resolved'
+                    ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+                    : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                }`}
+              >
+                {flagStatus === 'pending' && '⚠️ Flagged for Review'}
+                {flagStatus === 'under_review' && '⏳ Under Review'}
+                {flagStatus === 'resolved' && '⚠️ Review Completed'}
+                {flagStatus === 'dismissed' && '✓ Review Dismissed'}
               </span>
             )}
           </div>
@@ -494,30 +561,43 @@ export default function PublicPostPage() {
 
           {/* Author Info */}
           {post.author && (
-            <div className="flex items-center gap-4 p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
-                {post.author.avatar_url ? (
-                  <img 
-                    src={post.author.avatar_url}
-                    alt={post.author.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  post.author.name?.charAt(0).toUpperCase() || post.author.penName?.charAt(0).toUpperCase()
-                )}
+            <div className="flex items-center justify-between gap-4 p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+                  {post.author.avatar_url ? (
+                    <img 
+                      src={post.author.avatar_url}
+                      alt={post.author.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    post.author.name?.charAt(0).toUpperCase() || post.author.penName?.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="flex-1">
+                  <Link href={`/chronicles/portfolio/${post.author.penName}`}>
+                    <p className="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer">
+                      {post.author.name}
+                    </p>
+                  </Link>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{post.author.bio}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <Link href={`/chronicles/portfolio/${post.author.penName}`}>
-                  <p className="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer">
-                    {post.author.name}
-                  </p>
-                </Link>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{post.author.bio}</p>
-              </div>
+              {currentCreator?.id === post.author.id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  <Edit2 className="w-4 h-4" />
+                  <span>Edit</span>
+                </Button>
+              )}
             </div>
           )}
 
@@ -563,36 +643,57 @@ export default function PublicPostPage() {
         )}
 
         {/* Engagement Bar */}
-        <div className="border-t border-b border-gray-200 dark:border-slate-800 py-4 flex gap-3 mb-8">
-          <Button
-            variant={liked ? 'default' : 'outline'}
-            className={liked ? 'bg-red-600 hover:bg-red-700' : ''}
-            onClick={handleLike}
-            disabled={isLiking}
-          >
-            {isLiking ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Heart className={`w-4 h-4 mr-2 ${liked ? 'fill-current' : ''}`} />
-            )}
-            Like ({reactionCounts['like'] || engagementCount})
-          </Button>
-          <Button variant="outline" onClick={handleComment}>
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Comment ({post.commentsCount || 0})
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleShare}
-            disabled={isSharing}
-          >
-            {isSharing ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Share2 className="w-4 h-4 mr-2" />
-            )}
-            Share ({sharesCount})
-          </Button>
+        <div className="mb-8">
+          {flagStatus && (flagStatus === 'under_review' || flagStatus === 'resolved') && (
+            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/30 rounded-lg">
+              <div className="flex gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    {flagStatus === 'under_review' ? 'This post is under review' : 'This post review is completed'}
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    Interactions are temporarily disabled while the review is in progress.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="border-t border-b border-gray-200 dark:border-slate-800 py-4 flex gap-3">
+            <Button
+              variant={liked ? 'default' : 'outline'}
+              className={liked ? 'bg-red-600 hover:bg-red-700' : ''}
+              onClick={handleLike}
+              disabled={isLiking || (flagStatus === 'under_review' || flagStatus === 'resolved')}
+            >
+              {isLiking ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Heart className={`w-4 h-4 mr-2 ${liked ? 'fill-current' : ''}`} />
+              )}
+              Like ({reactionCounts['like'] || engagementCount})
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleComment}
+              disabled={flagStatus === 'under_review' || flagStatus === 'resolved'}
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Comment ({post.commentsCount || 0})
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleShare}
+              disabled={isSharing || (flagStatus === 'under_review' || flagStatus === 'resolved')}
+            >
+              {isSharing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Share2 className="w-4 h-4 mr-2" />
+              )}
+              Share ({sharesCount})
+            </Button>
+          </div>
         </div>
 
         {/* Comments Section */}
@@ -600,7 +701,7 @@ export default function PublicPostPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Comments ({comments.length})</h2>
           
           {/* Comment Input */}
-          {isAuthenticated && (
+          {isAuthenticated && !(flagStatus === 'under_review' || flagStatus === 'resolved') && (
             <div className="mb-8 p-4 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800">
               <div className="flex gap-3 items-end">
                 <textarea
@@ -637,6 +738,20 @@ export default function PublicPostPage() {
                     </>
                   )}
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {(flagStatus === 'under_review' || flagStatus === 'resolved') && (
+            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/30 rounded-lg">
+              <div className="flex gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Comments are disabled</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    This post is under review and interactions are temporarily disabled.
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -707,6 +822,17 @@ export default function PublicPostPage() {
         <div className="mt-12">
           <AppBanner postId={post.id} postType="chronicles" />
         </div>
+
+        {/* Edit Post Modal */}
+        {isEditModalOpen && post && (
+          <EditPostModal
+            post={post}
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleSaveEdit}
+            isLoading={isSavingEdit}
+          />
+        )}
 
         {/* Login Modal */}
         {showLoginModal && (
