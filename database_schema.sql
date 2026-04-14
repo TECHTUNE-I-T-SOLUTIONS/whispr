@@ -391,7 +391,7 @@ CREATE TABLE public.chronicles_creator_achievements (
 );
 CREATE TABLE public.chronicles_creator_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  creator_id uuid NOT NULL UNIQUE,
+  creator_id uuid NOT NULL,
   date date NOT NULL,
   posts_created integer DEFAULT 0,
   total_views integer DEFAULT 0,
