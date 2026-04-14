@@ -222,9 +222,9 @@ SELECT
   COALESCE((SELECT COUNT(*) FROM chronicles_post_likes), 0)
 UNION ALL
 SELECT 
-  'chronicles_creator_followers',
-  (SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'chronicles_creator_followers'),
-  COALESCE((SELECT COUNT(*) FROM chronicles_creator_followers), 0);
+  'chronicles_followers',
+  (SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'chronicles_followers'),
+  COALESCE((SELECT COUNT(*) FROM chronicles_followers), 0);
 
 -- =============================================================================
 -- QUERY 11: Orphaned Posts (Posts without creators) - Data Integrity Check

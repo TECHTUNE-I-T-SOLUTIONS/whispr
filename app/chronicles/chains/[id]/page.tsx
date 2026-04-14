@@ -32,10 +32,11 @@ interface Chain {
   entries: Entry[];
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
+    const { id } = await params;
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/chronicles/chains/${params.id}`);
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`);
     if (!res.ok) {
       return { title: 'Chain not found' };
     }
@@ -50,10 +51,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function ChainDetailPage({ params }: { params: { id: string } }) {
+export default async function ChainDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/chronicles/chains/${params.id}`);
+    const res = await fetch(`${baseUrl}/api/chronicles/chains/${id}`);
     if (!res.ok) {
       return notFound();
     }
@@ -94,7 +96,7 @@ export default async function ChainDetailPage({ params }: { params: { id: string
 
         {/* Add Entry */}
         <div className="mb-8">
-          <ChainContributor chainId={chain.id} onAdded={() => { /* reload page? via refresh */ }} />
+          <ChainContributor chainId={chain.id} />
         </div>
 
         {/* Entries */}
@@ -107,7 +109,7 @@ export default async function ChainDetailPage({ params }: { params: { id: string
             chain.entries.map((entry) => (
               <Link
                 key={entry.id}
-                href={`/chronicles/post/${entry.post.slug}`}
+                href={`/chronicles/chains/${chain.id}/entries/${entry.post.id}`}
                 className="block p-6 bg-card border border-border rounded-lg hover:border-primary transition-colors"
               >
                 <div className="flex items-start justify-between gap-4 mb-3">

@@ -1128,6 +1128,29 @@ CREATE TABLE public.conversations (
   CONSTRAINT conversations_pkey PRIMARY KEY (id),
   CONSTRAINT conversations_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id)
 );
+CREATE TABLE public.error_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  message text NOT NULL,
+  stack text,
+  url text,
+  user_agent text,
+  source character varying,
+  timestamp bigint,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  error_hash character varying,
+  resolved boolean DEFAULT false,
+  resolved_at timestamp with time zone,
+  resolved_by uuid,
+  notes text,
+  next_version character varying,
+  build_id character varying,
+  environment character varying DEFAULT 'production'::character varying,
+  session_id character varying,
+  user_id uuid,
+  occurrence_count integer DEFAULT 1,
+  last_occurrence_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT error_logs_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.feedback (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   message text NOT NULL,

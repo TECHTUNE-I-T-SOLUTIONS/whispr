@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       .from('chronicles_notifications')
       .select(`
         id,
-        notification_type,
+        type,
         title,
         message,
         creator_id,

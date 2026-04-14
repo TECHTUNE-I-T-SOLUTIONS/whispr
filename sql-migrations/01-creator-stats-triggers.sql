@@ -413,7 +413,7 @@ BEGIN
     (SELECT COALESCE(SUM(comments_count), 0) FROM chronicles_posts WHERE status = 'published'),
     (SELECT COALESCE(SUM(shares_count), 0) FROM chronicles_posts WHERE status = 'published'),
     (SELECT ROUND(COALESCE(AVG(likes_count + comments_count + shares_count), 0), 2) FROM chronicles_posts WHERE status = 'published'),
-    (SELECT COUNT(*) FROM chronicles_creator_followers WHERE created_at >= CURRENT_DATE)
+    (SELECT COUNT(*) FROM chronicles_followers WHERE created_at >= CURRENT_DATE)
   )
   ON CONFLICT (date) DO UPDATE
   SET

@@ -22,15 +22,15 @@ export async function POST(req: Request) {
 
     // Insert error log using the upsert function
     const { data, error } = await supabase.rpc('upsert_error_log', {
+      p_build_id: buildId,
       p_message: message || 'Unknown error',
+      p_next_version: nextVersion,
+      p_session_id: sessionId,
+      p_source: source || 'unknown',
       p_stack: stack || '',
+      p_timestamp: ts || Date.now(),
       p_url: url || '',
       p_user_agent: userAgent || '',
-      p_source: source || 'unknown',
-      p_timestamp: ts || Date.now(),
-      p_next_version: nextVersion,
-      p_build_id: buildId,
-      p_session_id: sessionId,
       p_user_id: userId,
     })
 

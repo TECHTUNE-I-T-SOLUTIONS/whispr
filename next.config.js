@@ -5,6 +5,26 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Localhost development
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+      },
+      {
+        protocol: 'http',
+        hostname: '10.0.2.2',
+      },
+      {
+        protocol: 'http',
+        hostname: '10.0.2.2',
+        port: '3000',
+      },
+      // Supabase storage
       {
         protocol: 'https',
         hostname: 'vkftywhuaxwbknlrymnr.supabase.co',

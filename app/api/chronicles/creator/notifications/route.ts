@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 export async function GET(request: NextRequest) {
   try {
     let supabase;
+    let authUser: any = null;
 
     // Check for Authorization header (for mobile app)
     const authHeader = request.headers.get('authorization');
@@ -21,34 +22,56 @@ export async function GET(request: NextRequest) {
           },
         }
       );
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) {
+        console.error('[NOTIFICATIONS] Bearer token auth error:', error);
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      authUser = data.user;
     } else {
       // Fallback to cookie-based auth for web
       supabase = await createSupabaseServerClient();
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) {
+        console.error('[NOTIFICATIONS] Cookie auth error:', error);
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      authUser = data.user;
     }
 
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    console.log('[NOTIFICATIONS] Authenticated user:', authUser.id);
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Create service role client for better access
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+          },
+        },
+      }
+    );
 
     // Get creator to check if exists
-    const { data: creator, error: creatorError } = await supabase
+    const { data: creator, error: creatorError } = await serviceSupabase
       .from('chronicles_creators')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', authUser.id)
       .single();
 
     if (creatorError || !creator) {
+      console.error('[NOTIFICATIONS] Creator lookup error - user.id:', authUser.id, 'creatorError:', creatorError);
       return NextResponse.json(
         { error: 'Creator not found' },
         { status: 404 }
       );
     }
+
+    console.log(`[NOTIFICATIONS] User ${authUser.id} has creator_id ${creator.id}`);
 
     // Parse query parameters
     const { searchParams } = new URL(request.url)
@@ -56,23 +79,25 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
     const type = searchParams.get('type') || 'all'
 
-    // Get unread notifications count
-    const { count: unreadCount, error: countError } = await supabase
+    // Get unread notifications count using service role
+    const { count: unreadCount, error: countError } = await serviceSupabase
       .from('chronicles_notifications')
       .select('*', { count: 'exact', head: true })
       .eq('creator_id', creator.id)
       .eq('read', false);
 
     if (countError) {
-      console.error('Error fetching unread count:', countError);
+      console.error('[NOTIFICATIONS] Error fetching unread count:', countError);
       return NextResponse.json(
         { error: 'Failed to fetch notifications' },
         { status: 500 }
       );
     }
 
-    // Build query for notifications
-    let query = supabase
+    console.log(`[NOTIFICATIONS] Unread count for creator ${creator.id}: ${unreadCount}`);
+
+    // Build query for notifications using service role
+    let query = serviceSupabase
       .from('chronicles_notifications')
       .select('*', { count: 'exact' })
       .eq('creator_id', creator.id)
@@ -88,12 +113,14 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1)
 
     if (notificationsError) {
-      console.error('Error fetching notifications:', notificationsError);
+      console.error('[NOTIFICATIONS] Query error:', notificationsError);
       return NextResponse.json(
         { error: 'Failed to fetch notifications' },
         { status: 500 }
       );
     }
+
+    console.log(`[NOTIFICATIONS] Creator ${creator.id}: Found ${notifications?.length || 0} notifications, Total: ${totalCount}, limit=${limit}, offset=${offset}`);
 
     return NextResponse.json({
       success: true,
@@ -122,20 +149,37 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('[NOTIFICATIONS] POST Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Create service role client for updates
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                          process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+          },
+        },
+      }
+    );
 
     const body = await request.json();
     const { notificationIds, notificationId, all, read } = body;
 
     // Get creator
-    const { data: creator, error: creatorError } = await supabase
+    const { data: creator, error: creatorError } = await serviceSupabase
       .from('chronicles_creators')
       .select('id')
       .eq('user_id', user.id)
       .single();
 
     if (creatorError || !creator) {
+      console.error('[NOTIFICATIONS] POST Creator lookup error:', creatorError);
       return NextResponse.json(
         { error: 'Creator not found' },
         { status: 404 }
@@ -144,7 +188,7 @@ export async function POST(request: NextRequest) {
 
     // Mark all as read
     if (all === true && read === true) {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await serviceSupabase
         .from('chronicles_notifications')
         .update({
           read: true,
@@ -166,7 +210,7 @@ export async function POST(request: NextRequest) {
 
     // Mark multiple as read (legacy support)
     if (notificationIds && Array.isArray(notificationIds)) {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await serviceSupabase
         .from('chronicles_notifications')
         .update({ read: true, read_at: new Date().toISOString() })
         .in('id', notificationIds)
@@ -189,7 +233,7 @@ export async function POST(request: NextRequest) {
         ? { read: false }
         : { read: true, read_at: new Date().toISOString() };
 
-      const { data: notification, error: updateError } = await supabase
+      const { data: notification, error: updateError } = await serviceSupabase
         .from('chronicles_notifications')
         .update(unreadIds)
         .eq('id', notificationId)
