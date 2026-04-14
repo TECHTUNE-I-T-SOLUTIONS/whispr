@@ -35,7 +35,7 @@ export default function ChainsListPage() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-white dark:bg-black">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Writing Chains</h1>
         <Link href="/chronicles/chains/new" className="btn btn-primary">
@@ -53,7 +53,7 @@ export default function ChainsListPage() {
             <Link
               key={chain.id}
               href={`/chronicles/chains/${chain.id}`}
-              className="block p-4 bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg transition"
+              className="block p-4 bg-white dark:bg-black border border-border rounded-lg shadow hover:shadow-lg transition dark:hover:shadow-white/10"
             >
               <h2 className="text-xl font-semibold">{chain.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">

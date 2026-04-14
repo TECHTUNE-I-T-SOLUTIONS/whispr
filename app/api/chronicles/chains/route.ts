@@ -46,7 +46,14 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query;
     if (error) throw error;
 
-    return NextResponse.json({ success: true, data: data || [], count });
+    // Transform entries count from nested structure to flat property
+    const transformedData = (data || []).map((chain: any) => ({
+      ...chain,
+      entries_count: chain.entries?.[0]?.count || 0,
+      entries: undefined, // Remove the nested entries array
+    }));
+
+    return NextResponse.json({ success: true, data: transformedData, count });
   } catch (err) {
     console.error('Chains GET error', err);
     return NextResponse.json({ success: false, error: 'Failed to list chains' }, { status: 500 });
