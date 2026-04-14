@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { createSupabaseBrowser } from '@/lib/supabase-browser';
 
 export default function NewChainPage() {
   const router = useRouter();
@@ -15,6 +15,29 @@ export default function NewChainPage() {
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [notLoggedIn, setNotLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/session');
+        const data = await res.json();
+        
+        if (!data.authenticated) {
+          setNotLoggedIn(true);
+        }
+      } catch (err) {
+        console.error('Failed to check authentication:', err);
+        setNotLoggedIn(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +50,8 @@ export default function NewChainPage() {
     setSubmitting(true);
     setError('');
     try {
-      // Get auth token from Supabase
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      
+      // Get auth token from browser client
+      const supabase = createSupabaseBrowser();
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
@@ -90,79 +109,103 @@ export default function NewChainPage() {
 
         {/* Form */}
         <div className="bg-card border border-border rounded-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="title" className="text-sm font-semibold mb-2 block">
-                Chain Title *
-              </label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="e.g., Love in Three Words, Midnight Thoughts, etc."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                disabled={submitting}
-                maxLength={200}
-                className="text-base"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                {title.length}/200
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                This is the main title and theme of your writing chain
-              </p>
-            </div>
-
-            <div>
-              <label htmlFor="description" className="text-sm font-semibold mb-2 block">
-                Description (Optional)
-              </label>
-              <Textarea
-                id="description"
-                placeholder="Describe the theme, rules, or inspiration for this writing challenge..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={submitting}
-                rows={5}
-                maxLength={1000}
-                className="resize-none text-base"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                {description.length}/1000
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Help writers understand what you're looking for
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
-                {error}
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Loading...</p>
               </div>
-            )}
-
-            <div className="flex gap-3 justify-end pt-4">
-              <Link href="/chronicles/chains">
-                <Button variant="outline" disabled={submitting}>
-                  Cancel
-                </Button>
-              </Link>
-              <Button
-                type="submit"
-                disabled={submitting || !title.trim()}
-                className="min-w-32"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Chain'
-                )}
-              </Button>
             </div>
-          </form>
+          ) : notLoggedIn ? (
+            <div className="py-12 text-center">
+              <h3 className="text-lg font-semibold mb-3">Authentication Required</h3>
+              <p className="text-muted-foreground mb-6">
+                You must be logged in to create a writing chain.
+              </p>
+              <div className="flex gap-3 justify-center flex-wrap">
+                <Link href="/auth/login">
+                  <Button>Log In</Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button variant="outline">Sign Up</Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="title" className="text-sm font-semibold mb-2 block">
+                  Chain Title *
+                </label>
+                <Input
+                  id="title"
+                  type="text"
+                  placeholder="e.g., Love in Three Words, Midnight Thoughts, etc."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  disabled={submitting}
+                  maxLength={200}
+                  className="text-base"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {title.length}/200
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This is the main title and theme of your writing chain
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="description" className="text-sm font-semibold mb-2 block">
+                  Description (Optional)
+                </label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe the theme, rules, or inspiration for this writing challenge..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={submitting}
+                  rows={5}
+                  maxLength={1000}
+                  className="resize-none text-base"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {description.length}/1000
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Help writers understand what you're looking for
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end pt-4">
+                <Link href="/chronicles/chains">
+                  <Button variant="outline" disabled={submitting}>
+                    Cancel
+                  </Button>
+                </Link>
+                <Button
+                  type="submit"
+                  disabled={submitting || !title.trim()}
+                  className="min-w-32"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create Chain'
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
 
           <div className="mt-8 pt-6 border-t border-border">
             <h3 className="text-sm font-semibold mb-3">How Writing Chains Work</h3>
