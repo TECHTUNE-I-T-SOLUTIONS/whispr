@@ -134,10 +134,13 @@ export async function POST(
         updateData.likes_count = (post?.likes_count || 0) + 1;
       }
     } else if (action === 'share') {
-      updateData.shares_count = supabase.rpc('increment_counter', { 
-        row_id: entryId, 
-        counter_field: 'shares_count' 
-      });
+      const { data: post } = await supabase
+        .from('chronicles_chain_entry_posts')
+        .select('shares_count')
+        .eq('id', entryId)
+        .single();
+
+      updateData.shares_count = (post?.shares_count || 0) + 1;
     } else if (action === 'view') {
       const { data: post } = await supabase
         .from('chronicles_chain_entry_posts')

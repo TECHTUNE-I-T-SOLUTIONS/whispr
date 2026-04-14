@@ -151,9 +151,9 @@ export default function ChainEntryDetail({
         if (!creator) return;
 
         const { data, error } = await supabase
-          .from('chronicles_chain_entry_reactions')
+          .from('chronicles_chain_entry_post_likes')
           .select('id')
-          .eq('entry_id', entryId)
+          .eq('chain_entry_post_id', entryId)
           .eq('creator_id', creator.id)
           .eq('reaction_type', 'like')
           .maybeSingle();
