@@ -54,7 +54,7 @@ export const PoemsList: React.FC<PoemsListProps> = ({ poems }) => {
       <div className="text-center">
         <h2 className="text-2xl font-serif font-bold mb-2">All Poems</h2>
         <p className="text-muted-foreground">
-          {poems.length} {poems.length === 1 ? "poem" : "poems"} in Prayce's whispering vault
+          {poems.length} {poems.length === 1 ? "poem" : "poems"} in Whispr's whispering vault
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export const PoemsList: React.FC<PoemsListProps> = ({ poems }) => {
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
-                    {poem.admin?.full_name || poem.admin?.username || "Prayce"}
+                    {poem.admin?.full_name || poem.admin?.username || "Whispr"}
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />

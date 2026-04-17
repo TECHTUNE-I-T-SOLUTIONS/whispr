@@ -8,8 +8,8 @@ import { AdsterraBanner } from "@/components/AdsterraBanner"
     return (
       <div className="whispr-gradient min-h-screen w-full">
         <AboutHero />
-        <AboutContent />
         <AboutStats />
+        <AboutContent />
         {/* Adsterra banners below main content */}
         <AdsterraBanner />
       </div>

@@ -161,12 +161,12 @@ export function Header() {
   return (
     <>
       <ChroniclesTeaserBanner />
-      <header className="sticky header-top-offset z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky header-top-offset z-50 w-full max-w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Sponsored posts ticker */}
-      <div className="w-full bg-primary/5 border-b">
+      <div className="w-full max-w-full bg-primary/5 border-b">
         <div className="container text-sm py-2 flex items-center justify-between">
           <div className="overflow-hidden whitespace-nowrap w-full pr-4">
-            <div className="marquee inline-block animate-marquee">
+            <div className="flex flex-col gap-2 marquee inline-block animate-marquee">
                 <span className="mr-8 text-xs sm:text-xs md:text-sm lg:text-xs">Get in touch to advertise on Whispr!</span>
                 <span className="mr-8 text-xs sm:text-xs md:text-sm lg:text-xs">Want to feature your product?</span>
               {/* <a href="mailto:whisprwords@gmail.com" className="underline font-medium">advertise@whisprwords</a> */}
@@ -177,7 +177,7 @@ export function Header() {
           </div>
         </div>
       </div>
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex max-w-full h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ type: 'spring', stiffness: 300 }} className="h-12 w-12 relative md:h-14 md:w-14">
             <Image src={logoSrc} alt="Whispr logo" fill className="rounded-full object-cover" priority />
@@ -198,13 +198,13 @@ export function Header() {
 
           {chroniclesEnabled && (
             <div className="hidden sm:flex md:hidden lg:flex items-center gap-1 md:gap-2">
-              <Button variant="outline" size="sm" asChild className="text-xs">
+              {/* <Button variant="outline" size="sm" asChild className="text-xs">
                 <Link href="/chronicles/feed">Chronicles Feed</Link>
-              </Button>
+              </Button> */}
               <Button variant="outline" size="sm" asChild className="text-xs">
                 <Link href="/auth/login">Chronicles Login</Link>
               </Button>
-              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white text-xs">
+              <Button size="sm" asChild className="bg-red-600 hover:bg-red-800 text-white text-xs">
                 <Link href="/auth/signup">Join Chronicles</Link>
               </Button>
             </div>

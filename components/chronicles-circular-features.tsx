@@ -111,7 +111,7 @@ export function ChroniclesCircularFeatures() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto"
+        className="max-w-full mx-auto"
       >
         {/* Header */}
         <motion.div

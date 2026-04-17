@@ -148,7 +148,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
               <ShareButtons
                 url={currentUrl}
                 title={poem.title}
-                description={poem.excerpt || `A beautiful poem by Prayce: ${poem.title}`}
+                description={poem.excerpt || `A beautiful poem by Whispr: ${poem.title}`}
               />
             </div>
           </div>

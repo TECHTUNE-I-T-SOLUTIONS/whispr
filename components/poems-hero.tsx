@@ -66,7 +66,7 @@ export function PoemsHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            — Prayce's collection of verses that dance between heartbeats and breathe life into quiet moments
+            — Whispr's collection of verses that dance between heartbeats and breathe life into quiet moments
           </motion.p>
         </div>
 

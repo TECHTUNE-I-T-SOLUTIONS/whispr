@@ -100,9 +100,9 @@ export default async function ChangelogPage() {
                         <div className="flex-1">
                           <h3 className="text-base font-semibold text-gray-900 dark:text-white break-words hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             <a
-                              href={commit.html_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              // href={commit.html_url}
+                              // target="_blank"
+                              // rel="noopener noreferrer"
                             >
                               {firstLine}
                             </a>
@@ -130,9 +130,9 @@ export default async function ChangelogPage() {
                         
                         {authorUrl ? (
                           <a
-                            href={authorUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            // href={authorUrl}
+                            // target="_blank"
+                            // rel="noopener noreferrer"
                             className="text-red-600 dark:text-red-400 hover:underline"
                           >
                             by {author}
@@ -141,7 +141,7 @@ export default async function ChangelogPage() {
                           <span>by {author}</span>
                         )}
                         
-                        <a
+                        {/* <a
                           href={commit.html_url}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -149,7 +149,7 @@ export default async function ChangelogPage() {
                         >
                           <ExternalLink className="w-3 h-3" />
                           View
-                        </a>
+                        </a> */}
                       </div>
                     </div>
                   </div>

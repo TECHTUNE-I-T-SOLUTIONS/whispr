@@ -19,7 +19,7 @@ export function ChroniclesTeaserBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-r from-[#911A1B] to-red-700 dark:from-[#6B1415] dark:to-red-900">
+    <div className="relative w-full max-w-full overflow-hidden bg-gradient-to-r from-[#911A1B] to-red-700 dark:from-[#6B1415] dark:to-red-900">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></motion.div>
@@ -28,7 +28,7 @@ export function ChroniclesTeaserBanner() {
 
       {/* Main banner content */}
       <div className="relative z-10 px-4 py-4 md:py-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-full mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Left content */}
             <div className="flex-1 flex items-center gap-3">

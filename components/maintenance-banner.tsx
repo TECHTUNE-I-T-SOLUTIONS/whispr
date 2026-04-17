@@ -111,7 +111,7 @@ export default function MaintenanceBanner() {
   return (
     <div role="region" aria-label="Site maintenance notice" className="w-full">
       <div ref={containerRef} className="w-full bg-gradient-to-r from-[#fff7f6] via-[#fff2f0] to-[#feecea] text-foreground dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 dark:text-white border-b border-gray-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-4">
+        <div className="max-w-full mx-auto px-4 py-2 sm:py-3 flex items-center gap-4">
           <div className="flex-shrink-0 w-8 h-8">
             <img src="/lightlogo.png" alt="Whispr" className="dark:hidden w-full h-full object-contain" />
             <img src="/darklogo.png" alt="Whispr" className="hidden dark:block w-full h-full object-contain" />

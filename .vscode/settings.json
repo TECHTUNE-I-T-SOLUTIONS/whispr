@@ -1,3 +1,6 @@
 {
-    "bitoAI.codeCompletion.enableAutoCompletion": false
+    "bitoAI.codeCompletion.enableAutoCompletion": false,
+    "cSpell.words": [
+        "Whispr's"
+    ]
 }

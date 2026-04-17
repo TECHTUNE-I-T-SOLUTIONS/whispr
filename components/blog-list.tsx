@@ -45,7 +45,7 @@ export async function BlogList() {
             <PenTool className="h-8 w-8 text-primary" />
           </div>
           <h3 className="text-lg font-serif font-semibold mb-2">No blog posts yet</h3>
-          <p className="text-muted-foreground">Prayce's thoughts are taking shape. Soon, whispers will become words.</p>
+          <p className="text-muted-foreground">Whispr's thoughts are taking shape. Soon, whispers will become words.</p>
         </div>
       </div>
     )
@@ -56,7 +56,7 @@ export async function BlogList() {
       <div className="text-center">
         <h2 className="text-2xl font-serif font-bold mb-2">All Blog Posts</h2>
         <p className="text-muted-foreground">
-          {posts.length} {posts.length === 1 ? "post" : "posts"} sharing Prayce's insights and musings
+          {posts.length} {posts.length === 1 ? "post" : "posts"} sharing Whispr's insights and musings
         </p>
       </div>
 

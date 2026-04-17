@@ -64,7 +64,7 @@ export function wallHero() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <BookOpen className="h-4 w-4" />
-          <span>Your whispes are completely anonimous, even to Prayce</span>
+          <span>Your whispes are completely anonimous, even to Us at Whispr</span>
         </motion.div>
       </div>
     </section>

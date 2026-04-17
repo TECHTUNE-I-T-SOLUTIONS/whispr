@@ -130,7 +130,7 @@ export function AppBanner({ postId, postType = 'chronicles' }: AppBannerProps) {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-3">
+      <div className="max-w-full mx-auto px-4 py-4 sm:py-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="flex-shrink-0">

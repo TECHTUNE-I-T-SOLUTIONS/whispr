@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PoemPageProps) {
   }
 
   return {
-    title: `${poem.title} - Whispr | Prayce's Poetry`,
+    title: `${poem.title} - Whispr | Whispr's Poetry`,
     description: poem.excerpt || poem.content.substring(0, 160),
     openGraph: {
       title: poem.title,
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PoemPageProps) {
       images: poem.featured_image ? [poem.featured_image] : [],
       type: "article",
       publishedTime: poem.created_at,
-      authors: ["Prayce"],
+      authors: ["Whispr"],
     },
     twitter: {
       card: "summary_large_image",

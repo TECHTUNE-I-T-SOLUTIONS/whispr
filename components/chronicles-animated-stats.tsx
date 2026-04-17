@@ -103,7 +103,7 @@ export function ChroniclesAnimatedStats() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto relative z-10"
+        className="max-w-full mx-auto relative z-10"
       >
         {/* Header */}
         <motion.div

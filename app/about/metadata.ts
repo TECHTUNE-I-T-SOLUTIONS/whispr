@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "About Prayce - Whispr | Meet the Writer & Poet",
+  title: "About Whispr - Whispr | Know about Whispr",
   description:
-    "Learn about Prayce, the talented writer and poet behind Whispr, her journey with words, and her passion for capturing life's quiet moments.",
+    "Learn about Whispr, the innovative platform for sharing stories and experiences, and discover what makes it special.",
 }

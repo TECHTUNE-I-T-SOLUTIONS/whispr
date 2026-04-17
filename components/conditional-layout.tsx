@@ -33,7 +33,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
 
   // Regular pages get header and footer
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen max-w-full bg-background text-foreground">
       <Header />
       <main>{children}</main>
       <Footer />

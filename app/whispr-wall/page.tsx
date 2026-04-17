@@ -154,7 +154,7 @@ export default function WhisprWallPage() {
 
               {post.response && (
                 <div className="bg-primary/10 border-l-4 border-primary p-3 rounded-md text-sm text-primary">
-                  <strong className="block mb-1">Prayce's Reply</strong>
+                  <strong className="block mb-1">Whispr's Reply</strong>
                   <p>{post.response}</p>
                   {post.updated_at && (
                     <span className="text-[10px] text-muted-foreground block mt-1">
@@ -173,7 +173,7 @@ export default function WhisprWallPage() {
 
                     {c.admin_response && (
                       <div className="mt-2 bg-primary/10 text-primary p-2 rounded text-xs">
-                        <strong className="block mb-1">Prayce's Reply</strong>
+                        <strong className="block mb-1">Whispr's Reply</strong>
                         <p>{c.admin_response}</p>
                         {c.admin_response_updated_at && (
                           <span className="text-[10px] text-muted-foreground block mt-1">
