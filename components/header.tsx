@@ -67,6 +67,7 @@ export function Header() {
     { name: "Spoken Words", href: "/media" },
     { name: "About", href: "/about" },
     { name: "whispr Wall", href: "/whispr-wall" },
+    { name: "Community", href: "/community" },
     ...(chroniclesEnabled ? [{ name: "Chronicles", href: "/chronicles" }] : []),
   ]
 
@@ -204,9 +205,9 @@ export function Header() {
               <Button variant="outline" size="sm" asChild className="text-xs">
                 <Link href="/auth/login">Chronicles Login</Link>
               </Button>
-              <Button size="sm" asChild className="bg-red-600 hover:bg-red-800 text-white text-xs">
+              {/* <Button size="sm" asChild className="bg-red-600 hover:bg-red-800 text-white text-xs">
                 <Link href="/auth/signup">Join Chronicles</Link>
-              </Button>
+              </Button> */}
             </div>
           )}
 
@@ -270,7 +271,7 @@ export function Header() {
               <div className="py-2 border-t mt-2 space-y-2">
                 <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
                 <Link href="/auth/login" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Login</Link>
-                <Link href="/auth/signup" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
+                {/* <Link href="/auth/signup" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link> */}
               </div>
             )}
             <div className="pt-4 border-t">

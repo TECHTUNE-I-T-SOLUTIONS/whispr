@@ -92,6 +92,9 @@ export function Footer() {
               Follow the whispers and stay updated with new writings.
             </p>
             {isSubscribed && <PushNotificationManager compact={true} />}
+            <Link href="/community" className="text-sm hover:text-primary transition-colors font-semibold text-[#911A1B] dark:text-red-100 dark:hover:text-red-500">
+              Community
+            </Link>
           </div>
 
           {/* Legal */}
