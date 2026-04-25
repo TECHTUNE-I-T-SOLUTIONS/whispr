@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /chronicles/dashboard
+Disallow: /chronicles/dashboard/
+Disallow: /chronicles/write
+Disallow: /chronicles/write/
+Disallow: /chronicles/analytics
+Disallow: /chronicles/analytics/
+Disallow: /chronicles/settings
+Disallow: /chronicles/settings/
+Disallow: /chronicles/posts
+Disallow: /chronicles/posts/
+Disallow: /chronicles/chains
+Disallow: /chronicles/chains/
+
+Sitemap: https://whisprwords.com/sitemap.xml

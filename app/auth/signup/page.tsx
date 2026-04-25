@@ -32,7 +32,7 @@ export default function ChroniclesSignup() {
     socialLinks: {
       twitter: '',
       instagram: '',
-      website: 'https://whisprwords.vercel.app',
+      website: 'https://whisprwords.com',
     },
   });
 

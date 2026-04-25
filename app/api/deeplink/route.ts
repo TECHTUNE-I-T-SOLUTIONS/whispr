@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * 4. Falls back to web version if app is not installed
  * 
  * Usage:
- * - Mobile app share URL: https://whisprwords.vercel.app/api/deeplink?type=chronicles&id=UUID
+ * - Mobile app share URL: https://whisprwords.com/api/deeplink?type=chronicles&id=UUID
  * - Direct navigation to app: whispr://app/chronicles/UUID
  */
 export async function GET(request: NextRequest) {
@@ -106,13 +106,13 @@ export async function GET(request: NextRequest) {
         <h1>Opening Whispr...</h1>
         <p>If the app doesn't open, you can view this on the web below.</p>
         <div class="fallback">
-            <p><a href="https://whisprwords.vercel.app/${type}/${id}">View on Web</a></p>
+            <p><a href="https://whisprwords.com/${type}/${id}">View on Web</a></p>
         </div>
     </div>
     <script>
         // Attempt to open the deep link
         const deepLink = "${deepLink}";
-        const webFallback = "https://whisprwords.vercel.app/${type}/${id}";
+        const webFallback = "https://whisprwords.com/${type}/${id}";
         
         // Try to open the deep link
         window.location.href = deepLink;
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
         );
       } else if (isIOS) {
         // iOS deep link: whispr://app/chronicles/{id}
-        // Can also use: https://whisprwords.vercel.app/chronicles/{id}?app=true
+        // Can also use: https://whisprwords.com/chronicles/{id}?app=true
         const deepLink = `whispr://app/${type}/${id}`;
         
         // Create HTML with fallback to web version
@@ -196,13 +196,13 @@ export async function GET(request: NextRequest) {
         <h1>Opening Whispr...</h1>
         <p>If the app doesn't open, you can view this on the web below.</p>
         <div class="fallback">
-            <p><a href="https://whisprwords.vercel.app/${type}/${id}">View on Web</a></p>
+            <p><a href="https://whisprwords.com/${type}/${id}">View on Web</a></p>
         </div>
     </div>
     <script>
         // Attempt to open the deep link
         const deepLink = "${deepLink}";
-        const webFallback = "https://whisprwords.vercel.app/${type}/${id}";
+        const webFallback = "https://whisprwords.com/${type}/${id}";
         
         // Store timestamp to detect if app opened
         const timestamp = Date.now();
