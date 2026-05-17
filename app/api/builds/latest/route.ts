@@ -81,8 +81,9 @@ export async function GET() {
     );
     const buildTime = latestRelease.published_at || latestRelease.created_at || null;
     const appVersion = latestRelease.tag_name.replace(/^v/, '').trim();
-    const androidDownloadUrl =
-      apkArtifact?.browser_download_url || aabArtifact?.browser_download_url || latestRelease.html_url;
+    const apkDownloadUrl = apkArtifact ? '/api/builds/download?asset=apk' : null;
+    const aabDownloadUrl = aabArtifact ? '/api/builds/download?asset=aab' : null;
+    const androidDownloadUrl = apkDownloadUrl || aabDownloadUrl || '/api/builds/latest';
 
     const response = {
       buildId: latestRelease.id,
@@ -97,8 +98,8 @@ export async function GET() {
           ? {
               name: apkArtifact.name,
               authenticatedUrl: apkArtifact.browser_download_url,
-              publicUrl: apkArtifact.browser_download_url,
-              url: apkArtifact.browser_download_url,
+              publicUrl: apkDownloadUrl,
+              url: apkDownloadUrl,
               size: apkArtifact.size,
               sizeFormatted: formatFileSize(apkArtifact.size || 0),
             }
@@ -107,8 +108,8 @@ export async function GET() {
           ? {
               name: aabArtifact.name,
               authenticatedUrl: aabArtifact.browser_download_url,
-              publicUrl: aabArtifact.browser_download_url,
-              url: aabArtifact.browser_download_url,
+              publicUrl: aabDownloadUrl,
+              url: aabDownloadUrl,
               size: aabArtifact.size,
               sizeFormatted: formatFileSize(aabArtifact.size || 0),
             }
@@ -117,7 +118,11 @@ export async function GET() {
       androidDownloadUrl,
       allArtifacts: latestRelease.assets.map((asset) => ({
         name: asset.name,
-        url: asset.browser_download_url,
+        url: asset.name.toLowerCase().endsWith('.apk')
+          ? '/api/builds/download?asset=apk'
+          : asset.name.toLowerCase().endsWith('.aab')
+            ? '/api/builds/download?asset=aab'
+            : asset.browser_download_url,
         size: asset.size,
         sizeFormatted: formatFileSize(asset.size || 0),
       })),

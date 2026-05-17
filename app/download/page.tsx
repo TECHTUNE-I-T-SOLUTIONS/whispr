@@ -135,7 +135,7 @@ export default function DownloadPage() {
                       <div className="space-y-2">
                         {builds.artifacts?.apk && (
                           <a
-                            href={builds.artifacts.apk.url}
+                            href="/api/builds/download?asset=apk"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black/60 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
@@ -151,7 +151,7 @@ export default function DownloadPage() {
                         )}
                         {builds.artifacts?.aab && (
                           <a
-                            href={builds.artifacts.aab.url}
+                            href="/api/builds/download?asset=aab"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-black/60 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
@@ -180,7 +180,7 @@ export default function DownloadPage() {
                     )}
                   </div>
                   <a
-                    href={builds.androidDownloadUrl}
+                    href="/api/builds/download?asset=apk"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full bg-gradient-to-r from-[#911A1B] to-red-700 hover:from-red-800 hover:to-red-900 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-300"
@@ -189,7 +189,7 @@ export default function DownloadPage() {
                     Quick Download (APK)
                   </a>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                    Direct download from GitHub Releases • Choose APK or AAB above for more options
+                    Direct download from Whispr Servers • Choose APK or AAB above for more options
                   </p>
                 </>
               ) : (
