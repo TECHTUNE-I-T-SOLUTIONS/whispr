@@ -1,2 +1,0 @@
-Hey buddy, I need you to help me make some bug fixes and enhancements;
-1. in the home screen, when the blogs and writings and chronicles are fetched, it fetches the admin's blog and poems
