@@ -3401,7 +3401,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.8.3, baseline-browser-mapping@npm:^2.9.0, baseline-browser-mapping@npm:^2.9.11":
+"baseline-browser-mapping@npm:^2.10.21":
+  version: 2.10.28
+  resolution: "baseline-browser-mapping@npm:2.10.28"
+  bin:
+    baseline-browser-mapping: dist/cli.cjs
+  checksum: 10c0/9471b802b7f7f18c1e5c089a78bd94283c7b032b4c8c489427f51d8ad49ae5c53544b6c64580540064687bdeee62737bfd47fdbf8179cce42e4dddd91958af24
+  languageName: node
+  linkType: hard
+
+"baseline-browser-mapping@npm:^2.8.3, baseline-browser-mapping@npm:^2.9.0":
   version: 2.10.8
   resolution: "baseline-browser-mapping@npm:2.10.8"
   bin:
@@ -9110,7 +9119,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     "@types/web-push": "npm:^3"
     autoprefixer: "npm:^10.4.20"
-    baseline-browser-mapping: "npm:^2.9.11"
+    baseline-browser-mapping: "npm:^2.10.21"
     bcryptjs: "npm:latest"
     caniuse-lite: "npm:^1.0.30001762"
     class-variance-authority: "npm:^0.7.1"

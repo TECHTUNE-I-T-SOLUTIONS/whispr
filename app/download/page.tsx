@@ -189,7 +189,7 @@ export default function DownloadPage() {
                     Quick Download (APK)
                   </a>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                    Direct download from Whispr Servers • Choose APK or AAB above for more options
+                    Direct download from GitHub Releases • Choose APK or AAB above for more options
                   </p>
                 </>
               ) : (

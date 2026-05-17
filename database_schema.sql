@@ -416,6 +416,31 @@ CREATE TABLE public.chronicles_creator_analytics (
   CONSTRAINT chronicles_creator_analytics_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
   CONSTRAINT chronicles_creator_analytics_best_post_id_fkey FOREIGN KEY (best_post_id) REFERENCES public.chronicles_posts(id)
 );
+CREATE TABLE public.chronicles_creator_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  achievement_id uuid NOT NULL,
+  earned_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_achievements_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_achievements_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_achievements_achievement_id_fkey FOREIGN KEY (achievement_id) REFERENCES public.chronicles_game_achievements(id)
+);
+CREATE TABLE public.chronicles_creator_game_progress (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  best_score integer NOT NULL DEFAULT 0,
+  total_score integer NOT NULL DEFAULT 0,
+  best_streak integer NOT NULL DEFAULT 0,
+  attempts_count integer NOT NULL DEFAULT 0,
+  completed_sessions integer NOT NULL DEFAULT 0,
+  last_played_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_progress_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_progress_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
 CREATE TABLE public.chronicles_creator_report_data (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   report_id uuid NOT NULL,
@@ -608,6 +633,72 @@ CREATE TABLE public.chronicles_followers (
   CONSTRAINT chronicles_followers_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES public.chronicles_creators(id),
   CONSTRAINT chronicles_followers_follows_id_fkey FOREIGN KEY (follows_id) REFERENCES public.chronicles_creators(id)
 );
+CREATE TABLE public.chronicles_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  description text,
+  icon text,
+  points_reward integer NOT NULL DEFAULT 0,
+  condition_type text NOT NULL,
+  condition_value integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_achievements_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chronicles_game_rounds (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  session_id uuid NOT NULL,
+  prompt text NOT NULL,
+  prompt_type text NOT NULL,
+  expected_answer text,
+  user_answer text,
+  is_correct boolean,
+  explanation text,
+  ai_hint text,
+  options jsonb NOT NULL DEFAULT '[]'::jsonb,
+  points_awarded integer NOT NULL DEFAULT 0,
+  order_index integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_rounds_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_game_rounds_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.chronicles_game_sessions(id)
+);
+CREATE TABLE public.chronicles_game_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  game_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  mode text NOT NULL DEFAULT 'practice'::text,
+  status text NOT NULL DEFAULT 'active'::text,
+  score integer NOT NULL DEFAULT 0,
+  streak_count integer NOT NULL DEFAULT 0,
+  correct_answers integer NOT NULL DEFAULT 0,
+  incorrect_answers integer NOT NULL DEFAULT 0,
+  total_rounds integer NOT NULL DEFAULT 0,
+  started_at timestamp with time zone NOT NULL DEFAULT now(),
+  ended_at timestamp with time zone,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  CONSTRAINT chronicles_game_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_game_sessions_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id),
+  CONSTRAINT chronicles_game_sessions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_games (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  description text,
+  game_type text NOT NULL,
+  audience text NOT NULL DEFAULT 'all'::text,
+  difficulty text NOT NULL DEFAULT 'beginner'::text,
+  is_offline_ready boolean NOT NULL DEFAULT true,
+  is_ai_powered boolean NOT NULL DEFAULT true,
+  is_published boolean NOT NULL DEFAULT true,
+  config jsonb NOT NULL DEFAULT '{}'::jsonb,
+  cover_image_url text,
+  created_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_games_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_games_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.chronicles_creators(id)
+);
 CREATE TABLE public.chronicles_gamification_settings (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   points_per_post integer DEFAULT 10,
@@ -705,6 +796,37 @@ CREATE TABLE public.chronicles_leaderboard_settings (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT chronicles_leaderboard_settings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chronicles_learning_modules (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  summary text,
+  content_type text NOT NULL DEFAULT 'tutorial'::text,
+  audience text NOT NULL DEFAULT 'all'::text,
+  topic text,
+  difficulty text NOT NULL DEFAULT 'beginner'::text,
+  estimated_read_time integer DEFAULT 5,
+  cover_image_url text,
+  is_ai_supported boolean NOT NULL DEFAULT true,
+  is_published boolean NOT NULL DEFAULT true,
+  created_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_learning_modules_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_learning_modules_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_learning_sections (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  module_id uuid NOT NULL,
+  title text NOT NULL,
+  body text NOT NULL,
+  order_index integer NOT NULL DEFAULT 0,
+  media_url text,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_learning_sections_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_learning_sections_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.chronicles_learning_modules(id)
 );
 CREATE TABLE public.chronicles_monetization (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -1108,6 +1230,55 @@ CREATE TABLE public.comments (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT comments_pkey PRIMARY KEY (id),
   CONSTRAINT comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
+);
+CREATE TABLE public.community_issues (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  description text NOT NULL,
+  category text NOT NULL DEFAULT 'general'::text CHECK (category = ANY (ARRAY['general'::text, 'bug'::text, 'account'::text, 'content'::text, 'suggestion'::text, 'complaint'::text, 'feature'::text, 'other'::text])),
+  status text NOT NULL DEFAULT 'open'::text CHECK (status = ANY (ARRAY['open'::text, 'in_progress'::text, 'resolved'::text, 'closed'::text])),
+  priority text NOT NULL DEFAULT 'normal'::text CHECK (priority = ANY (ARRAY['low'::text, 'normal'::text, 'high'::text, 'urgent'::text])),
+  tags ARRAY NOT NULL DEFAULT '{}'::text[],
+  author_name text,
+  author_email text,
+  author_token text NOT NULL,
+  reply_count integer NOT NULL DEFAULT 0,
+  upvote_count integer NOT NULL DEFAULT 0,
+  view_count integer NOT NULL DEFAULT 0,
+  is_pinned boolean NOT NULL DEFAULT false,
+  resolved_at timestamp with time zone,
+  resolved_by uuid,
+  search_vector tsvector,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT community_issues_pkey PRIMARY KEY (id),
+  CONSTRAINT community_issues_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.community_replies (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  issue_id uuid NOT NULL,
+  parent_reply_id uuid,
+  content text NOT NULL,
+  author_name text,
+  author_email text,
+  author_token text,
+  is_admin boolean NOT NULL DEFAULT false,
+  admin_id uuid,
+  is_solution boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT community_replies_pkey PRIMARY KEY (id),
+  CONSTRAINT community_replies_issue_fkey FOREIGN KEY (issue_id) REFERENCES public.community_issues(id),
+  CONSTRAINT community_replies_parent_fkey FOREIGN KEY (parent_reply_id) REFERENCES public.community_replies(id),
+  CONSTRAINT community_replies_admin_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
+);
+CREATE TABLE public.community_upvotes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  issue_id uuid NOT NULL,
+  voter_token text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT community_upvotes_pkey PRIMARY KEY (id),
+  CONSTRAINT community_upvotes_issue_fkey FOREIGN KEY (issue_id) REFERENCES public.community_issues(id)
 );
 CREATE TABLE public.conversation_participants (
   conversation_id uuid NOT NULL,

@@ -1,201 +1,133 @@
 import { NextResponse } from 'next/server';
 
-/**
- * Fetch latest build directly from CodeMagic API
- * Generates public download URLs for artifacts
- */
+type GitHubReleaseAsset = {
+  name: string;
+  browser_download_url: string;
+  size: number;
+};
 
-async function generatePublicUrl(
-  authenticatedUrl: string,
-  token: string,
-  expirationDays: number = 30
-): Promise<string | null> {
-  try {
-    // Extract secure filename from URL
-    // Format: https://api.codemagic.io/artifacts/UUID1/UUID2/filename
-    const urlParts = authenticatedUrl.split('api.codemagic.io/artifacts/');
-    if (urlParts.length !== 2) {
-      console.warn('Invalid artifact URL format:', authenticatedUrl);
-      return null;
-    }
+type GitHubRelease = {
+  id: number;
+  tag_name: string;
+  name?: string | null;
+  body?: string | null;
+  published_at?: string | null;
+  created_at?: string | null;
+  html_url: string;
+  draft: boolean;
+  prerelease: boolean;
+  assets: GitHubReleaseAsset[];
+};
 
-    const secureFilename = urlParts[1];
-    
-    // Calculate expiration timestamp (30 days from now by default)
-    const expiresAt = Math.floor(Date.now() / 1000) + (expirationDays * 24 * 60 * 60);
+function formatFileSize(bytes: number) {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100} ${sizes[i]}`;
+}
 
-    // Request public URL from CodeMagic
-    const publicUrlResponse = await fetch(
-      `https://api.codemagic.io/artifacts/${secureFilename}/public-url`,
-      {
-        method: 'POST',
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ expiresAt }),
-      }
-    );
-
-    if (!publicUrlResponse.ok) {
-      console.warn(
-        `Failed to generate public URL for ${secureFilename}: ${publicUrlResponse.status}`
-      );
-      return null;
-    }
-
-    const data = await publicUrlResponse.json();
-    return data.url || null;
-  } catch (error) {
-    console.error('Error generating public URL:', error);
-    return null;
-  }
+function findReleaseAsset(assets: GitHubReleaseAsset[], matcher: (asset: GitHubReleaseAsset) => boolean) {
+  return assets.find(matcher) || null;
 }
 
 export async function GET() {
   try {
-    const codemagicToken = process.env.CODEMAGIC_API_TOKEN;
-    const codemagicAppId = process.env.CODEMAGIC_APP_ID;
+    const owner = process.env.GITHUB_MOBILE_REPO_OWNER || 'TECHTUNE-I-T-SOLUTIONS';
+    const repo = process.env.GITHUB_MOBILE_REPO_NAME || 'whispr-mobile';
+    const githubToken = process.env.GITHUB_TOKEN;
 
-    if (!codemagicToken || !codemagicAppId) {
-      console.error('Missing CodeMagic API credentials');
-      return NextResponse.json(
-        {
-          androidDownloadUrl: null,
-          status: 'CodeMagic credentials not configured',
-        },
-        { status: 200 }
-      );
-    }
-
-    // Fetch latest successful builds from CodeMagic
-    const codemagicResponse = await fetch(
-      `https://api.codemagic.io/builds?appId=${codemagicAppId}&status=finished&limit=5`,
+    const releaseResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/releases?per_page=10`,
       {
         headers: {
-          'x-auth-token': codemagicToken,
-          'Content-Type': 'application/json',
+          Accept: 'application/vnd.github+json',
+          ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
+          'X-GitHub-Api-Version': '2022-11-28',
         },
+        next: { revalidate: 300 },
       }
     );
 
-    if (!codemagicResponse.ok) {
-      console.error(`CodeMagic API error: ${codemagicResponse.status}`);
+    if (!releaseResponse.ok) {
+      console.error(`GitHub releases API error: ${releaseResponse.status}`);
       return NextResponse.json(
         {
           androidDownloadUrl: null,
-          status: 'Failed to fetch from CodeMagic',
+          status: 'Failed to fetch from GitHub Releases',
         },
         { status: 200 }
       );
     }
 
-    const buildData = await codemagicResponse.json();
+    const releases = (await releaseResponse.json()) as GitHubRelease[];
+    const latestRelease = releases.find((release) => !release.draft) || releases[0];
 
-    if (!buildData.builds || buildData.builds.length === 0) {
-      console.warn('No finished builds found in CodeMagic');
+    if (!latestRelease) {
       return NextResponse.json(
         {
           androidDownloadUrl: null,
-          status: 'No builds available',
+          status: 'No releases available',
         },
         { status: 200 }
       );
     }
 
-    const latestBuild = buildData.builds[0] as any;
-    const buildId = latestBuild.id;
-    const buildTime = latestBuild.finishedAt || latestBuild.buildStartedTime;
-    const buildNumber = latestBuild.buildNumber || latestBuild.issueNumber || 'Latest Build';
-    
-    // Extract version from git tag (e.g., v1.0.1 -> 1.0.1) - most reliable source
-    let appVersion = '1.0.0';
-    
-    // Try tag first (most reliable)
-    if (latestBuild.tags && Array.isArray(latestBuild.tags) && latestBuild.tags.length > 0) {
-      const versionTag = latestBuild.tags[0];
-      if (versionTag && typeof versionTag === 'string') {
-        appVersion = versionTag.replace(/^v/, '').trim();
-        console.log(`✓ Version extracted from tag: ${appVersion}`);
-      }
-    } 
-    // Fallback to appVersion
-    else if (latestBuild.appVersion) {
-      appVersion = latestBuild.appVersion;
-      console.log(`✓ Version extracted from appVersion: ${appVersion}`);
-    } else {
-      console.log(`⚠ Using default version: ${appVersion}`);
-    }
-
-    // Extract artifact URLs (CodeMagic uses "artefacts" spelling)
-    const artifacts = (latestBuild.artefacts || []) as any[];
-    
-    // Get APK and AAB URLs
-    const apkArtifact = artifacts.find((a: any) => a.name?.endsWith('.apk'));
-    const aabArtifact = artifacts.find((a: any) => a.name?.endsWith('.aab'));
-
-    // Format file sizes
-    const formatFileSize = (bytes: number) => {
-      if (bytes === 0) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    };
-
-    // Generate public URLs for artifacts
-    let apkPublicUrl: string | null = null;
-    let aabPublicUrl: string | null = null;
-
-    if (apkArtifact?.url) {
-      apkPublicUrl = await generatePublicUrl(apkArtifact.url, codemagicToken);
-    }
-
-    if (aabArtifact?.url) {
-      aabPublicUrl = await generatePublicUrl(aabArtifact.url, codemagicToken);
-    }
-
-    // Use public URLs if available, fall back to authenticated URLs
-    const androidDownloadUrl = apkPublicUrl || apkArtifact?.url || aabPublicUrl || aabArtifact?.url;
+    const apkArtifact = findReleaseAsset(latestRelease.assets, (asset) =>
+      asset.name.toLowerCase().endsWith('.apk')
+    );
+    const aabArtifact = findReleaseAsset(latestRelease.assets, (asset) =>
+      asset.name.toLowerCase().endsWith('.aab')
+    );
+    const buildTime = latestRelease.published_at || latestRelease.created_at || null;
+    const appVersion = latestRelease.tag_name.replace(/^v/, '').trim();
+    const androidDownloadUrl =
+      apkArtifact?.browser_download_url || aabArtifact?.browser_download_url || latestRelease.html_url;
 
     const response = {
-      buildId,
-      buildNumber,
+      buildId: latestRelease.id,
+      buildNumber: latestRelease.id.toString(),
       buildTime,
       releaseDate: buildTime,
       version: appVersion,
-      buildStatus: latestBuild.status,
-      workflowName: latestBuild.workflow?.name || 'Android Release',
+      buildStatus: latestRelease.prerelease ? 'prerelease' : 'released',
+      workflowName: 'GitHub Release',
       artifacts: {
-        apk: apkArtifact ? {
-          name: apkArtifact.name,
-          authenticatedUrl: apkArtifact.url,
-          publicUrl: apkPublicUrl,
-          url: apkPublicUrl || apkArtifact.url,
-          size: apkArtifact.size,
-          sizeFormatted: formatFileSize(apkArtifact.size || 0),
-        } : null,
-        aab: aabArtifact ? {
-          name: aabArtifact.name,
-          authenticatedUrl: aabArtifact.url,
-          publicUrl: aabPublicUrl,
-          url: aabPublicUrl || aabArtifact.url,
-          size: aabArtifact.size,
-          sizeFormatted: formatFileSize(aabArtifact.size || 0),
-        } : null,
+        apk: apkArtifact
+          ? {
+              name: apkArtifact.name,
+              authenticatedUrl: apkArtifact.browser_download_url,
+              publicUrl: apkArtifact.browser_download_url,
+              url: apkArtifact.browser_download_url,
+              size: apkArtifact.size,
+              sizeFormatted: formatFileSize(apkArtifact.size || 0),
+            }
+          : null,
+        aab: aabArtifact
+          ? {
+              name: aabArtifact.name,
+              authenticatedUrl: aabArtifact.browser_download_url,
+              publicUrl: aabArtifact.browser_download_url,
+              url: aabArtifact.browser_download_url,
+              size: aabArtifact.size,
+              sizeFormatted: formatFileSize(aabArtifact.size || 0),
+            }
+          : null,
       },
       androidDownloadUrl,
-      allArtifacts: artifacts.map((a: any) => ({
-        name: a.name,
-        url: a.url,
-        size: a.size,
-        sizeFormatted: formatFileSize(a.size || 0),
+      allArtifacts: latestRelease.assets.map((asset) => ({
+        name: asset.name,
+        url: asset.browser_download_url,
+        size: asset.size,
+        sizeFormatted: formatFileSize(asset.size || 0),
       })),
-      changelog: `Build ${buildNumber} - v${appVersion}`,
-      releaseName: `Whispr v${appVersion}`,
+      changelog: latestRelease.body || `Whispr v${appVersion}`,
+      releaseName: latestRelease.name || `Whispr v${appVersion}`,
+      releaseUrl: latestRelease.html_url,
+      repository: `${owner}/${repo}`,
     };
 
-    // Add cache headers (revalidate every 5 minutes for fresher builds)
+    // Add cache headers (revalidate every 5 minutes for fresher releases)
     const nextResponse = NextResponse.json(response);
     nextResponse.headers.set(
       'Cache-Control',
@@ -204,7 +136,7 @@ export async function GET() {
 
     return nextResponse;
   } catch (error) {
-    console.error('Error fetching build details from CodeMagic:', error);
+    console.error('Error fetching build details from GitHub Releases:', error);
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
