@@ -82,6 +82,11 @@ export function Footer() {
                   Download App
                 </Link>
               </li>
+              <li>
+                <Link href="/opportunities" className="hover:text-primary transition-colors">
+                  Opportunities
+                </Link>
+              </li>
             </ul>
           </div>
 

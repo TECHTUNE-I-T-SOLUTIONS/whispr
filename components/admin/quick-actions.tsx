@@ -35,6 +35,15 @@ export function QuickActions() {
       hoverColor: "hover:bg-green-100 dark:hover:bg-green-900/30",
     },
     {
+      title: "Manage Opportunities",
+      description: "Create and publish jobs, grants, and calls",
+      icon: Sparkles,
+      href: "/admin/opportunities",
+      color: "text-rose-600",
+      bgColor: "bg-rose-50 dark:bg-rose-900/20",
+      hoverColor: "hover:bg-rose-100 dark:hover:bg-rose-900/30",
+    },
+    {
       title: "Media Library",
       description: "Upload and manage media",
       icon: ImageIcon,

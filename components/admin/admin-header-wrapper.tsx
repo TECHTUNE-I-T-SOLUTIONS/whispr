@@ -8,8 +8,8 @@ import { useState, useEffect } from "react"
 import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
-  MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart,
-  FileText, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle
+  MessageSquareText, PenTool, MessageSquareHeart,
+  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -30,6 +30,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
     { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
     { name: "Feedback", href: "/admin/feedback", icon: MessageCircle },
+    { name: "Opportunities", href: "/admin/opportunities", icon: Sparkles },
     { name: "Community", href: "/admin/community", icon: MessageCircle },
     { name: "Notifications", href: "/admin/notifications", icon: Bell },
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
