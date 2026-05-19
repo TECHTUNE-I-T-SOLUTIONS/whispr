@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // 2. Get creator profile
     const { data: creator, error: creatorError } = await supabase
       .from("chronicles_creators")
-      .select("id, email, pen_name, display_name, profile_image_url, is_verified")
+      .select("id, email, pen_name, display_name, profile_image_url, is_verified, status")
       .eq("user_id", authData.user.id)
       .single();
 
@@ -49,6 +49,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Creator profile not found" },
         { status: 404 }
+      );
+    }
+
+    if (creator.status === "pending") {
+      // Sign out session
+      await supabase.auth.signOut();
+      return NextResponse.json(
+        { error: "Chronicles hasn't officially launched yet! Your account is active on our waitlist. We will notify you once we launch." },
+        { status: 403 }
       );
     }
 

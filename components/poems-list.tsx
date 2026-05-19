@@ -117,7 +117,7 @@ export const PoemsList: React.FC<PoemsListProps> = ({ poems }) => {
               </div>
 
               <Link
-                href={`/poems/${poem.id}`}
+                href={`/poems/${poem.slug || poem.id}`}
                 className="inline-flex items-center text-primary hover:text-primary/80 text-sm font-medium transition-colors group-hover:translate-x-1 transform"
               >
                 Read more →

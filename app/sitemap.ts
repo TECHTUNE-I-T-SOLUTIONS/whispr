@@ -21,7 +21,7 @@ async function getPublishedCorePosts() {
     const supabase = createSupabaseServer()
     const { data, error } = await supabase
       .from("posts")
-      .select("id, type, created_at, updated_at, published_at")
+      .select("id, slug, type, created_at, updated_at, published_at")
       .eq("status", "published")
 
     if (error) {
@@ -32,6 +32,25 @@ async function getPublishedCorePosts() {
     return data || []
   } catch (error) {
     console.error("Sitemap posts fetch failed:", error)
+    return []
+  }
+}
+
+async function getPublishedStoriesSitemap() {
+  try {
+    const supabase = createSupabaseServer()
+    const { data, error } = await supabase
+      .from("view_all_stories")
+      .select("slug, updated_at, published_at, created_at")
+      .eq("status", "published")
+
+    if (error) {
+      console.error("Sitemap stories query failed:", error.message)
+      return []
+    }
+    return data || []
+  } catch (error) {
+    console.error("Sitemap stories fetch failed:", error)
     return []
   }
 }
@@ -113,20 +132,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteUrl("/privacy"), lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
     { url: absoluteUrl("/terms"), lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
     { url: absoluteUrl("/whispr-wall"), lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
+    { url: absoluteUrl("/stories"), lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
   ]
 
-  const [corePosts, chroniclesPosts, communityIssues, creators] = await Promise.all([
+  const [corePosts, chroniclesPosts, communityIssues, creators, stories] = await Promise.all([
     getPublishedCorePosts(),
     getPublishedChroniclesPosts(),
     getPublicCommunityIssues(),
     getPublicChroniclesCreators(),
+    getPublishedStoriesSitemap(),
   ])
 
   const postPages: MetadataRoute.Sitemap = corePosts
     .map((post) => {
       const segment = post.type === "poem" ? "poems" : "blog"
       return {
-        url: absoluteUrl(`/${segment}/${post.id}`),
+        url: absoluteUrl(`/${segment}/${post.slug || post.id}`),
         lastModified: toDate(post.updated_at || post.published_at || post.created_at),
         changeFrequency: "weekly" as const,
         priority: 0.7,
@@ -154,5 +175,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...postPages, ...chroniclesPages, ...communityPages, ...creatorPages]
+  const storyPages: MetadataRoute.Sitemap = stories.map((story) => ({
+    url: absoluteUrl(`/stories/${story.slug}`),
+    lastModified: toDate(story.updated_at || story.published_at || story.created_at),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }))
+
+  return [
+    ...staticPages, 
+    ...postPages, 
+    ...chroniclesPages, 
+    ...communityPages, 
+    ...creatorPages,
+    ...storyPages
+  ]
 }

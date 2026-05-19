@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
         social_links: socialLinks || {},
         
         // Status
-        status: "active",
+        status: body.isWaitlist ? "pending" : "active",
         role: "creator",
         is_verified: false,
         is_banned: false,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       })
       .select()
       .single();
-
+ 
     if (creatorError || !creator) {
       console.error("Creator creation error:", {
         error: creatorError,
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       } catch (cleanupError) {
         console.error("Cleanup error:", cleanupError);
       }
-
+ 
       return NextResponse.json(
         { 
           error: "Failed to create creator profile: " + (creatorError?.message || "Unknown error"),
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
+ 
     // 7. Log the signup activity using service role
     try {
       await serviceRoleClient
@@ -215,31 +215,35 @@ export async function POST(request: NextRequest) {
         .insert({
           activity_type: "creator_signup",
           creator_id: creator.id,
-          title: "New Creator Signup",
-          description: `Creator ${penName} (${email}) has joined Chronicles`,
+          title: body.isWaitlist ? "New Creator Waitlisted" : "New Creator Signup",
+          description: body.isWaitlist 
+            ? `Creator ${penName} (${email}) has joined waitlist`
+            : `Creator ${penName} (${email}) has joined Chronicles`,
         });
     } catch (logError) {
       console.error("Activity log error:", logError);
       // Don't fail if logging fails
     }
-
+ 
     // 8. Sign in the user to establish session
     let accessToken: string | null = null;
     let refreshToken: string | null = null;
-    try {
-      const signInResult = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      console.log("Auto sign-in successful:", {
-        userId: signInResult.data?.user?.id,
-        email: signInResult.data?.user?.email,
-      });
-      accessToken = signInResult.data?.session?.access_token || null;
-      refreshToken = signInResult.data?.session?.refresh_token || null;
-    } catch (signInError) {
-      console.error("Sign in error after signup:", signInError);
-      // Continue - signup is successful even if auto-signin fails
+    if (!body.isWaitlist) {
+      try {
+        const signInResult = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        console.log("Auto sign-in successful:", {
+          userId: signInResult.data?.user?.id,
+          email: signInResult.data?.user?.email,
+        });
+        accessToken = signInResult.data?.session?.access_token || null;
+        refreshToken = signInResult.data?.session?.refresh_token || null;
+      } catch (signInError) {
+        console.error("Sign in error after signup:", signInError);
+        // Continue - signup is successful even if auto-signin fails
+      }
     }
 
     return NextResponse.json(

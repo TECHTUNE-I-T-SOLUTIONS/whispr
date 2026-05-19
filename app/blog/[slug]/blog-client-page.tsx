@@ -15,9 +15,9 @@ export function BlogClientPage({ htmlContent, plainText }: BlogClientPageProps) 
 
   return (
     <div className="border-t pt-6 mb-6">
-      <Card className="mb-8">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <span className="text-sm text-muted-foreground">Advanced Reading Features</span>
+      <Card className="mb-8 border-0 bg-card/50 backdrop-blur shadow-xl">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border/20">
+          <span className="text-sm text-muted-foreground font-serif">Advanced Reading Features</span>
           <AdvancedFeaturesModal text={plainText} contentRef={contentRef} onAutoScrollChange={setAutoScrollMode} />
         </CardHeader>
         <CardContent className={autoScrollMode ? 'p-0' : 'p-8'}>
@@ -33,7 +33,7 @@ export function BlogClientPage({ htmlContent, plainText }: BlogClientPageProps) 
               </div>
             </div>
           ) : (
-            <div className="prose prose-lg dark:prose-invert">
+            <div className="prose prose-lg dark:prose-invert text-foreground leading-relaxed">
               <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
             </div>
           )}

@@ -20,6 +20,7 @@ import {
   Sun,
   Moon,
   Bot,
+  Plus,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -106,6 +107,8 @@ export default function ChroniclesHeader({
   const navigationItems = [
     { label: 'Feed', href: '/chronicles/feed', icon: Home },
     { label: 'Posts', href: '/chronicles/posts', icon: BookOpen },
+    { label: 'Stories', href: '/chronicles/stories', icon: BookOpen },
+    { label: 'Write Story', href: '/chronicles/stories/new', icon: Plus },
     { label: 'Chains', href: '/chronicles/chains', icon: BarChart3 },
     { label: 'Dashboard', href: '/chronicles/dashboard', icon: TrendingUp },
     { label: 'Write Post', href: '/chronicles/write', icon: BookOpen },
@@ -117,9 +120,9 @@ export default function ChroniclesHeader({
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      
+
       // Call logout API and wait for response
-      const response = await fetch('/api/chronicles/auth/logout', { 
+      const response = await fetch('/api/chronicles/auth/logout', {
         method: 'POST',
         credentials: 'include', // Include cookies in the request
       });
@@ -130,7 +133,7 @@ export default function ChroniclesHeader({
 
       // Close the modal
       setLogoutModalOpen(false);
-      
+
       // Clear any client-side storage (if using localStorage/sessionStorage)
       localStorage.clear();
       sessionStorage.clear();
@@ -177,11 +180,10 @@ export default function ChroniclesHeader({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-lg transition-colors text-sm font-medium flex items-center gap-2 ${
-                  isActive(item.href)
+                className={`px-3 py-2 rounded-lg transition-colors text-sm font-medium flex items-center gap-2 ${isActive(item.href)
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
@@ -192,7 +194,7 @@ export default function ChroniclesHeader({
           {/* Right Section */}
           <div className="flex items-center gap-3 ml-auto">
             {/* Notifications */}
-            <button 
+            <button
               onClick={() => router.push('/chronicles/notifications')}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors relative"
               title="Notifications"
@@ -231,7 +233,7 @@ export default function ChroniclesHeader({
                 </span>
                 <ChevronDown className="w-4 h-4 text-gray-700 dark:text-gray-300" />
               </button>
-              
+
               {/* Mobile/Tablet menu icon for user dropdown */}
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -303,27 +305,25 @@ export default function ChroniclesHeader({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-30 overflow-y-auto flex flex-col ${
-          sidebarOpen ? 'translate-x-0' : 'translate-x-0'
-        }`}
+        className={`hidden lg:fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-30 overflow-y-auto flex flex-col ${sidebarOpen ? 'translate-x-0' : 'translate-x-0'
+          }`}
       >
         <nav className="p-4 space-y-2 flex-1">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-                isActive(item.href)
+              className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${isActive(item.href)
                   ? 'bg-purple-600 text-white'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
-              }`}
+                }`}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">{item.label}</span>
             </Link>
           ))}
         </nav>
-        
+
         {/* Theme Toggle at Bottom of Sidebar */}
         <div className="p-4 border-t border-gray-200 dark:border-slate-700">
           <button
@@ -344,11 +344,11 @@ export default function ChroniclesHeader({
 
       {/* Mobile Sidebar */}
       {mounted && sidebarOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 top-16 z-20 bg-black/50"
           onClick={() => setSidebarOpen(false)}
         >
-          <div 
+          <div
             ref={sidebarRef}
             className="w-64 h-full bg-white dark:bg-black border border-gray-200 dark:border-slate-700 dark:shadow-2xl dark:shadow-white/40 shadow-lg animate-slideIn flex flex-col"
             onClick={(e) => e.stopPropagation()}
@@ -358,11 +358,10 @@ export default function ChroniclesHeader({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-                    isActive(item.href)
+                  className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${isActive(item.href)
                       ? 'bg-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                  }`}
+                    }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className="w-5 h-5 flex-shrink-0" />

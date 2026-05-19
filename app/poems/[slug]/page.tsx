@@ -1,30 +1,47 @@
 import notFound from "./not-found"
 import PoemClientPage from "./PoemClientPage"
 import { createSupabaseServer } from "@/lib/supabase-server"
-import { markdownToHtml } from "@/lib/utils" // ✅ import the utility
+import { markdownToHtml } from "@/lib/utils"
 
 interface PoemPageProps {
   params: Promise<{
-    id: string
+    slug: string
   }>
 }
 
-async function getPoem(id: string) {
+async function getPoem(slugOrId: string) {
   const supabase = createSupabaseServer()
-  const { data: poem, error } = await supabase
+  
+  // 1. Try fetching by slug
+  let { data: poem } = await supabase
     .from("posts")
     .select("*")
-    .eq("id", id)
+    .eq("slug", slugOrId)
     .eq("type", "poem")
     .eq("status", "published")
-    .single()
+    .maybeSingle()
 
-  return error || !poem ? null : poem
+  // 2. Fallback to ID check if it's a valid UUID
+  if (!poem) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId)
+    if (isUuid) {
+      const { data } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("id", slugOrId)
+        .eq("type", "poem")
+        .eq("status", "published")
+        .maybeSingle()
+      poem = data
+    }
+  }
+
+  return poem
 }
 
 export async function generateMetadata({ params }: PoemPageProps) {
-  const { id } = await params
-  const poem = await getPoem(id)
+  const { slug } = await params
+  const poem = await getPoem(slug)
 
   if (!poem) {
     return {
@@ -53,16 +70,16 @@ export async function generateMetadata({ params }: PoemPageProps) {
 }
 
 export default async function PoemPage({ params }: PoemPageProps) {
-  const { id } = await params
-  const poem = await getPoem(id)
+  const { slug } = await params
+  const poem = await getPoem(slug)
 
   if (!poem) {
     return notFound()
   }
 
-  // ✅ Convert poem.content (Markdown) to HTML
+  // Convert poem.content (Markdown) to HTML
   const htmlContent = await markdownToHtml(poem.content || "")
 
-  // ✅ Pass HTML content to client page
+  // Pass HTML content to client page
   return <PoemClientPage poem={{ ...poem, content: htmlContent }} />
 }

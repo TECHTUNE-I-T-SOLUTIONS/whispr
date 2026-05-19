@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
-  MessageSquareText, PenTool, MessageSquareHeart,
+  MessageSquareText, PenTool, MessageSquareHeart, ArrowUp10,
   Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle
 } from "lucide-react"
 import { usePathname } from "next/navigation"
@@ -26,6 +26,8 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
+    { name: "Stories", href: "/admin/stories", icon: PenTool },
+    { name: "Stories Metrics", href: "/admin/stories/metrics", icon: ArrowUp10 },
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },
     { name: "Messages", href: "/admin/messages", icon: MessageSquareText },
@@ -120,13 +122,13 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
             setMessagesUnread(Math.max(0, data.unread_count))
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     }
     window.addEventListener('storage', storageHandler)
 
     return () => {
-      try { window.removeEventListener('conversations:refreshed', handler as EventListener) } catch (e) {}
-      try { window.removeEventListener('storage', storageHandler) } catch (e) {}
+      try { window.removeEventListener('conversations:refreshed', handler as EventListener) } catch (e) { }
+      try { window.removeEventListener('storage', storageHandler) } catch (e) { }
     }
   }, [])
 

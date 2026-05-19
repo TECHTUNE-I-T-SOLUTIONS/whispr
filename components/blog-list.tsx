@@ -112,7 +112,7 @@ export async function BlogList() {
               </div>
 
               <Link
-                href={`/blog/${post.id}`}
+                href={`/blog/${post.slug || post.id}`}
                 className="inline-flex items-center text-primary hover:text-primary/80 text-sm font-medium transition-colors group-hover:translate-x-1 transform"
               >
                 Read more →

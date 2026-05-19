@@ -31,6 +31,7 @@ interface FeedPost {
   publishedAt: string;
   author: Author;
   userReaction?: string | null;
+  slug?: string;
 }
 
 // Helper function to strip HTML tags from content
@@ -62,6 +63,9 @@ function generateSlug(title: string): string {
 
 // Helper function to get detail page URL
 function getDetailPageUrl(post: FeedPost): string {
+  if (post.type === 'story') {
+    return `/stories/${post.slug || post.id}`;
+  }
   if (post.source === 'admin') {
     return `/poems/${post.id}`;
   }

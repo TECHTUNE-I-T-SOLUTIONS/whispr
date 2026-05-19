@@ -132,11 +132,18 @@ function DashboardContent() {
             <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
             <p className="text-muted-foreground">Manage your stories and track your growth</p>
           </div>
-          <Link href="/chronicles/write">
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-              <Plus className="w-4 h-4 mr-2" /> New Post
-            </Button>
-          </Link>
+          <div className="flex gap-2 shrink-0">
+            <Link href="/chronicles/stories/new">
+              <Button variant="outline" className="border-purple-600/40 hover:bg-purple-50 dark:hover:bg-purple-950/20 text-purple-600 dark:text-purple-400 rounded-lg">
+                <Plus className="w-4 h-4 mr-2" /> New Story
+              </Button>
+            </Link>
+            <Link href="/chronicles/write">
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
+                <Plus className="w-4 h-4 mr-2" /> New Post
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {loading ? (

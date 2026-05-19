@@ -11,18 +11,57 @@ import { BlogClientPage } from "./blog-client-page"
 import { AppBanner } from "@/components/app-banner"
 
 type BlogPostPageProps = {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params
+async function getPost(slugOrId: string) {
+  const supabase = createSupabaseServer()
+  
+  // 1. Try slug first
+  let { data: post } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      admin (
+        full_name,
+        username,
+        bio,
+        avatar_url
+      )
+    `)
+    .eq("slug", slugOrId)
+    .eq("status", "published")
+    .maybeSingle()
+
+  // 2. Fallback to ID check
+  if (!post) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId)
+    if (isUuid) {
+      const { data } = await supabase
+        .from("posts")
+        .select(`
+          *,
+          admin (
+            full_name,
+            username,
+            bio,
+            avatar_url
+          )
+        `)
+        .eq("id", slugOrId)
+        .eq("status", "published")
+        .maybeSingle()
+      post = data
+    }
+  }
+
+  return post
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
   try {
-    const supabase = createSupabaseServer()
-    const { data: post } = await supabase
-      .from("posts")
-      .select("title, excerpt, seo_description, status")
-      .eq("id", id)
-      .single()
+    const post = await getPost(slug)
 
     if (!post || post.status !== "published") return {}
 
@@ -36,26 +75,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const supabase = createSupabaseServer()
-  const { id } = await params
-  const { data: post } = await supabase
-    .from("posts")
-    .select(`
-      *,
-      admin (
-        full_name,
-        username,
-        bio,
-        avatar_url
-      )
-    `)
-    .eq("id", id)
-    .eq("status", "published")
-    .single()
+  const { slug } = await params
+  const post = await getPost(slug)
 
   if (!post) return notFound()
-
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
   const htmlContent = post.content_html || (await markdownToHtml(post.content || ""))
 
@@ -70,7 +93,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <span>Back to Blog</span>
         </Link>
 
-        <h1 className="text-4xl font-bold">{post.title}</h1>
+        <h1 className="text-4xl font-bold font-serif">{post.title}</h1>
 
         <p className="text-muted-foreground text-sm">
           {post.admin?.full_name || post.admin?.username || "Anonymous"} • {formatDate(post.created_at)} •{" "}
@@ -81,7 +104,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {post.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 text-sm">
             {post.tags.map((tag: string) => (
-              <span key={tag} className="bg-muted/30 px-3 py-1 rounded-full">
+              <span key={tag} className="bg-muted/30 px-3 py-1 rounded-full text-xs">
                 #{tag}
               </span>
             ))}
@@ -122,7 +145,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Share Buttons */}
         <div className="border-t pt-6">
           <ShareButtons
-            url={`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/blog/${post.id}`}
+            url={`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/blog/${post.slug || post.id}`}
             title={post.title}
             description={post.excerpt || post.seo_description || ""}
           />

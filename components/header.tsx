@@ -64,6 +64,7 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
     { name: "Poems", href: "/poems" },
+    { name: "Stories", href: "/stories" },
     { name: "Spoken Words", href: "/media" },
     { name: "About", href: "/about" },
     { name: "whispr Wall", href: "/whispr-wall" },
@@ -202,12 +203,9 @@ export function Header() {
               {/* <Button variant="outline" size="sm" asChild className="text-xs">
                 <Link href="/chronicles/feed">Chronicles Feed</Link>
               </Button> */}
-              <Button variant="outline" size="sm" asChild className="text-xs">
-                <Link href="/auth/login">Chronicles Login</Link>
+              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-lg shadow-sm">
+                <Link href="/chronicles/waitlist">Join Chronicles</Link>
               </Button>
-              {/* <Button size="sm" asChild className="bg-red-600 hover:bg-red-800 text-white text-xs">
-                <Link href="/auth/signup">Join Chronicles</Link>
-              </Button> */}
             </div>
           )}
 
@@ -270,7 +268,7 @@ export function Header() {
             {chroniclesEnabled && (
               <div className="py-2 border-t mt-2 space-y-2">
                 <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
-                <Link href="/auth/login" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Login</Link>
+                <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-purple-400 hover:text-purple-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
                 {/* <Link href="/auth/signup" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link> */}
               </div>
             )}

@@ -109,7 +109,7 @@ export function ChroniclesCTA({ onOpenModal }: ChronicleCTAProps) {
               size="lg"
               className="bg-gradient-to-r from-gray-800 to-primary hover:shadow-xl text-white font-semibold px-8 shadow-lg transition-all"
             >
-              <Link href="/auth/signup" className="flex items-center gap-2">
+              <Link href="/chronicles/waitlist" className="flex items-center gap-2">
                 <Zap className="w-5 h-5" />
                 Start Creating
                 <ArrowRight className="w-5 h-5" />

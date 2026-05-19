@@ -114,7 +114,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                       size="lg"
                       className="bg-white text-purple-600 hover:bg-white/90 font-semibold"
                     >
-                      <Link href="/auth/signup" className="flex items-center gap-2">
+                      <Link href="/chronicles/waitlist" className="flex items-center gap-2">
                         Join Now
                         <ArrowRight className="w-4 h-4" />
                       </Link>

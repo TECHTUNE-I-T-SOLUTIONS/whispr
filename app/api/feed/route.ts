@@ -155,6 +155,18 @@ export async function GET(request: NextRequest) {
       }
     }))
 
+    // Fetch stories from view_all_stories
+    const { data: feedStories, error: storiesError } = await supabase
+      .from("view_all_stories")
+      .select("*")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(10)
+
+    if (storiesError) {
+      console.error("Stories feed error:", storiesError)
+    }
+
     // Combine and format posts
     const formattedPosts = []
 
@@ -210,6 +222,36 @@ export async function GET(request: NextRequest) {
             username: post.creator?.pen_name?.toLowerCase().replace(/\s+/g, ''),
             avatar_url: post.author?.avatar_url, // Use processed avatar
             type: "creator"
+          }
+        })
+      })
+    }
+
+    // Format stories
+    if (feedStories) {
+      feedStories.forEach(story => {
+        formattedPosts.push({
+          id: story.id,
+          title: story.title,
+          content: story.description || story.excerpt || "",
+          excerpt: story.excerpt || story.description || "",
+          type: "story",
+          source: story.author_type === "admin" ? "admin" : "creator",
+          featured: false,
+          readingTime: story.chapters_count * 5 || 5,
+          tags: story.tags || [],
+          viewCount: story.views_count,
+          likesCount: story.likes_count,
+          coverImageUrl: story.cover_image_url,
+          createdAt: story.published_at || story.created_at,
+          publishedAt: story.published_at || story.created_at,
+          slug: story.slug,
+          author: {
+            id: story.author_id,
+            name: story.author_name,
+            username: story.author_username,
+            avatar_url: story.author_avatar ? getAvatarProxyUrlWithBucket(story.author_avatar, story.author_type === 'admin' ? 'avatars' : 'chronicles-profiles') : null,
+            type: story.author_type === "admin" ? "admin" : "creator"
           }
         })
       })

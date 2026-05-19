@@ -221,7 +221,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
                     size="lg"
                     className="flex-1 bg-gradient-to-r from-foreground to-primary text-white hover:shadow-lg transition-shadow p-2"
                   >
-                    <Link href="/auth/signup" className="flex items-center gap-2">
+                    <Link href="/chronicles/waitlist" className="flex items-center gap-2">
                       Get Started
                       <ArrowRight className="w-4 h-4" />
                     </Link>

@@ -1,7 +1,6 @@
 "use client"
 
 import { Suspense, useRef, useState } from "react"
-import { notFound } from "next/navigation"
 import { Comments } from "@/components/comments"
 import { Reactions } from "@/components/reactions"
 import { ShareButtons } from "@/components/share-buttons"
@@ -19,7 +18,7 @@ interface PoemClientPageProps {
 }
 
 export default function PoemClientPage({ poem }: PoemClientPageProps) {
-  const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/poems/${poem.id}`
+  const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/poems/${poem.slug || poem.id}`
   const contentRef = useRef<HTMLDivElement>(null)
   const [autoScrollMode, setAutoScrollMode] = useState(false)
 
@@ -37,7 +36,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
               <span>{formatDate(poem.created_at)}</span>
               <span>•</span>
               <Clock className="h-4 w-4" />
-              <span>{Math.ceil(poem.content.split(" ").length / 200)} min read</span>
+              <span>{Math.ceil((poem.content || "").split(" ").length / 200)} min read</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
@@ -82,28 +81,28 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
             <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
               {poem.media_files.map((file: any, index: number) => (
                 <MediaPlayer
-                  key={index}
-                  media={{
-                    id: file.id || `media-${index}`,
-                    original_name: file.original_name || file.file_name || `Media ${index + 1}`,
-                    file_name: file.file_name || file.original_name || `media-${index}`,
-                    file_path: file.file_path || "",
-                    file_url: file.file_url || "",
-                    file_type: file.file_type || "application/octet-stream",
-                    file_size: file.file_size || 0
-                  }}
-                  showControls={false}
-                  showDownload={false}
-                  hideMeta={true}
-                />
+                   key={index}
+                   media={{
+                     id: file.id || `media-${index}`,
+                     original_name: file.original_name || file.file_name || `Media ${index + 1}`,
+                     file_name: file.file_name || file.original_name || `media-${index}`,
+                     file_path: file.file_path || "",
+                     file_url: file.file_url || "",
+                     file_type: file.file_type || "application/octet-stream",
+                     file_size: file.file_size || 0
+                   }}
+                   showControls={false}
+                   showDownload={false}
+                   hideMeta={true}
+                 />
               ))}
             </div>
           )}
 
           {/* Poem Content */}
-          <Card className="mb-8">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <span className="text-sm text-muted-foreground">Advanced Reading Features</span>
+          <Card className="mb-8 border-0 bg-card/50 backdrop-blur shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-border/20">
+              <span className="text-sm text-muted-foreground font-serif">Advanced Reading Features</span>
               <AdvancedFeaturesModal text={poem.content.replace(/<[^>]*>/g, '')} contentRef={contentRef} onAutoScrollChange={setAutoScrollMode} />
             </CardHeader>
             <CardContent className={autoScrollMode ? 'p-0' : 'p-8'}>
@@ -128,7 +127,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
                 <div className="p-8">
                   <div 
                     ref={contentRef}
-                    className="prose prose-invert poem-content" 
+                    className="prose prose-invert poem-content font-serif text-lg leading-relaxed text-foreground" 
                     dangerouslySetInnerHTML={{ __html: poem.content }}
                     suppressHydrationWarning
                   />
@@ -168,8 +167,8 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
       <style jsx global>{`
         .poem-content {
           white-space: pre-wrap;
-          line-height: 1.0;
-          font-size: 1.1rem;
+          line-height: 1.8;
+          font-size: 1.125rem;
           word-break: break-word;
           color: #000000;
         }
@@ -184,7 +183,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
         }
 
         .poem-content p {
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
           text-align: left;
           color: inherit;
         }
@@ -211,11 +210,6 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
         .poem-content em {
           color: hsl(var(--muted-foreground));
           font-style: italic;
-        }
-        
-        .poem-content strong {
-          font-weight: 600;
-          color: inherit;
         }
       `}</style>
     </div>

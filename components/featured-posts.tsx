@@ -88,7 +88,7 @@ export async function FeaturedPosts() {
                   {post.authors?.name || "Prayce"}
                 </div>
                 <Link
-                  href={`/${post.type === "poem" ? "poems" : "blog"}/${post.id}`}
+                  href={`/${post.type === "poem" ? "poems" : "blog"}/${post.slug || post.id}`}
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Read {post.type === "poem" ? "poem" : "more"} →
