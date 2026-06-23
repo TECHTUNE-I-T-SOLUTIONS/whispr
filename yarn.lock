@@ -2742,6 +2742,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pluralize@npm:^0.0.29":
+  version: 0.0.29
+  resolution: "@types/pluralize@npm:0.0.29"
+  checksum: 10c0/840796fa1db158eb4d9787758d134736e29d9a8035f5b0cbad06e3801fc64b79112ba944c83f9a1a5b94da08703f505b8315b7e0f28bfc0f8e9e1ccfead7b083
+  languageName: node
+  linkType: hard
+
 "@types/quill@npm:^1.3.10":
   version: 1.3.10
   resolution: "@types/quill@npm:1.3.10"
@@ -5853,6 +5860,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"keyword-extractor@npm:^0.0.28":
+  version: 0.0.28
+  resolution: "keyword-extractor@npm:0.0.28"
+  checksum: 10c0/d4ddd6e752e03d2f8ca202a0ddcc0b03a8cdfa48ab8ef6a81f1e251b0e1735f7b9f8b16abf2f0500159d745bf2cb534cc593862c7512fe687b539bff1693dd46
+  languageName: node
+  linkType: hard
+
 "language-subtag-registry@npm:^0.3.20":
   version: 0.3.23
   resolution: "language-subtag-registry@npm:0.3.23"
@@ -6917,6 +6931,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"normalize-strings@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "normalize-strings@npm:1.1.1"
+  checksum: 10c0/5090299b495353ea435c31feb3b1b9684a1034b599fd29f1babf210b417c286683dc52a035ddc5cff682148df1e2641a9c40be29254d2b609e27a5e09134657d
+  languageName: node
+  linkType: hard
+
 "npm-run-path@npm:^4.0.1":
   version: 4.0.1
   resolution: "npm-run-path@npm:4.0.1"
@@ -7132,6 +7153,13 @@ __metadata:
   version: 4.0.7
   resolution: "pirates@npm:4.0.7"
   checksum: 10c0/a51f108dd811beb779d58a76864bbd49e239fa40c7984cd11596c75a121a8cc789f1c8971d8bb15f0dbf9d48b76c05bb62fcbce840f89b688c0fa64b37e8478a
+  languageName: node
+  linkType: hard
+
+"pluralize@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "pluralize@npm:8.0.0"
+  checksum: 10c0/2044cfc34b2e8c88b73379ea4a36fc577db04f651c2909041b054c981cd863dd5373ebd030123ab058d194ae615d3a97cfdac653991e499d10caf592e8b3dc33
   languageName: node
   linkType: hard
 
@@ -7539,6 +7567,13 @@ __metadata:
   dependencies:
     picomatch: "npm:^2.2.1"
   checksum: 10c0/6fa848cf63d1b82ab4e985f4cf72bd55b7dcfd8e0a376905804e48c3634b7e749170940ba77b32804d5fe93b3cc521aa95a8d7e7d725f830da6d93f3669ce66b
+  languageName: node
+  linkType: hard
+
+"reading-time@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "reading-time@npm:1.5.0"
+  checksum: 10c0/0f730852fd4fb99e5f78c5b0cf36ab8c3fa15db96f87d9563843f6fd07a47864273ade539ebb184b785b728cde81a70283aa2d9b80cba5ca03b81868be03cabc
   languageName: node
   linkType: hard
 
@@ -8374,6 +8409,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"syllable@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "syllable@npm:5.0.1"
+  dependencies:
+    "@types/pluralize": "npm:^0.0.29"
+    normalize-strings: "npm:^1.1.0"
+    pluralize: "npm:^8.0.0"
+  bin:
+    syllable: cli.js
+  checksum: 10c0/942eef863c48ccf45fb8b608fb4ce811883ed4cb84050c57d87277cec00b666da97cc61bc7141f0238b98232827c0ca7deecc9e7ee4f24f2b1074c7ecdcdb771
+  languageName: node
+  linkType: hard
+
 "tailwind-merge@npm:^2.5.5":
   version: 2.6.0
   resolution: "tailwind-merge@npm:2.6.0"
@@ -8434,6 +8482,16 @@ __metadata:
     mkdirp: "npm:^3.0.1"
     yallist: "npm:^5.0.0"
   checksum: 10c0/d4679609bb2a9b48eeaf84632b6d844128d2412b95b6de07d53d8ee8baf4ca0857c9331dfa510390a0727b550fd543d4d1a10995ad86cdf078423fbb8d99831d
+  languageName: node
+  linkType: hard
+
+"text-readability@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "text-readability@npm:1.1.1"
+  dependencies:
+    pluralize: "npm:^8.0.0"
+    syllable: "npm:^5.0.1"
+  checksum: 10c0/9bbec44f615c65939db449a1ffa60e95715e8cf21c087e83a25359d8a71e9e9d6ea05f16f627a507d3fe7c297f0a744cb9e427dc3f92a22cbc6624f6a16f7d30
   languageName: node
   linkType: hard
 
@@ -9135,6 +9193,7 @@ __metadata:
     file-saver: "npm:^2.0.5"
     framer-motion: "npm:latest"
     input-otp: "npm:latest"
+    keyword-extractor: "npm:^0.0.28"
     lucide-react: "npm:^0.454.0"
     markdown-it: "npm:^14.1.0"
     marked: "npm:latest"
@@ -9148,6 +9207,7 @@ __metadata:
     react-is: "npm:^19.1.0"
     react-quill: "npm:^2.0.0"
     react-resizable-panels: "npm:latest"
+    reading-time: "npm:^1.5.0"
     recharts: "npm:latest"
     remark: "npm:^15.0.1"
     remark-gfm: "npm:^4.0.1"
@@ -9156,6 +9216,7 @@ __metadata:
     tailwind-merge: "npm:^2.5.5"
     tailwindcss: "npm:^3.4.17"
     tailwindcss-animate: "npm:^1.0.7"
+    text-readability: "npm:^1.1.1"
     typescript: "npm:^5"
     vaul: "npm:latest"
     web-push: "npm:^3.6.7"
