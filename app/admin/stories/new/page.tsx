@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { BookOpen, ArrowLeft, Send, ShieldCheck, Plus } from "lucide-react"
+import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
 
 const GENRES = ["Fantasy", "Sci-Fi", "Romance", "Mystery", "Adventure", "Comedy", "Thriller", "Drama", "Historical Fiction"]
 
@@ -216,6 +217,22 @@ export default function NewAdminStoryPage() {
                   className="bg-background/60 border-border/40 focus:ring-primary rounded-lg font-serif"
                 />
               </div>
+
+              {/* SEO Analyzer Integration */}
+              <SEOAnalyzer 
+                title={title}
+                content={description}
+                excerpt={excerpt}
+                tags={tagsInput.split(",").map(t => t.trim()).filter(t => t)}
+                type="story"
+                genre={genre}
+                onApplyTitle={setTitle}
+                onApplyTags={(newTags) => {
+                  const currentTags = tagsInput.split(",").map(t => t.trim()).filter(t => t)
+                  const combined = Array.from(new Set([...currentTags, ...newTags]))
+                  setTagsInput(combined.join(", "))
+                }}
+              />
 
               {/* Optional First Chapter Section */}
               <div className="p-5 border border-border/10 rounded-2xl bg-muted/20 space-y-4">

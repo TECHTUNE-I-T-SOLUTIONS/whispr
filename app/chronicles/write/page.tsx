@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Send, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SEOAnalyzer } from '@/components/seo/seo-analyzer';
 
 interface PostData {
   id?: string;
@@ -132,9 +133,9 @@ function ChroniclesWriteContent() {
       
       let element = contentRef.current;
       if (!element) {
-        element = document.getElementById('chronicles-content-editor');
+        element = document.getElementById('chronicles-content-editor') as HTMLDivElement;
       }
-      
+
       console.log('element found:', !!element);
       console.log('postData.content length:', postData.content?.length);
       
@@ -721,6 +722,22 @@ function ChroniclesWriteContent() {
               ))}
             </div>
           </div>
+
+          <SEOAnalyzer 
+            title={postData.title}
+            content={postData.content}
+            excerpt={postData.excerpt}
+            tags={postData.tags}
+            type={postData.post_type}
+            genre={postData.category}
+            onApplyTitle={(newTitle) => setPostData(prev => ({ ...prev, title: newTitle, slug: generateSlug(newTitle) }))}
+            onApplyTags={(newTags) => {
+              setPostData(prev => ({
+                ...prev,
+                tags: Array.from(new Set([...prev.tags, ...newTags]))
+              }))
+            }}
+          />
 
           <hr className="my-6 border-gray-200 dark:border-slate-800" />
 

@@ -38,6 +38,7 @@ import { marked } from "marked"
 import { useToast } from "@/hooks/use-toast"
 import DOMPurify from "dompurify"
 import { MediaSelector } from "@/components/admin/media-selector"
+import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
 marked.setOptions({ breaks: true })
 
 
@@ -1071,6 +1072,20 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   className="min-h-[80px] resize-none"
                 />
               </div>
+              <SEOAnalyzer 
+                title={formData.title}
+                content={formData.content}
+                excerpt={formData.excerpt}
+                tags={formData.tags}
+                type={formData.type}
+                onApplyTitle={(newTitle) => setFormData((prev) => ({ ...prev, title: newTitle, seoTitle: newTitle }))}
+                onApplyTags={(newTags) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    tags: Array.from(new Set([...prev.tags, ...newTags.map(t => t.trim().replace(/^#/, "").toLowerCase()).filter(t => t)]))
+                  }))
+                }}
+              />
             </CardContent>
           </Card>
 

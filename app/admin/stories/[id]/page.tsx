@@ -40,6 +40,7 @@ import {
   X,
   Edit,
 } from "lucide-react"
+import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
 
 interface AdminStory {
   id: string
@@ -592,6 +593,21 @@ export default function AdminStoryManagerPage() {
                       className="bg-background/60 border-border/40 focus:ring-primary rounded-lg font-serif"
                     />
                   </div>
+
+                  <SEOAnalyzer 
+                    title={title}
+                    content={description}
+                    excerpt={excerpt}
+                    tags={tagsInput.split(",").map(t => t.trim()).filter(t => t)}
+                    type="story"
+                    genre={genre}
+                    onApplyTitle={setTitle}
+                    onApplyTags={(newTags) => {
+                      const currentTags = tagsInput.split(",").map(t => t.trim()).filter(t => t)
+                      const combined = Array.from(new Set([...currentTags, ...newTags]))
+                      setTagsInput(combined.join(", "))
+                    }}
+                  />
 
                   <div className="p-4 bg-muted/20 border border-border/10 rounded-xl flex items-center justify-between">
                     <div>
