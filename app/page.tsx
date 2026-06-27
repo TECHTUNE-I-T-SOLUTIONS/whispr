@@ -11,6 +11,8 @@ import { AIIntroductorySection } from "@/components/ai-introductory-section"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, BookOpen, Wand2, Rocket, Search, Compass } from "lucide-react"
 
+export const revalidate = 60
+
 export default function HomePage() {
 
   return (

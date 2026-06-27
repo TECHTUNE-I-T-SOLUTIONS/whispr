@@ -4,20 +4,22 @@ import { BlogHero } from "@/components/blog-hero"
 import { metadata } from "./metadata"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 
-  export default function BlogPage() {
-    return (
-      <div className="whispr-gradient min-h-screen">
-        <BlogHero />
-        <section className="container py-16">
-          <Suspense fallback={<BlogListSkeleton />}>
-            <BlogList />
-          </Suspense>
-        </section>
-        {/* Adsterra banners below main content */}
-        <AdsterraBanner />
-      </div>
-    );
-  }
+export const revalidate = 60
+
+export default function BlogPage() {
+  return (
+    <div className="whispr-gradient min-h-screen">
+      <BlogHero />
+      <section className="container py-16">
+        <Suspense fallback={<BlogListSkeleton />}>
+          <BlogList />
+        </Suspense>
+      </section>
+      {/* Adsterra banners below main content */}
+      <AdsterraBanner />
+    </div>
+  );
+}
 
 function BlogListSkeleton() {
   return (

@@ -5,6 +5,8 @@ import { createSupabaseServer } from "@/lib/supabase-server"
 import { metadata } from "./metadata"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 
+export const revalidate = 60
+
 async function getPoems() {
   const supabase = createSupabaseServer()
 
