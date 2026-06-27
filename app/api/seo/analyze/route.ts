@@ -57,18 +57,101 @@ export async function POST(request: NextRequest) {
         responseMimeType: "application/json",
         responseSchema: responseSchema,
         temperature: 0.7,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,
       },
     });
 
     const text = textResponse.text || '';
-    
+
     let analysisData;
     try {
       analysisData = JSON.parse(text.trim());
     } catch (parseError) {
-      console.error('JSON Parse Error:', text);
-      return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
+      // Extract JSON from potential markdown wrapping
+      let cleanedText = text;
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        cleanedText = codeBlockMatch[1];
+      }
+
+      // Use brace-counting to find the first complete JSON object
+      const start = cleanedText.indexOf('{');
+      if (start === -1) {
+        console.error('JSON Parse Error: No JSON object found in response:', text);
+        return NextResponse.json({ error: 'Failed to parse AI response: invalid format' }, { status: 500 });
+      }
+
+      let depth = 0;
+      let end = -1;
+      let inString = false;
+      let escaped = false;
+
+      for (let i = start; i < cleanedText.length; i++) {
+        const ch = cleanedText[i];
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (ch === '\\' && inString) {
+          escaped = true;
+          continue;
+        }
+        if (ch === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (inString) continue;
+        if (ch === '{') depth++;
+        else if (ch === '}') {
+          depth--;
+          if (depth === 0) {
+            end = i;
+            break;
+          }
+        }
+      }
+
+      if (end === -1) {
+        console.error('JSON Parse Error: Unbalanced braces in response:', text);
+        return NextResponse.json({ error: 'Failed to parse AI response: invalid format' }, { status: 500 });
+      }
+
+      let jsonText = cleanedText.slice(start, end + 1);
+
+      // Progressive trim-from-end to handle truncated/broken JSON strings
+      let parsed = false;
+
+      try {
+        analysisData = JSON.parse(jsonText);
+        parsed = true;
+      } catch {
+        // Fix trailing commas and retry
+        let candidate = jsonText.replace(/,(\s*[}\]])/g, '$1');
+        try {
+          analysisData = JSON.parse(candidate);
+          parsed = true;
+        } catch {
+          // Progressively trim from the end to recover from truncated strings
+          let maxTrims = 500;
+          while (maxTrims-- > 0) {
+            try {
+              analysisData = JSON.parse(candidate);
+              parsed = true;
+              break;
+            } catch {
+              if (candidate.length <= 1) break;
+              candidate = candidate.slice(0, -1).trim();
+              // If we've closed back to a balanced object/array, stop trimming
+              if (candidate.endsWith('}') || candidate.endsWith(']')) break;
+            }
+          }
+        }
+      }
+
+      if (!parsed) {
+        console.error('JSON Parse Error. Raw response:', text);
+        return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
+      }
     }
 
     return NextResponse.json(analysisData);

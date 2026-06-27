@@ -31,6 +31,8 @@ import {
   AlignJustify,
   Image,
   Link as LinkIcon,
+  Heading,
+  MousePointer2,
 } from "lucide-react"
 import { MediaPlayer } from "@/components/media-player"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -58,6 +60,8 @@ interface FormData {
   tags: string[]
   seoTitle: string
   seoDescription: string
+  slug: string
+  schemaType: "Article" | "HowTo" | "FAQPage" | "None"
 }
 
 export function PostEditor({ type: initialType, postId, initialData }: PostEditorProps) {
@@ -78,6 +82,8 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
     tags: initialData?.tags || [],
     seoTitle: initialData?.seo_title || "",
     seoDescription: initialData?.seo_description || "",
+    slug: (initialData as any)?.slug || "",
+    schemaType: "None",
   })
   const [newTag, setNewTag] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -130,6 +136,9 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   const [showLinkDialog, setShowLinkDialog] = useState(false)
   const [linkUrl, setLinkUrl] = useState("")
   const [linkText, setLinkText] = useState("")
+  const [showCtaDialog, setShowCtaDialog] = useState(false)
+  const [ctaText, setCtaText] = useState("")
+  const [ctaUrl, setCtaUrl] = useState("")
   const [selectedFigure, setSelectedFigure] = useState<HTMLElement | null>(null)
   // toolbar positioning will be set using CSS variables on the editor container
   const [editingCaption, setEditingCaption] = useState(false)
@@ -641,7 +650,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-auto mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-ml font-serif font-bold flex items-center gap-2">
@@ -686,10 +695,26 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                      slug: prev.slug || e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+                    }))
+                  }
                   placeholder={formData.type === "poem" ? "Enter poem title..." : "Enter post title..."}
                   className="text-lg font-serif"
                 />
+              </div>
+              <div>
+                <Label htmlFor="slug">URL Slug</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "") }))}
+                  placeholder="clean-url-slug"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Auto-generated from title. Edit for keywords if needed.</p>
               </div>
 
               {/* Formatting toolbar */}
@@ -728,6 +753,18 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   {" "}
                   <AlignJustify className="h-4 w-4" />{" "}
                 </Button>
+                <Button type="button" variant="ghost" onClick={() => exec('formatBlock', 'H1')}>
+                  <Heading className="h-4 w-4" />1
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => exec('formatBlock', 'H2')}>
+                  <Heading className="h-4 w-4" />2
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => exec('formatBlock', 'H3')}>
+                  <Heading className="h-4 w-4" />3
+                </Button>
+                <Button type="button" variant="ghost" onMouseDown={(e) => e.preventDefault()} onClick={() => { saveSelection(); setShowCtaDialog(true); setCtaText(''); setCtaUrl(''); }}>
+                  <MousePointer2 className="h-4 w-4" />
+                </Button>
               </div>
 
               <div>
@@ -739,7 +776,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   contentEditable
                   suppressContentEditableWarning
                   onInput={() => setFormData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || "" }))}
-                  className={`min-h-[400px] p-3 text-black dark:text-white border rounded prose max-w-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
+                  className={`min-h-[400px] p-3 text-black dark:text-white border rounded prose dark:prose-invert max-w-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                   aria-label={formData.type === "poem" ? "Poem content editor" : "Post content editor"}
                 />
                   {/* Floating figure toolbar (positioned via CSS variables set on the editor container) */}
@@ -843,6 +880,39 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                                 el.setAttribute('rel', 'noopener noreferrer')
                               }
                             }
+                          }
+                        }, 0)
+                      }}>Insert</Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* CTA button dialog */}
+              <Dialog open={showCtaDialog} onOpenChange={setShowCtaDialog}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Insert CTA Button</DialogTitle>
+                    <DialogDescription>Add a highlighted CTA button/link at the current caret/selection.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3 mt-4">
+                    <div>
+                      <Label>Button text</Label>
+                      <Input value={ctaText} onChange={(e) => setCtaText(e.target.value)} placeholder="Get Started" />
+                    </div>
+                    <div>
+                      <Label>URL</Label>
+                      <Input value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} placeholder="https://example.com" />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" onClick={() => setShowCtaDialog(false)}>Cancel</Button>
+                      <Button onClick={() => {
+                        setShowCtaDialog(false)
+                        setTimeout(() => {
+                          restoreSelection()
+                          if (ctaText && ctaUrl) {
+                            const html = `<a href="${ctaUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90">${ctaText}</a>`
+                            exec('insertHTML', html)
                           }
                         }, 0)
                       }}>Insert</Button>
@@ -1006,7 +1076,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-20 lg:self-start">
           <Card className="border-0 bg-card/50 backdrop-blur">
             <CardHeader>
               <CardTitle>Publish Settings</CardTitle>
@@ -1071,6 +1141,24 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   placeholder="SEO meta description..."
                   className="min-h-[80px] resize-none"
                 />
+              </div>
+              <div>
+                <Label>Schema Markup</Label>
+                <Select
+                  value={formData.schemaType}
+                  onValueChange={(value: FormData["schemaType"]) => setFormData((prev) => ({ ...prev, schemaType: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select schema type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="None">None</SelectItem>
+                    <SelectItem value="Article">Article</SelectItem>
+                    <SelectItem value="HowTo">HowTo</SelectItem>
+                    <SelectItem value="FAQPage">FAQPage</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Adds structured data for richer search results.</p>
               </div>
               <SEOAnalyzer 
                 title={formData.title}

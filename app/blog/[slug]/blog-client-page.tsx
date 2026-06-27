@@ -20,20 +20,20 @@ export function BlogClientPage({ htmlContent, plainText }: BlogClientPageProps) 
           <span className="text-sm text-muted-foreground font-serif">Advanced Reading Features</span>
           <AdvancedFeaturesModal text={plainText} contentRef={contentRef} onAutoScrollChange={setAutoScrollMode} />
         </CardHeader>
-        <CardContent className={autoScrollMode ? 'p-0' : 'p-8'}>
+        <CardContent className={autoScrollMode ? 'p-0' : 'p-6 md:p-8'}>
           {autoScrollMode ? (
-            <div className="h-96 overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg">
-              <div 
+            <div className="h-[70vh] overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg">
+              <div
                 ref={contentRef}
-                className="h-full overflow-y-auto flex flex-col items-center justify-end px-4 py-8"
+                className="h-full overflow-y-auto px-4 py-6 md:px-6 lg:px-8"
               >
-                <div className="pt-96 text-center w-full prose prose-lg dark:prose-invert max-w-none">
+                <div className="w-full prose prose-lg dark:prose-invert max-w-none">
                   <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
                 </div>
               </div>
             </div>
           ) : (
-            <div className="prose prose-lg dark:prose-invert text-foreground leading-relaxed">
+            <div className="prose prose-lg dark:prose-invert text-foreground leading-relaxed max-w-none">
               <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
             </div>
           )}

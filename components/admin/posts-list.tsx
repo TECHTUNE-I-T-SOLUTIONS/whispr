@@ -84,7 +84,7 @@ export const PostsList = ({ data = [], currentAdminId = null }: PostsListProps) 
       header: "Content",
       cell: ({ row }) => (
         <div
-          className="prose max-w-none"
+          className="prose dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(marked.parse(row.original.content) as string),
           }}

@@ -364,7 +364,7 @@ export function SEOAnalyzer({
                 "h-3 w-3 rounded-full animate-pulse transition-all duration-300",
                 activeScore > 75 ? "bg-green-500" : activeScore > 50 ? "bg-amber-500" : "bg-red-500"
               )} />
-              <CardTitle className="text-lg font-serif">SEO Compatibility</CardTitle>
+              <CardTitle className="text-lg font-serif">SEO Check</CardTitle>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -373,7 +373,7 @@ export function SEOAnalyzer({
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="rounded-lg h-8 px-3 text-xs"
               >
-                {isExpanded ? "Hide Details" : "View Live Checks"}
+                {isExpanded ? "Hide Details" : "View Live"}
               </Button>
               {result && (
                 <Button 
@@ -382,7 +382,7 @@ export function SEOAnalyzer({
                   onClick={() => setShowModal(true)}
                   className="rounded-lg h-8 px-3 text-xs"
                 >
-                  View Details
+                  Details
                 </Button>
               )}
               <Button 
@@ -399,7 +399,7 @@ export function SEOAnalyzer({
                 ) : (
                   <>
                     <Sparkles className="h-3 w-3 mr-1.5" />
-                    Trigger SEO Check
+                    Trigger Check
                   </>
                 )}
               </Button>
@@ -484,7 +484,7 @@ export function SEOAnalyzer({
       {/* Advanced Analysis Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto border-none shadow-2xl rounded-3xl p-0">
-          <div className={cn("p-8 sticky top-0 z-10 border-b", result ? getScoreBg(result.score) : "bg-muted")}>
+          <div className={cn("p-8 sticky top-0 z-10 border-b", result ? getScoreBg(result.score) : "bg-primary")}>
             <DialogHeader className="space-y-1">
               <div className="flex items-center justify-between mb-4">
                 <Badge variant="outline" className="bg-background/50 border-border/20 uppercase tracking-tighter text-[10px]">

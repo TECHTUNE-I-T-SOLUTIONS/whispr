@@ -42,13 +42,14 @@ export async function POST(request: NextRequest) {
     const supabase = createSupabaseServer()
 
     const body = await request.json()
-    const { title, content, excerpt, type, status, featured, tags, seoTitle, seoDescription, mediaFiles } = body
+    const { title, content, excerpt, type, status, featured, tags, seoTitle, seoDescription, mediaFiles, slug, schemaType } = body
 
-    // Generate slug from title
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
+    // Generate slug from title if not provided
+    const postSlug = (slug || "").trim() ||
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")
 
     // Calculate reading time (rough estimate)
     const wordsPerMinute = 200
@@ -68,7 +69,8 @@ export async function POST(request: NextRequest) {
       media_files: mediaFiles || [],
       seo_title: seoTitle || title,
       seo_description: seoDescription || excerpt,
-      slug,
+      slug: postSlug,
+      schema_type: schemaType,
       published_at: status === "published" ? new Date().toISOString() : null,
     }
 
