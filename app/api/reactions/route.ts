@@ -157,9 +157,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
-    }
+    // Capture request metadata for anonymous users
+    const userAgent = request.headers.get("user-agent") || ""
 
     // Determine if this is an admin post or chronicles post
     const { data: adminPost } = await supabase
@@ -171,15 +170,21 @@ export async function POST(request: NextRequest) {
     const isAdminPost = !!adminPost
 
     if (isAdminPost) {
-      console.log("Handling admin post reaction:", { post_id, reaction_type, userId })
-      // Handle admin post reactions
-      // Check if user already reacted to this post
-      const { data: existing, error: fetchError } = await supabase
+      console.log("Handling admin post reaction:", { post_id, reaction_type, userId, userIp })
+      // Handle admin post reactions — supports both authenticated and anonymous users
+      // For anonymous users, match by IP; for authenticated, match by user_id
+      let query = supabase
         .from("reactions")
         .select("*")
         .eq("post_id", post_id)
-        .eq("user_id", userId)
-        .single()
+
+      if (userId) {
+        query = query.eq("user_id", userId)
+      } else {
+        query = query.is("user_id", null).eq("user_ip", userIp)
+      }
+
+      const { data: existing, error: fetchError } = await query.single()
 
       if (fetchError && fetchError.code !== "PGRST116") {
         console.error("Fetch error:", fetchError)
@@ -234,10 +239,20 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // No previous reaction — insert new one
+      // No previous reaction — insert new one (supports both authenticated and anonymous)
+      const insertPayload: any = {
+        post_id,
+        reaction_type,
+        user_ip: userIp,
+        user_agent: userAgent,
+      }
+      if (userId) {
+        insertPayload.user_id = userId
+      }
+
       const { error: insertError } = await supabase
         .from("reactions")
-        .insert({ post_id, user_id: userId, reaction_type })
+        .insert(insertPayload)
 
       if (insertError) {
         console.error("Insert error:", insertError)
@@ -285,10 +300,16 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: deleteError.message }, { status: 500 })
         }
 
-        // Update likes count
+        // Update likes count (read current, then update)
+        const { data: postToDec } = await supabase
+          .from("chronicles_posts")
+          .select("likes_count")
+          .eq("id", post_id)
+          .single()
+
         const { error: decrementError } = await supabase
           .from("chronicles_posts")
-          .update({ likes_count: supabase.raw('likes_count - 1') })
+          .update({ likes_count: Math.max(0, (postToDec?.likes_count || 0) - 1) })
           .eq("id", post_id)
 
         if (decrementError) {
@@ -311,10 +332,16 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: insertError.message }, { status: 500 })
         }
 
-        // Update likes count
+        // Update likes count (read current, then update)
+        const { data: postToInc } = await supabase
+          .from("chronicles_posts")
+          .select("likes_count")
+          .eq("id", post_id)
+          .single()
+
         const { error: incrementError } = await supabase
           .from("chronicles_posts")
-          .update({ likes_count: supabase.raw('likes_count + 1') })
+          .update({ likes_count: (postToInc?.likes_count || 0) + 1 })
           .eq("id", post_id)
 
         if (incrementError) {
