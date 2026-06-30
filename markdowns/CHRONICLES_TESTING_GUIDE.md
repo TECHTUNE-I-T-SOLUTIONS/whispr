@@ -27,7 +27,7 @@
 - **Status**: FIXED - Logout now functional
 
 #### 5. **Website Field Prefilling** ✅
-- **Problem**: Website field should prefill with whisprwords.vercel.app
+- **Problem**: Website field should prefill with whisprwords.com
 - **Solution**: Already implemented in form initialization
 - **Status**: CONFIRMED WORKING - Users can change it if they have their own domain
 
@@ -49,7 +49,7 @@
 ✅ Step 2: Profile info (pen name, display name, bio, profile picture upload)
 ✅ Step 3: Content preferences (type, categories, visibility, social links)
 ✅ Step 4: Notification settings (push, email, engagement)
-✅ Website field prefilled with `https://whisprwords.vercel.app`
+✅ Website field prefilled with `https://whisprwords.com`
 ✅ Users can change website to their own domain
 ✅ Image preview with remove option
 ✅ Multi-select category picker with visual feedback
@@ -84,7 +84,7 @@
 7. Select content type: `both`
 8. Select categories: Choose at least 2 (e.g., "Fiction", "Poetry")
 9. Keep profile visibility: `public`
-10. **Website field shows:** `https://whisprwords.vercel.app` (can change if desired)
+10. **Website field shows:** `https://whisprwords.com` (can change if desired)
 11. Enter X handle: (optional)
 12. Enter Instagram handle: (optional)
 13. Keep notification preferences checked (defaults)
@@ -205,7 +205,7 @@ LIMIT 1;
 **Test with custom website:**
 
 1. On Step 4 (Social Links):
-2. Change Website from `https://whisprwords.vercel.app` to `https://mysite.com`
+2. Change Website from `https://whisprwords.com` to `https://mysite.com`
 3. Complete signup
 4. Verify in database `social_links` contains:
 ```json
@@ -269,7 +269,7 @@ LIMIT 1;
   "socialLinks": {
     "twitter": "handle",
     "instagram": "handle",
-    "website": "https://whisprwords.vercel.app"
+    "website": "https://whisprwords.com"
   }
 }
 ```

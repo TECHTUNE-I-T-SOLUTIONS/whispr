@@ -103,7 +103,7 @@ interface AppBannerProps {
 ## How It Works
 
 ### User on Mobile WITH App Installed:
-1. User visits: `https://whisprwords.vercel.app/chronicles/UUID`
+1. User visits: `https://whisprwords.com/chronicles/UUID`
 2. Banner appears with "Open in App"
 3. User taps "Open" button
 4. Banner attempts deeplink: `whispr://app/chronicles/UUID`
@@ -111,7 +111,7 @@ interface AppBannerProps {
 6. App navigates to chronicle detail screen
 
 ### User on Mobile WITHOUT App Installed:
-1. User visits: `https://whisprwords.vercel.app/chronicles/UUID`
+1. User visits: `https://whisprwords.com/chronicles/UUID`
 2. Banner appears with "Open in App"
 3. User taps "Open" button
 4. Deeplink fails (no app handler)
@@ -203,7 +203,7 @@ const appStoreUrl = 'https://apps.apple.com/app/whispr/id1234567890'; // Add rea
 ## Testing the Integration
 
 ### Test on Mobile Device (Android):
-1. Visit: `https://whisprwords.vercel.app/chronicles/any-chronicle-id`
+1. Visit: `https://whisprwords.com/chronicles/any-chronicle-id`
 2. Look for purple banner at bottom
 3. Tap "Open in App" button
    - If app installed: Opens app to chronicle
@@ -212,7 +212,7 @@ const appStoreUrl = 'https://apps.apple.com/app/whispr/id1234567890'; // Add rea
 5. Tap X to dismiss → Banner hidden for 24 hours
 
 ### Test on Mobile Device (iOS):
-1. Visit: `https://whisprwords.vercel.app/poems/any-poem-id`
+1. Visit: `https://whisprwords.com/poems/any-poem-id`
 2. Look for purple banner at bottom
 3. Tap "Open in App" button
    - If app installed: Opens app to poem
@@ -221,7 +221,7 @@ const appStoreUrl = 'https://apps.apple.com/app/whispr/id1234567890'; // Add rea
 5. Tap "Get App" (second button) → Download app
 
 ### Test on Desktop:
-1. Visit: `https://whisprwords.vercel.app/blog/any-blog-id`
+1. Visit: `https://whisprwords.com/blog/any-blog-id`
 2. Banner should NOT appear
 3. Normal web reading experience
 
@@ -357,14 +357,14 @@ const handleOpenPlayStore = () => {
 **Android** (Google Play Console):
 - [ ] Go to "Setup" → "App signing"
 - [ ] Add Digital Asset Links
-- [ ] Whispr domain: `whisprwords.vercel.app`
+- [ ] Whispr domain: `whisprwords.com`
 - [ ] Apps can now auto-open without chooser
 
 **iOS** (.well-known/apple-app-site-association):
 - [ ] Create file at: `/public/.well-known/apple-app-site-association`
 - [ ] Add your Team ID and app ID
 - [ ] Deploy to production
-- [ ] Verify in browser: `https://whisprwords.vercel.app/.well-known/apple-app-site-association`
+- [ ] Verify in browser: `https://whisprwords.com/.well-known/apple-app-site-association`
 
 ### Step 5: Deploy Web App
 - [ ] Update AppBanner component with real store URLs
