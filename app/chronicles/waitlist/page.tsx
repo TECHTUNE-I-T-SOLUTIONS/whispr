@@ -27,9 +27,9 @@ import {
   Globe,
   Lock,
   Instagram,
-  Twitter,
-  ArrowLeft
-} from 'lucide-react';
+  } from 'lucide-react';
+  import { XIcon } from '@/components/icons/XIcon';
+
 
 export default function ChroniclesWaitlist() {
   const router = useRouter();
@@ -719,7 +719,7 @@ export default function ChroniclesWaitlist() {
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Social Handles (for reservations confirmation)</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="relative">
-                        <Twitter className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                        <XIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                         <Input
                           type="text"
                           placeholder="twitter_handle"

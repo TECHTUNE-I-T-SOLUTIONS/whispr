@@ -6,7 +6,14 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, Menu, ChevronLeft, ChevronRight, Settings, ZoomIn, ZoomOut, Maximize2, X, Sparkles } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
+import { createSupabaseBrowser } from "@/lib/supabase-browser"
+import {
+  BookOpen, Menu, ChevronLeft, ChevronRight, Maximize2, X, Sparkles, TypeOutline,
+  ThumbsUp, ThumbsDown, MessageSquare, Send
+} from "lucide-react"
 
 interface ChapterClientPageProps {
   story: any
@@ -26,11 +33,29 @@ export default function ChapterClientPage({
   nextChapterSlug,
 }: ChapterClientPageProps) {
   const router = useRouter()
+  const { toast } = useToast()
+  const supabase = createSupabaseBrowser()
 
   const [scrollProgress, setScrollProgress] = useState(0)
   const [fontSize, setFontSize] = useState<FontSize>("base")
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [immersiveMode, setImmersiveMode] = useState(false)
+
+  // ----- Comments state -----
+  const [user, setUser] = useState<any>(null)
+  const [comments, setComments] = useState<any[]>([])
+  const [newComment, setNewComment] = useState("")
+  const [commenterName, setCommenterName] = useState("")
+  const [commenterEmail, setCommenterEmail] = useState("")
+  const [submittingComment, setSubmittingComment] = useState(false)
+  const [savedGuestName, setSavedGuestName] = useState("")
+  const [savedGuestEmail, setSavedGuestEmail] = useState("")
+
+  // ----- Reactions state -----
+  const [likesCount, setLikesCount] = useState(chapter.likes_count || 0)
+  const [dislikesCount, setDislikesCount] = useState(chapter.dislikes_count || 0)
+  const [userReaction, setUserReaction] = useState<string | null>(null)
+  const [loadingReaction, setLoadingReaction] = useState(true)
 
   // 1. Monitor scroll coordinates to compute horizontal progress
   useEffect(() => {
@@ -45,6 +70,197 @@ export default function ChapterClientPage({
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  // 2. Load user, comments, and reactions on mount
+  useEffect(() => {
+    const initialize = async () => {
+      // Check user
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+
+      if (user) {
+        // Try fetching creator details for chronicles users
+        const { data: creator } = await supabase
+          .from("chronicles_creators")
+          .select("pen_name, display_name, email")
+          .eq("user_id", user.id)
+          .single()
+
+        const creatorData = creator as { pen_name?: string; display_name?: string; email?: string } | null
+        const name = creatorData
+          ? (creatorData.display_name || creatorData.pen_name)
+          : (user.user_metadata?.full_name || user.email?.split("@")[0] || "Reader")
+        setCommenterName(name)
+      } else {
+        // Check localStorage for saved guest identity
+        const savedName = localStorage.getItem("whispr_guest_name")
+        const savedEmail = localStorage.getItem("whispr_guest_email")
+        if (savedName) {
+          setSavedGuestName(savedName)
+          setCommenterName(savedName)
+        }
+        if (savedEmail) {
+          setSavedGuestEmail(savedEmail)
+          setCommenterEmail(savedEmail)
+        }
+      }
+
+      // Fetch comments
+      fetchComments()
+      // Fetch reactions
+      fetchReactions()
+    }
+
+    initialize()
+  }, [chapter.id])
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(
+        `/api/stories/chapter-comment?chapterId=${chapter.id}&storyId=${story.id}&authorType=${story.author_type}`
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setComments(data.comments || [])
+      }
+    } catch (err) {
+      console.error("Chapter comments fetch error:", err)
+    }
+  }
+
+  const fetchReactions = async () => {
+    try {
+      setLoadingReaction(true)
+      const res = await fetch(
+        `/api/stories/chapter-reaction?chapterId=${chapter.id}&storyId=${story.id}&authorType=${story.author_type}`
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setLikesCount(data.likes)
+        setDislikesCount(data.dislikes)
+        setUserReaction(data.userReaction)
+      }
+    } catch (err) {
+      console.error("Chapter reactions fetch error:", err)
+    } finally {
+      setLoadingReaction(false)
+    }
+  }
+
+  // 3. Handle reaction (like / dislike) — works for both authenticated and anonymous users
+  const handleReaction = async (type: 'like' | 'dislike') => {
+    // Optimistic update
+    const wasLiked = userReaction === 'like'
+    const wasDisliked = userReaction === 'dislike'
+    const isSameReaction = userReaction === type
+
+    // Toggle counts optimistically
+    if (isSameReaction) {
+      // Remove reaction
+      if (type === 'like') setLikesCount((prev: number) => Math.max(0, prev - 1))
+      else setDislikesCount((prev: number) => Math.max(0, prev - 1))
+      setUserReaction(null)
+    } else {
+      // Change or add reaction
+      if (wasLiked) setLikesCount((prev: number) => Math.max(0, prev - 1))
+      if (wasDisliked) setDislikesCount((prev: number) => Math.max(0, prev - 1))
+      if (type === 'like') setLikesCount((prev: number) => prev + 1)
+      else setDislikesCount((prev: number) => prev + 1)
+      setUserReaction(type)
+    }
+
+    try {
+      const res = await fetch("/api/stories/chapter-reaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chapterId: chapter.id,
+          storyId: story.id,
+          authorType: story.author_type,
+          reactionType: type,
+        }),
+      })
+
+      if (!res.ok) {
+        // Rollback on error
+        fetchReactions()
+        const data = await res.json()
+        throw new Error(data.error || "Failed to save reaction")
+      }
+
+      toast({
+        title: isSameReaction ? "Reaction removed" : `${type === 'like' ? "Liked" : "Disliked"} chapter`,
+        description: isSameReaction
+          ? `You removed your ${type} from this chapter.`
+          : `You ${type === 'like' ? "liked" : "disliked"} "${chapter.title}".`,
+      })
+    } catch (err: any) {
+      toast({
+        title: "Reaction Error",
+        description: err.message || "Failed to update reaction",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // 4. Handle comment submit (supports guest commenters)
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!newComment.trim() || !commenterName.trim()) {
+      toast({
+        title: "Empty fields",
+        description: "Please enter your name and comment content.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setSubmittingComment(true)
+
+    try {
+      // Save guest identity to localStorage if not logged in
+      if (!user) {
+        localStorage.setItem("whispr_guest_name", commenterName.trim())
+        if (commenterEmail.trim()) {
+          localStorage.setItem("whispr_guest_email", commenterEmail.trim())
+        }
+      }
+
+      const res = await fetch("/api/stories/chapter-comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chapterId: chapter.id,
+          storyId: story.id,
+          authorType: story.author_type,
+          content: newComment.trim(),
+          commenterName: commenterName.trim(),
+          commenterEmail: commenterEmail.trim() || undefined,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to post comment")
+      }
+
+      toast({
+        title: "Comment published",
+        description: "Your thought on this chapter has been recorded!",
+      })
+      setNewComment("")
+      fetchComments()
+    } catch (err: any) {
+      toast({
+        title: "Comment Failed",
+        description: err.message || "Could not publish your comment.",
+        variant: "destructive",
+      })
+    } finally {
+      setSubmittingComment(false)
+    }
+  }
 
   // Class helper for font size
   const getFontSizeClass = () => {
@@ -102,7 +318,7 @@ export default function ChapterClientPage({
             className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary"
             title="Adjust Font Size"
           >
-            <Settings className="h-4 w-4" />
+            <TypeOutline className="h-4 w-4" />
           </Button>
 
           {/* Immersive mode trigger */}
@@ -133,7 +349,7 @@ export default function ChapterClientPage({
           <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-xs uppercase px-3 py-0.5 rounded-full mb-3">
             ✨ Chapter {chapter.sequence}
           </Badge>
-          <h1 className="font-serif text-3xl md:text-5xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent leading-tight mb-2">
+          <h1 className="font-serif text-3xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent leading-tight mb-2">
             {chapter.title}
           </h1>
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
@@ -142,12 +358,153 @@ export default function ChapterClientPage({
         </header>
 
         {/* Immersive Reading Canvas */}
-        <Card className="border-0 bg-card/35 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden mb-12">
+        <Card className="border-0 bg-card/35 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden mb-8">
           <CardContent className="p-8 md:p-12">
             <div
-              className={`prose prose-invert max-w-none leading-relaxed font-serif ${getFontSizeClass()} text-slate-200 focus:outline-none scroll-smooth`}
+              className={`prose prose-invert max-w-none leading-relaxed font-serif ${getFontSizeClass()} text-slate-900 dark:text-slate-200 focus:outline-none scroll-smooth`}
               dangerouslySetInnerHTML={{ __html: chapter.content }}
             />
+          </CardContent>
+        </Card>
+
+        {/* Reactions Bar (Like / Dislike) */}
+        <div className="flex items-center justify-center gap-4 mb-8 bg-card/30 backdrop-blur border border-border/10 p-3 rounded-2xl">
+          <Button
+            variant={userReaction === 'like' ? "default" : "ghost"}
+            size="sm"
+            onClick={() => handleReaction('like')}
+            disabled={loadingReaction}
+            className={`rounded-full flex items-center gap-2 px-5 transition-all ${
+              userReaction === 'like'
+                ? "bg-green-600 hover:bg-green-700 text-white"
+                : "text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
+            }`}
+          >
+            <ThumbsUp className={`h-4 w-4 ${userReaction === 'like' ? "fill-white" : ""}`} />
+            <span className="text-sm font-semibold">{likesCount}</span>
+          </Button>
+
+          <div className="w-px h-6 bg-border/30" />
+
+          <Button
+            variant={userReaction === 'dislike' ? "default" : "ghost"}
+            size="sm"
+            onClick={() => handleReaction('dislike')}
+            disabled={loadingReaction}
+            className={`rounded-full flex items-center gap-2 px-5 transition-all ${
+              userReaction === 'dislike'
+                ? "bg-red-600 hover:bg-red-700 text-white"
+                : "text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+            }`}
+          >
+            <ThumbsDown className={`h-4 w-4 ${userReaction === 'dislike' ? "fill-white" : ""}`} />
+            <span className="text-sm font-semibold">{dislikesCount}</span>
+          </Button>
+
+          <div className="w-px h-6 bg-border/30" />
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MessageSquare className="h-4 w-4" />
+            <span>{comments.length} comments</span>
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <Card className="border-0 bg-card/35 backdrop-blur-md shadow-xl rounded-2xl overflow-hidden mb-8">
+          <CardContent className="p-6 md:p-8">
+            <h3 className="font-serif text-xl font-bold flex items-center gap-2 mb-6 text-foreground">
+              <MessageSquare className="h-5 w-5 text-primary" />
+              Reader Reactions ({comments.length})
+            </h3>
+
+            {/* Comment Form - Supports both authenticated users and guests */}
+            <form onSubmit={handleCommentSubmit} className="space-y-4 mb-8 bg-muted/15 p-4 rounded-xl border border-border/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-muted-foreground font-semibold mb-1 block">
+                    Your Name <span className="text-red-400">*</span>
+                  </label>
+                  <Input
+                    value={commenterName}
+                    onChange={(e) => setCommenterName(e.target.value)}
+                    placeholder={user ? "Your display name" : "Enter your name..."}
+                    required
+                    className="bg-background/60 border-border/40 focus:ring-primary rounded-lg"
+                  />
+                </div>
+                {!user && (
+                  <div>
+                    <label className="text-xs text-muted-foreground font-semibold mb-1 block">
+                      Email (optional - for replies)
+                    </label>
+                    <Input
+                      type="email"
+                      value={commenterEmail}
+                      onChange={(e) => setCommenterEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="bg-background/60 border-border/40 focus:ring-primary rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground font-semibold mb-1 block">
+                  Your Thought <span className="text-red-400">*</span>
+                </label>
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Share your thoughts on this chapter..."
+                  required
+                  rows={4}
+                  className="bg-background/60 border-border/40 focus:ring-primary rounded-lg font-serif"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                {!user && (
+                  <p className="text-[10px] text-muted-foreground italic">
+                    Your name & email will be saved locally for future comments.
+                  </p>
+                )}
+                <Button type="submit" disabled={submittingComment} className="rounded-lg flex items-center gap-2 ml-auto">
+                  {submittingComment ? "Publishing..." : "Post Comment"}
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+
+            {/* Comments List */}
+            {comments.length === 0 ? (
+              <div className="text-center py-6">
+                <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-muted-foreground text-sm">No thoughts posted yet. Be the first to share your reaction to this chapter!</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                {comments.map((comm) => (
+                  <div key={comm.id} className="p-4 bg-muted/10 rounded-xl border border-border/5 space-y-2 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="font-bold text-foreground">@{comm.commenter_name}</span>
+                      <span>•</span>
+                      <span>{new Date(comm.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}</span>
+                      {comm.commenter_email && (
+                        <>
+                          <span>•</span>
+                          <span className="text-[10px] text-muted-foreground/60">{comm.commenter_email}</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-900 dark:text-slate-200 leading-relaxed font-serif">
+                      {comm.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

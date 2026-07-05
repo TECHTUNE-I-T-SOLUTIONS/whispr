@@ -144,11 +144,13 @@ export async function getChapterBySlugs(supabase: any, storySlug: string, chapte
   // Record a view for the story if it is a published reader page
   if (chapter.status === 'published' && story.status === 'published') {
     const storyTable = story.author_type === 'admin' ? 'admin_stories' : 'chronicles_stories'
-    await supabase.rpc('increment_story_views', { story_id: story.id, story_type: story.author_type })
-      .catch(() => {
-        // Fallback standard update
-        supabase.from(storyTable).update({ views_count: (story.views_count || 0) + 1 }).eq('id', story.id).then()
-      })
+    try {
+      const { error: rpcError } = await supabase.rpc('increment_story_views', { story_id: story.id, story_type: story.author_type })
+      if (rpcError) throw rpcError
+    } catch {
+      // Fallback standard update
+      await supabase.from(storyTable).update({ views_count: (story.views_count || 0) + 1 }).eq('id', story.id)
+    }
   }
 
   // Get adjacent chapters for reader navigation
@@ -277,6 +279,204 @@ export async function addStoryComment(
     return { success: false, error }
   }
   return { success: true, data }
+}
+
+// ============================================================
+// 2b. CHAPTER-LEVEL COMMENTS & REACTIONS
+// ============================================================
+
+// Fetch chapter-level comments
+export async function getChapterComments(supabase: any, chapterId: string, storyId: string, authorType: 'admin' | 'chronicle') {
+  const table = authorType === 'admin' ? 'admin_story_chapter_comments' : 'chronicles_story_chapter_comments'
+  const { data, error } = await supabase
+    .from(table)
+    .select('*')
+    .eq('chapter_id', chapterId)
+    .eq('story_id', storyId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Failed to fetch chapter comments:', error)
+    return []
+  }
+
+  return data || []
+}
+
+// Add a chapter-level comment (supports guest commenters with cached name/email)
+export async function addChapterComment(
+  supabase: any,
+  params: {
+    chapterId: string
+    storyId: string
+    commenterName: string
+    commenterEmail?: string
+    content: string
+    authorType: 'admin' | 'chronicle'
+    userId?: string
+    creatorId?: string
+    parentCommentId?: string
+  }
+) {
+  const compliance = checkContentCompliance(params.content, params.commenterName)
+  if (!compliance.compliant) {
+    throw new Error(`Your comment contains inappropriate content (words similar to "${compliance.offendingWord}"). Please keep Whispr creative and family-friendly.`)
+  }
+
+  const table = params.authorType === 'admin' ? 'admin_story_chapter_comments' : 'chronicles_story_chapter_comments'
+  const payload: any = {
+    chapter_id: params.chapterId,
+    story_id: params.storyId,
+    commenter_name: params.commenterName,
+    commenter_email: params.commenterEmail || null,
+    content: params.content,
+    parent_comment_id: params.parentCommentId || null,
+    status: 'approved'
+  }
+
+  if (params.authorType === 'admin') {
+    payload.user_id = params.userId || null
+  } else {
+    payload.user_id = params.userId || null
+    payload.creator_id = params.creatorId || null
+  }
+
+  const { data, error } = await supabase
+    .from(table)
+    .insert([payload])
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Failed to post chapter comment:', error)
+    return { success: false, error }
+  }
+  return { success: true, data }
+}
+
+// Get chapter reaction (like/dislike) status for a user (supports both user_id and user_ip for anonymous)
+export async function getChapterReactionStatus(supabase: any, chapterId: string, storyId: string, authorType: 'admin' | 'chronicle', userId?: string, userIp?: string) {
+  const table = authorType === 'admin' ? 'admin_story_chapter_reactions' : 'chronicles_story_chapter_reactions'
+
+  let query = supabase
+    .from(table)
+    .select('reaction_type')
+    .eq('chapter_id', chapterId)
+    .eq('story_id', storyId)
+
+  if (userId) {
+    query = query.eq('user_id', userId)
+  } else if (userIp) {
+    query = query.is('user_id', null).eq('user_ip', userIp)
+  } else {
+    return null
+  }
+
+  const { data, error } = await query.single()
+
+  if (error || !data) return null
+  return data.reaction_type
+}
+
+// Toggle chapter reaction (like/dislike) — supports both authenticated (user_id) and anonymous (user_ip) users
+export async function toggleChapterReaction(
+  supabase: any,
+  chapterId: string,
+  storyId: string,
+  reactionType: 'like' | 'dislike',
+  authorType: 'admin' | 'chronicle',
+  userId?: string,
+  userIp?: string,
+  creatorId?: string
+) {
+  const table = authorType === 'admin' ? 'admin_story_chapter_reactions' : 'chronicles_story_chapter_reactions'
+
+  // Build the lookup query based on identity
+  let lookupQuery = supabase
+    .from(table)
+    .select('id, reaction_type')
+    .eq('chapter_id', chapterId)
+    .eq('story_id', storyId)
+
+  if (userId) {
+    lookupQuery = lookupQuery.eq('user_id', userId)
+  } else if (userIp) {
+    lookupQuery = lookupQuery.is('user_id', null).eq('user_ip', userIp)
+  } else {
+    return { success: false, error: 'No user identifier provided', action: 'none' }
+  }
+
+  const { data: existing } = await lookupQuery.single()
+
+  if (existing) {
+    // If same reaction type, remove it (toggle off)
+    if (existing.reaction_type === reactionType) {
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', existing.id)
+      if (error) return { success: false, error, action: 'none' }
+      return { success: true, action: 'removed' }
+    }
+    // If different reaction type, update it
+    const { error } = await supabase
+      .from(table)
+      .update({ reaction_type: reactionType })
+      .eq('id', existing.id)
+    if (error) return { success: false, error, action: 'none' }
+    return { success: true, action: 'updated' }
+  }
+
+  // Create new reaction
+  const payload: any = {
+    chapter_id: chapterId,
+    story_id: storyId,
+    reaction_type: reactionType
+  }
+
+  if (userId) {
+    payload.user_id = userId
+  }
+  if (!userId && userIp) {
+    payload.user_ip = userIp
+  }
+  if (authorType === 'chronicle' && creatorId) {
+    payload.creator_id = creatorId
+  }
+
+  const { error } = await supabase
+    .from(table)
+    .insert([payload])
+
+  if (error) return { success: false, error, action: 'none' }
+  return { success: true, action: 'liked' }
+}
+
+// Fetch chapter reaction counts (likes & dislikes)
+export async function getChapterReactionCounts(supabase: any, chapterId: string, storyId: string, authorType: 'admin' | 'chronicle') {
+  const table = authorType === 'admin' ? 'admin_story_chapter_reactions' : 'chronicles_story_chapter_reactions'
+
+  const { count: likes, error: likesError } = await supabase
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .eq('chapter_id', chapterId)
+    .eq('story_id', storyId)
+    .eq('reaction_type', 'like')
+
+  const { count: dislikes, error: dislikesError } = await supabase
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .eq('chapter_id', chapterId)
+    .eq('story_id', storyId)
+    .eq('reaction_type', 'dislike')
+
+  if (likesError || dislikesError) {
+    console.error('Failed to fetch chapter reaction counts')
+    return { likes: 0, dislikes: 0 }
+  }
+
+  return { likes: likes || 0, dislikes: dislikes || 0 }
 }
 
 export async function shareStory(supabase: any, storyId: string, sharedTo: string, authorType: 'admin' | 'chronicle', creatorId?: string) {

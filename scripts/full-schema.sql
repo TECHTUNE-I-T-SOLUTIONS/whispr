@@ -1529,6 +1529,606 @@ CREATE TABLE public.chronicles_game_rounds (
   CONSTRAINT chronicles_game_rounds_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_game_rounds_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.chronicles_game_sessions(id)
 );
+CREATE TABLE public.chronicles_creator_game_progress (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  best_score integer NOT NULL DEFAULT 0,
+  total_score integer NOT NULL DEFAULT 0,
+  best_streak integer NOT NULL DEFAULT 0,
+  attempts_count integer NOT NULL DEFAULT 0,
+  completed_sessions integer NOT NULL DEFAULT 0,
+  last_played_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_progress_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_progress_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.chronicles_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  description text,
+  icon text,
+  points_reward integer NOT NULL DEFAULT 0,
+  condition_type text NOT NULL,
+  condition_value integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_achievements_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chronicles_creator_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  achievement_id uuid NOT NULL,
+  earned_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_achievements_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_achievements_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_achievements_achievement_id_fkey FOREIGN KEY (achievement_id) REFERENCES public.chronicles_game_achievements(id)
+);
+CREATE TABLE public.job_opportunity_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  icon text,
+  color text,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT job_opportunity_categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.job_opportunities (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  category_id uuid NOT NULL,
+  created_by_admin_id uuid,
+  title text NOT NULL,
+  slug text NOT NULL UNIQUE,
+  summary text NOT NULL,
+  description text NOT NULL,
+  organization_name text NOT NULL,
+  organization_website text,
+  opportunity_type text NOT NULL DEFAULT 'job'::text CHECK (opportunity_type = ANY (ARRAY['job'::text, 'freelance'::text, 'internship'::text, 'grant'::text, 'residency'::text, 'competition'::text, 'commission'::text, 'call_for_submissions'::text, 'volunteer'::text])),
+  location text,
+  remote_type text DEFAULT 'any'::text CHECK (remote_type = ANY (ARRAY['onsite'::text, 'hybrid'::text, 'remote'::text, 'any'::text])),
+  compensation text,
+  application_url text NOT NULL,
+  source_url text,
+  contact_email text,
+  image_url text,
+  image_alt text,
+  tags ARRAY DEFAULT ARRAY[]::text[],
+  requirements ARRAY DEFAULT ARRAY[]::text[],
+  benefits ARRAY DEFAULT ARRAY[]::text[],
+  featured boolean DEFAULT false,
+  status text DEFAULT 'draft'::text CHECK (status = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  deadline_at timestamp with time zone,
+  published_at timestamp with time zone,
+  view_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT job_opportunities_pkey PRIMARY KEY (id),
+  CONSTRAINT job_opportunities_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.job_opportunity_categories(id),
+  CONSTRAINT job_opportunities_created_by_admin_id_fkey FOREIGN KEY (created_by_admin_id) REFERENCES public.admin(id)
+);
+CREATE TABLE public.hashtags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name character varying NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hashtags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.admin_stories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  admin_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL UNIQUE,
+  description text,
+  excerpt text,
+  genre character varying NOT NULL,
+  cover_image_url text,
+  status character varying DEFAULT 'draft'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  views_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  shares_count integer DEFAULT 0,
+  seo_title character varying,
+  seo_description text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  published_at timestamp with time zone,
+  CONSTRAINT admin_stories_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_stories_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
+);
+CREATE TABLE public.admin_story_chapters (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL,
+  content text NOT NULL,
+  sequence integer NOT NULL,
+  status character varying DEFAULT 'published'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_chapters_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_chapters_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id)
+);
+CREATE TABLE public.chronicles_stories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL UNIQUE,
+  description text,
+  excerpt text,
+  genre character varying NOT NULL,
+  cover_image_url text,
+  status character varying DEFAULT 'draft'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  views_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  shares_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  published_at timestamp with time zone,
+  CONSTRAINT chronicles_stories_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_stories_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_story_chapters (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL,
+  content text NOT NULL,
+  sequence integer NOT NULL,
+  status character varying DEFAULT 'published'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_chapters_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_chapters_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id)
+);
+CREATE TABLE public.admin_story_hashtags (
+  story_id uuid NOT NULL,
+  hashtag_id uuid NOT NULL,
+  CONSTRAINT admin_story_hashtags_pkey PRIMARY KEY (story_id, hashtag_id),
+  CONSTRAINT admin_story_hashtags_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_hashtags_hashtag_id_fkey FOREIGN KEY (hashtag_id) REFERENCES public.hashtags(id)
+);
+CREATE TABLE public.chronicles_story_hashtags (
+  story_id uuid NOT NULL,
+  hashtag_id uuid NOT NULL,
+  CONSTRAINT chronicles_story_hashtags_pkey PRIMARY KEY (story_id, hashtag_id),
+  CONSTRAINT chronicles_story_hashtags_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_hashtags_hashtag_id_fkey FOREIGN KEY (hashtag_id) REFERENCES public.hashtags(id)
+);
+CREATE TABLE public.admin_story_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_likes_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_story_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_likes_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.admin_story_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid,
+  commenter_name character varying NOT NULL,
+  commenter_email character varying,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  status character varying DEFAULT 'approved'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT admin_story_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.admin_story_comments(id)
+);
+CREATE TABLE public.chronicles_story_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid,
+  creator_id uuid,
+  commenter_name character varying NOT NULL,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  status character varying DEFAULT 'approved'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT chronicles_story_comments_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_story_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.chronicles_story_comments(id)
+);
+CREATE TABLE public.admin_story_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  shared_to character varying NOT NULL DEFAULT 'link'::character varying,
+  share_metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_shares_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id)
+);
+CREATE TABLE public.chronicles_story_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  creator_id uuid,
+  shared_to character varying NOT NULL DEFAULT 'link'::character varying,
+  share_metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_shares_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_shares_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_game_challenges (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  game_id uuid NOT NULL,
+  challenge_order integer NOT NULL,
+  question text NOT NULL,
+  context text,
+  options jsonb NOT NULL DEFAULT '[]'::jsonb,
+  correct_answer text NOT NULL,
+  explanation text NOT NULL,
+  teaching_point text,
+  difficulty text NOT NULL DEFAULT 'beginner'::text,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_challenges_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_game_challenges_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.billing_plans (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  price_monthly numeric NOT NULL DEFAULT 0,
+  price_yearly numeric NOT NULL DEFAULT 0,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  paystack_monthly_price_code text,
+  paystack_yearly_price_code text,
+  trial_days integer NOT NULL DEFAULT 7,
+  active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  features jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plans_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  key text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  category text DEFAULT 'general'::text,
+  coming_soon boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_features_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_plan_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  plan_id uuid NOT NULL,
+  feature_id uuid NOT NULL,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_features_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_features_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id),
+  CONSTRAINT billing_plan_features_feature_id_fkey FOREIGN KEY (feature_id) REFERENCES public.billing_features(id)
+);
+CREATE TABLE public.billing_plan_limits (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  plan_id uuid NOT NULL UNIQUE,
+  daily_chat_limit integer,
+  monthly_chat_limit integer,
+  daily_token_limit bigint,
+  monthly_token_limit bigint,
+  daily_image_limit integer,
+  monthly_image_limit integer,
+  voice_minutes integer,
+  storage_mb integer,
+  priority_level integer DEFAULT 1,
+  max_response_length integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_limits_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_limits_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_user_subscriptions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  provider text NOT NULL DEFAULT 'paystack'::text,
+  provider_customer_id text,
+  provider_subscription_id text,
+  provider_price_id text,
+  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['trialing'::text, 'active'::text, 'past_due'::text, 'paused'::text, 'cancelled'::text, 'expired'::text, 'incomplete'::text])),
+  billing_interval text CHECK (billing_interval = ANY (ARRAY['monthly'::text, 'yearly'::text])),
+  trial_ends_at timestamp with time zone,
+  started_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  current_period_start timestamp with time zone,
+  current_period_end timestamp with time zone,
+  cancel_at_period_end boolean DEFAULT false,
+  cancelled_at timestamp with time zone,
+  trial_used boolean DEFAULT false,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_subscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_subscriptions_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_user_entitlements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  feature_key text NOT NULL,
+  granted boolean NOT NULL DEFAULT false,
+  expires_at timestamp with time zone,
+  source_subscription_id uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_entitlements_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_entitlements_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_entitlements_source_subscription_id_fkey FOREIGN KEY (source_subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_ai_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  month text NOT NULL,
+  tokens_used bigint NOT NULL DEFAULT 0,
+  input_tokens bigint NOT NULL DEFAULT 0,
+  output_tokens bigint NOT NULL DEFAULT 0,
+  chat_count integer NOT NULL DEFAULT 0,
+  completion_count integer NOT NULL DEFAULT 0,
+  image_requests integer NOT NULL DEFAULT 0,
+  voice_minutes integer NOT NULL DEFAULT 0,
+  research_requests integer NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_ai_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_ai_usage_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  provider text NOT NULL,
+  model text NOT NULL,
+  feature text NOT NULL,
+  request_tokens bigint NOT NULL DEFAULT 0,
+  response_tokens bigint NOT NULL DEFAULT 0,
+  total_tokens bigint NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  response_time_ms integer,
+  status text DEFAULT 'success'::text,
+  error_message text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_ai_usage_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_ai_models (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  provider text NOT NULL,
+  model_name text NOT NULL,
+  display_name text NOT NULL,
+  input_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  output_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  supports_images boolean DEFAULT false,
+  supports_voice boolean DEFAULT false,
+  supports_streaming boolean DEFAULT true,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_models_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_feature_flags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  key text NOT NULL UNIQUE,
+  enabled boolean NOT NULL DEFAULT false,
+  description text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_feature_flags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_payment_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  transaction_type text NOT NULL CHECK (transaction_type = ANY (ARRAY['subscription'::text, 'upgrade'::text, 'downgrade'::text, 'renewal'::text, 'refund'::text, 'trial_start'::text])),
+  amount numeric NOT NULL,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text, 'failed'::text, 'refunded'::text])),
+  provider_transaction_id text,
+  provider_payment_method text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  completed_at timestamp with time zone,
+  CONSTRAINT billing_payment_transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_payment_transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_payment_transactions_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  premium_enabled boolean NOT NULL DEFAULT true,
+  ai_premium_enabled boolean NOT NULL DEFAULT true,
+  games_premium_enabled boolean NOT NULL DEFAULT true,
+  free_trial_enabled boolean NOT NULL DEFAULT true,
+  trial_days integer NOT NULL DEFAULT 7,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  exchange_rate_to_ngn numeric NOT NULL DEFAULT 1500,
+  paystack_public_key text,
+  paystack_secret_key text,
+  auto_renewal_enabled boolean NOT NULL DEFAULT true,
+  grace_period_days integer NOT NULL DEFAULT 3,
+  dunning_enabled boolean NOT NULL DEFAULT true,
+  max_retry_attempts integer NOT NULL DEFAULT 3,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_settings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_admin_subscription_actions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  admin_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  action_type text NOT NULL CHECK (action_type = ANY (ARRAY['manual_upgrade'::text, 'manual_downgrade'::text, 'extend_trial'::text, 'grant_free_access'::text, 'revoke_access'::text, 'refund'::text, 'adjust_quota'::text, 'pause_subscription'::text, 'resume_subscription'::text])),
+  action_details jsonb DEFAULT '{}'::jsonb,
+  reason text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_admin_subscription_actions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_admin_subscription_actions_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id),
+  CONSTRAINT billing_admin_subscription_actions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_subscription_disputes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  dispute_type text NOT NULL CHECK (dispute_type = ANY (ARRAY['unauthorized_charge'::text, 'service_not_received'::text, 'quality_issue'::text, 'billing_error'::text, 'refund_request'::text, 'other'::text])),
+  description text NOT NULL,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'resolved'::text, 'rejected'::text, 'escalated'::text])),
+  provider_dispute_id text,
+  resolution text,
+  resolved_by uuid,
+  resolved_at timestamp with time zone,
+  refund_amount numeric,
+  refund_currency text DEFAULT 'USD'::text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_subscription_disputes_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_subscription_disputes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_subscription_disputes_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id),
+  CONSTRAINT billing_subscription_disputes_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.billing_coupons (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  code text NOT NULL UNIQUE,
+  description text,
+  discount_type text NOT NULL CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])),
+  discount_value numeric NOT NULL,
+  applicable_plans ARRAY,
+  max_uses integer,
+  uses_count integer NOT NULL DEFAULT 0,
+  valid_from timestamp with time zone NOT NULL,
+  valid_until timestamp with time zone NOT NULL,
+  active boolean NOT NULL DEFAULT true,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupons_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_coupons_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.billing_coupon_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coupon_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  discount_amount numeric NOT NULL,
+  used_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupon_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_coupon_usage_coupon_id_fkey FOREIGN KEY (coupon_id) REFERENCES public.billing_coupons(id),
+  CONSTRAINT billing_coupon_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_coupon_usage_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_referrals (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  referrer_id uuid NOT NULL,
+  referral_code text NOT NULL UNIQUE,
+  total_referrals integer NOT NULL DEFAULT 0,
+  successful_referrals integer NOT NULL DEFAULT 0,
+  total_rewards_earned numeric NOT NULL DEFAULT 0,
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referrals_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_referrals_referrer_id_fkey FOREIGN KEY (referrer_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_referral_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  referral_id uuid NOT NULL,
+  referred_user_id uuid,
+  reward_type text NOT NULL CHECK (reward_type = ANY (ARRAY['tokens'::text, 'free_days'::text, 'discount'::text, 'cash'::text])),
+  reward_value numeric NOT NULL,
+  reward_currency text DEFAULT 'USD'::text,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'granted'::text, 'expired'::text, 'revoked'::text])),
+  granted_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referral_transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_referral_transactions_referral_id_fkey FOREIGN KEY (referral_id) REFERENCES public.billing_referrals(id),
+  CONSTRAINT billing_referral_transactions_referred_user_id_fkey FOREIGN KEY (referred_user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  date date NOT NULL UNIQUE,
+  total_subscribers integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  cancelled_subscribers integer NOT NULL DEFAULT 0,
+  churned_subscribers integer NOT NULL DEFAULT 0,
+  trial_users integer NOT NULL DEFAULT 0,
+  mrr numeric NOT NULL DEFAULT 0,
+  arr numeric NOT NULL DEFAULT 0,
+  total_revenue numeric NOT NULL DEFAULT 0,
+  refunds numeric NOT NULL DEFAULT 0,
+  failed_payments integer NOT NULL DEFAULT 0,
+  conversion_rate numeric DEFAULT 0,
+  avg_revenue_per_user numeric DEFAULT 0,
+  total_ai_cost numeric DEFAULT 0,
+  profit_margin numeric DEFAULT 0,
+  active_plans jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_analytics_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_plan_revenue (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  analytics_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  subscriber_count integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  revenue numeric NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_revenue_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_revenue_analytics_id_fkey FOREIGN KEY (analytics_id) REFERENCES public.billing_analytics(id),
+  CONSTRAINT billing_plan_revenue_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_games_config (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  game_id uuid NOT NULL,
+  premium_required boolean NOT NULL DEFAULT false,
+  is_free boolean NOT NULL DEFAULT false,
+  required_feature_key text,
+  minimum_plan_slug text,
+  free_daily_plays integer NOT NULL DEFAULT 1,
+  premium_daily_plays integer NOT NULL DEFAULT '-1'::integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_games_config_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_games_config_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.billing_user_game_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  date date NOT NULL,
+  plays_count integer NOT NULL DEFAULT 0,
+  premium_plays_count integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_game_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_game_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_game_usage_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
 
 create index if not exists idx_chronicles_learning_modules_audience on public.chronicles_learning_modules(audience, is_published);
 create index if not exists idx_chronicles_games_type on public.chronicles_games(game_type, is_published);
@@ -1613,3 +2213,582 @@ for select using (exists (
   select 1 from public.chronicles_creators c
   where c.id = creator_id and c.user_id = auth.uid()
 ));
+
+-- ============================================
+-- BILLING AND PREMIUM SUBSCRIPTION TABLES
+-- ============================================
+
+-- 1. PLANS TABLE
+CREATE TABLE public.billing_plans (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  price_monthly numeric NOT NULL DEFAULT 0,
+  price_yearly numeric NOT NULL DEFAULT 0,
+  currency text NOT NULL DEFAULT 'USD',
+  paystack_monthly_price_code text,
+  paystack_yearly_price_code text,
+  trial_days integer NOT NULL DEFAULT 7,
+  active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  features jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. FEATURES TABLE
+CREATE TABLE public.billing_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  key text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  category text DEFAULT 'general',
+  coming_soon boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. PLAN FEATURES TABLE (Mapping)
+CREATE TABLE public.billing_plan_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  plan_id uuid NOT NULL,
+  feature_id uuid NOT NULL,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_features_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id) ON DELETE CASCADE,
+  CONSTRAINT billing_plan_features_feature_id_fkey FOREIGN KEY (feature_id) REFERENCES public.billing_features(id) ON DELETE CASCADE,
+  UNIQUE(plan_id, feature_id)
+);
+
+-- 4. PLAN LIMITS TABLE
+CREATE TABLE public.billing_plan_limits (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  plan_id uuid NOT NULL UNIQUE,
+  daily_chat_limit integer,
+  monthly_chat_limit integer,
+  daily_token_limit bigint,
+  monthly_token_limit bigint,
+  daily_image_limit integer,
+  monthly_image_limit integer,
+  voice_minutes integer,
+  storage_mb integer,
+  priority_level integer DEFAULT 1,
+  max_response_length integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_limits_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id) ON DELETE CASCADE
+);
+
+-- 5. USER SUBSCRIPTIONS TABLE
+CREATE TABLE public.billing_user_subscriptions (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  provider text NOT NULL DEFAULT 'paystack',
+  provider_customer_id text,
+  provider_subscription_id text,
+  provider_price_id text,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('trialing', 'active', 'past_due', 'paused', 'cancelled', 'expired', 'incomplete')),
+  billing_interval text CHECK (billing_interval IN ('monthly', 'yearly')),
+  trial_ends_at timestamp with time zone,
+  started_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  current_period_start timestamp with time zone,
+  current_period_end timestamp with time zone,
+  cancel_at_period_end boolean DEFAULT false,
+  cancelled_at timestamp with time zone,
+  trial_used boolean DEFAULT false,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_user_subscriptions_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+
+-- 6. USER ENTITLEMENTS TABLE (Cache)
+CREATE TABLE public.billing_user_entitlements (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  feature_key text NOT NULL,
+  granted boolean NOT NULL DEFAULT false,
+  expires_at timestamp with time zone,
+  source_subscription_id uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_entitlements_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_user_entitlements_source_subscription_id_fkey FOREIGN KEY (source_subscription_id) REFERENCES public.billing_user_subscriptions(id) ON DELETE SET NULL,
+  UNIQUE(user_id, feature_key)
+);
+
+-- 7. AI USAGE TABLE
+CREATE TABLE public.billing_ai_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  month text NOT NULL,
+  tokens_used bigint NOT NULL DEFAULT 0,
+  input_tokens bigint NOT NULL DEFAULT 0,
+  output_tokens bigint NOT NULL DEFAULT 0,
+  chat_count integer NOT NULL DEFAULT 0,
+  completion_count integer NOT NULL DEFAULT 0,
+  image_requests integer NOT NULL DEFAULT 0,
+  voice_minutes integer NOT NULL DEFAULT 0,
+  research_requests integer NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  UNIQUE(user_id, month)
+);
+
+-- 8. AI USAGE LOGS TABLE (Detailed)
+CREATE TABLE public.billing_ai_usage_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  provider text NOT NULL,
+  model text NOT NULL,
+  feature text NOT NULL,
+  request_tokens bigint NOT NULL DEFAULT 0,
+  response_tokens bigint NOT NULL DEFAULT 0,
+  total_tokens bigint NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  response_time_ms integer,
+  status text DEFAULT 'success',
+  error_message text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+
+-- 9. AI MODELS TABLE
+CREATE TABLE public.billing_ai_models (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  provider text NOT NULL,
+  model_name text NOT NULL,
+  display_name text NOT NULL,
+  input_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  output_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  supports_images boolean DEFAULT false,
+  supports_voice boolean DEFAULT false,
+  supports_streaming boolean DEFAULT true,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(provider, model_name)
+);
+
+-- 10. FEATURE FLAGS TABLE
+CREATE TABLE public.billing_feature_flags (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  key text NOT NULL UNIQUE,
+  enabled boolean NOT NULL DEFAULT false,
+  description text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11. PAYMENT TRANSACTIONS TABLE
+CREATE TABLE public.billing_payment_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  transaction_type text NOT NULL CHECK (transaction_type IN ('subscription', 'upgrade', 'downgrade', 'renewal', 'refund', 'trial_start')),
+  amount numeric NOT NULL,
+  currency text NOT NULL DEFAULT 'USD',
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
+  provider_transaction_id text,
+  provider_payment_method text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  completed_at timestamp with time zone,
+  CONSTRAINT billing_payment_transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_payment_transactions_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id) ON DELETE SET NULL
+);
+
+-- 12. BILLING SETTINGS TABLE
+CREATE TABLE public.billing_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  premium_enabled boolean NOT NULL DEFAULT true,
+  ai_premium_enabled boolean NOT NULL DEFAULT true,
+  games_premium_enabled boolean NOT NULL DEFAULT true,
+  free_trial_enabled boolean NOT NULL DEFAULT true,
+  trial_days integer NOT NULL DEFAULT 7,
+  currency text NOT NULL DEFAULT 'USD',
+  exchange_rate_to_ngn numeric NOT NULL DEFAULT 1500,
+  paystack_public_key text,
+  paystack_secret_key text,
+  auto_renewal_enabled boolean NOT NULL DEFAULT true,
+  grace_period_days integer NOT NULL DEFAULT 3,
+  dunning_enabled boolean NOT NULL DEFAULT true,
+  max_retry_attempts integer NOT NULL DEFAULT 3,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 13. ADMIN SUBSCRIPTION MANAGEMENT TABLE
+CREATE TABLE public.billing_admin_subscription_actions (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  admin_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  action_type text NOT NULL CHECK (action_type IN ('manual_upgrade', 'manual_downgrade', 'extend_trial', 'grant_free_access', 'revoke_access', 'refund', 'adjust_quota', 'pause_subscription', 'resume_subscription')),
+  action_details jsonb DEFAULT '{}'::jsonb,
+  reason text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_admin_subscription_actions_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id) ON DELETE CASCADE,
+  CONSTRAINT billing_admin_subscription_actions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+
+-- 14. SUBSCRIPTION DISPUTES TABLE
+CREATE TABLE public.billing_subscription_disputes (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  dispute_type text NOT NULL CHECK (dispute_type IN ('unauthorized_charge', 'service_not_received', 'quality_issue', 'billing_error', 'refund_request', 'other')),
+  description text NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'under_review', 'resolved', 'rejected', 'escalated')),
+  provider_dispute_id text,
+  resolution text,
+  resolved_by uuid,
+  resolved_at timestamp with time zone,
+  refund_amount numeric,
+  refund_currency text DEFAULT 'USD',
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_subscription_disputes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_subscription_disputes_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id) ON DELETE SET NULL,
+  CONSTRAINT billing_subscription_disputes_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.admin(id)
+);
+
+-- 15. COUPONS TABLE
+CREATE TABLE public.billing_coupons (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  code text NOT NULL UNIQUE,
+  description text,
+  discount_type text NOT NULL CHECK (discount_type IN ('percentage', 'fixed_amount')),
+  discount_value numeric NOT NULL,
+  applicable_plans uuid[],
+  max_uses integer,
+  uses_count integer NOT NULL DEFAULT 0,
+  valid_from timestamp with time zone NOT NULL,
+  valid_until timestamp with time zone NOT NULL,
+  active boolean NOT NULL DEFAULT true,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupons_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id)
+);
+
+-- 16. COUPON USAGE TABLE
+CREATE TABLE public.billing_coupon_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  coupon_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  discount_amount numeric NOT NULL,
+  used_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupon_usage_coupon_id_fkey FOREIGN KEY (coupon_id) REFERENCES public.billing_coupons(id) ON DELETE CASCADE,
+  CONSTRAINT billing_coupon_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_coupon_usage_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id) ON DELETE SET NULL,
+  UNIQUE(coupon_id, user_id)
+);
+
+-- 17. REFERRALS TABLE
+CREATE TABLE public.billing_referrals (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  referrer_id uuid NOT NULL,
+  referral_code text NOT NULL UNIQUE,
+  total_referrals integer NOT NULL DEFAULT 0,
+  successful_referrals integer NOT NULL DEFAULT 0,
+  total_rewards_earned numeric NOT NULL DEFAULT 0,
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referrals_referrer_id_fkey FOREIGN KEY (referrer_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+
+-- 18. REFERRAL TRANSACTIONS TABLE
+CREATE TABLE public.billing_referral_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  referral_id uuid NOT NULL,
+  referred_user_id uuid,
+  reward_type text NOT NULL CHECK (reward_type IN ('tokens', 'free_days', 'discount', 'cash')),
+  reward_value numeric NOT NULL,
+  reward_currency text DEFAULT 'USD',
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'granted', 'expired', 'revoked')),
+  granted_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referral_transactions_referral_id_fkey FOREIGN KEY (referral_id) REFERENCES public.billing_referrals(id) ON DELETE CASCADE,
+  CONSTRAINT billing_referral_transactions_referred_user_id_fkey FOREIGN KEY (referred_user_id) REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+-- 19. BILLING ANALYTICS TABLE
+CREATE TABLE public.billing_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  date date NOT NULL UNIQUE,
+  total_subscribers integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  cancelled_subscribers integer NOT NULL DEFAULT 0,
+  churned_subscribers integer NOT NULL DEFAULT 0,
+  trial_users integer NOT NULL DEFAULT 0,
+  mrr numeric NOT NULL DEFAULT 0,
+  arr numeric NOT NULL DEFAULT 0,
+  total_revenue numeric NOT NULL DEFAULT 0,
+  refunds numeric NOT NULL DEFAULT 0,
+  failed_payments integer NOT NULL DEFAULT 0,
+  conversion_rate numeric DEFAULT 0,
+  avg_revenue_per_user numeric DEFAULT 0,
+  total_ai_cost numeric DEFAULT 0,
+  profit_margin numeric DEFAULT 0,
+  active_plans jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 20. PLAN REVENUE BREAKDOWN TABLE
+CREATE TABLE public.billing_plan_revenue (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  analytics_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  subscriber_count integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  revenue numeric NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_revenue_analytics_id_fkey FOREIGN KEY (analytics_id) REFERENCES public.billing_analytics(id) ON DELETE CASCADE,
+  CONSTRAINT billing_plan_revenue_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id) ON DELETE CASCADE,
+  UNIQUE(analytics_id, plan_id)
+);
+
+-- 21. GAMES PREMIUM CONFIGURATION TABLE
+CREATE TABLE public.billing_games_config (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id uuid NOT NULL,
+  premium_required boolean NOT NULL DEFAULT false,
+  is_free boolean NOT NULL DEFAULT false,
+  required_feature_key text,
+  minimum_plan_slug text,
+  free_daily_plays integer NOT NULL DEFAULT 1,
+  premium_daily_plays integer NOT NULL DEFAULT -1,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_games_config_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id) ON DELETE CASCADE
+);
+
+-- 22. USER GAME USAGE TABLE
+CREATE TABLE public.billing_user_game_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  date date NOT NULL,
+  plays_count integer NOT NULL DEFAULT 0,
+  premium_plays_count integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_game_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
+  CONSTRAINT billing_user_game_usage_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id) ON DELETE CASCADE,
+  UNIQUE(user_id, game_id, date)
+);
+
+-- ============================================
+-- BILLING TABLE INDEXES
+-- ============================================
+CREATE INDEX idx_billing_plans_slug ON public.billing_plans(slug);
+CREATE INDEX idx_billing_plans_active ON public.billing_plans(active);
+CREATE INDEX idx_billing_features_key ON public.billing_features(key);
+CREATE INDEX idx_billing_plan_features_plan ON public.billing_plan_features(plan_id);
+CREATE INDEX idx_billing_plan_features_feature ON public.billing_plan_features(feature_id);
+CREATE INDEX idx_billing_plan_limits_plan ON public.billing_plan_limits(plan_id);
+CREATE INDEX idx_billing_user_subscriptions_user ON public.billing_user_subscriptions(user_id);
+CREATE INDEX idx_billing_user_subscriptions_status ON public.billing_user_subscriptions(status);
+CREATE INDEX idx_billing_user_subscriptions_provider_sub ON public.billing_user_subscriptions(provider_subscription_id);
+CREATE INDEX idx_billing_user_entitlements_user ON public.billing_user_entitlements(user_id);
+CREATE INDEX idx_billing_user_entitlements_feature ON public.billing_user_entitlements(feature_key);
+CREATE INDEX idx_billing_ai_usage_user_month ON public.billing_ai_usage(user_id, month);
+CREATE INDEX idx_billing_ai_usage_logs_user ON public.billing_ai_usage_logs(user_id);
+CREATE INDEX idx_billing_ai_usage_logs_created ON public.billing_ai_usage_logs(created_at);
+CREATE INDEX idx_billing_ai_models_provider ON public.billing_ai_models(provider);
+CREATE INDEX idx_billing_payment_transactions_user ON public.billing_payment_transactions(user_id);
+CREATE INDEX idx_billing_payment_transactions_subscription ON public.billing_payment_transactions(subscription_id);
+CREATE INDEX idx_billing_admin_actions_admin ON public.billing_admin_subscription_actions(admin_id);
+CREATE INDEX idx_billing_admin_actions_user ON public.billing_admin_subscription_actions(user_id);
+CREATE INDEX idx_billing_disputes_user ON public.billing_subscription_disputes(user_id);
+CREATE INDEX idx_billing_disputes_status ON public.billing_subscription_disputes(status);
+CREATE INDEX idx_billing_coupons_code ON public.billing_coupons(code);
+CREATE INDEX idx_billing_coupons_active ON public.billing_coupons(active);
+CREATE INDEX idx_billing_coupon_usage_coupon ON public.billing_coupon_usage(coupon_id);
+CREATE INDEX idx_billing_coupon_usage_user ON public.billing_coupon_usage(user_id);
+CREATE INDEX idx_billing_referrals_referrer ON public.billing_referrals(referrer_id);
+CREATE INDEX idx_billing_referrals_code ON public.billing_referrals(referral_code);
+CREATE INDEX idx_billing_referral_transactions_referral ON public.billing_referral_transactions(referral_id);
+CREATE INDEX idx_billing_analytics_date ON public.billing_analytics(date);
+CREATE INDEX idx_billing_plan_revenue_analytics ON public.billing_plan_revenue(analytics_id);
+CREATE INDEX idx_billing_games_config_game ON public.billing_games_config(game_id);
+CREATE INDEX idx_billing_user_game_usage_user_game_date ON public.billing_user_game_usage(user_id, game_id, date);
+
+-- ============================================
+-- BILLING TABLE RLS POLICIES
+-- ============================================
+ALTER TABLE public.billing_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_features ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_plan_features ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_plan_limits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_user_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_user_entitlements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_ai_usage ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_ai_usage_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_ai_models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_feature_flags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_payment_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_admin_subscription_actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_subscription_disputes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_coupon_usage ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_referral_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_plan_revenue ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_games_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.billing_user_game_usage ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active plans
+CREATE POLICY "Public can read active plans" ON public.billing_plans
+FOR SELECT USING (active = true);
+
+-- Public can read features
+CREATE POLICY "Public can read features" ON public.billing_features
+FOR SELECT USING (true);
+
+-- Public can read plan features
+CREATE POLICY "Public can read plan features" ON public.billing_plan_features
+FOR SELECT USING (true);
+
+-- Public can read plan limits
+CREATE POLICY "Public can read plan limits" ON public.billing_plan_limits
+FOR SELECT USING (true);
+
+-- Users can read their own subscriptions
+CREATE POLICY "Users can read own subscriptions" ON public.billing_user_subscriptions
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read their own entitlements
+CREATE POLICY "Users can read own entitlements" ON public.billing_user_entitlements
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read their own usage
+CREATE POLICY "Users can read own usage" ON public.billing_ai_usage
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read their own usage logs
+CREATE POLICY "Users can read own usage logs" ON public.billing_ai_usage_logs
+FOR SELECT USING (user_id = auth.uid());
+
+-- Public can read active AI models
+CREATE POLICY "Public can read active AI models" ON public.billing_ai_models
+FOR SELECT USING (active = true);
+
+-- Public can read feature flags
+CREATE POLICY "Public can read feature flags" ON public.billing_feature_flags
+FOR SELECT USING (true);
+
+-- Users can read their own transactions
+CREATE POLICY "Users can read own transactions" ON public.billing_payment_transactions
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read their own disputes
+CREATE POLICY "Users can read own disputes" ON public.billing_subscription_disputes
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read active coupons
+CREATE POLICY "Users can read active coupons" ON public.billing_coupons
+FOR SELECT USING (active = true AND valid_from <= CURRENT_TIMESTAMP AND valid_until >= CURRENT_TIMESTAMP);
+
+-- Users can read their own coupon usage
+CREATE POLICY "Users can read own coupon usage" ON public.billing_coupon_usage
+FOR SELECT USING (user_id = auth.uid());
+
+-- Users can read their own referrals
+CREATE POLICY "Users can read own referrals" ON public.billing_referrals
+FOR SELECT USING (referrer_id = auth.uid());
+
+-- Users can read their own referral transactions
+CREATE POLICY "Users can read own referral transactions" ON public.billing_referral_transactions
+FOR ALL USING (EXISTS (
+  SELECT 1 FROM public.billing_referrals r
+  WHERE r.id = referral_id AND r.referrer_id = auth.uid()
+));
+
+-- Public can read games config
+CREATE POLICY "Public can read games config" ON public.billing_games_config
+FOR SELECT USING (true);
+
+-- Users can read their own game usage
+CREATE POLICY "Users can read own game usage" ON public.billing_user_game_usage
+FOR SELECT USING (user_id = auth.uid());
+
+-- Service role can manage all billing tables
+CREATE POLICY "Service role can manage plans" ON public.billing_plans
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage features" ON public.billing_features
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage plan features" ON public.billing_plan_features
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage plan limits" ON public.billing_plan_limits
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage user subscriptions" ON public.billing_user_subscriptions
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage user entitlements" ON public.billing_user_entitlements
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage AI usage" ON public.billing_ai_usage
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage AI usage logs" ON public.billing_ai_usage_logs
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage AI models" ON public.billing_ai_models
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage feature flags" ON public.billing_feature_flags
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage payment transactions" ON public.billing_payment_transactions
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage billing settings" ON public.billing_settings
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage admin actions" ON public.billing_admin_subscription_actions
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage disputes" ON public.billing_subscription_disputes
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage coupons" ON public.billing_coupons
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage coupon usage" ON public.billing_coupon_usage
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage referrals" ON public.billing_referrals
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage referral transactions" ON public.billing_referral_transactions
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage analytics" ON public.billing_analytics
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage plan revenue" ON public.billing_plan_revenue
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage games config" ON public.billing_games_config
+FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Service role can manage user game usage" ON public.billing_user_game_usage
+FOR ALL USING (auth.role() = 'service_role');

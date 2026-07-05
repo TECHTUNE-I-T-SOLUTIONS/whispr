@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { Heart, BookOpen, MessageSquare, Share2, Calendar, Eye, Send, Play, Copy, Twitter, Mail, HelpCircle } from "lucide-react"
+import { Heart, BookOpen, MessageSquare, Share2, Calendar, Eye, Send, Play, Copy, Mail, HelpCircle } from "lucide-react"
+import { XIcon } from '@/components/icons/XIcon';
 
 interface StoryClientPageProps {
   story: any
@@ -190,7 +191,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
   }
 
   const handleShareTwitter = () => {
-    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Check out "${story.title}" on Whispr!`)}`, "_blank")
+    window.open(`https://x.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Check out "${story.title}" on Whispr!`)}`, "_blank")
     logShare("twitter")
   }
 
@@ -228,7 +229,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
           </div>
 
           <CardHeader className="p-6 md:p-8 pb-4">
-            <h1 className="font-serif text-3xl md:text-5xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-transparent mb-4 leading-tight">
+            <h1 className="font-serif text-3xl md:text-5xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-200 bg-clip-text text-primary mb-4 leading-tight">
               {story.title}
             </h1>
 
@@ -302,7 +303,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
 
               <div className="flex items-center gap-2 ml-auto">
                 <Button size="icon" variant="outline" className="rounded-full hover:bg-blue-600/10 hover:text-blue-500 hover:border-blue-500" onClick={handleShareTwitter}>
-                  <Twitter className="h-4 w-4" />
+                  <XIcon className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="outline" className="rounded-full hover:bg-primary/10 hover:text-primary" onClick={handleCopyLink}>
                   <Copy className="h-4 w-4" />
@@ -416,7 +417,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
                     <span>•</span>
                     <span>{new Date(comm.created_at).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-sm text-slate-300 leading-relaxed font-serif">{comm.content}</p>
+                  <p className="text-sm text-slate-900 dark:text-slate-200 leading-relaxed font-serif">{comm.content}</p>
                 </div>
               ))}
             </div>

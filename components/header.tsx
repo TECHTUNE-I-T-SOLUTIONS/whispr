@@ -12,6 +12,7 @@ import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useToast } from '@/hooks/use-toast'
 import { ChroniclesTeaserBanner } from "@/components/chronicles-teaser-banner"
+import { XIcon } from '@/components/icons/XIcon';
 
 export function Header() {
   const pathname = usePathname()
@@ -134,7 +135,7 @@ export function Header() {
 
           <div className="flex items-center gap-2 mb-2">
             <a className="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-muted/20" target="_blank" rel="noreferrer" href={(() => { const url = buildTrackedUrl(typeof window !== 'undefined' ? window.location.href : 'https://whispr.example'); const text = 'Whispr — bite-sized poems, spoken word, and stories that spark curiosity. Discover something unforgettable.'; return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}` })()} onClick={async () => { const url = buildTrackedUrl(typeof window !== 'undefined' ? window.location.href : 'https://whispr.example'); await recordShare(url, 'x'); setMobilePreviewOpen(false) }}>
-              {/* <Twitter className="w-4 h-4" /> */}
+              <XIcon className="w-4 h-4" />
               <span className="text-sm">X</span>
             </a>
 
@@ -225,7 +226,7 @@ export function Header() {
 
                 <div className="flex items-center gap-2 mb-2">
                   <a className="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-muted/20" target="_blank" rel="noreferrer" href={(() => { const url = buildTrackedUrl(typeof window !== 'undefined' ? window.location.href : 'https://whispr.example'); const text = 'Whispr — bite-sized poems, spoken word, and stories that spark curiosity. Discover something unforgettable.'; return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}` })()} onClick={async () => { const url = buildTrackedUrl(typeof window !== 'undefined' ? window.location.href : 'https://whispr.example'); await recordShare(url, 'x') }}>
-                    {/* <Twitter className="w-4 h-4" /> */}
+                    <XIcon className="w-4 h-4" />
                     <span className="text-sm">X</span>
                   </a>
 
