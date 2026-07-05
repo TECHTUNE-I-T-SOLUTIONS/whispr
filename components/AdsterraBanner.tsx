@@ -15,35 +15,60 @@ export function AdsterraBanner() {
 
   useEffect(() => {
     if (!showAds) return;
+
+    const loadScript = (src: string, parent: HTMLElement): Promise<HTMLScriptElement> => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.setAttribute('data-cfasync', 'false');
+        
+        script.onload = () => resolve(script);
+        script.onerror = () => {
+          // Silently fail - ad scripts often fail due to ad blockers
+          parent.innerHTML = '';
+          reject(new Error('Ad script failed to load'));
+        };
+        
+        script.src = src;
+        parent.appendChild(script);
+      });
+    };
+
     // Adsterra iframe banner
     if (adRef1.current) {
-      const script1 = document.createElement('script');
-      script1.type = 'text/javascript';
-      script1.innerHTML = `
-        atOptions = {
-          'key' : 'cf4f74123f08a93fa2b9c21405fb0da4',
-          'format' : 'iframe',
-          'height' : 60,
-          'width' : 468,
-          'params' : {}
-        };
-      `;
-      adRef1.current.appendChild(script1);
-      const script2 = document.createElement('script');
-      script2.type = 'text/javascript';
-      script2.src = 'https://www.highperformanceformat.com/cf4f74123f08a93fa2b9c21405fb0da4/invoke.js';
-      adRef1.current.appendChild(script2);
+      try {
+        const script1 = document.createElement('script');
+        script1.type = 'text/javascript';
+        script1.textContent = `
+          atOptions = {
+            'key' : 'cf4f74123f08a93fa2b9c21405fb0da4',
+            'format' : 'iframe',
+            'height' : 60,
+            'width' : 468,
+            'params' : {}
+          };
+        `;
+        adRef1.current.appendChild(script1);
+        
+        loadScript('https://www.highperformanceformat.com/cf4f74123f08a93fa2b9c21405fb0da4/invoke.js', adRef1.current).catch(() => {});
+      } catch (e) {
+        // Silently fail
+        if (adRef1.current) adRef1.current.innerHTML = '';
+      }
     }
+    
     // Adsterra async banner
     if (adRef2.current) {
-      const script3 = document.createElement('script');
-      script3.async = true;
-      script3.setAttribute('data-cfasync', 'false');
-      script3.src = 'https://pl27902130.effectivegatecpm.com/595afd21b56559223443ca3b653978bd/invoke.js';
-      adRef2.current.appendChild(script3);
-      const div = document.createElement('div');
-      div.id = 'container-595afd21b56559223443ca3b653978bd';
-      adRef2.current.appendChild(div);
+      try {
+        const div = document.createElement('div');
+        div.id = 'container-595afd21b56559223443ca3b653978bd';
+        adRef2.current.appendChild(div);
+        
+        loadScript('https://pl27902130.effectivegatecpm.com/595afd21b56559223443ca3b653978bd/invoke.js', adRef2.current).catch(() => {});
+      } catch (e) {
+        // Silently fail
+        if (adRef2.current) adRef2.current.innerHTML = '';
+      }
     }
   }, [showAds]);
 
