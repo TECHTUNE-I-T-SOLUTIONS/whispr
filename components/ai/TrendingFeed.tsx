@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Loader2, ExternalLink, Clock, Flame } from 'lucide-react';
+import { TrendingUp, Loader2, ExternalLink, Clock, Flame, Newspaper, Github, Youtube } from 'lucide-react';
 
 interface TrendingItem {
   id: string;
@@ -249,5 +249,3 @@ export default function TrendingFeed({
   );
 }
 
-// Import icons at the top
-import { Newspaper, Github, Youtube } from 'lucide-react';
