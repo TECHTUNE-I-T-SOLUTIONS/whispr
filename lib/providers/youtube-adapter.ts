@@ -8,6 +8,8 @@ export class YouTubeAdapter extends BaseAdapter {
   name = 'youtube';
   private baseUrl = 'https://www.googleapis.com/youtube/v3';
   private apiKey: string | undefined;
+  protected timeout = 5000;
+  protected maxRetries = 0; // No retries - fail fast
 
   constructor() {
     super();
@@ -23,7 +25,7 @@ export class YouTubeAdapter extends BaseAdapter {
     const maxResults = options?.maxResults || 10;
     const order = options?.order || 'relevance';
 
-    return this.withRetry(async () => {
+    try {
       const response = await axios.get(searchUrl, {
         params: {
           part: 'snippet',
@@ -36,6 +38,7 @@ export class YouTubeAdapter extends BaseAdapter {
         headers: {
           'Accept': 'application/json',
         },
+        timeout: 5000,
       });
 
       return {
@@ -52,7 +55,10 @@ export class YouTubeAdapter extends BaseAdapter {
         nextPageToken: response.data.nextPageToken,
         pageInfo: response.data.pageInfo,
       };
-    }, 'search');
+    } catch (error) {
+      console.warn('YouTube search failed:', (error as Error).message);
+      return { items: [] };
+    }
   }
 
   async fetch(id: string, options?: any): Promise<any> {
@@ -143,48 +149,122 @@ export class YouTubeAdapter extends BaseAdapter {
   }
 
   async trending(options?: any): Promise<any> {
-    if (!this.apiKey) {
-      throw new Error('YouTube API key not configured');
+    // Try API key first, fall back to RSS feed if it fails
+    if (this.apiKey) {
+      try {
+        return await this.trendingWithAPI(options);
+      } catch (error: any) {
+        // Log the actual Google API error response for debugging
+        if (error?.response?.data?.error) {
+          const apiError = error.response.data.error;
+          console.warn('YouTube API trending failed:', apiError.message || apiError.status, '-', JSON.stringify(apiError.errors || []));
+        } else {
+          console.warn('YouTube API trending failed, falling back to RSS feed:', (error as Error).message);
+        }
+      }
     }
 
-    // Use the videos API with chart parameter for trending
+    // Fallback: Use YouTube's public RSS feed for trending (no API key needed)
+    return this.trendingWithRSS(options);
+  }
+
+  private async trendingWithAPI(options?: any): Promise<any> {
     const videosUrl = `${this.baseUrl}/videos`;
     const regionCode = options?.regionCode || 'US';
-    const categoryId = options?.categoryId || '0'; // 0 = all categories
+    const categoryId = options?.categoryId || '0';
 
-    return this.withRetry(async () => {
-      const response = await axios.get(videosUrl, {
-        params: {
-          part: 'snippet,statistics',
-          chart: 'mostPopular',
-          regionCode,
-          videoCategoryId: categoryId,
-          maxResults: 20,
-          key: this.apiKey,
+    const response = await axios.get(videosUrl, {
+      params: {
+        part: 'snippet,statistics',
+        chart: 'mostPopular',
+        regionCode,
+        videoCategoryId: categoryId,
+        maxResults: 20,
+        key: this.apiKey,
+      },
+      headers: {
+        'Accept': 'application/json',
+      },
+      timeout: 5000,
+      // Don't throw on 403 so we can see the response body
+      validateStatus: (status) => status < 500,
+    });
+
+    if (response.status === 403) {
+      const reason = response?.data?.error?.message || 'API key restricted or YouTube Data API v3 not enabled';
+      const errors = response?.data?.error?.errors || [];
+      throw new Error(`YouTube API 403: ${reason} ${errors.length ? JSON.stringify(errors) : ''}`);
+    }
+
+    return {
+      items: response.data.items?.map((item: any) => ({
+        id: item.id,
+        title: item.snippet.title,
+        description: item.snippet.description,
+        thumbnail: item.snippet.thumbnails?.default?.url,
+        channelTitle: item.snippet.channelTitle,
+        channelId: item.snippet.channelId,
+        publishedAt: item.snippet.publishedAt,
+        url: `https://www.youtube.com/watch?v=${item.id}`,
+        statistics: {
+          viewCount: item.statistics?.viewCount,
+          likeCount: item.statistics?.likeCount,
+          commentCount: item.statistics?.commentCount,
         },
+      })) || [],
+    };
+  }
+
+  private async trendingWithRSS(options?: any): Promise<any> {
+    // YouTube trending RSS feed (no API key required)
+    const rssUrl = 'https://www.youtube.com/feeds/videos.xml?playlist_id=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf';
+
+    try {
+      const response = await axios.get(rssUrl, {
         headers: {
-          'Accept': 'application/json',
+          'Accept': 'application/xml, text/xml, */*',
+          'User-Agent': 'Mozilla/5.0 (compatible; Whispr/1.0)',
         },
+        timeout: 5000,
       });
 
-      return {
-        items: response.data.items?.map((item: any) => ({
-          id: item.id,
-          title: item.snippet.title,
-          description: item.snippet.description,
-          thumbnail: item.snippet.thumbnails?.default?.url,
-          channelTitle: item.snippet.channelTitle,
-          channelId: item.snippet.channelId,
-          publishedAt: item.snippet.publishedAt,
-          url: `https://www.youtube.com/watch?v=${item.id}`,
+      // Parse XML manually (simple approach)
+      const xml = response.data;
+      const items: any[] = [];
+      const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
+      let match;
+
+      while ((match = entryRegex.exec(xml)) !== null) {
+        const entry = match[1];
+        const id = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1] || '';
+        const title = entry.match(/<title>([^<]+)<\/title>/)?.[1] || '';
+        const channelName = entry.match(/<name>([^<]+)<\/name>/)?.[1] || '';
+        const channelId = entry.match(/<yt:channelId>([^<]+)<\/yt:channelId>/)?.[1] || '';
+        const publishedAt = entry.match(/<published>([^<]+)<\/published>/)?.[1] || '';
+        const thumbnail = `https://i.ytimg.com/vi/${id}/default.jpg`;
+
+        items.push({
+          id,
+          title,
+          description: '',
+          thumbnail,
+          channelTitle: channelName,
+          channelId,
+          publishedAt,
+          url: `https://www.youtube.com/watch?v=${id}`,
           statistics: {
-            viewCount: item.statistics?.viewCount,
-            likeCount: item.statistics?.likeCount,
-            commentCount: item.statistics?.commentCount,
+            viewCount: '0',
+            likeCount: '0',
+            commentCount: '0',
           },
-        })) || [],
-      };
-    }, 'trending');
+        });
+      }
+
+      return { items };
+    } catch (error) {
+      console.warn('YouTube RSS trending also failed:', (error as Error).message);
+      return { items: [] };
+    }
   }
 
   async details(url: string, options?: any): Promise<any> {

@@ -92,7 +92,13 @@ class TrendingEngine {
 
   private async getTrendingYouTube(limit: number, region?: string): Promise<any[]> {
     try {
-      const result = await youtubeAdapter.trending({ regionCode: region });
+      // Use a timeout to fail fast if YouTube API is not available
+      const result = await Promise.race([
+        youtubeAdapter.trending({ regionCode: region }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('YouTube trending timeout')), 5000)
+        ),
+      ]);
       return (result.items || []).slice(0, limit).map((video: any) => ({
         id: video.id,
         title: video.title,

@@ -1,5 +1,6 @@
 // Search Engine
 // Searches Whispr before searching the internet following docs/V2/ section 30
+// Runs all external providers in parallel and combines results
 
 import { knowledgeEngine } from '../knowledge/knowledge-engine';
 import { cacheEngine } from '../cache/cache-engine';
@@ -8,8 +9,10 @@ import { googleNewsRSSAdapter } from '../providers/google-news-rss-adapter';
 import { githubAdapter } from '../providers/github-adapter';
 import { youtubeAdapter } from '../providers/youtube-adapter';
 import { googleSearchAdapter } from '../providers/google-search-adapter';
+import { bingSearchAdapter } from '../providers/bing-search-adapter';
 import { getCategoryFromQuery } from '../config/search-categories';
 import { createSupabaseServer } from '../supabase-server';
+import { addUtmTracking, getSourceLabel, getSourceIcon } from '../utils/utm';
 
 class SearchEngine {
   async search(query: string, options?: {
@@ -39,10 +42,8 @@ class SearchEngine {
     // Priority 3: Search database (posts, chronicles)
     const databaseResults = await this.searchDatabase(query, type, limit);
 
-    // Priority 4: Search external providers (if needed)
-    const externalResults = localResults.length + databaseResults.length < limit
-      ? await this.searchExternal(query, type, limit - localResults.length - databaseResults.length)
-      : [];
+    // Priority 4: Search ALL external providers in parallel
+    const externalResults = await this.searchExternal(query, type, limit);
 
     // Combine and deduplicate
     const combined = this.deduplicateAndRank([...localResults, ...databaseResults, ...externalResults]);
@@ -150,112 +151,179 @@ class SearchEngine {
   }
 
   private async searchExternal(query: string, type: string, limit: number): Promise<any[]> {
-    const results: any[] = [];
     const category = getCategoryFromQuery(query);
+    const results: any[] = [];
+    const perProviderLimit = Math.max(3, Math.ceil(limit / 5)); // Distribute limit across providers
 
-    try {
-      // Priority 1: Google Search with category-based filtering
-      if (type === 'all' || type === 'articles') {
+    // Run ALL external providers in parallel for maximum speed
+    const providers: Promise<void>[] = [];
+
+    // 1. Google Search / DuckDuckGo
+    if (type === 'all' || type === 'articles') {
+      providers.push((async () => {
         try {
           const googleResults = await googleSearchAdapter.search(query, {
             category,
-            num: Math.floor(limit / 2),
+            num: perProviderLimit,
           });
-
           if (googleResults.items) {
             for (const item of googleResults.items) {
               results.push({
                 id: `google-${item.id}`,
                 title: item.title,
                 summary: item.snippet,
-                url: item.link,
-                source: 'google_search',
+                url: addUtmTracking(item.link, item.source || 'google_search'),
+                source: item.source || 'google_search',
+                sourceLabel: getSourceLabel(item.source || 'google_search'),
+                sourceIcon: getSourceIcon(item.source || 'google_search'),
                 type: 'article',
-                category: item.category,
+                category: item.category || category,
                 credibility: 0.8,
                 displayLink: item.displayLink,
               });
             }
           }
         } catch (error) {
-          console.error('Google Search failed, falling back to other providers:', error);
+          console.error('Google Search failed:', (error as Error).message);
         }
-      }
+      })());
 
-      // Priority 2: Search Wikipedia (if knowledge category or general)
-      if ((category === 'knowledge' || type === 'all' || type === 'articles') && results.length < limit) {
-        const wikiResults = await wikipediaAdapter.search(query, { limit: Math.floor(limit / 4) });
-        if (wikiResults.pages) {
-          for (const page of wikiResults.pages) {
-            results.push({
-              id: `wiki-${page.pageid}`,
-              title: page.title,
-              summary: page.excerpt,
-              url: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title)}`,
-              source: 'wikipedia',
-              type: 'article',
-              credibility: 0.9,
-            });
+      // Also try Bing if available
+      providers.push((async () => {
+        try {
+          const bingResults = await bingSearchAdapter.search(query, {
+            category,
+            num: perProviderLimit,
+          });
+          if (bingResults.items) {
+            for (const item of bingResults.items) {
+              results.push({
+                id: `bing-${item.id}`,
+                title: item.title,
+                summary: item.snippet,
+                url: addUtmTracking(item.link, 'bing_search'),
+                source: 'bing_search',
+                sourceLabel: getSourceLabel('bing_search'),
+                sourceIcon: getSourceIcon('bing_search'),
+                type: 'article',
+                category: item.category || category,
+                credibility: 0.8,
+                displayLink: item.displayLink,
+              });
+            }
           }
+        } catch (error) {
+          console.error('Bing Search failed:', (error as Error).message);
         }
-      }
-
-      // Priority 3: Search GitHub (if programming or developer communities category)
-      if ((category === 'programming' || category === 'developer_communities' || type === 'all' || type === 'repositories') && results.length < limit) {
-        const githubResults = await githubAdapter.search(query, { limit: Math.floor(limit / 4) });
-        if (githubResults.items) {
-          for (const repo of githubResults.items) {
-            results.push({
-              id: `github-${repo.id}`,
-              title: repo.name,
-              summary: repo.description,
-              url: repo.url,
-              source: 'github',
-              type: 'repository',
-              stars: repo.stars,
-            });
-          }
-        }
-      }
-
-      // Priority 4: Search YouTube (if general or video type)
-      if ((type === 'all' || type === 'videos') && results.length < limit) {
-        const youtubeResults = await youtubeAdapter.search(query, { maxResults: Math.floor(limit / 4) });
-        if (youtubeResults.items) {
-          for (const video of youtubeResults.items) {
-            results.push({
-              id: `youtube-${video.id}`,
-              title: video.title,
-              summary: video.description,
-              url: video.url,
-              source: 'youtube',
-              type: 'video',
-              channel: video.channelTitle,
-            });
-          }
-        }
-      }
-
-      // Priority 5: Search News (if news category or news type)
-      if ((category === 'news' || type === 'all' || type === 'news') && results.length < limit) {
-        const newsResults = await googleNewsRSSAdapter.search(query);
-        if (newsResults.items) {
-          for (const item of newsResults.items.slice(0, Math.floor(limit / 4))) {
-            results.push({
-              id: `news-${item.guid}`,
-              title: item.title,
-              summary: item.content,
-              url: item.link,
-              source: 'news',
-              type: 'news',
-              publishedAt: item.pubDate,
-            });
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Failed to search external:', error);
+      })());
     }
+
+    // 2. Wikipedia
+    if (category === 'knowledge' || type === 'all' || type === 'articles') {
+      providers.push((async () => {
+        try {
+          const wikiResults = await wikipediaAdapter.search(query, { limit: perProviderLimit });
+          if (wikiResults.pages) {
+            for (const page of wikiResults.pages) {
+              results.push({
+                id: `wiki-${page.pageid}`,
+                title: page.title,
+                summary: page.excerpt,
+                url: addUtmTracking(`https://en.wikipedia.org/wiki/${encodeURIComponent(page.title)}`, 'wikipedia'),
+                source: 'wikipedia',
+                sourceLabel: getSourceLabel('wikipedia'),
+                sourceIcon: getSourceIcon('wikipedia'),
+                type: 'article',
+                credibility: 0.9,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Wikipedia search failed:', (error as Error).message);
+        }
+      })());
+    }
+
+    // 3. GitHub
+    if (category === 'programming' || category === 'developer_communities' || type === 'all' || type === 'repositories') {
+      providers.push((async () => {
+        try {
+          const githubResults = await githubAdapter.search(query, { limit: perProviderLimit });
+          if (githubResults.items) {
+            for (const repo of githubResults.items) {
+              results.push({
+                id: `github-${repo.id}`,
+                title: repo.name,
+                summary: repo.description,
+                url: addUtmTracking(repo.url, 'github'),
+                source: 'github',
+                sourceLabel: getSourceLabel('github'),
+                sourceIcon: getSourceIcon('github'),
+                type: 'repository',
+                stars: repo.stars,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('GitHub search failed:', (error as Error).message);
+        }
+      })());
+    }
+
+    // 4. YouTube
+    if (type === 'all' || type === 'videos') {
+      providers.push((async () => {
+        try {
+          const youtubeResults = await youtubeAdapter.search(query, { maxResults: perProviderLimit });
+          if (youtubeResults.items) {
+            for (const video of youtubeResults.items) {
+              results.push({
+                id: `youtube-${video.id}`,
+                title: video.title,
+                summary: video.description,
+                url: addUtmTracking(video.url, 'youtube'),
+                source: 'youtube',
+                sourceLabel: getSourceLabel('youtube'),
+                sourceIcon: getSourceIcon('youtube'),
+                type: 'video',
+                channel: video.channelTitle,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('YouTube search failed:', (error as Error).message);
+        }
+      })());
+    }
+
+    // 5. News
+    if (category === 'news' || type === 'all' || type === 'news') {
+      providers.push((async () => {
+        try {
+          const newsResults = await googleNewsRSSAdapter.search(query);
+          if (newsResults.items) {
+            for (const item of newsResults.items.slice(0, perProviderLimit)) {
+              results.push({
+                id: `news-${item.guid}`,
+                title: item.title,
+                summary: item.content,
+                url: addUtmTracking(item.link, 'news'),
+                source: 'news',
+                sourceLabel: getSourceLabel('news'),
+                sourceIcon: getSourceIcon('news'),
+                type: 'news',
+                publishedAt: item.pubDate,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('News search failed:', (error as Error).message);
+        }
+      })());
+    }
+
+    // Wait for all providers to complete (or timeout)
+    await Promise.all(providers);
 
     return results;
   }

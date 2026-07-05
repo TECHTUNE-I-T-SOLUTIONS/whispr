@@ -6,8 +6,8 @@ import { createSupabaseServer } from '../supabase-server';
 
 export abstract class BaseAdapter implements ProviderAdapter {
   abstract name: string;
-  protected maxRetries: number = 3;
-  protected timeout: number = 30000;
+  protected maxRetries: number = 1;
+  protected timeout: number = 10000;
 
   abstract search(query: string, options?: any): Promise<any>;
   abstract fetch?(id: string, options?: any): Promise<any>;
@@ -20,8 +20,10 @@ export abstract class BaseAdapter implements ProviderAdapter {
     context: string
   ): Promise<T> {
     let lastError: Error | null = null;
+    // Always run at least once, even if maxRetries is 0
+    const totalAttempts = Math.max(1, this.maxRetries);
 
-    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= totalAttempts; attempt++) {
       try {
         const startTime = Date.now();
         const result = await Promise.race([
@@ -62,7 +64,7 @@ export abstract class BaseAdapter implements ProviderAdapter {
         // Update provider health
         await this.updateProviderHealth(false);
 
-        if (attempt === this.maxRetries) {
+        if (attempt === totalAttempts) {
           throw new Error(
             `${this.name} ${context} failed after ${attempt} attempts: ${lastError.message}`
           );

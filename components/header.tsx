@@ -12,7 +12,13 @@ import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useToast } from '@/hooks/use-toast'
 import { ChroniclesTeaserBanner } from "@/components/chronicles-teaser-banner"
-import { XIcon } from '@/components/icons/XIcon';
+import { XIcon } from '@/components/icons/XIcon'
+import dynamic from "next/dynamic"
+
+const SmartSearch = dynamic(() => import("@/components/ai/SmartSearch"), {
+  loading: () => <div className="w-8 h-8" />,
+  ssr: false,
+})
 
 export function Header() {
   const pathname = usePathname()
@@ -193,6 +199,10 @@ export function Header() {
             <Link key={item.name} href={item.href} className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary border-b-2 border-primary pb-1' : 'text-muted-foreground'}`}>{item.name}</Link>
           ))}
         </nav>
+
+        <div className="lg:flex items-center flex-1 max-w-xs ml-8">
+          <SmartSearch placeholder="Search..." />
+        </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
           {hasMounted && isAdmin && (

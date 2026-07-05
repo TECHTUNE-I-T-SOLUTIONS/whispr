@@ -10,6 +10,7 @@ export { knowledgeEngine } from './knowledge/knowledge-engine';
 // Adapters
 export { geminiAdapter } from './providers/gemini-adapter';
 export { googleSearchAdapter } from './providers/google-search-adapter';
+export { bingSearchAdapter } from './providers/bing-search-adapter';
 export { googleNewsRSSAdapter } from './providers/google-news-rss-adapter';
 export { wikipediaAdapter } from './providers/wikipedia-adapter';
 export { githubAdapter } from './providers/github-adapter';

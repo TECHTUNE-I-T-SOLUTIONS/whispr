@@ -41,6 +41,13 @@ import { useToast } from "@/hooks/use-toast"
 import DOMPurify from "dompurify"
 import { MediaSelector } from "@/components/admin/media-selector"
 import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
+import dynamic from "next/dynamic"
+
+const EditorAI = dynamic(() => import("@/components/ai/EditorAI"), {
+  loading: () => <div className="p-4 text-center text-gray-500">Loading AI Assistant...</div>,
+  ssr: false,
+})
+
 marked.setOptions({ breaks: true })
 
 
@@ -1172,6 +1179,26 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                     ...prev,
                     tags: Array.from(new Set([...prev.tags, ...newTags.map(t => t.trim().replace(/^#/, "").toLowerCase()).filter(t => t)]))
                   }))
+                }}
+              />
+            </CardContent>
+          </Card>
+
+          {/* AI Writing Assistant */}
+          <Card className="border-0 bg-card/50 backdrop-blur">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-purple-500" />
+                AI Writing Assistant
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EditorAI
+                content={formData.content}
+                onContentChange={(content) => setFormData((prev) => ({ ...prev, content }))}
+                onSuggestionApply={(suggestion) => {
+                  // Apply suggestion to content
+                  setFormData((prev) => ({ ...prev, content: suggestion }));
                 }}
               />
             </CardContent>

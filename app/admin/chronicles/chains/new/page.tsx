@@ -6,6 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const EditorAI = dynamic(() => import('@/components/ai/EditorAI'), {
+  loading: () => <div className="p-4 text-center text-gray-500">Loading AI Assistant...</div>,
+  ssr: false,
+});
 
 export default function NewChainPage() {
   const router = useRouter();
@@ -96,6 +102,21 @@ export default function NewChainPage() {
                 placeholder="Enter chain description (optional)"
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              />
+            </div>
+
+            {/* AI Assistant */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                AI Writing Assistant
+              </label>
+              <EditorAI
+                content={formData.description}
+                onContentChange={(content) => setFormData(prev => ({ ...prev, description: content }))}
+                onSuggestionApply={(suggestion) => {
+                  // Apply suggestion to description
+                  setFormData(prev => ({ ...prev, description: suggestion }));
+                }}
               />
             </div>
 

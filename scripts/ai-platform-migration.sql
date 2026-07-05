@@ -370,17 +370,20 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_is_public ON public.system_settin
 -- ============================================
 
 -- Insert default feature flags based on documentation
+-- All features disabled by default - admin will enable via control panel
 INSERT INTO public.feature_flags (flag_name, enabled, description, rollout_percentage) VALUES
-('ENABLE_EDITOR_AI', true, 'Enable AI-powered editor features', 100),
-('ENABLE_RESEARCH_ENGINE', true, 'Enable research engine', 100),
-('ENABLE_RECOMMENDATION_ENGINE', true, 'Enable recommendation engine', 100),
-('ENABLE_TRENDING_ENGINE', true, 'Enable trending engine', 100),
-('ENABLE_LEARNING_ENGINE', false, 'Enable learning engine', 0),
-('ENABLE_YOUTUBE_PROVIDER', true, 'Enable YouTube provider', 100),
+('ENABLE_EDITOR_AI', false, 'Enable AI-powered editor features (grammar, SEO, outlines, headlines)', 0),
+('ENABLE_RESEARCH_ENGINE', false, 'Enable research engine with multi-source synthesis', 0),
+('ENABLE_RECOMMENDATION_ENGINE', false, 'Enable personalized recommendation engine', 0),
+('ENABLE_TRENDING_ENGINE', false, 'Enable trending content engine', 0),
+('ENABLE_LEARNING_ENGINE', false, 'Enable learning engine for creators', 0),
+('ENABLE_SMART_SEARCH', false, 'Enable category-aware smart search', 0),
+('ENABLE_YOUTUBE_PROVIDER', false, 'Enable YouTube provider', 0),
 ('ENABLE_REDDIT_PROVIDER', false, 'Enable Reddit provider', 0),
-('ENABLE_GITHUB_PROVIDER', true, 'Enable GitHub provider', 100),
-('ENABLE_WIKIPEDIA_PROVIDER', true, 'Enable Wikipedia provider', 100),
-('ENABLE_SEARCH_PROVIDER', true, 'Enable search provider', 100)
+('ENABLE_GITHUB_PROVIDER', false, 'Enable GitHub provider', 0),
+('ENABLE_WIKIPEDIA_PROVIDER', false, 'Enable Wikipedia provider', 0),
+('ENABLE_SEARCH_PROVIDER', false, 'Enable Google Search provider', 0),
+('ENABLE_GOOGLE_NEWS_RSS', false, 'Enable Google News RSS provider', 0)
 ON CONFLICT (flag_name) DO NOTHING;
 
 -- Insert default system settings

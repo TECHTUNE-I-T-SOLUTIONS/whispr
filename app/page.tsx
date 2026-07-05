@@ -10,8 +10,9 @@ import { ChroniclesFeatureSection } from "@/components/chronicles-feature-sectio
 import { AIIntroductorySection } from "@/components/ai-introductory-section"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, BookOpen, Wand2, Rocket, Search, Compass } from "lucide-react"
+import TrendingFeed from "@/components/ai/TrendingFeed"
 
-export const revalidate = 60
+export const revalidate = 300 // 5 minutes
 
 export default function HomePage() {
 
@@ -29,6 +30,13 @@ export default function HomePage() {
 
       {/* Chronicles Feature Section */}
       <ChroniclesFeatureSection />
+
+      {/* Trending Feed */}
+      <section className="container py-12">
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading trending content...</div>}>
+          <TrendingFeed limit={10} />
+        </Suspense>
+      </section>
 
       {/* Whispering Stories Showcase Section */}
       <section className="container py-12 md:py-16">

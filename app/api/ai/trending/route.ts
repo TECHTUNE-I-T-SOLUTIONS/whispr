@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trendingEngine } from '@/lib';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 600; // 10 minutes
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;

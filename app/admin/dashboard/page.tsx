@@ -5,6 +5,12 @@ import { RecentActivity } from "@/components/admin/recent-activity"
 import { QuickActions } from "@/components/admin/quick-actions"
 import { useSession } from "@/components/admin/session-provider"
 import { Loader2 } from "lucide-react"
+import dynamic from "next/dynamic"
+
+const PersonalizedRecommendations = dynamic(() => import("@/components/ai/PersonalizedRecommendations"), {
+  loading: () => <div className="p-4 text-center text-gray-500">Loading recommendations...</div>,
+  ssr: false,
+})
 
 export default function AdminDashboard() {
   const { admin, isLoading } = useSession()
@@ -34,8 +40,9 @@ export default function AdminDashboard() {
             <DashboardStats />
             <RecentActivity />
           </div>
-          <div>
+          <div className="space-y-8">
             <QuickActions />
+            <PersonalizedRecommendations userId={admin.id} limit={8} />
           </div>
         </div>
       </main>

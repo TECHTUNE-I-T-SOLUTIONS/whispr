@@ -1,31 +1,43 @@
 // Wikipedia Adapter
 // Knowledge provider adapter following docs/V2/ section 9
+// Uses the MediaWiki action API for reliable search
 
 import { BaseAdapter } from './base-adapter';
 import axios from 'axios';
 
 export class WikipediaAdapter extends BaseAdapter {
   name = 'wikipedia';
-  private baseUrl = 'https://en.wikipedia.org/api/rest_v1';
+  // MediaWiki action API is the correct search endpoint
+  private baseUrl = 'https://en.wikipedia.org/w/api.php';
+  protected timeout = 8000; // 8s timeout for Wikipedia (faster than default 30s)
+  protected maxRetries = 1; // Only 1 retry for Wikipedia
 
   async search(query: string, options?: any): Promise<any> {
-    const searchUrl = `${this.baseUrl}/page/search/${encodeURIComponent(query)}`;
     const limit = options?.limit || 10;
 
     return this.withRetry(async () => {
-      const response = await axios.get(searchUrl, {
-        params: { limit },
+      const response = await axios.get(this.baseUrl, {
+        params: {
+          action: 'query',
+          list: 'search',
+          srsearch: query,
+          format: 'json',
+          srlimit: limit,
+          origin: '*',
+        },
         headers: {
-          'User-Agent': 'Whispr/1.0',
+          'User-Agent': 'Whispr/1.0 (whisprwords@gmail.com)',
         },
       });
 
+      const searchResults = response.data?.query?.search || [];
+
       return {
-        pages: response.data.pages?.map((page: any) => ({
+        pages: searchResults.map((page: any) => ({
           title: page.title,
-          excerpt: page.excerpt,
-          description: page.description,
-          thumbnail: page.thumbnail?.source,
+          excerpt: page.snippet?.replace(/<\/?[^>]+(>|$)/g, '') || '', // strip HTML tags
+          description: '',
+          thumbnail: null,
           pageid: page.pageid,
         })) || [],
       };
@@ -33,12 +45,13 @@ export class WikipediaAdapter extends BaseAdapter {
   }
 
   async fetch(id: string, options?: any): Promise<any> {
-    const summaryUrl = `${this.baseUrl}/page/summary/${encodeURIComponent(id)}`;
+    // id here is the page title
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(id)}`;
 
     return this.withRetry(async () => {
       const response = await axios.get(summaryUrl, {
         headers: {
-          'User-Agent': 'Whispr/1.0',
+          'User-Agent': 'Whispr/1.0 (whisprwords@gmail.com)',
         },
       });
 
@@ -59,12 +72,10 @@ export class WikipediaAdapter extends BaseAdapter {
   }
 
   async latest(options?: any): Promise<any> {
-    // Wikipedia doesn't have a "latest" concept
     return { error: 'Not implemented for Wikipedia' };
   }
 
   async trending(options?: any): Promise<any> {
-    // Wikipedia doesn't have a "trending" concept
     return { error: 'Not implemented for Wikipedia' };
   }
 

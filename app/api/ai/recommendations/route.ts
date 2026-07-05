@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recommendationEngine } from '@/lib';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 1800; // 30 minutes
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
