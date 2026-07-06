@@ -30,12 +30,16 @@ interface AuthenticityResult {
 }
 
 class ContentAuthenticityService {
-  private readonly AUTHENTICITY_THRESHOLD = 80; // Minimum 80% authenticity score to proceed
-  private readonly WARNING_THRESHOLD = 80; // Below 80% blocks publishing
+  private AUTHENTICITY_THRESHOLD = 70; // Default: Minimum 70% authenticity score to proceed
+  private WARNING_THRESHOLD = 70; // Default: Below 70% blocks publishing
   private readonly MIN_TEXT_LENGTH = 50; // Minimum characters for analysis
-  private readonly SECTION_THRESHOLD = 0.6; // 60% AI confidence to flag a section
+  private SECTION_THRESHOLD = 0.5; // Default: 50% AI confidence to flag a section
+  private readonly MAX_PARAGRAPH_LENGTH = 800; // Default: Split paragraphs longer than this
 
   async checkContent(content: string): Promise<AuthenticityResult> {
+    // Load dynamic config from database
+    await this.loadConfig();
+
     // Check minimum length
     if (content.length < this.MIN_TEXT_LENGTH) {
       return {
@@ -70,10 +74,10 @@ class ContentAuthenticityService {
 
       // Generate recommendation
       let recommendation = '';
-      if (authenticityScore >= 80) {
+      if (authenticityScore >= this.AUTHENTICITY_THRESHOLD) {
         recommendation = 'Content appears to be original and human-written. Great job!';
       } else {
-        recommendation = 'Content does not meet our authenticity threshold (80%+ required). Please rewrite with your own voice, examples, and personal insights before publishing.';
+        recommendation = `Content does not meet our authenticity threshold (${this.AUTHENTICITY_THRESHOLD}%+ required). Please rewrite with your own voice, examples, and personal insights before publishing.`;
       }
 
       // Perform line-by-line analysis
@@ -84,12 +88,12 @@ class ContentAuthenticityService {
         isAIGenerated: isAI,
         confidenceScore: confidence,
         authenticityScore,
-        reasoning: detection.reasoning || [],
+        reasoning: [],
         metrics: {
-          perplexity: detection.metrics?.perplexity || 0,
-          burstiness: detection.metrics?.burstiness || 0,
-          vocabulary: detection.metrics?.vocabulary || 0,
-          structure: detection.metrics?.structure || 0,
+          perplexity: 0,
+          burstiness: 0,
+          vocabulary: 0,
+          structure: 0,
         },
         canProceed,
         recommendation,
@@ -119,12 +123,45 @@ class ContentAuthenticityService {
   }
 
   private async analyzeBySections(content: string): Promise<SectionAnalysis[]> {
+    // Load dynamic config from database
+    await this.loadConfig();
+
     // Split content into paragraphs/sections
     const sections = content.split(/\n\n+/).filter(s => s.trim().length > 0);
+    
+    // Split long paragraphs
+    const processedSections: string[] = [];
+    for (const section of sections) {
+      if (section.length > this.MAX_PARAGRAPH_LENGTH) {
+        // Split long paragraphs into smaller chunks
+        const words = section.split(' ');
+        const chunks: string[] = [];
+        let currentChunk: string[] = [];
+        let currentLength = 0;
+        
+        for (const word of words) {
+          if (currentLength + word.length > this.MAX_PARAGRAPH_LENGTH && currentChunk.length > 0) {
+            chunks.push(currentChunk.join(' '));
+            currentChunk = [word];
+            currentLength = word.length;
+          } else {
+            currentChunk.push(word);
+            currentLength += word.length + 1;
+          }
+        }
+        if (currentChunk.length > 0) {
+          chunks.push(currentChunk.join(' '));
+        }
+        processedSections.push(...chunks);
+      } else {
+        processedSections.push(section);
+      }
+    }
+    
     const analysis: SectionAnalysis[] = [];
 
-    for (let i = 0; i < sections.length; i++) {
-      const section = sections[i].trim();
+    for (let i = 0; i < processedSections.length; i++) {
+      const section = processedSections[i].trim();
       if (section.length < 20) continue; // Skip very short sections
 
       try {
@@ -156,6 +193,9 @@ class ContentAuthenticityService {
 
   // Check multiple sections (e.g., for longer content)
   async checkContentSections(sections: string[]): Promise<AuthenticityResult> {
+    // Load dynamic config from database
+    await this.loadConfig();
+
     if (sections.length === 0) {
       return this.checkContent('');
     }
@@ -202,9 +242,9 @@ class ContentAuthenticityService {
         structure: results.reduce((sum, r) => sum + r.metrics.structure, 0) / results.length,
       },
       canProceed: avgAuthenticity >= this.AUTHENTICITY_THRESHOLD,
-      recommendation: avgAuthenticity >= 80
+      recommendation: avgAuthenticity >= this.AUTHENTICITY_THRESHOLD
         ? 'Content sections appear to be original and human-written.'
-        : 'Content does not meet our authenticity threshold (80%+ required). Please rewrite sections with your own voice.',
+        : `Content does not meet our authenticity threshold (${this.AUTHENTICITY_THRESHOLD}%+ required). Please rewrite sections with your own voice.`,
       sectionAnalysis: allSectionAnalysis,
       aiSections: allAISections,
     };
@@ -213,6 +253,33 @@ class ContentAuthenticityService {
   // Get policy explanation for UI
   getPolicyExplanation(): string {
     return `Our AI Content Policy: We encourage the use of AI as a writing assistant, but all published content must be original and substantially refined by human creators. AI can help with grammar, structure, and suggestions, but the final work must reflect your unique voice, experiences, and perspective. Content that appears to be primarily AI-generated will be flagged for revision.`;
+  }
+
+  // Load configuration from database
+  private async loadConfig(): Promise<void> {
+    try {
+      const { createSupabaseServer } = await import('@/lib/supabase-server');
+      const supabase = createSupabaseServer();
+      
+      const { data, error } = await supabase
+        .from('ai_content_config')
+        .select('*')
+        .single();
+
+      if (error || !data) {
+        // Use defaults if no config exists
+        this.AUTHENTICITY_THRESHOLD = 70;
+        this.SECTION_THRESHOLD = 0.5;
+        return;
+      }
+
+      // Update thresholds from database
+      this.AUTHENTICITY_THRESHOLD = data.authenticity_threshold;
+      this.SECTION_THRESHOLD = parseFloat(data.section_threshold);
+    } catch (error) {
+      console.error('Failed to load AI content config:', error);
+      // Keep defaults on error
+    }
   }
 }
 

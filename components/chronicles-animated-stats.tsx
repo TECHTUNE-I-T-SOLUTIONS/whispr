@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Users, BookOpen, Heart, Zap } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 
 interface ProjectionCardProps {
@@ -22,7 +23,7 @@ function ProjectionCard({ label, description, icon, delay = 0 }: ProjectionCardP
     >
       {/* Holographic border effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-foreground/20 via-primary/20 to-foreground/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
-      
+
       {/* Card */}
       <div className="relative p-8 rounded-2xl border border-primary/30 bg-gradient-to-br from-background to-background/50 dark:from-slate-900/50 dark:to-slate-900/30 backdrop-blur-sm hover:border-primary/50 transition-all group-hover:shadow-xl group-hover:shadow-primary/20">
         {/* Animated corner accent */}
@@ -73,23 +74,23 @@ function ProjectionCard({ label, description, icon, delay = 0 }: ProjectionCardP
 export function ChroniclesAnimatedStats() {
   const projections = [
     {
-      label: 'Platform Ready',
-      description: 'Chronicles is in development. Our team is crafting the ultimate writing platform to empower creators worldwide.',
+      label: 'Platform Live',
+      description: 'Chronicles is fully built and active. Our team is refining the ultimate writing platform to empower creators worldwide.',
       icon: <Zap className="w-8 h-8 text-white" />,
     },
     {
-      label: 'Creator Focused',
-      description: 'We\'re building tools designed specifically for writers, poets, and storytellers to share their voice.',
+      label: 'Creator Empowered',
+      description: 'We have created tools designed specifically for writers, poets, and storytellers to amplify their voices.',
       icon: <Users className="w-8 h-8 text-white" />,
     },
     {
-      label: 'Launch Coming',
-      description: 'Be among the first to join when we launch. Sign up now to get early access to Chronicles.',
+      label: 'Active Access',
+      description: 'Join the vanguard of digital literature. Sign up now to access Chronicles.',
       icon: <BookOpen className="w-8 h-8 text-white" />,
     },
     {
-      label: 'Community First',
-      description: 'We\'re building a passionate community where every creator\'s voice matters and is celebrated.',
+      label: 'Community Thriving',
+      description: 'We support a passionate community where every creator\'s voice matters and is celebrated.',
       icon: <Heart className="w-8 h-8 text-white" />,
     },
   ];
@@ -124,14 +125,14 @@ export function ChroniclesAnimatedStats() {
               transition={{ duration: 2, repeat: Infinity }}
               className="w-2 h-2 rounded-full bg-primary"
             />
-            <span className="text-primary font-semibold">Coming Soon</span>
+            <span className="text-primary font-semibold">System Active</span>
           </motion.div>
 
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-            The Future Awaits
+            Chronicles is Live
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Chronicles is being carefully crafted to revolutionize how creators share their stories. We're building something special for you.
+            Chronicles has been built to revolutionize how creators share their stories. We've created something special for you, and we're constantly making it better.
           </p>
         </motion.div>
 
@@ -157,22 +158,24 @@ export function ChroniclesAnimatedStats() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex-1">
-              <h3 className="text-2xl font-bold mb-3">Ready to Shape the Future?</h3>
+              <h3 className="text-2xl font-bold mb-3">Ready to Share Your Voice?</h3>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Join thousands of creators who are waiting to launch their stories on Chronicles. Sign up today for exclusive early access.
+                Join thousands of creators who have published their stories on Chronicles. Sign up today for early access.
               </p>
-              <motion.div
-                whileHover={{ x: 5 }}
-                className="flex items-center gap-2 text-primary font-semibold cursor-pointer group"
-              >
-                <span>Get Early Access</span>
-                <motion.span
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+              <Link href="/chronicles/waitlist">
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-2 text-primary font-semibold cursor-pointer group"
                 >
-                  →
-                </motion.span>
-              </motion.div>
+                  <span>Get Early Access</span>
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    →
+                  </motion.span>
+                </motion.div>
+              </Link>
             </div>
 
             {/* Animated graphic */}

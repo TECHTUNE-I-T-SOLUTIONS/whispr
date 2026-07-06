@@ -44,6 +44,7 @@ import {
 interface Story {
   id: string
   title: string
+  slug?: string
   genre: string
   excerpt: string
   description: string
@@ -97,6 +98,29 @@ export default function StoryChaptersManagerPage() {
   const [chapterStatus, setChapterStatus] = useState<"draft" | "published">("published")
   const [savingChapter, setSavingChapter] = useState(false)
   const [chapterError, setChapterError] = useState("")
+  
+  // Authenticity check state
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null)
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false)
+
+  const checkContentAuthenticity = async (contentToCheck: string) => {
+    setCheckingAuthenticity(true)
+    try {
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: contentToCheck }),
+      })
+      const result = await response.json()
+      setAuthenticityCheck(result)
+      return result
+    } catch (error) {
+      console.error('Authenticity check failed:', error)
+      return null
+    } finally {
+      setCheckingAuthenticity(false)
+    }
+  }
 
   useEffect(() => {
     if (storyId) {
@@ -232,6 +256,21 @@ export default function StoryChaptersManagerPage() {
       return
     }
 
+    // Check authenticity before publishing
+    if (chapterStatus === "published") {
+      const checkResult = await checkContentAuthenticity(chapterContent.trim())
+      if (checkResult && !checkResult.canProceed) {
+        setChapterError(checkResult.recommendation || 'Content authenticity check failed. Please ensure your content is at least 80% original.')
+        toast({
+          title: "Authenticity Check Failed",
+          description: "AI-generated content detected. Review guidelines in editor.",
+          variant: "destructive",
+        })
+        setSavingChapter(false)
+        return
+      }
+    }
+
     try {
       const method = editingChapter ? "PUT" : "POST"
       const payload: any = {
@@ -357,6 +396,7 @@ export default function StoryChaptersManagerPage() {
     setChapterContent("")
     setChapterStatus("published")
     setChapterError("")
+    setAuthenticityCheck(null)
     setEditorOpen(true)
   }
 
@@ -366,6 +406,7 @@ export default function StoryChaptersManagerPage() {
     setChapterContent(chap.content)
     setChapterStatus(chap.status)
     setChapterError("")
+    setAuthenticityCheck(null)
     setEditorOpen(true)
   }
 
@@ -375,6 +416,7 @@ export default function StoryChaptersManagerPage() {
     setChapterTitle("")
     setChapterContent("")
     setChapterError("")
+    setAuthenticityCheck(null)
   }
 
   if (loadingStory) {
@@ -698,6 +740,26 @@ export default function StoryChaptersManagerPage() {
                   </div>
                 )}
 
+                {authenticityCheck && (
+                  <div className={`mb-4 p-3 rounded-lg border text-xs ${
+                    authenticityCheck.authenticityScore >= 80
+                      ? 'bg-green-500/10 border-green-500/30 text-green-400'
+                      : 'bg-red-500/10 border-red-500/30 text-red-400'
+                  }`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold">
+                        AI Authenticity Score: {authenticityCheck.authenticityScore}%
+                      </span>
+                      {authenticityCheck.authenticityScore >= 80 ? (
+                        <ShieldCheck className="h-4 w-4 text-green-400" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-red-400" />
+                      )}
+                    </div>
+                    <p className="opacity-90">{authenticityCheck.recommendation}</p>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground mb-1 block">Chapter Title</label>
@@ -725,6 +787,29 @@ export default function StoryChaptersManagerPage() {
                       rows={18}
                       className="bg-background/60 border-border/40 focus:ring-primary rounded-lg font-serif leading-relaxed text-sm"
                     />
+                  </div>
+
+                  <div className="pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => checkContentAuthenticity(chapterContent.trim())}
+                      disabled={checkingAuthenticity || !chapterContent.trim()}
+                      className="w-full text-xs"
+                    >
+                      {checkingAuthenticity ? (
+                        <>
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                          Checking Content Authenticity...
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="mr-2 h-3.5 w-3.5" />
+                          Check Content Authenticity
+                        </>
+                      )}
+                    </Button>
                   </div>
 
                   <div className="p-3 bg-muted/20 border border-border/10 rounded-lg flex items-center justify-between text-xs">

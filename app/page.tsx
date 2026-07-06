@@ -8,8 +8,9 @@ import DailyPoemModal from "@/components/daily-poem-modal"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
 import { AIIntroductorySection } from "@/components/ai-introductory-section"
+import { ControlSystemSection } from "@/components/control-system-section"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, BookOpen, Wand2, Rocket, Search, Compass } from "lucide-react"
+import { ArrowRight, BookOpen, Wand2, Rocket, Search, Compass, Sparkles } from "lucide-react"
 import TrendingFeed from "@/components/ai/TrendingFeed"
 import { ErrorBoundary } from "@/components/error-boundary"
 
@@ -18,7 +19,10 @@ export const revalidate = 300 // 5 minutes
 export default function HomePage() {
 
   return (
-    <div className="whispr-gradient min-h-screen">
+    <div className="whispr-gradient min-h-screen relative overflow-hidden">
+      {/* Mesh/Grid Background combining with primary color */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(145,26,27,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(145,26,27,0.035)_1px,transparent_1px)] bg-[length:40px_40px] pointer-events-none z-0" />
+
       {/* Cookie Consent Modal */}
       <Suspense fallback={null}>
         <CookieConsentModal />
@@ -28,6 +32,9 @@ export default function HomePage() {
 
       {/* AI Introductory Section */}
       <AIIntroductorySection />
+
+      {/* Control System Section */}
+      <ControlSystemSection />
 
       {/* Chronicles Feature Section */}
       <ChroniclesFeatureSection />

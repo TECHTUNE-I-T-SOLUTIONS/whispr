@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FileText, Shield, Users, AlertCircle, Zap, Heart, Scale, Lock } from 'lucide-react';
+import { FileText, Shield, Users, AlertCircle, Zap, Heart, Scale, Lock, Brain } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Section {
@@ -74,6 +74,17 @@ export default function TermsOfServicePage() {
         'The Service, including all text, graphics, logos, images, and software, is the exclusive property of Whispr and is protected by copyright and other intellectual property laws.',
         'You may not reproduce, distribute, transmit, modify, or prepare derivative works from any materials on the Service without prior written permission from Whispr, except as permitted for your personal, non-commercial use.',
         'All trademarks, service marks, and logos are the property of Whispr or their respective owners. You may not use any of these marks without permission.',
+      ],
+    },
+    {
+      id: 'ai-guidelines',
+      icon: <Brain className="w-6 h-6" />,
+      title: 'AI Usage & Content Regulation (CONTROL System)',
+      content: [
+        'Whispr utilizes artificial intelligence technologies, collectively termed the "CONTROL System", to assist, explain, suggest, and critique writing styles and content. You acknowledge that under the CONTROL System, you, the human creator, retain sole authorship and ownership of your creations.',
+        'AI tools provided by Whispr are designed purely to assist your creative process. They are not error-free. AI suggestions or explanations may contain mistakes, inaccuracies, or incomplete information. Under no circumstances should you replace a professional tutor, teacher, or educational authority with these AI tools.',
+        'You are solely responsible for reviewing, verifying, and certifying any suggestions or text produced by the AI before publishing. Whispr holds no responsibility or liability for any errors, plagiarism, copyright claims, or factual inaccuracies that result from AI-generated suggestions that you choose to publish.',
+        'To protect our community and promote authenticity, you must ensure that your core creative voice, logical structure, and overall reasoning remain entirely your own. Plagiarism or copying raw, unverified AI outputs without substantive human modification may result in account termination.',
       ],
     },
     {

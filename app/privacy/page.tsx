@@ -165,6 +165,16 @@ export default function PrivacyPolicyPage() {
       ],
     },
     {
+      id: 'ai-processing',
+      icon: <Database className="w-6 h-6" />,
+      title: 'AI Data Processing & Interactions',
+      content: [
+        'When you interact with Whispr\'s AI features (such as drafting suggestions, grammar checks, style critiques, or the CONTROL system), we process your textual input and generated outputs to deliver the service.',
+        'We do not sell your drafts or prompt interactions to third parties. Your interactions with the AI are stored securely and processed in accordance with our standard data protection guidelines.',
+        'To improve the performance of our writing assistance models and secure our platform, anonymized or de-identified interaction metrics may be analyzed. No personally identifiable details are included in training sets or shared with AI providers in a manner that compromises your privacy.',
+      ],
+    },
+    {
       id: 'cookies-tracking',
       icon: <Database className="w-6 h-6" />,
       title: 'Cookies and Tracking Technologies',

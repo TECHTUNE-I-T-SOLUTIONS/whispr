@@ -26,6 +26,7 @@ export function Header() {
   const { theme } = useTheme()
   const [hasMounted, setHasMounted] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isCreator, setIsCreator] = useState(false)
   const [chroniclesEnabled, setChroniclesEnabled] = useState(false)
   const { toast } = useToast()
   const [sharePreviewOpen, setSharePreviewOpen] = useState(false)
@@ -35,7 +36,7 @@ export function Header() {
 
   useEffect(() => setHasMounted(true), [])
 
-  // admin detection
+  // session detection
   useEffect(() => {
     let mounted = true
     ;(async () => {
@@ -44,7 +45,10 @@ export function Header() {
         if (!mounted) return
         if (!res.ok) return
         const data = await res.json()
-        if (mounted) setIsAdmin(Boolean(data?.authenticated))
+        if (mounted) {
+          setIsAdmin(data?.type === 'admin')
+          setIsCreator(data?.type === 'creator')
+        }
       } catch (e) {}
     })()
     return () => { mounted = false }
@@ -205,15 +209,15 @@ export function Header() {
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
-          {hasMounted && isAdmin && (
-            <Link href="/admin/dashboard" className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"><LayoutDashboard className="h-4 w-4" /><span className="hidden xl:inline">Dashboard</span></Link>
+          {hasMounted && (isAdmin || isCreator) && (
+            <Link href={isAdmin ? "/admin/dashboard" : "/chronicles/dashboard"} className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden xl:inline">Dashboard</span>
+            </Link>
           )}
 
-          {chroniclesEnabled && (
+          {chroniclesEnabled && !isCreator && (
             <div className="hidden sm:flex md:hidden lg:flex items-center gap-1 md:gap-2">
-              {/* <Button variant="outline" size="sm" asChild className="text-xs">
-                <Link href="/chronicles/feed">Chronicles Feed</Link>
-              </Button> */}
               <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-lg shadow-sm">
                 <Link href="/chronicles/waitlist">Join Chronicles</Link>
               </Button>
@@ -279,15 +283,18 @@ export function Header() {
             {chroniclesEnabled && (
               <div className="py-2 border-t mt-2 space-y-2">
                 <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
-                <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-purple-400 hover:text-purple-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
-                {/* <Link href="/auth/signup" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link> */}
+                {!isCreator && (
+                  <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-purple-400 hover:text-purple-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
+                )}
               </div>
             )}
             <div className="pt-4 border-t">
-              {isAdmin && (
+              {(isAdmin || isCreator) && (
                 <div className="space-y-2">
-                  <Link href="/admin/messages" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Messages</Link>
-                  <Link href="/admin/dashboard" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+                  {isAdmin && (
+                    <Link href="/admin/messages" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Messages</Link>
+                  )}
+                  <Link href={isAdmin ? "/admin/dashboard" : "/chronicles/dashboard"} className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
                 </div>
               )}
               <div className="pt-3">

@@ -6,12 +6,21 @@ import { Switch } from "@/components/ui/switch";
 import { Shield, Monitor, Sparkles, Search, TrendingUp, Brain, BookOpen, Youtube, Github, Globe, Newspaper } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface FeatureFlag {
   flag_name: string;
   enabled: boolean;
   description: string;
   rollout_percentage: number;
+}
+
+interface AIConfig {
+  authenticity_threshold: number;
+  section_threshold: number;
+  max_paragraph_length: number;
 }
 
 export default function AdsControlPage() {
@@ -21,6 +30,12 @@ export default function AdsControlPage() {
   const [error, setError] = useState("");
   const [featureFlags, setFeatureFlags] = useState<FeatureFlag[]>([]);
   const [savingFlags, setSavingFlags] = useState<Record<string, boolean>>({});
+  const [aiConfig, setAiConfig] = useState<AIConfig>({
+    authenticity_threshold: 70,
+    section_threshold: 0.5,
+    max_paragraph_length: 800,
+  });
+  const [savingAiConfig, setSavingAiConfig] = useState(false);
 
   useEffect(() => {
     // Fetch current ads setting from Supabase
@@ -53,6 +68,26 @@ export default function AdsControlPage() {
       }
     }
     fetchFeatureFlags();
+  }, []);
+
+  useEffect(() => {
+    // Fetch AI config
+    async function fetchAiConfig() {
+      try {
+        const res = await fetch("/api/admin/ai-config");
+        if (res.ok) {
+          const data = await res.json();
+          setAiConfig({
+            authenticity_threshold: data.authenticity_threshold || 70,
+            section_threshold: data.section_threshold || 0.5,
+            max_paragraph_length: data.max_paragraph_length || 800,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to fetch AI config:", e);
+      }
+    }
+    fetchAiConfig();
   }, []);
 
   async function handleToggle(value: boolean) {
@@ -112,6 +147,36 @@ export default function AdsControlPage() {
   };
 
   const getFlag = (name: string) => featureFlags.find(f => f.flag_name === name);
+
+  async function handleSaveAiConfig() {
+    setSavingAiConfig(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/ai-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authenticity_threshold: aiConfig.authenticity_threshold,
+          section_threshold: aiConfig.section_threshold,
+          max_paragraph_length: aiConfig.max_paragraph_length,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update AI config");
+      }
+      // Refresh config
+      const data = await res.json();
+      setAiConfig({
+        authenticity_threshold: data.authenticity_threshold,
+        section_threshold: data.section_threshold,
+        max_paragraph_length: data.max_paragraph_length,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to update AI config");
+    }
+    setSavingAiConfig(false);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 py-8 px-4">
@@ -220,6 +285,98 @@ export default function AdsControlPage() {
                     </div>
                   );
                 })}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <Shield className="w-8 h-8 text-green-500 mb-2" />
+                <CardTitle>Content Authenticity Thresholds</CardTitle>
+                <CardDescription>
+                  Configure AI content detection thresholds. Content must meet these thresholds to be published.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="authenticity_threshold">
+                      Overall Authenticity % (Minimum: {aiConfig.authenticity_threshold}%)
+                    </Label>
+                    <Input
+                      id="authenticity_threshold"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={aiConfig.authenticity_threshold}
+                      onChange={(e) =>
+                        setAiConfig({
+                          ...aiConfig,
+                          authenticity_threshold: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      disabled={savingAiConfig}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      The minimum authenticity score a chapter must reach to be publishable. Higher values are stricter.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="section_threshold">
+                      Section AI-Confidence % (Minimum: {Math.round(aiConfig.section_threshold * 100)}%)
+                    </Label>
+                    <Input
+                      id="section_threshold"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={Math.round(aiConfig.section_threshold * 100)}
+                      onChange={(e) =>
+                        setAiConfig({
+                          ...aiConfig,
+                          section_threshold: (parseInt(e.target.value) || 0) / 100,
+                        })
+                      }
+                      disabled={savingAiConfig}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      The confidence level that flags a paragraph as AI-generated. Higher values are stricter.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="max_paragraph_length">
+                      Max Paragraph Length (Characters: {aiConfig.max_paragraph_length})
+                    </Label>
+                    <Input
+                      id="max_paragraph_length"
+                      type="number"
+                      min="100"
+                      max="2000"
+                      step="50"
+                      value={aiConfig.max_paragraph_length}
+                      onChange={(e) =>
+                        setAiConfig({
+                          ...aiConfig,
+                          max_paragraph_length: parseInt(e.target.value) || 800,
+                        })
+                      }
+                      disabled={savingAiConfig}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Paragraphs longer than this will be split before analysis to improve detection accuracy.
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={handleSaveAiConfig}
+                    disabled={savingAiConfig}
+                    className="w-full"
+                  >
+                    {savingAiConfig ? "Saving..." : "Save Authenticity Settings"}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

@@ -6,16 +6,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  ArrowRight, 
-  Loader2, 
-  AlertCircle, 
-  Upload, 
-  X, 
-  Check, 
-  Sparkles, 
-  ShieldCheck, 
-  PartyPopper, 
+import {
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+  Upload,
+  X,
+  Check,
+  Sparkles,
+  ShieldCheck,
+  PartyPopper,
   Bookmark,
   Calendar,
   Key,
@@ -27,8 +27,8 @@ import {
   Globe,
   Lock,
   Instagram,
-  } from 'lucide-react';
-  import { XIcon } from '@/components/icons/XIcon';
+} from 'lucide-react';
+import { XIcon } from '@/components/icons/XIcon';
 
 
 export default function ChroniclesWaitlist() {
@@ -40,7 +40,7 @@ export default function ChroniclesWaitlist() {
   const [submitted, setSubmitted] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImagePreview, setProfileImagePreview] = useState<string>('');
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -324,7 +324,7 @@ export default function ChroniclesWaitlist() {
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-600/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
 
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-        
+
         {/* Left Column: Premium Value Props */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-4">
@@ -348,13 +348,12 @@ export default function ChroniclesWaitlist() {
               { num: 4, title: "Review & Security", desc: "Finalize notifications.", icon: Sliders },
             ].map((s) => (
               <div key={s.num} className={`flex gap-3.5 transition-all duration-300 ${step === s.num ? 'opacity-100 scale-102 translation-x-1' : 'opacity-40'}`}>
-                <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${
-                  step === s.num 
-                    ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
-                    : step > s.num
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                      : 'bg-slate-900 border-white/10 text-slate-500'
-                }`}>
+                <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${step === s.num
+                  ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
+                  : step > s.num
+                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                    : 'bg-slate-900 border-white/10 text-slate-500'
+                  }`}>
                   {step > s.num ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
                 </div>
                 <div>
@@ -384,19 +383,18 @@ export default function ChroniclesWaitlist() {
         {/* Right Column: Premium Glassmorphic Card Form */}
         <div className="lg:col-span-7">
           <div className="bg-slate-900/30 border border-white/10 rounded-[32px] p-6 md:p-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
-            
+
             {/* Step Indicators for Mobile */}
             <div className="flex lg:hidden gap-3 mb-6 items-center justify-center">
               {[1, 2, 3, 4].map((s) => (
                 <div
                   key={s}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    step === s 
-                      ? 'w-8 bg-purple-500' 
-                      : step > s 
-                        ? 'w-2.5 bg-emerald-500' 
-                        : 'w-2.5 bg-white/10'
-                  }`}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${step === s
+                    ? 'w-8 bg-purple-500'
+                    : step > s
+                      ? 'w-2.5 bg-emerald-500'
+                      : 'w-2.5 bg-white/10'
+                    }`}
                 />
               ))}
             </div>
@@ -453,8 +451,8 @@ export default function ChroniclesWaitlist() {
 
                 <p className="text-xs text-center text-slate-400">
                   Already secured an outline?{' '}
-                  <Link href="/chronicles/login" className="text-purple-400 hover:text-purple-300 font-semibold hover:underline">
-                    Sign in here
+                  <Link href="/" className="text-purple-400 hover:text-purple-300 font-semibold hover:underline">
+                    Go Home
                   </Link>
                 </p>
               </form>
@@ -594,11 +592,10 @@ export default function ChroniclesWaitlist() {
                           key={type}
                           type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, contentType: type }))}
-                          className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${
-                            formData.contentType === type
-                              ? 'border-purple-500 bg-purple-500/20 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
-                              : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
-                          }`}
+                          className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${formData.contentType === type
+                            ? 'border-purple-500 bg-purple-500/20 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
+                            : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
+                            }`}
                         >
                           {type}
                         </button>
@@ -614,11 +611,10 @@ export default function ChroniclesWaitlist() {
                           key={category}
                           type="button"
                           onClick={() => handleCategoryToggle(category)}
-                          className={`p-2.5 rounded-xl border transition-all text-xs font-medium flex items-center justify-center gap-1.5 ${
-                            formData.preferredCategories.includes(category)
-                              ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                              : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
-                          }`}
+                          className={`p-2.5 rounded-xl border transition-all text-xs font-medium flex items-center justify-center gap-1.5 ${formData.preferredCategories.includes(category)
+                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
+                            }`}
                         >
                           {formData.preferredCategories.includes(category) && (
                             <Check className="w-3.5 h-3.5 shrink-0 text-purple-400 font-black" />
@@ -637,11 +633,10 @@ export default function ChroniclesWaitlist() {
                           key={visibility}
                           type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, profileVisibility: visibility }))}
-                          className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${
-                            formData.profileVisibility === visibility
-                              ? 'border-purple-500 bg-purple-500/20 text-purple-300'
-                              : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
-                          }`}
+                          className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${formData.profileVisibility === visibility
+                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
+                            }`}
                         >
                           {visibility}
                         </button>

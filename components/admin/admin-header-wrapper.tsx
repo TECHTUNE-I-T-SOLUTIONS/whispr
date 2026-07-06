@@ -41,7 +41,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Flagged Content", href: "/admin/chronicles/flagged-content", icon: ClipboardList },
     { name: "Error Logs", href: "/admin/error-logs", icon: AlertTriangle },
     // Ads Control Section
-    { name: "Ads Control", href: "/admin/ads-control", icon: Sliders },
+    { name: "Control", href: "/admin/ads-control", icon: Sliders },
     // Chronicles Section
     { name: "Chronicles Analytics", href: "/admin/chronicles/analytics", icon: TrendingUp },
     { name: "Chronicles Settings", href: "/admin/chronicles/settings", icon: Sliders },

@@ -6,6 +6,7 @@ import { Lock } from 'lucide-react';
 import { ChroniclesFeatureBanner } from '@/components/chronicles-feature-banner';
 import { ChroniclesFeatureModal } from '@/components/chronicles-feature-modal';
 import { ChroniclesCircularFeatures } from '@/components/chronicles-circular-features';
+import { ControlSystemSection } from '@/components/control-system-section';
 import { ChroniclesAnimatedStats } from '@/components/chronicles-animated-stats';
 import { ChroniclesTestimonials } from '@/components/chronicles-testimonials';
 import { ChroniclesCTA } from '@/components/chronicles-cta';
@@ -66,6 +67,9 @@ export default function ChroniclesLanding() {
 
       {/* Circular Features Section */}
       <ChroniclesCircularFeatures />
+
+      {/* Control System Section */}
+      <ControlSystemSection />
 
       {/* Animated Stats Section */}
       <ChroniclesAnimatedStats />
