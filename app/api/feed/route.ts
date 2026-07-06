@@ -82,6 +82,7 @@ export async function GET(request: NextRequest) {
         view_count,
         created_at,
         published_at,
+        slug,
         admin:admin!admin_id(id, username, full_name, avatar_url)
       `)
       .eq("status", "published")
@@ -110,14 +111,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Process admin posts - use avatar proxy like whispr wall does for reliable loading
-    const processedAdminPosts = adminPosts?.map(post => ({
-      ...post,
-      author: {
-        ...post.admin,
-        avatar_url: post.admin?.avatar_url ? getAvatarProxyUrlWithBucket(post.admin?.avatar_url, 'avatars') : null
-      },
-      likesCount: adminLikesCounts.get(post.id) || 0
-    }))
+    const processedAdminPosts = adminPosts?.map(post => {
+      // Supabase returns relationship data - handle both object and array formats
+      const adminData = Array.isArray((post as any).admin) ? (post as any).admin[0] : (post as any).admin
+      return {
+        ...post,
+        author: {
+          id: adminData?.id,
+          name: adminData?.full_name || "Whispr Admin",
+          username: adminData?.username || "admin",
+          avatar_url: adminData?.avatar_url ? getAvatarProxyUrlWithBucket(adminData?.avatar_url, 'avatars') : null
+        },
+        likesCount: adminLikesCounts.get(post.id) || 0
+      }
+    })
 
     // Fetch chronicles posts
     const { data: chroniclesPosts, error: chroniclesError } = await supabase
@@ -147,13 +154,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Process chronicles posts to use avatar proxy for reliable loading
-    const processedChroniclesPosts = chroniclesPosts?.map(post => ({
-      ...post,
-      author: {
-        ...post.creator,
-        avatar_url: post.creator?.profile_image_url ? getAvatarProxyUrlWithBucket(post.creator?.profile_image_url, 'chronicles-profiles') : null
+    const processedChroniclesPosts = chroniclesPosts?.map(post => {
+      // Supabase returns relationship data - handle both object and array formats
+      const creatorData = Array.isArray((post as any).creator) ? (post as any).creator[0] : (post as any).creator
+      return {
+        ...post,
+        author: {
+          id: creatorData?.id,
+          name: creatorData?.pen_name || "Unknown Author",
+          username: creatorData?.pen_name?.toLowerCase().replace(/\s+/g, '') || "unknown",
+          avatar_url: creatorData?.profile_image_url ? getAvatarProxyUrlWithBucket(creatorData?.profile_image_url, 'chronicles-profiles') : null
+        }
       }
-    }))
+    })
 
     // Fetch stories from view_all_stories
     const { data: feedStories, error: storiesError } = await supabase
@@ -168,7 +181,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Combine and format posts
-    const formattedPosts = []
+    const formattedPosts: any[] = []
 
     // Format admin posts
     if (processedAdminPosts) {
@@ -185,12 +198,13 @@ export async function GET(request: NextRequest) {
           tags: post.tags,
           viewCount: post.view_count,
           likesCount: post.likesCount,
+          slug: post.slug, // Include slug for proper routing
           createdAt: post.created_at,
           publishedAt: post.published_at,
           author: {
-            id: post.admin?.id || "admin",
-            name: post.admin?.full_name || "Whispr Admin",
-            username: post.admin?.username || "admin",
+            id: post.author?.id || "admin",
+            name: post.author?.name || "Whispr Admin",
+            username: post.author?.username || "admin",
             avatar_url: post.author?.avatar_url, // Use processed avatar
             type: "admin"
           }
@@ -217,9 +231,9 @@ export async function GET(request: NextRequest) {
           createdAt: post.published_at,
           publishedAt: post.published_at,
           author: {
-            id: post.creator?.id,
-            name: post.creator?.pen_name,
-            username: post.creator?.pen_name?.toLowerCase().replace(/\s+/g, ''),
+            id: post.author?.id,
+            name: post.author?.name,
+            username: post.author?.username,
             avatar_url: post.author?.avatar_url, // Use processed avatar
             type: "creator"
           }

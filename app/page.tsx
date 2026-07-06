@@ -11,6 +11,7 @@ import { AIIntroductorySection } from "@/components/ai-introductory-section"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, BookOpen, Wand2, Rocket, Search, Compass } from "lucide-react"
 import TrendingFeed from "@/components/ai/TrendingFeed"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 export const revalidate = 300 // 5 minutes
 
@@ -116,7 +117,9 @@ export default function HomePage() {
       </section>
 
       {/* Adsterra banners below main content */}
-      <AdsterraBanner />
+      <ErrorBoundary fallback={null}>
+        <AdsterraBanner />
+      </ErrorBoundary>
     </div>
   );
 }

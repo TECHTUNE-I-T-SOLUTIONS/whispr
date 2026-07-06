@@ -1,18 +1,21 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { requireAuthFromRequest } from '@/lib/auth-server'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServer()
+    const { admin } = await requireAuthFromRequest(request as any)
+    const supabase = createSupabaseServer()
+    const { id } = await params
 
     // Get single error
     const { data, error } = await supabase
       .from('error_logs')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -22,6 +25,9 @@ export async function GET(
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error fetching error log:', error)
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
+    }
     return NextResponse.json(
       { error: 'Failed to fetch error log' },
       { status: 500 }
@@ -31,34 +37,13 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createSupabaseServer()
+    const { admin } = await requireAuthFromRequest(request as any)
+    const supabase = createSupabaseServer()
     const body = await request.json()
-
-    const { data: { session } } = await supabase.auth.getSession()
-
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // Check if user is admin
-    const { data: admin } = await supabase
-      .from('admin')
-      .select('id')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!admin) {
-      return NextResponse.json(
-        { error: 'Forbidden - Admin access required' },
-        { status: 403 }
-      )
-    }
+    const { id } = await params
 
     // Update error log
     const { data, error } = await supabase
@@ -66,10 +51,10 @@ export async function PATCH(
       .update({
         resolved: body.resolved || false,
         resolved_at: body.resolved ? new Date().toISOString() : null,
-        resolved_by: body.resolved ? session.user.id : null,
+        resolved_by: body.resolved ? admin.id : null,
         notes: body.notes || null,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -77,7 +62,7 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    console.log(`✅ Error ${params.id} marked as ${body.resolved ? 'resolved' : 'unresolved'}`)
+    console.log(`✅ Error ${id} marked as ${body.resolved ? 'resolved' : 'unresolved'}`)
 
     return NextResponse.json(data)
   } catch (error) {

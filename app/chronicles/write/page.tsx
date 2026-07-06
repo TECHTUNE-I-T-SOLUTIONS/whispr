@@ -16,7 +16,7 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Send, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Save, Send, ArrowLeft, Loader2, AlertCircle, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SEOAnalyzer } from '@/components/seo/seo-analyzer';
 
@@ -74,6 +74,10 @@ function ChroniclesWriteContent() {
   const [flaggedReason, setFlaggedReason] = useState<string>('');
   const [flagResolution, setFlagResolution] = useState<string | null>(null);
   const [appealing, setAppealing] = useState(false);
+
+  // Authenticity check state
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null);
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false);
 
   // All useRef calls
   const contentRef = useRef<HTMLDivElement>(null);
@@ -330,12 +334,40 @@ function ChroniclesWriteContent() {
     }
   };
 
+  const checkContentAuthenticity = async () => {
+    setCheckingAuthenticity(true);
+    try {
+      const plainText = contentRef.current?.innerText || postData.content.replace(/<[^>]+>/g, '');
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: plainText }),
+      });
+      const result = await response.json();
+      setAuthenticityCheck(result);
+      return result;
+    } catch (error) {
+      console.error('Authenticity check failed:', error);
+      return null;
+    } finally {
+      setCheckingAuthenticity(false);
+    }
+  };
+
   const handlePublish = async () => {
     setPublishing(true);
     setError('');
 
     if (!postData.title || !postData.content || !postData.category) {
       setError('Please fill in all required fields');
+      setPublishing(false);
+      return;
+    }
+
+    // Check authenticity before publishing
+    const checkResult = await checkContentAuthenticity();
+    if (checkResult && !checkResult.canProceed) {
+      setError(checkResult.recommendation || 'Content authenticity check failed. Please ensure your content is at least 80% original.');
       setPublishing(false);
       return;
     }
@@ -445,7 +477,13 @@ function ChroniclesWriteContent() {
               className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handlePublish}
               disabled={publishing || (isFlagged && (flagStatus === 'pending' || flagStatus === 'under_review'))}
-              title={isFlagged && (flagStatus === 'pending' || flagStatus === 'under_review') ? 'Cannot publish while under review' : undefined}
+              title={
+                isFlagged && (flagStatus === 'pending' || flagStatus === 'under_review')
+                  ? 'Cannot publish while under review'
+                  : authenticityCheck && authenticityCheck.authenticityScore < 80
+                  ? 'Cannot publish: authenticity score below 80%'
+                  : undefined
+              }
             >
               {publishing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
               Publish
@@ -458,6 +496,29 @@ function ChroniclesWriteContent() {
           <div className="flex gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg mb-8">
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Authenticity Check Results */}
+        {authenticityCheck && (
+          <div className={`p-4 rounded-lg border mb-8 ${
+            authenticityCheck.authenticityScore >= 80
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+          }`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-sm">
+                Authenticity Score: {authenticityCheck.authenticityScore}%
+              </span>
+              {authenticityCheck.authenticityScore >= 80 ? (
+                <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {authenticityCheck.recommendation}
+            </p>
           </div>
         )}
 
@@ -543,6 +604,29 @@ function ChroniclesWriteContent() {
             )}
           </>
         )}
+
+        {/* Authenticity Check Button */}
+        <div className="mb-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={checkContentAuthenticity}
+            disabled={checkingAuthenticity || !postData.content}
+            className="w-full"
+          >
+            {checkingAuthenticity ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Checking Authenticity...
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Check Content Authenticity
+              </>
+            )}
+          </Button>
+        </div>
 
         <div className="mb-2 align-middle flex justify-end gap-2">
           <select

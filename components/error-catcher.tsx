@@ -42,6 +42,29 @@ export default function ErrorCatcher() {
           eObj = new Error(String(msg))
         }
         
+        // Filter out Adsterra and other third-party script errors
+        const errorMessage = eObj.message || ''
+        const errorUrl = url || ''
+        
+        // Check if this is a third-party script error (Adsterra, ads, etc.)
+        const isThirdPartyError = 
+          errorMessage === 'Script error.' ||
+          errorUrl.includes('adsterra') ||
+          errorUrl.includes('ads') ||
+          errorUrl.includes('doubleclick') ||
+          errorUrl.includes('googlesyndication') ||
+          errorUrl.includes('google-analytics') ||
+          errorUrl.includes('googleanalytics') ||
+          errorUrl.includes('facebook.net') ||
+          errorUrl.includes('connect.facebook.net')
+        
+        if (isThirdPartyError) {
+          // Log to console and report to server, but don't show UI to user
+          console.warn('Third-party script error (suppressed from UI):', eObj.message, errorUrl)
+          reportToServer(eObj, 'onerror-thirdparty')
+          return false
+        }
+        
         setError(eObj)
         setHasError(true)
         reportToServer(eObj, 'onerror')

@@ -237,7 +237,7 @@ export default function SmartSearch({ onResultClick, userId, placeholder = 'Sear
               )}
 
               {results.combined.length === 0 && (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   No results found. Try a different search term.
                 </div>
               )}

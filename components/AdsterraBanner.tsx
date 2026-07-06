@@ -5,6 +5,7 @@ export function AdsterraBanner() {
   const adRef1 = useRef<HTMLDivElement>(null);
   const adRef2 = useRef<HTMLDivElement>(null);
   const [showAds, setShowAds] = useState<boolean | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     fetch("/api/ads-settings")
@@ -14,7 +15,19 @@ export function AdsterraBanner() {
   }, []);
 
   useEffect(() => {
-    if (!showAds) return;
+    if (!showAds || hasError) return;
+
+    // Add global error handler for script errors
+    const handleScriptError = (event: ErrorEvent) => {
+      // Ignore errors from ad domains
+      if (event.filename?.includes('highperformanceformat.com') || 
+          event.filename?.includes('effectivegatecpm.com')) {
+        event.preventDefault();
+        setHasError(true);
+      }
+    };
+
+    window.addEventListener('error', handleScriptError);
 
     const loadScript = (src: string, parent: HTMLElement): Promise<HTMLScriptElement> => {
       return new Promise((resolve, reject) => {
@@ -70,9 +83,13 @@ export function AdsterraBanner() {
         if (adRef2.current) adRef2.current.innerHTML = '';
       }
     }
-  }, [showAds]);
 
-  if (!showAds) return null;
+    return () => {
+      window.removeEventListener('error', handleScriptError);
+    };
+  }, [showAds, hasError]);
+
+  if (!showAds || hasError) return null;
   return (
     <div className="flex flex-col items-center gap-6 py-8">
       <div ref={adRef1} />

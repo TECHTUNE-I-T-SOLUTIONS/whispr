@@ -73,7 +73,7 @@ class RecommendationEngine {
       const profileData = await this.buildProfileFromActivity(userId);
 
       // Save profile
-      const { data: newProfile } = await supabase
+      const { data: newProfile, error: insertError } = await supabase
         .from('recommendation_profiles')
         .insert({
           user_id: userId,
@@ -81,6 +81,16 @@ class RecommendationEngine {
         })
         .select('*')
         .single();
+
+      if (insertError || !newProfile) {
+        console.error('Failed to create profile:', insertError);
+        // Return a temporary profile without saving
+        return {
+          userId,
+          profileData,
+          lastUpdatedAt: new Date(),
+        };
+      }
 
       return {
         id: newProfile.id,

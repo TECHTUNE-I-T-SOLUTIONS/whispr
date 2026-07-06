@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
 
 interface Props {
@@ -22,12 +22,41 @@ export default function ChainContributor({ chainId }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null);
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false);
+
+  const checkContentAuthenticity = async () => {
+    setCheckingAuthenticity(true);
+    try {
+      const plainText = content;
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: plainText }),
+      });
+      const result = await response.json();
+      setAuthenticityCheck(result);
+      return result;
+    } catch (error) {
+      console.error('Authenticity check failed:', error);
+      return null;
+    } finally {
+      setCheckingAuthenticity(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim() || !content.trim()) {
       setError('Title and content are required');
+      return;
+    }
+
+    // Check authenticity before creating entry
+    const checkResult = await checkContentAuthenticity();
+    if (checkResult && !checkResult.canProceed) {
+      setError(checkResult.recommendation || 'Content authenticity check failed. Please ensure your content is at least 80% original.');
       return;
     }
 
@@ -192,6 +221,7 @@ export default function ChainContributor({ chainId }: Props) {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             disabled={submitting}
+            title="Category"
             className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm"
           >
             <option value="">None</option>
@@ -225,6 +255,7 @@ export default function ChainContributor({ chainId }: Props) {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             disabled={submitting}
+            title="Status"
             className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm"
           >
             <option value="draft">Draft</option>
@@ -234,6 +265,29 @@ export default function ChainContributor({ chainId }: Props) {
           <p className="text-xs text-muted-foreground mt-1">Choose entry status</p>
         </div>
 
+        {/* Authenticity Check Results */}
+        {authenticityCheck && (
+          <div className={`p-4 rounded-lg border ${
+            authenticityCheck.authenticityScore >= 80
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+          }`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-sm">
+                Authenticity Score: {authenticityCheck.authenticityScore}%
+              </span>
+              {authenticityCheck.authenticityScore >= 80 ? (
+                <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {authenticityCheck.recommendation}
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="p-3 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive dark:text-primary">
             {error}
@@ -241,6 +295,24 @@ export default function ChainContributor({ chainId }: Props) {
         )}
 
         <div className="flex gap-2 justify-end pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={checkContentAuthenticity}
+            disabled={checkingAuthenticity || !content.trim()}
+          >
+            {checkingAuthenticity ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Checking...
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                Check Authenticity
+              </>
+            )}
+          </Button>
           <Button
             type="button"
             variant="outline"

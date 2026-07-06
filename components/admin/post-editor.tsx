@@ -33,6 +33,8 @@ import {
   Link as LinkIcon,
   Heading,
   MousePointer2,
+  ShieldCheck,
+  AlertTriangle,
 } from "lucide-react"
 import { MediaPlayer } from "@/components/media-player"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -150,6 +152,9 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   // toolbar positioning will be set using CSS variables on the editor container
   const [editingCaption, setEditingCaption] = useState(false)
   const [captionInput, setCaptionInput] = useState("")
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null)
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false)
+  const [showAuthenticityWarning, setShowAuthenticityWarning] = useState(false)
 
   const getPublicUrl = (path: string) =>
     `https://vkftywhuaxwbknlrymnr.supabase.co/storage/v1/object/public/media/${path}`
@@ -543,7 +548,46 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
     setFormData((prev) => ({ ...prev, content: html }))
   }
 
+  const checkContentAuthenticity = async () => {
+    setCheckingAuthenticity(true)
+    try {
+      const plainText = contentRef.current?.innerText || formData.content
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: plainText }),
+      })
+      const result = await response.json()
+      setAuthenticityCheck(result)
+      
+      if (!result.canProceed) {
+        setShowAuthenticityWarning(true)
+      }
+      
+      return result
+    } catch (error) {
+      console.error('Authenticity check failed:', error)
+      return null
+    } finally {
+      setCheckingAuthenticity(false)
+    }
+  }
+
   const handleSubmit = async (status: "draft" | "published") => {
+    // Check authenticity before publishing
+    if (status === 'published') {
+      const checkResult = await checkContentAuthenticity()
+      if (checkResult && !checkResult.canProceed) {
+        setShowAuthenticityWarning(true)
+        toast({
+          variant: "destructive",
+          title: "Content Authenticity Check",
+          description: checkResult.recommendation,
+        })
+        return
+      }
+    }
+
     setIsLoading(true)
     try {
       const url = postId ? `/api/admin/posts/${postId}` : "/api/admin/posts"
@@ -1201,6 +1245,144 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   setFormData((prev) => ({ ...prev, content: suggestion }));
                 }}
               />
+            </CardContent>
+          </Card>
+
+          {/* Content Authenticity Checker */}
+          <Card className="border-0 bg-card/50 backdrop-blur">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-blue-500" />
+                Content Authenticity Checker
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Check your content for AI-generated patterns before publishing. AI can assist, but content must be original and refined by you.
+              </p>
+              
+              <Button
+                onClick={checkContentAuthenticity}
+                disabled={checkingAuthenticity || !formData.content}
+                variant="outline"
+                className="w-full"
+              >
+                {checkingAuthenticity ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    Check Authenticity
+                  </>
+                )}
+              </Button>
+
+              {authenticityCheck && (
+                <div className="space-y-4">
+                  {/* Overall Score */}
+                  <div className={`p-4 rounded-lg border ${
+                    authenticityCheck.authenticityScore >= 80
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-sm">
+                        Authenticity Score: {authenticityCheck.authenticityScore}%
+                      </span>
+                      {authenticityCheck.authenticityScore >= 80 ? (
+                        <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      ) : (
+                        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {authenticityCheck.recommendation}
+                    </p>
+                    {authenticityCheck.authenticityScore < 80 && (
+                      <p className="text-xs font-medium text-red-600 dark:text-red-400 mt-2">
+                        Publishing is blocked until authenticity reaches 80%+
+                      </p>
+                    )}
+                    {authenticityCheck.reasoning && authenticityCheck.reasoning.length > 0 && (
+                      <div className="text-xs text-muted-foreground">
+                        <p className="font-medium mb-1">Analysis:</p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {authenticityCheck.reasoning.map((reason: string, idx: number) => (
+                            <li key={idx}>{reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* AI-Flagged Sections */}
+                  {authenticityCheck.aiSections && authenticityCheck.aiSections.length > 0 && (
+                    <div className="p-4 rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 text-orange-800 dark:text-orange-300">
+                        <AlertTriangle className="h-4 w-4" />
+                        AI-Flagged Sections ({authenticityCheck.aiSections.length})
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        These sections show significant AI patterns. Please rewrite them with your own voice:
+                      </p>
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {authenticityCheck.aiSections.map((section: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded bg-white dark:bg-black/30 border border-orange-100 dark:border-orange-900/50">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-medium text-orange-700 dark:text-orange-400">
+                                Section {section.lineNumber}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {Math.round(section.authenticityScore)}% authentic
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-3">
+                              {section.text.substring(0, 200)}{section.text.length > 200 ? '...' : ''}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Detailed Section Analysis */}
+                  {authenticityCheck.sectionAnalysis && authenticityCheck.sectionAnalysis.length > 0 && (
+                    <details className="group">
+                      <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                        <span>View detailed section analysis ({authenticityCheck.sectionAnalysis.length} sections)</span>
+                        <span className="transform group-open:rotate-180 transition-transform">▼</span>
+                      </summary>
+                      <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
+                        {authenticityCheck.sectionAnalysis.map((section: any, idx: number) => (
+                          <div 
+                            key={idx} 
+                            className={`p-2 rounded text-xs ${
+                              section.isAIGenerated
+                                ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                                : section.authenticityScore >= 80
+                                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                : 'bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium">Section {section.lineNumber}</span>
+                              <span className={section.isAIGenerated ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                                {Math.round(section.authenticityScore)}%
+                              </span>
+                            </div>
+                            <p className="text-muted-foreground line-clamp-2">
+                              {section.text.substring(0, 100)}...
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -67,7 +67,13 @@ function getDetailPageUrl(post: FeedPost): string {
     return `/stories/${post.slug || post.id}`;
   }
   if (post.source === 'admin') {
-    return `/poems/${post.id}`;
+    // Admin posts can be either blog or poem, route accordingly
+    if (post.type === 'poem') {
+      return `/poems/${post.id}`;
+    } else {
+      // For blog posts, use slug if available, otherwise use ID
+      return `/blog/${post.slug || post.id}`;
+    }
   }
   // For creator posts, generate slug from title for routing
   const slug = generateSlug(post.title);
@@ -116,7 +122,7 @@ export default function FeedPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-20">
         <div className="flex flex-col items-center gap-4">
-          <AlertCircle className="w-12 h-12 text-red-600" />
+          <AlertCircle className="w-12 h-12 text-primary" />
           <p className="text-lg font-semibold text-gray-900 dark:text-white">{error}</p>
           <Button onClick={fetchFeed} variant="outline">Retry</Button>
         </div>
@@ -198,7 +204,7 @@ export default function FeedPage() {
                         </p>
                       </div>
                       {post.featured && (
-                        <span className="text-xs font-semibold px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200 rounded-full">
+                        <span className="text-xs font-semibold px-2 py-1 bg-primary/40 dark:bg-primary/40 text-primary-foreground dark:text-primary-foreground rounded-full">
                           Featured
                         </span>
                       )}
@@ -237,7 +243,7 @@ export default function FeedPage() {
                       </span>
                       
                       <Link href={detailUrl} className="ml-auto">
-                        <Button size="sm" variant="default" className="bg-red-600 hover:bg-red-700">
+                        <Button size="sm" variant="default" className="bg-primary hover:bg-red-700">
                           Read Full Post
                         </Button>
                       </Link>

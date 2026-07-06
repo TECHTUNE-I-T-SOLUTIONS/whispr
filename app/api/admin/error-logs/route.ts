@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { requireAuthFromRequest } from '@/lib/auth-server'
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createSupabaseServer()
+    const { admin } = await requireAuthFromRequest(request as any)
+    const supabase = createSupabaseServer()
     const url = new URL(request.url)
 
     // Get query parameters
@@ -49,6 +51,9 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error('Error fetching error logs:', error)
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
+    }
     return NextResponse.json(
       { error: 'Failed to fetch error logs' },
       { status: 500 }

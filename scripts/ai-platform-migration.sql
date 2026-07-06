@@ -190,8 +190,7 @@ CREATE TABLE IF NOT EXISTS public.recommendation_profiles (
   last_updated_at timestamp with time zone DEFAULT now(),
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT recommendation_profiles_pkey PRIMARY KEY (id),
-  CONSTRAINT recommendation_profiles_user_id_unique UNIQUE (user_id),
-  CONSTRAINT recommendation_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  CONSTRAINT recommendation_profiles_user_id_unique UNIQUE (user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_recommendation_profiles_user_id ON public.recommendation_profiles(user_id);
@@ -205,8 +204,7 @@ CREATE TABLE IF NOT EXISTS public.recommendation_scores (
   reason text,
   calculated_at timestamp with time zone DEFAULT now(),
   expires_at timestamp with time zone,
-  CONSTRAINT recommendation_scores_pkey PRIMARY KEY (id),
-  CONSTRAINT recommendation_scores_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  CONSTRAINT recommendation_scores_pkey PRIMARY KEY (id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_recommendation_scores_user_id ON public.recommendation_scores(user_id);
@@ -227,8 +225,7 @@ CREATE TABLE IF NOT EXISTS public.user_interests (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT user_interests_pkey PRIMARY KEY (id),
-  CONSTRAINT user_interests_user_id_interest_unique UNIQUE (user_id, interest),
-  CONSTRAINT user_interests_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  CONSTRAINT user_interests_user_id_interest_unique UNIQUE (user_id, interest)
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_interests_user_id ON public.user_interests(user_id);
@@ -243,8 +240,7 @@ CREATE TABLE IF NOT EXISTS public.user_topics (
   last_engaged_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT user_topics_pkey PRIMARY KEY (id),
-  CONSTRAINT user_topics_user_id_topic_unique UNIQUE (user_id, topic),
-  CONSTRAINT user_topics_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  CONSTRAINT user_topics_user_id_topic_unique UNIQUE (user_id, topic)
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_topics_user_id ON public.user_topics(user_id);
@@ -260,8 +256,7 @@ CREATE TABLE IF NOT EXISTS public.user_search_history (
   clicked_result_type text,
   timestamp timestamp with time zone DEFAULT now(),
   metadata jsonb DEFAULT '{}'::jsonb,
-  CONSTRAINT user_search_history_pkey PRIMARY KEY (id),
-  CONSTRAINT user_search_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+  CONSTRAINT user_search_history_pkey PRIMARY KEY (id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_search_history_user_id ON public.user_search_history(user_id);
@@ -341,8 +336,7 @@ CREATE TABLE IF NOT EXISTS public.prompt_versions (
   created_at timestamp with time zone DEFAULT now(),
   created_by uuid,
   CONSTRAINT prompt_versions_pkey PRIMARY KEY (id),
-  CONSTRAINT prompt_versions_name_version_unique UNIQUE (prompt_name, version),
-  CONSTRAINT prompt_versions_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id)
+  CONSTRAINT prompt_versions_name_version_unique UNIQUE (prompt_name, version)
 );
 
 CREATE INDEX IF NOT EXISTS idx_prompt_versions_prompt_name ON public.prompt_versions(prompt_name);
@@ -358,8 +352,7 @@ CREATE TABLE IF NOT EXISTS public.system_settings (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   updated_by uuid,
-  CONSTRAINT system_settings_pkey PRIMARY KEY (id),
-  CONSTRAINT system_settings_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id)
+  CONSTRAINT system_settings_pkey PRIMARY KEY (id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_system_settings_setting_key ON public.system_settings(setting_key);

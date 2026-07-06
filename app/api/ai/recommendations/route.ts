@@ -28,10 +28,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ recommendations });
   } catch (error) {
     console.error('Recommendations API error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get recommendations' },
-      { status: 500 }
-    );
+    // Return empty recommendations instead of error to avoid breaking the UI
+    return NextResponse.json({ recommendations: [] });
   }
 }
 

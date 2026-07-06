@@ -3131,6 +3131,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ai-text-detector@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "ai-text-detector@npm:1.0.8"
+  checksum: 10c0/47428b783bf51320c8b9285aa723b9a8971ce2bec0cbfe7284a618feae5e420fd203c0d1cdfd3819764de0298e0c0890df0ad0a464c32388e000e0077785d68a
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -9624,6 +9631,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@types/web-push": "npm:^3"
+    ai-text-detector: "npm:^1.0.8"
     autoprefixer: "npm:^10.4.20"
     axios: "npm:^1.18.1"
     baseline-browser-mapping: "npm:^2.10.21"

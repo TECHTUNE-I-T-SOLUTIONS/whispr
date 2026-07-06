@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, X, CheckCircle2, AlertCircle, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 interface Entry {
   id: string;
@@ -44,6 +44,28 @@ export default function EditChainEntryModal({
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null);
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false);
+
+  const checkContentAuthenticity = async () => {
+    setCheckingAuthenticity(true);
+    try {
+      const plainText = formData.content;
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: plainText }),
+      });
+      const result = await response.json();
+      setAuthenticityCheck(result);
+      return result;
+    } catch (error) {
+      console.error('Authenticity check failed:', error);
+      return null;
+    } finally {
+      setCheckingAuthenticity(false);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -63,6 +85,14 @@ export default function EditChainEntryModal({
     if (!formData.title.trim() || !formData.content.trim()) {
       setError('Title and content are required');
       setToast({ type: 'error', message: 'Title and content are required' });
+      return;
+    }
+
+    // Check authenticity before saving
+    const checkResult = await checkContentAuthenticity();
+    if (checkResult && !checkResult.canProceed) {
+      setError(checkResult.recommendation || 'Content authenticity check failed. Please ensure your content is at least 80% original.');
+      setToast({ type: 'error', message: checkResult.recommendation || 'Content authenticity check failed.' });
       return;
     }
 
@@ -262,8 +292,49 @@ export default function EditChainEntryModal({
             </select>
           </div>
 
+          {/* Authenticity Check Results */}
+          {authenticityCheck && (
+            <div className={`p-4 rounded-lg border ${
+              authenticityCheck.authenticityScore >= 80
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+            }`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-sm">
+                  Authenticity Score: {authenticityCheck.authenticityScore}%
+                </span>
+                {authenticityCheck.authenticityScore >= 80 ? (
+                  <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {authenticityCheck.recommendation}
+              </p>
+            </div>
+          )}
+
           {/* Buttons */}
           <div className="flex gap-3 justify-end pt-4 border-t border-gray-200 dark:border-slate-700">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={checkContentAuthenticity}
+              disabled={checkingAuthenticity || !formData.content.trim()}
+            >
+              {checkingAuthenticity ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4 mr-2" />
+                  Check Authenticity
+                </>
+              )}
+            </Button>
             <Button
               type="button"
               variant="outline"

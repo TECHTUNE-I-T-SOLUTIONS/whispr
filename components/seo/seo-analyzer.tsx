@@ -364,7 +364,7 @@ export function SEOAnalyzer({
                 "h-3 w-3 rounded-full animate-pulse transition-all duration-300",
                 activeScore > 75 ? "bg-green-500" : activeScore > 50 ? "bg-amber-500" : "bg-red-500"
               )} />
-              <CardTitle className="text-lg font-serif">SEO Check</CardTitle>
+              <CardTitle className="text-sm font-serif">SEO Check</CardTitle>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -373,7 +373,7 @@ export function SEOAnalyzer({
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="rounded-lg h-8 px-3 text-xs"
               >
-                {isExpanded ? "Hide Details" : "View Live"}
+                {isExpanded ? "Hide" : "Live"}
               </Button>
               {result && (
                 <Button 
@@ -398,8 +398,8 @@ export function SEOAnalyzer({
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-3 w-3 mr-1.5" />
-                    Trigger Check
+                    <Sparkles className="h-3 w-3 mr-0.5" />
+                    Check
                   </>
                 )}
               </Button>

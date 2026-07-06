@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { BookOpen, ArrowLeft, Send, ShieldCheck, Plus } from "lucide-react"
+import { BookOpen, ArrowLeft, Send, ShieldCheck, Plus, Loader2, AlertTriangle } from "lucide-react"
 import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
 
 const GENRES = ["Fantasy", "Sci-Fi", "Romance", "Mystery", "Adventure", "Comedy", "Thriller", "Drama", "Historical Fiction"]
@@ -32,6 +32,29 @@ export default function NewAdminStoryPage() {
   const [chapContent, setChapContent] = useState("")
   const [chapStatus, setChapStatus] = useState<"draft" | "published">("published")
 
+  // Content authenticity state
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null)
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false)
+
+  const checkContentAuthenticity = async (content: string) => {
+    setCheckingAuthenticity(true)
+    try {
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
+      const result = await response.json()
+      setAuthenticityCheck(result)
+      return result
+    } catch (error) {
+      console.error('Authenticity check failed:', error)
+      return null
+    } finally {
+      setCheckingAuthenticity(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -54,6 +77,34 @@ export default function NewAdminStoryPage() {
       })
       setSaving(false)
       return
+    }
+
+    // Check authenticity for description if publishing
+    if (status === 'published' && description.trim()) {
+      const descCheck = await checkContentAuthenticity(description.trim())
+      if (descCheck && !descCheck.canProceed) {
+        toast({
+          variant: "destructive",
+          title: "Content Authenticity Check",
+          description: descCheck.recommendation,
+        })
+        setSaving(false)
+        return
+      }
+    }
+
+    // Check authenticity for chapter content if publishing and adding chapter
+    if (addFirstChapter && chapStatus === 'published' && chapContent.trim()) {
+      const chapCheck = await checkContentAuthenticity(chapContent.trim())
+      if (chapCheck && !chapCheck.canProceed) {
+        toast({
+          variant: "destructive",
+          title: "Chapter Content Authenticity Check",
+          description: chapCheck.recommendation,
+        })
+        setSaving(false)
+        return
+      }
     }
 
     const hashtags = tagsInput
@@ -233,6 +284,154 @@ export default function NewAdminStoryPage() {
                   setTagsInput(combined.join(", "))
                 }}
               />
+
+              {/* Content Authenticity Checker */}
+              <div className="p-5 border border-border/10 rounded-2xl bg-muted/20 space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-blue-500 shrink-0" />
+                    Content Authenticity Checker
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">Check your content for AI-generated patterns before publishing.</p>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={() => description && checkContentAuthenticity(description)}
+                    disabled={checkingAuthenticity || !description}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                  >
+                    {checkingAuthenticity ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                        Checking...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="mr-2 h-3 w-3" />
+                        Check Description
+                      </>
+                    )}
+                  </Button>
+                  {addFirstChapter && (
+                    <Button
+                      onClick={() => chapContent && checkContentAuthenticity(chapContent)}
+                      disabled={checkingAuthenticity || !chapContent}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                    >
+                      {checkingAuthenticity ? (
+                        <>
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="mr-2 h-3 w-3" />
+                          Check Chapter
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+
+                {authenticityCheck && (
+                  <div className="space-y-3">
+                    {/* Overall Score */}
+                    <div className={`p-3 rounded-lg border ${
+                      authenticityCheck.authenticityScore >= 80
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                        : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                    }`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-xs">
+                          Authenticity Score: {authenticityCheck.authenticityScore}%
+                        </span>
+                        {authenticityCheck.authenticityScore >= 80 ? (
+                          <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {authenticityCheck.recommendation}
+                      </p>
+                      {authenticityCheck.authenticityScore < 80 && (
+                        <p className="text-[10px] font-medium text-red-600 dark:text-red-400 mt-1">
+                          Publishing is blocked until authenticity reaches 80%+
+                        </p>
+                      )}
+                    </div>
+
+                    {/* AI-Flagged Sections */}
+                    {authenticityCheck.aiSections && authenticityCheck.aiSections.length > 0 && (
+                      <div className="p-3 rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20">
+                        <h4 className="font-semibold text-xs mb-2 flex items-center gap-2 text-orange-800 dark:text-orange-300">
+                          <AlertTriangle className="h-3 w-3" />
+                          AI-Flagged Sections ({authenticityCheck.aiSections.length})
+                        </h4>
+                        <p className="text-[10px] text-muted-foreground mb-2">
+                          These sections show significant AI patterns. Please rewrite them with your own voice:
+                        </p>
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                          {authenticityCheck.aiSections.map((section: any, idx: number) => (
+                            <div key={idx} className="p-2 rounded bg-white dark:bg-black/30 border border-orange-100 dark:border-orange-900/50">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-[10px] font-medium text-orange-700 dark:text-orange-400">
+                                  Section {section.lineNumber}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {Math.round(section.authenticityScore)}% authentic
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground line-clamp-2">
+                                {section.text.substring(0, 150)}{section.text.length > 150 ? '...' : ''}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Detailed Section Analysis */}
+                    {authenticityCheck.sectionAnalysis && authenticityCheck.sectionAnalysis.length > 0 && (
+                      <details className="group">
+                        <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                          <span>View detailed section analysis ({authenticityCheck.sectionAnalysis.length} sections)</span>
+                          <span className="transform group-open:rotate-180 transition-transform text-[10px]">▼</span>
+                        </summary>
+                        <div className="mt-2 space-y-1.5 max-h-48 overflow-y-auto">
+                          {authenticityCheck.sectionAnalysis.map((section: any, idx: number) => (
+                            <div 
+                              key={idx} 
+                              className={`p-2 rounded text-[10px] ${
+                                section.isAIGenerated
+                                  ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                                  : section.authenticityScore >= 80
+                                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                                  : 'bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-0.5">
+                                <span className="font-medium">Section {section.lineNumber}</span>
+                                <span className={section.isAIGenerated ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                                  {Math.round(section.authenticityScore)}%
+                                </span>
+                              </div>
+                              <p className="text-muted-foreground line-clamp-1">
+                                {section.text.substring(0, 80)}...
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Optional First Chapter Section */}
               <div className="p-5 border border-border/10 rounded-2xl bg-muted/20 space-y-4">

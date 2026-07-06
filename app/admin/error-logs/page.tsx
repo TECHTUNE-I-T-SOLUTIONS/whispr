@@ -51,7 +51,9 @@ export default function ErrorLogsPage() {
         ...(resolved !== undefined && { resolved: resolved.toString() }),
       })
 
-      const res = await fetch(`/api/admin/error-logs?${params}`)
+      const res = await fetch(`/api/admin/error-logs?${params}`, {
+        credentials: 'include',
+      })
       if (!res.ok) throw new Error('Failed to fetch error logs')
 
       const data: ErrorResponse = await res.json()
@@ -68,11 +70,17 @@ export default function ErrorLogsPage() {
     try {
       const res = await fetch(`/api/admin/error-logs/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ resolved: true, notes: 'Marked as resolved' }),
+        credentials: 'include',
       })
 
-      if (!res.ok) throw new Error('Failed to resolve error')
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Failed to resolve error')
+      }
       fetchErrors()
       setSelectedError(null)
     } catch (error) {
