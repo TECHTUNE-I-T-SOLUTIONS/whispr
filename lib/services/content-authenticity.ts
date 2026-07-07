@@ -1,8 +1,143 @@
 // Content Authenticity Checker Service
 // Uses ai-text-detector to analyze content for AI-generated patterns
+// Enhanced with additional pattern detection for better AI identification
 // Policy: AI can assist but content must be refined and original
 
 import { detectAIText, getConfidenceScore, isAIGenerated } from 'ai-text-detector';
+
+// Common AI-generated phrases and patterns
+const AI_PATTERNS = [
+  // Generic AI transitions
+  /\b(in conclusion|furthermore|moreover|additionally|consequently|therefore|thus|hence|nonetheless|nevertheless)\b/gi,
+  // AI clichés
+  /\b(it's important to note|it's worth mentioning|it's crucial to understand|plays a pivotal role|serves as a testament)\b/gi,
+  // AI structural patterns
+  /\b(in today's world|in the realm of|in the landscape of|in the context of|in the era of)\b/gi,
+  // AI hedging
+  /\b(arguably|arguably the|it could be argued that|one might argue that|it's safe to say)\b/gi,
+  // AI conclusion patterns
+  /\b(to sum up|in summary|to summarize|in conclusion|ultimately|in essence)\b/gi,
+];
+
+// AI-specific vocabulary patterns
+const AI_VOCABULARY = [
+  'delve', 'underscore', 'highlight', 'emphasize', 'comprehensive',
+  'multifaceted', 'nuanced', 'intricate', 'sophisticated', 'paradigm',
+  'synergy', 'leverage', 'optimize', 'streamline', 'revolutionize',
+  'transformative', 'cutting-edge', 'state-of-the-art', 'groundbreaking',
+  'holistic', 'integrated', 'seamless', 'robust', 'scalable',
+];
+
+// Repetitive sentence structures (common in AI)
+function detectRepetitiveStructure(text: string): number {
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  if (sentences.length < 3) return 0;
+
+  const sentenceStarts = sentences.map(s => s.trim().split(' ')[0].toLowerCase());
+  const uniqueStarts = new Set(sentenceStarts);
+  const repetitionRatio = 1 - (uniqueStarts.size / sentenceStarts.length);
+  
+  return repetitionRatio > 0.3 ? repetitionRatio * 100 : 0;
+}
+
+// Uniform sentence length (AI tends to have consistent sentence lengths)
+function detectUniformSentenceLength(text: string): number {
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  if (sentences.length < 5) return 0;
+
+  const lengths = sentences.map(s => s.trim().length);
+  const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+  const variance = lengths.reduce((sum, len) => sum + Math.pow(len - avgLength, 2), 0) / lengths.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Low standard deviation indicates uniform lengths
+  const coefficientOfVariation = stdDev / avgLength;
+  return coefficientOfVariation < 0.3 ? (1 - coefficientOfVariation) * 50 : 0;
+}
+
+// Excessive use of passive voice (common in AI)
+function detectPassiveVoice(text: string): number {
+  const passivePatterns = [
+    /\b(is|are|was|were|be|been|being)\s+\w+ed\b/gi,
+    /\b(is|are|was|were)\s+\w+ed\s+by\b/gi,
+  ];
+  
+  let passiveCount = 0;
+  passivePatterns.forEach(pattern => {
+    const matches = text.match(pattern);
+    if (matches) passiveCount += matches.length;
+  });
+  
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const passiveRatio = passiveCount / sentences.length;
+  
+  return passiveRatio > 0.3 ? passiveRatio * 40 : 0;
+}
+
+// Lack of personal voice and anecdotes
+function detectPersonalVoice(text: string): number {
+  const personalIndicators = [
+    /\b(i|my|me|mine|myself)\b/gi,
+    /\b(personal experience|in my opinion|i believe|i think|i feel)\b/gi,
+    /\b(remember when|i recall|from my experience)\b/gi,
+  ];
+  
+  let personalCount = 0;
+  personalIndicators.forEach(pattern => {
+    const matches = text.match(pattern);
+    if (matches) personalCount += matches.length;
+  });
+  
+  const wordCount = text.split(/\s+/).length;
+  const personalRatio = personalCount / wordCount;
+  
+  // Low personal voice indicates potential AI
+  return personalRatio < 0.005 ? 30 : 0;
+}
+
+// Generic/abstract language vs concrete details
+function detectAbstractLanguage(text: string): number {
+  const concreteIndicators = [
+    /\b(specific|particular|exact|precise|definite)\b/gi,
+    /\b(example|instance|case|illustration)\b/gi,
+    /\b(\d+|(one|two|three|four|five|six|seven|eight|nine|ten))\b/gi,
+  ];
+  
+  let concreteCount = 0;
+  concreteIndicators.forEach(pattern => {
+    const matches = text.match(pattern);
+    if (matches) concreteCount += matches.length;
+  });
+  
+  const wordCount = text.split(/\s+/).length;
+  const concreteRatio = concreteCount / wordCount;
+  
+  // Low concrete details indicate potential AI
+  return concreteRatio < 0.01 ? 25 : 0;
+}
+
+// Check for AI vocabulary usage
+function detectAIVocabulary(text: string): number {
+  const words = text.toLowerCase().split(/\s+/);
+  const aiWords = words.filter(word => AI_VOCABULARY.includes(word));
+  const aiRatio = aiWords.length / words.length;
+  
+  return aiRatio > 0.05 ? aiRatio * 100 : 0;
+}
+
+// Check for AI pattern usage
+function detectAIPatterns(text: string): number {
+  let patternCount = 0;
+  AI_PATTERNS.forEach(pattern => {
+    const matches = text.match(pattern);
+    if (matches) patternCount += matches.length;
+  });
+  
+  const wordCount = text.split(/\s+/).length;
+  const patternRatio = patternCount / wordCount;
+  
+  return patternRatio > 0.02 ? patternRatio * 80 : 0;
+}
 
 interface SectionAnalysis {
   lineNumber: number;
@@ -61,16 +196,63 @@ class ContentAuthenticityService {
     }
 
     try {
-      // Analyze full content
+      // Analyze full content with ai-text-detector
       const detection = detectAIText(content);
-      const confidence = getConfidenceScore(content);
+      const baseConfidence = getConfidenceScore(content);
       const isAI = isAIGenerated(content);
+
+      // Enhanced pattern detection
+      const patternScores = {
+        repetitiveStructure: detectRepetitiveStructure(content),
+        uniformSentenceLength: detectUniformSentenceLength(content),
+        passiveVoice: detectPassiveVoice(content),
+        personalVoice: detectPersonalVoice(content),
+        abstractLanguage: detectAbstractLanguage(content),
+        aiVocabulary: detectAIVocabulary(content),
+        aiPatterns: detectAIPatterns(content),
+      };
+
+      // Calculate weighted confidence score
+      // Base ai-text-detector score (60% weight)
+      // Pattern detection scores (40% weight distributed)
+      const patternWeight = 0.4;
+      const baseWeight = 0.6;
+      
+      const totalPatternScore = Object.values(patternScores).reduce((sum, score) => sum + score, 0) / 7;
+      const enhancedConfidence = (baseConfidence * baseWeight) + (totalPatternScore / 100 * patternWeight);
+      
+      // Clamp confidence between 0 and 1
+      const confidence = Math.max(0, Math.min(1, enhancedConfidence));
 
       // Calculate authenticity score (inverse of AI confidence)
       const authenticityScore = Math.round((1 - confidence) * 100);
 
       // Determine if content can proceed
       const canProceed = authenticityScore >= this.AUTHENTICITY_THRESHOLD;
+
+      // Generate detailed reasoning
+      const reasoning: string[] = [];
+      if (patternScores.repetitiveStructure > 0) {
+        reasoning.push(`Repetitive sentence structures detected (${patternScores.repetitiveStructure.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.uniformSentenceLength > 0) {
+        reasoning.push(`Uniform sentence lengths suggest AI generation (${patternScores.uniformSentenceLength.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.passiveVoice > 0) {
+        reasoning.push(`Excessive passive voice detected (${patternScores.passiveVoice.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.personalVoice > 0) {
+        reasoning.push(`Lack of personal voice and anecdotes (${patternScores.personalVoice.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.abstractLanguage > 0) {
+        reasoning.push(`Generic/abstract language without concrete details (${patternScores.abstractLanguage.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.aiVocabulary > 0) {
+        reasoning.push(`AI-specific vocabulary usage (${patternScores.aiVocabulary.toFixed(0)}% AI likelihood)`);
+      }
+      if (patternScores.aiPatterns > 0) {
+        reasoning.push(`Common AI transition phrases and patterns (${patternScores.aiPatterns.toFixed(0)}% AI likelihood)`);
+      }
 
       // Generate recommendation
       let recommendation = '';
@@ -85,15 +267,15 @@ class ContentAuthenticityService {
       const aiSections = sectionAnalysis.filter(s => s.isAIGenerated);
 
       return {
-        isAIGenerated: isAI,
+        isAIGenerated: isAI || confidence > 0.5,
         confidenceScore: confidence,
         authenticityScore,
-        reasoning: [],
+        reasoning,
         metrics: {
-          perplexity: 0,
-          burstiness: 0,
-          vocabulary: 0,
-          structure: 0,
+          perplexity: patternScores.uniformSentenceLength,
+          burstiness: patternScores.repetitiveStructure,
+          vocabulary: patternScores.aiVocabulary,
+          structure: patternScores.aiPatterns,
         },
         canProceed,
         recommendation,

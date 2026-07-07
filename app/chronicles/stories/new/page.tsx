@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { BookOpen, ArrowLeft, Send, ShieldAlert, ShieldCheck, Plus } from "lucide-react"
+import { BookOpen, ArrowLeft, Send, ShieldAlert, ShieldCheck, Plus, Loader2, AlertTriangle } from "lucide-react"
 import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
 
 const GENRES = [
@@ -35,6 +35,10 @@ export default function NewStoryOutlinePage() {
   const [chapContent, setChapContent] = useState("")
   const [chapStatus, setChapStatus] = useState<"draft" | "published">("published")
 
+  // Content authenticity state
+  const [authenticityCheck, setAuthenticityCheck] = useState<any>(null)
+  const [checkingAuthenticity, setCheckingAuthenticity] = useState(false)
+
   // Redirect if not authenticated
   useEffect(() => {
     const checkAuth = async () => {
@@ -49,6 +53,25 @@ export default function NewStoryOutlinePage() {
     }
     checkAuth()
   }, [router])
+
+  const checkContentAuthenticity = async (content: string) => {
+    setCheckingAuthenticity(true)
+    try {
+      const response = await fetch('/api/content/authenticity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
+      const result = await response.json()
+      setAuthenticityCheck(result)
+      return result
+    } catch (error) {
+      console.error('Authenticity check failed:', error)
+      return null
+    } finally {
+      setCheckingAuthenticity(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,6 +96,34 @@ export default function NewStoryOutlinePage() {
       })
       setSaving(false)
       return
+    }
+
+    // Check authenticity for description if publishing
+    if (status === 'published' && description.trim()) {
+      const descCheck = await checkContentAuthenticity(description.trim())
+      if (descCheck && !descCheck.canProceed) {
+        toast({
+          variant: "destructive",
+          title: "Content Authenticity Check",
+          description: descCheck.recommendation,
+        })
+        setSaving(false)
+        return
+      }
+    }
+
+    // Check authenticity for chapter content if publishing and adding chapter
+    if (addFirstChapter && chapStatus === 'published' && chapContent.trim()) {
+      const chapCheck = await checkContentAuthenticity(chapContent.trim())
+      if (chapCheck && !chapCheck.canProceed) {
+        toast({
+          variant: "destructive",
+          title: "Chapter Content Authenticity Check",
+          description: chapCheck.recommendation,
+        })
+        setSaving(false)
+        return
+      }
     }
 
     // Process hashtags
@@ -174,6 +225,34 @@ export default function NewStoryOutlinePage() {
                   <h4 className="font-semibold mb-1">Moderation Restriction</h4>
                   <p>{validationError}</p>
                 </div>
+              </div>
+            )}
+
+            {/* Authenticity Check Results */}
+            {authenticityCheck && (
+              <div className={`p-3 rounded-lg border mb-4 ${
+                authenticityCheck.authenticityScore >= 80
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                  : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-xs">
+                    Authenticity Score: {authenticityCheck.authenticityScore}%
+                  </span>
+                  {authenticityCheck.authenticityScore >= 80 ? (
+                    <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {authenticityCheck.recommendation}
+                </p>
+                {authenticityCheck.authenticityScore < 80 && (
+                  <p className="text-[10px] font-medium text-red-600 dark:text-red-400 mt-1">
+                    Publishing is blocked until authenticity reaches 80%+
+                  </p>
+                )}
               </div>
             )}
 

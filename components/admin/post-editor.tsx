@@ -43,6 +43,7 @@ import { useToast } from "@/hooks/use-toast"
 import DOMPurify from "dompurify"
 import { MediaSelector } from "@/components/admin/media-selector"
 import { SEOAnalyzer } from "@/components/seo/seo-analyzer"
+import { EditorSuggestions } from "@/components/editor/EditorSuggestions"
 import dynamic from "next/dynamic"
 
 const EditorAI = dynamic(() => import("@/components/ai/EditorAI"), {
@@ -101,6 +102,11 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
   const contentRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { toast } = useToast()
+
+  // Editor suggestions state
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [cursorPosition, setCursorPosition] = useState(0)
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 })
 
   // Use document.execCommand for simple rich-text operations (widely supported despite deprecation)
   const exec = (command: string, value?: string) => {
@@ -381,6 +387,67 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
     }
     // after setting content, keep DOM in sync (do not auto-enable resizers)
   }, [formData.content])
+
+  // Handle editor input for suggestions
+  const handleEditorInput = () => {
+    setFormData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || "" }))
+    
+    // Get cursor position for suggestions
+    const sel = window.getSelection()
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0)
+      const preCaretRange = range.cloneRange()
+      preCaretRange.selectNodeContents(contentRef.current!)
+      preCaretRange.setEnd(range.endContainer, range.endOffset)
+      const cursorOffset = preCaretRange.toString().length
+      setCursorPosition(cursorOffset)
+
+      // Calculate position for suggestions popup
+      const rect = range.getBoundingClientRect()
+      const editorRect = contentRef.current?.getBoundingClientRect()
+      if (editorRect) {
+        setSuggestionPosition({
+          top: rect.bottom - editorRect.top + 5,
+          left: rect.left - editorRect.left
+        })
+      }
+
+      // Show suggestions after typing 2+ characters
+      const textBeforeCursor = contentRef.current?.innerText?.substring(0, cursorOffset) || ""
+      const lastWord = textBeforeCursor.split(/\s+/).pop() || ""
+      if (lastWord.length >= 2) {
+        setShowSuggestions(true)
+      } else {
+        setShowSuggestions(false)
+      }
+    }
+  }
+
+  // Apply suggestion to editor
+  const applySuggestion = (suggestion: string) => {
+    const sel = window.getSelection()
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0)
+      
+      // Get the current word being typed
+      const textBeforeCursor = contentRef.current?.innerText?.substring(0, cursorPosition) || ""
+      const words = textBeforeCursor.split(/\s+/)
+      const lastWord = words.pop() || ""
+      
+      // Delete the current partial word
+      if (lastWord.length > 0) {
+        for (let i = 0; i < lastWord.length; i++) {
+          document.execCommand('delete', false)
+        }
+      }
+      
+      // Insert the suggestion
+      document.execCommand('insertText', false, suggestion + ' ')
+      
+      setShowSuggestions(false)
+      setFormData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || "" }))
+    }
+  }
 
   // Fetch media when image dialog opens
   useEffect(() => {
@@ -826,10 +893,27 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
                   ref={contentRef}
                   contentEditable
                   suppressContentEditableWarning
-                  onInput={() => setFormData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || "" }))}
+                  onInput={handleEditorInput}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setShowSuggestions(false)
+                    }
+                  }}
                   className={`min-h-[400px] p-3 text-black dark:text-white border rounded prose dark:prose-invert max-w-none ${formData.type === "poem" ? "font-serif leading-relaxed" : ""}`}
                   aria-label={formData.type === "poem" ? "Poem content editor" : "Post content editor"}
                 />
+
+                {/* Editor Suggestions Popup */}
+                {showSuggestions && (
+                  <div className="absolute z-50" style={{ top: suggestionPosition.top, left: suggestionPosition.left }}>
+                    <EditorSuggestions
+                      content={contentRef.current?.innerText || ""}
+                      cursorPosition={cursorPosition}
+                      onApplySuggestion={applySuggestion}
+                      onClose={() => setShowSuggestions(false)}
+                    />
+                  </div>
+                )}
                   {/* Floating figure toolbar (positioned via CSS variables set on the editor container) */}
                   {selectedFigure && (
                     <div

@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Save, Send, ArrowLeft, Loader2, AlertCircle, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SEOAnalyzer } from '@/components/seo/seo-analyzer';
+import { EditorSuggestions } from '@/components/editor/EditorSuggestions';
 
 interface PostData {
   id?: string;
@@ -78,6 +79,11 @@ function ChroniclesWriteContent() {
   // Authenticity check state
   const [authenticityCheck, setAuthenticityCheck] = useState<any>(null);
   const [checkingAuthenticity, setCheckingAuthenticity] = useState(false);
+
+  // Editor suggestions state
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
 
   // All useRef calls
   const contentRef = useRef<HTMLDivElement>(null);
@@ -351,6 +357,75 @@ function ChroniclesWriteContent() {
       return null;
     } finally {
       setCheckingAuthenticity(false);
+    }
+  };
+
+  // Handle editor input for suggestions
+  const handleEditorInput = () => {
+    if (!isUpdatingContent.current) {
+      const editor = document.getElementById('chronicles-content-editor');
+      if (editor) {
+        const newContent = editor.innerHTML;
+        setPostData((prev) => ({ ...prev, content: newContent }));
+        
+        // Get cursor position for suggestions
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          const preCaretRange = range.cloneRange();
+          preCaretRange.selectNodeContents(editor);
+          preCaretRange.setEnd(range.endContainer, range.endOffset);
+          const cursorOffset = preCaretRange.toString().length;
+          setCursorPosition(cursorOffset);
+
+          // Calculate position for suggestions popup
+          const rect = range.getBoundingClientRect();
+          const editorRect = editor.getBoundingClientRect();
+          if (editorRect) {
+            setSuggestionPosition({
+              top: rect.bottom - editorRect.top + 5,
+              left: rect.left - editorRect.left
+            });
+          }
+
+          // Show suggestions after typing 2+ characters
+          const textBeforeCursor = editor.innerText?.substring(0, cursorOffset) || "";
+          const lastWord = textBeforeCursor.split(/\s+/).pop() || "";
+          if (lastWord.length >= 2) {
+            setShowSuggestions(true);
+          } else {
+            setShowSuggestions(false);
+          }
+        }
+      }
+    }
+  };
+
+  // Apply suggestion to editor
+  const applySuggestion = (suggestion: string) => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      
+      // Get the current word being typed
+      const editor = document.getElementById('chronicles-content-editor');
+      const textBeforeCursor = editor?.innerText?.substring(0, cursorPosition) || "";
+      const words = textBeforeCursor.split(/\s+/);
+      const lastWord = words.pop() || "";
+      
+      // Delete the current partial word
+      if (lastWord.length > 0) {
+        for (let i = 0; i < lastWord.length; i++) {
+          document.execCommand('delete', false);
+        }
+      }
+      
+      // Insert the suggestion
+      document.execCommand('insertText', false, suggestion + ' ');
+      
+      setShowSuggestions(false);
+      const newContent = editor?.innerHTML || "";
+      setPostData((prev) => ({ ...prev, content: newContent }));
     }
   };
 
@@ -730,15 +805,28 @@ function ChroniclesWriteContent() {
                 ref={contentRef}
                 contentEditable
                 suppressContentEditableWarning
-                onInput={() => {
-                  if (!isUpdatingContent.current) {
-                    const editor = document.getElementById('chronicles-content-editor');
-                    setPostData((prev) => ({ ...prev, content: editor?.innerHTML || '' }));
+                onInput={handleEditorInput}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setShowSuggestions(false)
                   }
                 }}
                 className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-black text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-purple-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
                 aria-label="Post content editor"
               />
+              
+              {/* Editor Suggestions Popup */}
+              {showSuggestions && (
+                <div className="absolute" style={{ top: suggestionPosition.top, left: suggestionPosition.left }}>
+                  <EditorSuggestions
+                    content={document.getElementById('chronicles-content-editor')?.innerText || ""}
+                    cursorPosition={cursorPosition}
+                    onApplySuggestion={applySuggestion}
+                    onClose={() => setShowSuggestions(false)}
+                  />
+                </div>
+              )}
+              
               {(!postData.content || postData.content === '<p><br></p>') && (
                 <span className={`absolute top-4 left-4 text-muted-foreground pointer-events-none select-none ${postData.post_type === 'poem' ? 'w-full text-center' : ''}`}>{postData.post_type === 'poem' ? 'Write your poem here...' : 'Write your story here...'}</span>
               )}
