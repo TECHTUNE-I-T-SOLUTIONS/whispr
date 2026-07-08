@@ -39,7 +39,7 @@ export function FeedbackWidget() {
 
   return (
     <div>
-      <div className="fixed bottom-6 left-6 z-[9999]">
+      <div className="fixed bottom-32 left-6 z-[9999]">
         <Dialog open={open} onOpenChange={(o) => setOpen(Boolean(o))}>
           <Tooltip>
             <TooltipTrigger asChild>

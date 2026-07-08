@@ -206,7 +206,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {stories.map((story) => (
+                {stories.map((story: any) => (
                   <Card
                     key={story.id}
                     className="group border-0 bg-card/45 backdrop-blur hover:bg-card/70 hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden flex flex-col justify-between"
@@ -326,7 +326,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
                 <p className="text-xs text-muted-foreground">No tags recorded yet.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {trendingTags.map((tag) => (
+                  {trendingTags.map((tag: any) => (
                     <Badge
                       key={tag.id}
                       variant={activeTag === tag.name ? "default" : "secondary"}

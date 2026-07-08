@@ -1,7 +1,7 @@
 // UTM Tracking Utility
 // Adds Whispr referral tracking to external URLs
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://whisprwords.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://whisprwords.com';
 
 export function addUtmTracking(url: string, source: string, medium: string = 'referral'): string {
   if (!url || url.startsWith('/') || url.startsWith(SITE_URL)) {
@@ -14,7 +14,7 @@ export function addUtmTracking(url: string, source: string, medium: string = 're
     
     // Only add UTM if not already present
     if (!params.has('utm_source')) {
-      params.set('utm_source', 'whispr');
+      params.set('utm_source', 'whisprwords.com');
       params.set('utm_medium', medium);
       params.set('utm_campaign', source);
       urlObj.search = params.toString();
@@ -35,6 +35,7 @@ export function getSourceLabel(source: string): string {
     github: 'GitHub',
     youtube: 'YouTube',
     news: 'Google News',
+    rss: 'RSS Feed',
     knowledge: 'Whispr Knowledge',
     database: 'Whispr',
     chronicles: 'Chronicles',
@@ -51,6 +52,7 @@ export function getSourceIcon(source: string): string {
     github: '💻',
     youtube: '🎬',
     news: '📰',
+    rss: '📡',
     knowledge: '🧠',
     database: '📝',
     chronicles: '📖',

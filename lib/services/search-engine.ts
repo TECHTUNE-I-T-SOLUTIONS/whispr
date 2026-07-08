@@ -6,6 +6,7 @@ import { knowledgeEngine } from '../knowledge/knowledge-engine';
 import { cacheEngine } from '../cache/cache-engine';
 import { wikipediaAdapter } from '../providers/wikipedia-adapter';
 import { googleNewsRSSAdapter } from '../providers/google-news-rss-adapter';
+import { rssAdapter } from '../providers/rss-adapter';
 import { githubAdapter } from '../providers/github-adapter';
 import { youtubeAdapter } from '../providers/youtube-adapter';
 import { googleSearchAdapter } from '../providers/google-search-adapter';
@@ -318,6 +319,32 @@ class SearchEngine {
           }
         } catch (error) {
           console.error('News search failed:', (error as Error).message);
+        }
+      })());
+
+      // Also search RSS feeds
+      providers.push((async () => {
+        try {
+          const rssResults = await rssAdapter.search(query, { limit: perProviderLimit });
+          if (rssResults.items) {
+            for (const item of rssResults.items) {
+              results.push({
+                id: item.id,
+                title: item.title,
+                summary: item.summary,
+                url: addUtmTracking(item.url, 'rss'),
+                source: 'rss',
+                sourceLabel: item.sourceName,
+                sourceIcon: getSourceIcon('rss'),
+                type: 'news',
+                category: item.category,
+                credibility: item.credibilityScore,
+                publishedAt: item.publishedAt,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('RSS search failed:', (error as Error).message);
         }
       })());
     }

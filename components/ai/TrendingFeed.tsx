@@ -51,6 +51,7 @@ export default function TrendingFeed({
       if (category) params.append('category', category);
       params.append('limit', limit.toString());
 
+      // Fetch AI trending data
       const response = await fetch(`/api/ai/trending?${params.toString()}`);
       const data = await response.json();
 
@@ -58,7 +59,33 @@ export default function TrendingFeed({
         throw new Error(data.error || 'Failed to fetch trending content');
       }
 
-      setTrending(data);
+      // Fetch RSS trending data
+      let rssTrending: TrendingItem[] = [];
+      try {
+        const rssResponse = await fetch(`/api/rss/trending?limit=5`);
+        if (rssResponse.ok) {
+          const rssData = await rssResponse.json();
+          rssTrending = (rssData.topics || []).map((topic: any, idx: number) => ({
+            id: topic.id,
+            title: topic.sampleArticles?.[0]?.title || topic.topic,
+            url: topic.sampleArticles?.[0]?.url,
+            source: 'news',
+            score: topic.trendScore,
+            publishedAt: topic.lastUpdated,
+          }));
+        }
+      } catch (rssErr) {
+        console.error('Failed to fetch RSS trending:', rssErr);
+      }
+
+      // Combine RSS news with existing news
+      const combinedNews = [...rssTrending, ...(data.news || [])].slice(0, limit);
+
+      setTrending({
+        ...data,
+        news: combinedNews,
+        overall: [...rssTrending, ...(data.overall || [])].slice(0, limit),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch trending content');
     } finally {
@@ -163,12 +190,13 @@ export default function TrendingFeed({
   const displayItems = getDisplayItems();
 
   return (
-    <div className="bg-white dark:bg-black/30 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
+    <div className="bg-transparent border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
           <Flame className="w-5 h-5 text-orange-500" />
           <h3 className="font-semibold text-gray-800 dark:text-white">Trending Now</h3>
         </div>
+        <div>
         <button
           onClick={fetchTrending}
           className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
@@ -176,6 +204,14 @@ export default function TrendingFeed({
         >
           <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </button>
+        <button
+          onClick={() => window.location.href = '/trends'}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          title="View all trends"
+        >
+          <Flame className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+        </button>
+        </div>
       </div>
 
       <div className="flex border-b border-gray-200 dark:border-slate-700">

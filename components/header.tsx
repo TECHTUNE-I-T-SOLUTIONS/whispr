@@ -204,7 +204,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="lg:flex items-center flex-1 max-w-xs ml-8">
+        <div className="hidden lg:flex items-center flex-1 max-w-xs ml-8">
           <SmartSearch placeholder="Search..." />
         </div>
 
@@ -274,33 +274,36 @@ export function Header() {
 
       {mobileMenuOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="lg:hidden border-t bg-background/95 backdrop-blur">
-          <nav className="container py-4 space-y-2">
+          <nav className="container py-2 space-y-1">
             {navigation.map((item) => (
               <Link key={item.name} href={item.href} className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`} onClick={() => setMobileMenuOpen(false)}>
                 {item.name}
               </Link>
             ))}
             {chroniclesEnabled && (
-              <div className="py-2 border-t mt-2 space-y-2">
+              <div className="py-2 border-t mt-1 space-y-1">
                 <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
                 {!isCreator && (
                   <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-purple-400 hover:text-purple-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
                 )}
               </div>
             )}
-            <div className="pt-4 border-t">
+            <div className="pt-2 border-t">
               {(isAdmin || isCreator) && (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {isAdmin && (
                     <Link href="/admin/messages" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Messages</Link>
                   )}
                   <Link href={isAdmin ? "/admin/dashboard" : "/chronicles/dashboard"} className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
                 </div>
               )}
-              <div className="pt-3">
+              <div className="pt-1">
                 <button onClick={() => { setMobileMenuOpen(false); setMobilePreviewOpen(true) }} className="w-full text-left py-2 text-sm font-medium flex items-center gap-2">
                   <Share2 className="w-4 h-4" /> Share Whispr
                 </button>
+              </div>
+              <div className="lg:flex items-center flex-1 max-w-xs ml-8">
+                <SmartSearch placeholder="Search..." />
               </div>
             </div>
           </nav>

@@ -1,0 +1,1216 @@
+{
+  "topics": [
+    {
+      "id": "trend-2026",
+      "topic": "2026",
+      "keywords": [
+        "2026",
+        "2026",
+        "caption",
+        "lampedusa",
+        "https"
+      ],
+      "frequency": 112,
+      "uniqueSources": 14,
+      "credibilityScore": 0.887500000000002,
+      "recencyScore": 0.0065408912037036,
+      "trendScore": 37.9788081782408,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-channels-tv-cdzglt",
+          "title": "Sunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle",
+          "content": "\u003Cp\u003E\u003Cstrong\u003EOnce the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EThe semi-arid outcrop, closer to North Africa than Italy, is a port of call for people attempting the perilous crossing to Europe, and their capsized or abandoned boats dot its emerald depths.\u003C/p\u003E\u003Cfigure id=\"attachment_1039932\" aria-describedby=\"caption-attachment-1039932\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg fetchpriority=\"high\" decoding=\"async\" class=\"size-full wp-image-1039932\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg\" alt=\"A fishing boat is navigated during its' return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039932\" class=\"wp-caption-text\"\u003EA fishing boat is navigated during its&rsquo; return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&ldquo;The nets are continuously torn&hellip; there are days when you snag two, three (migrant) boats,&rdquo; 71-year-old fisherman Salvatore Mannino told AFP.\u003C/p\u003E\u003Cp\u003E&ldquo;We map the boats, but they move. They can snag one (fishing boat),&rdquo; and then later, &ldquo;another passes and gets caught too,&rdquo; he said as he and a fellow fisherman mended a broken net while the sun beat down on the pier.\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EREAD ALSO:&nbsp;\u003C/strong\u003E\u003Ca href=\"https://www.channelstv.com/2026/06/28/europe-swelters-as-heatwave-moves-east-excess-deaths-rise/\" target=\"_blank\" rel=\"noopener\"\u003EEurope Swelters As Heatwave Moves East, Excess Deaths Rise\u003C/a\u003E\u003C/p\u003E\u003Cp\u003EMannino comes from generations of fishermen but has told his children they have no future in the sector.\u003C/p\u003E\u003Cp\u003EThe island&rsquo;s economy is based largely on fishing and tourism, though its fishing fleet has &ldquo;shrunk by 50 percent&rdquo; since the early 2000s, according to Salvatore Martello, head of Lampedusa&rsquo;s fishing cooperative.\u003C/p\u003E\u003Ch2\u003EIsland&rsquo;s Identity\u003C/h2\u003E\u003Cfigure id=\"attachment_1039929\" aria-describedby=\"caption-attachment-1039929\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039929\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg\" alt=\"A fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP)\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ASAS-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039929\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP) | TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003ESome from the younger generations have transformed their family boats into pleasure boats for holidaymakers.\u003C/p\u003E\u003Cp\u003EBut fishing &ldquo;gives Lampedusa&rsquo;s tourism its identity,&rdquo; Martello said.\u003C/p\u003E\u003Cp\u003EFailing to support the sector will have &ldquo;an automatic repercussion on tourism, because people come to eat fresh fish,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EFisherman Pietro Riso&rsquo;s sons did follow him into fishing&mdash;catching red mullet, calamari, and rose shrimp&mdash;but just last week clashed with a migrant boat.\u003C/p\u003E\u003Cp\u003E&ldquo;It hit under the stern&hellip; and could have perforated our vessel; it could even have sunk it,&rdquo; the 67-year-old told AFP.\u003C/p\u003E\u003Cp\u003EThe tin or iron boats are either shipwrecked or abandoned after the migrants on board are rescued.\u003C/p\u003E\u003Cp\u003ERun-ins happen between seven and 10 times a year, Riso said. The latest caused up to 4,000 euros worth of damage.\u003C/p\u003E\u003Cp\u003EIt is not the only cost weighing on the sector: fuel prices&mdash;driven up by the Iran war&mdash;are even higher on Italy&rsquo;s islands than the mainland.\u003C/p\u003E\u003Cp\u003EThe fishermen accuse competitors from Tunisia, Algeria, and Egypt of illegally fishing in Italian waters and say some restaurants on the island serve cheaper frozen fish from Spain instead of the local catch.\u003C/p\u003E\u003Cfigure id=\"attachment_1039928\" aria-describedby=\"caption-attachment-1039928\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039928\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg\" alt=\"A fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/New-Project-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039928\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe Lampedusa fishermen also have to go further out to catch some species due to the warming sea.\u003C/p\u003E\u003Cp\u003EThe Mediterranean is one of the fastest-warming seas in the world, and marine heatwaves are getting longer and more intense due to man-made climate change.\u003C/p\u003E\u003Cp\u003EThat can cause stocks to decline or move elsewhere, making some traditionally fished species harder to find.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EExtreme Temperatures\u003C/h2\u003E\u003Cfigure id=\"attachment_1039930\" aria-describedby=\"caption-attachment-1039930\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039930\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg\" alt=\"A fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026. Photo by TIZIANA FABI / AFP\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/aaA-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039930\" class=\"wp-caption-text\"\u003EA fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026.\u003Cbr\u003EPhoto by TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E&ldquo;Extreme water temperatures are pushing species past their thermal limits,&rdquo; Giulia Bonino, research scientist at the Euro-Mediterranean Center on Climate Change (CMCC), told AFP.\u003C/p\u003E\u003Cp\u003EThat is &ldquo;hitting Mediterranean aquaculture and fisheries hard, with real economic consequences,&rdquo; she said.\u003C/p\u003E\u003Cp\u003EHeatwaves can also affect fish reproduction and growth, according to the CMCC.\u003C/p\u003E\u003Cp\u003EMartello said the warming sea has caused a &ldquo;shift in the Mediterranean&rsquo;s entire fish production.&rdquo;\u003C/p\u003E\u003Cp\u003EAnd it is an effect of climate change that needs to be acknowledged on a national and European Union level, he said.\u003C/p\u003E\u003Cp\u003EFishermen are banned from a certain area off Lampedusa in September because the eggs laid by red mullets traditionally hatch in that period, Martello said.\u003C/p\u003E\u003Cp\u003E&ldquo;But with the warming water, the red mullets are born earlier,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EWhen the ban comes in, they are no longer young fish that need protecting but are big &mdash; and ready to be caught.\u003C/p\u003E\u003Cp\u003E\u003Cem\u003E\u003Cstrong\u003EAFP\u003C/strong\u003E\u003C/em\u003E\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/\"\u003ESunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "Once the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.The semi...",
+          "url": "https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:25:35 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "lampedusa",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "fishing",
+            "afp",
+            "width"
+          ],
+          "entities": [
+            "Sunken",
+            "Wrecks",
+            "Hot",
+            "Seas",
+            "Threaten"
+          ],
+          "hash": "cdzglt"
+        },
+        {
+          "id": "rss-channels-tv-quffmq",
+          "title": "World Cup: Eight Teams Remain In The Hunt For Glory",
+          "content": "\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EThe World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EAFP Sport looks at the match-ups, all of which are taking place in the United States.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EFrance v Morocco\u003C/h2\u003E\u003Cfigure id=\"attachment_1039099\" aria-describedby=\"caption-attachment-1039099\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039099\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039099\" class=\"wp-caption-text\"\u003EFrance&rsquo;s forward #10 Kylian Mbappe celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 16 football match between Paraguay and France at the Philadelphia Stadium in Philadelphia on July 4, 2026. (Photo by CHARLY TRIBALLEAU / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EImperious France have lived up to their billing as World Cup favourites, sweeping through the group stage and swatting aside Sweden before edging past Paraguay in the last 16.\u003C/p\u003E\u003Cp\u003EIt is difficult to see any team keeping Didier Deschamps&rsquo; men quiet, given their embarrassment of riches in attack, including Kylian Mbappe, Ousmane Dembele, Bradley Barcola and the wonderfully creative Michael Olise.\u003C/p\u003E\u003Cp\u003EBut unbeaten Morocco will not be fazed by facing the two-time world champions after seeing off the Netherlands on penalties and crushing co-hosts Canada 3-0 in the last 16.\u003C/p\u003E\u003Cfigure id=\"attachment_1037847\" aria-describedby=\"caption-attachment-1037847\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1037847\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1037847\" class=\"wp-caption-text\"\u003EMorocco&rsquo;s defender #14 Issa Diop (C) celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 32 football match between the Netherlands and Morocco at the Monterrey Stadium in Guadalupe on June 29, 2026. (Photo by Julio Cesar AGUILAR / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe North African team will have revenge on their minds in Boston after they lost to France in the semi-finals four years ago in Qatar.\u003C/p\u003E\u003Cp\u003EThe Atlas Lions created history by becoming the first African team to progress to the last four in 2022 and will be keen to match that feat.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ESpain v Belgium\u003C/h2\u003E\u003Cfigure id=\"attachment_1038622\" aria-describedby=\"caption-attachment-1038622\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038622\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038622\" class=\"wp-caption-text\"\u003ESpain&rsquo;s defender #12 Pedro Porro celebrates scoring his team&rsquo;s second goal with Spain&rsquo;s midfielder #15 Alex Baena during the 2026 World Cup round of 32 football match between Spain and Austria at the Los Angeles Stadium in Inglewood on July 2, 2026. (Photo by Frederic J. Brown / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EIn beating Portugal 1-0 on Monday, Spain became the first team in tournament history to record six consecutive World Cup clean sheets.\u003C/p\u003E\u003Cp\u003ELuis de la Fuente&rsquo;s European champions do not always set pulses racing but they are strikingly efficient and comfortable on the ball.\u003C/p\u003E\u003Cp\u003EBarcelona star Lamine Yamal has netted just once in five games but Mikel Oyarzabal has scored four times, including twice in a 3-0 win against Austria in the last 32.\u003C/p\u003E\u003Cfigure id=\"attachment_1038405\" aria-describedby=\"caption-attachment-1038405\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038405\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038405\" class=\"wp-caption-text\"\u003EYouri Tielemans of Belgium celebrates with teammate Nicolas Raskin after scoring his team&rsquo;s third goal from the penalty spot during the FIFA World Cup 2026 Round Of 32 match between Belgium and Senegal at Seattle Stadium on July 01, 2026 in Seattle, Washington. Alex Grimm/Getty Images/AFP (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EBelgium go into the match in Los Angeles on the back of a 4-1 thumping of co-hosts the United States.\u003C/p\u003E\u003Cp\u003EThat came after they rallied from two goals down in the last 32 to beat Senegal 3-2 in extra-time.\u003C/p\u003E\u003Cp\u003EThe World Cup is likely the last hurrah for the remainder of the nation&rsquo;s so-called Golden Generation, including Kevin De Bruyne and Romelu Lukaku, who will be desperate to leave the stage on a high.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ENorway v England\u003C/h2\u003E\u003Cfigure id=\"attachment_1039288\" aria-describedby=\"caption-attachment-1039288\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039288\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039288\" class=\"wp-caption-text\"\u003EEngland&rsquo;s midfielder #10 Jude Bellingham celebrates scoring his team&rsquo;s first goal with England&rsquo;s forward #09 Harry Kane during the 2026 World Cup round of 16 football match between Mexico and England at the Mexico City Stadium in Mexico City on July 5, 2026. (Photo by CARL DE SOUZA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland&rsquo;s defenders are used to facing Norway hotshot Erling Haaland in the Premier League &mdash; but whether they can handle him is another story.\u003C/p\u003E\u003Cp\u003EThomas Tuchel&rsquo;s men arrived in the United States among the favourites to win the tournament for just the second time in their history.\u003C/p\u003E\u003Cp\u003ECaptain Harry Kane and Jude Bellingham have been the standout players so far, scoring 10 of the team&rsquo;s 11 goals, including all three in a gripping 3-2 win against Mexico.\u003C/p\u003E\u003Cfigure id=\"attachment_1039323\" aria-describedby=\"caption-attachment-1039323\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039323\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039323\" class=\"wp-caption-text\"\u003EErling Braut Haaland plays the drum as Norway celebrates winning the 2026 World Cup round of 16 football match between Brazil and Norway at the New York/New Jersey Stadium in East Rutherford on July 5, 2026. (Photo by MAURO PIMENTEL / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland, reduced to 10 men, had to dig deep to see off the co-hosts in a result that will infuse them with confidence ahead of their meeting with Norway.\u003C/p\u003E\u003Cp\u003EBut they will come up against a team in Miami led by the irrepressible Haaland, who has scored seven goals so far as he chases the Golden Boot.\u003C/p\u003E\u003Cp\u003EThe Manchester City man has netted in each of his past 14 competitive outings for Norway &mdash; 27 goals in total &mdash; and is bound to create problems for England&rsquo;s shaky defence.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EArgentina v&nbsp;Switzerland\u003C/h2\u003E\u003Cfigure id=\"attachment_1038885\" aria-describedby=\"caption-attachment-1038885\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038885\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038885\" class=\"wp-caption-text\"\u003EArgentina&rsquo;s forward #10 Lionel Messi celebrates next to teammates after winning the 2026 World Cup round of 32 football match between Argentina and Cabo Verde at the Miami Stadium in Miami Gardens on July 3, 2026. (Photo by CHANDAN KHANNA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003ELionel Messi&rsquo;s Argentina have come through two almighty scares to set up a quarter-final against Switzerland.\u003C/p\u003E\u003Cp\u003EThe defending champions were taken to extra-time by World Cup debutants Cape Verde before prevailing 3-2.\u003C/p\u003E\u003Cp\u003EThen in the last 16 they looked down and out when trailing 2-0 against Egypt before an astonishing comeback, with Messi at the centre of the action.\u003C/p\u003E\u003Cfigure id=\"attachment_1036621\" aria-describedby=\"caption-attachment-1036621\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1036621\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Switz-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1036621\" class=\"wp-caption-text\"\u003EVANCOUVER, BRITISH COLUMBIA &ndash; JUNE 24: Players of Switzerland applaud fans after the team&rsquo;s 2-1 victory in the FIFA World Cup 2026 Group B match between Switzerland and Canada at BC Place Vancouver on June 24, 2026 in Vancouver, British Columbia. (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EHead coach Lionel Scaloni will know his team cannot keep testing fate as they chase a fourth World Cup crown, but they have shown they can never be counted out.\u003C/p\u003E\u003Cp\u003ENow they face Switzerland in Kansas City, who beat Colombia on penalties in Vancouver after a goalless draw.\u003C/p\u003E\u003Cp\u003EThe Swiss, who are into the last eight for the first time since they hosted the tournament in 1954, are an organised outfit and will likely be tough to break down.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/\"\u003EWorld Cup: Eight Teams Remain In The Hunt For Glory\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "&nbsp;The World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.AFP Sport looks at the match-ups, all of which are taking place in the ...",
+          "url": "https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 10:46:24 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "cup",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "width",
+            "650px",
+            "class"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "Eight",
+            "Teams",
+            "Remain"
+          ],
+          "hash": "quffmq"
+        },
+        {
+          "id": "rss-premium-times-6oyams",
+          "title": "2026 FIFA World Cup: How goalkeepers have become defining heroes",
+          "content": "\u003Cimg width=\"1080\" height=\"750\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?fit=1080%2C750&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"Vozinha (CREDIT: FIFA World Cup on X)\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?w=1080&amp;ssl=1 1080w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=503%2C349&amp;ssl=1 503w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=768%2C533&amp;ssl=1 768w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=750%2C521&amp;ssl=1 750w\" sizes=\"(max-width: 1080px) 100vw, 1080px\" /\u003E\u003Cp\u003EFrom world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, often deciding matches with a single save\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html\"\u003E2026 FIFA World Cup: How goalkeepers have become defining heroes\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "From world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, of...",
+          "url": "https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:40:40 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "2026",
+            "https",
+            "premiumtimesng",
+            "world",
+            "media",
+            "content",
+            "files",
+            "untitled",
+            "design"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "How",
+            "Untitled",
+            "Vozinha"
+          ],
+          "hash": "6oyams"
+        }
+      ]
+    },
+    {
+      "id": "trend-https",
+      "topic": "https",
+      "keywords": [
+        "https",
+        "2026",
+        "caption",
+        "lampedusa",
+        "https"
+      ],
+      "frequency": 110,
+      "uniqueSources": 11,
+      "credibilityScore": 0.825454545454545,
+      "recencyScore": 0.0065408912037036,
+      "trendScore": 36.4663990873316,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-channels-tv-cdzglt",
+          "title": "Sunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle",
+          "content": "\u003Cp\u003E\u003Cstrong\u003EOnce the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EThe semi-arid outcrop, closer to North Africa than Italy, is a port of call for people attempting the perilous crossing to Europe, and their capsized or abandoned boats dot its emerald depths.\u003C/p\u003E\u003Cfigure id=\"attachment_1039932\" aria-describedby=\"caption-attachment-1039932\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg fetchpriority=\"high\" decoding=\"async\" class=\"size-full wp-image-1039932\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg\" alt=\"A fishing boat is navigated during its' return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039932\" class=\"wp-caption-text\"\u003EA fishing boat is navigated during its&rsquo; return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&ldquo;The nets are continuously torn&hellip; there are days when you snag two, three (migrant) boats,&rdquo; 71-year-old fisherman Salvatore Mannino told AFP.\u003C/p\u003E\u003Cp\u003E&ldquo;We map the boats, but they move. They can snag one (fishing boat),&rdquo; and then later, &ldquo;another passes and gets caught too,&rdquo; he said as he and a fellow fisherman mended a broken net while the sun beat down on the pier.\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EREAD ALSO:&nbsp;\u003C/strong\u003E\u003Ca href=\"https://www.channelstv.com/2026/06/28/europe-swelters-as-heatwave-moves-east-excess-deaths-rise/\" target=\"_blank\" rel=\"noopener\"\u003EEurope Swelters As Heatwave Moves East, Excess Deaths Rise\u003C/a\u003E\u003C/p\u003E\u003Cp\u003EMannino comes from generations of fishermen but has told his children they have no future in the sector.\u003C/p\u003E\u003Cp\u003EThe island&rsquo;s economy is based largely on fishing and tourism, though its fishing fleet has &ldquo;shrunk by 50 percent&rdquo; since the early 2000s, according to Salvatore Martello, head of Lampedusa&rsquo;s fishing cooperative.\u003C/p\u003E\u003Ch2\u003EIsland&rsquo;s Identity\u003C/h2\u003E\u003Cfigure id=\"attachment_1039929\" aria-describedby=\"caption-attachment-1039929\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039929\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg\" alt=\"A fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP)\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ASAS-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039929\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP) | TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003ESome from the younger generations have transformed their family boats into pleasure boats for holidaymakers.\u003C/p\u003E\u003Cp\u003EBut fishing &ldquo;gives Lampedusa&rsquo;s tourism its identity,&rdquo; Martello said.\u003C/p\u003E\u003Cp\u003EFailing to support the sector will have &ldquo;an automatic repercussion on tourism, because people come to eat fresh fish,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EFisherman Pietro Riso&rsquo;s sons did follow him into fishing&mdash;catching red mullet, calamari, and rose shrimp&mdash;but just last week clashed with a migrant boat.\u003C/p\u003E\u003Cp\u003E&ldquo;It hit under the stern&hellip; and could have perforated our vessel; it could even have sunk it,&rdquo; the 67-year-old told AFP.\u003C/p\u003E\u003Cp\u003EThe tin or iron boats are either shipwrecked or abandoned after the migrants on board are rescued.\u003C/p\u003E\u003Cp\u003ERun-ins happen between seven and 10 times a year, Riso said. The latest caused up to 4,000 euros worth of damage.\u003C/p\u003E\u003Cp\u003EIt is not the only cost weighing on the sector: fuel prices&mdash;driven up by the Iran war&mdash;are even higher on Italy&rsquo;s islands than the mainland.\u003C/p\u003E\u003Cp\u003EThe fishermen accuse competitors from Tunisia, Algeria, and Egypt of illegally fishing in Italian waters and say some restaurants on the island serve cheaper frozen fish from Spain instead of the local catch.\u003C/p\u003E\u003Cfigure id=\"attachment_1039928\" aria-describedby=\"caption-attachment-1039928\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039928\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg\" alt=\"A fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/New-Project-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039928\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe Lampedusa fishermen also have to go further out to catch some species due to the warming sea.\u003C/p\u003E\u003Cp\u003EThe Mediterranean is one of the fastest-warming seas in the world, and marine heatwaves are getting longer and more intense due to man-made climate change.\u003C/p\u003E\u003Cp\u003EThat can cause stocks to decline or move elsewhere, making some traditionally fished species harder to find.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EExtreme Temperatures\u003C/h2\u003E\u003Cfigure id=\"attachment_1039930\" aria-describedby=\"caption-attachment-1039930\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039930\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg\" alt=\"A fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026. Photo by TIZIANA FABI / AFP\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/aaA-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039930\" class=\"wp-caption-text\"\u003EA fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026.\u003Cbr\u003EPhoto by TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E&ldquo;Extreme water temperatures are pushing species past their thermal limits,&rdquo; Giulia Bonino, research scientist at the Euro-Mediterranean Center on Climate Change (CMCC), told AFP.\u003C/p\u003E\u003Cp\u003EThat is &ldquo;hitting Mediterranean aquaculture and fisheries hard, with real economic consequences,&rdquo; she said.\u003C/p\u003E\u003Cp\u003EHeatwaves can also affect fish reproduction and growth, according to the CMCC.\u003C/p\u003E\u003Cp\u003EMartello said the warming sea has caused a &ldquo;shift in the Mediterranean&rsquo;s entire fish production.&rdquo;\u003C/p\u003E\u003Cp\u003EAnd it is an effect of climate change that needs to be acknowledged on a national and European Union level, he said.\u003C/p\u003E\u003Cp\u003EFishermen are banned from a certain area off Lampedusa in September because the eggs laid by red mullets traditionally hatch in that period, Martello said.\u003C/p\u003E\u003Cp\u003E&ldquo;But with the warming water, the red mullets are born earlier,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EWhen the ban comes in, they are no longer young fish that need protecting but are big &mdash; and ready to be caught.\u003C/p\u003E\u003Cp\u003E\u003Cem\u003E\u003Cstrong\u003EAFP\u003C/strong\u003E\u003C/em\u003E\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/\"\u003ESunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "Once the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.The semi...",
+          "url": "https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:25:35 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "lampedusa",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "fishing",
+            "afp",
+            "width"
+          ],
+          "entities": [
+            "Sunken",
+            "Wrecks",
+            "Hot",
+            "Seas",
+            "Threaten"
+          ],
+          "hash": "cdzglt"
+        },
+        {
+          "id": "rss-channels-tv-quffmq",
+          "title": "World Cup: Eight Teams Remain In The Hunt For Glory",
+          "content": "\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EThe World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EAFP Sport looks at the match-ups, all of which are taking place in the United States.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EFrance v Morocco\u003C/h2\u003E\u003Cfigure id=\"attachment_1039099\" aria-describedby=\"caption-attachment-1039099\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039099\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039099\" class=\"wp-caption-text\"\u003EFrance&rsquo;s forward #10 Kylian Mbappe celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 16 football match between Paraguay and France at the Philadelphia Stadium in Philadelphia on July 4, 2026. (Photo by CHARLY TRIBALLEAU / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EImperious France have lived up to their billing as World Cup favourites, sweeping through the group stage and swatting aside Sweden before edging past Paraguay in the last 16.\u003C/p\u003E\u003Cp\u003EIt is difficult to see any team keeping Didier Deschamps&rsquo; men quiet, given their embarrassment of riches in attack, including Kylian Mbappe, Ousmane Dembele, Bradley Barcola and the wonderfully creative Michael Olise.\u003C/p\u003E\u003Cp\u003EBut unbeaten Morocco will not be fazed by facing the two-time world champions after seeing off the Netherlands on penalties and crushing co-hosts Canada 3-0 in the last 16.\u003C/p\u003E\u003Cfigure id=\"attachment_1037847\" aria-describedby=\"caption-attachment-1037847\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1037847\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1037847\" class=\"wp-caption-text\"\u003EMorocco&rsquo;s defender #14 Issa Diop (C) celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 32 football match between the Netherlands and Morocco at the Monterrey Stadium in Guadalupe on June 29, 2026. (Photo by Julio Cesar AGUILAR / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe North African team will have revenge on their minds in Boston after they lost to France in the semi-finals four years ago in Qatar.\u003C/p\u003E\u003Cp\u003EThe Atlas Lions created history by becoming the first African team to progress to the last four in 2022 and will be keen to match that feat.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ESpain v Belgium\u003C/h2\u003E\u003Cfigure id=\"attachment_1038622\" aria-describedby=\"caption-attachment-1038622\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038622\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038622\" class=\"wp-caption-text\"\u003ESpain&rsquo;s defender #12 Pedro Porro celebrates scoring his team&rsquo;s second goal with Spain&rsquo;s midfielder #15 Alex Baena during the 2026 World Cup round of 32 football match between Spain and Austria at the Los Angeles Stadium in Inglewood on July 2, 2026. (Photo by Frederic J. Brown / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EIn beating Portugal 1-0 on Monday, Spain became the first team in tournament history to record six consecutive World Cup clean sheets.\u003C/p\u003E\u003Cp\u003ELuis de la Fuente&rsquo;s European champions do not always set pulses racing but they are strikingly efficient and comfortable on the ball.\u003C/p\u003E\u003Cp\u003EBarcelona star Lamine Yamal has netted just once in five games but Mikel Oyarzabal has scored four times, including twice in a 3-0 win against Austria in the last 32.\u003C/p\u003E\u003Cfigure id=\"attachment_1038405\" aria-describedby=\"caption-attachment-1038405\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038405\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038405\" class=\"wp-caption-text\"\u003EYouri Tielemans of Belgium celebrates with teammate Nicolas Raskin after scoring his team&rsquo;s third goal from the penalty spot during the FIFA World Cup 2026 Round Of 32 match between Belgium and Senegal at Seattle Stadium on July 01, 2026 in Seattle, Washington. Alex Grimm/Getty Images/AFP (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EBelgium go into the match in Los Angeles on the back of a 4-1 thumping of co-hosts the United States.\u003C/p\u003E\u003Cp\u003EThat came after they rallied from two goals down in the last 32 to beat Senegal 3-2 in extra-time.\u003C/p\u003E\u003Cp\u003EThe World Cup is likely the last hurrah for the remainder of the nation&rsquo;s so-called Golden Generation, including Kevin De Bruyne and Romelu Lukaku, who will be desperate to leave the stage on a high.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ENorway v England\u003C/h2\u003E\u003Cfigure id=\"attachment_1039288\" aria-describedby=\"caption-attachment-1039288\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039288\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039288\" class=\"wp-caption-text\"\u003EEngland&rsquo;s midfielder #10 Jude Bellingham celebrates scoring his team&rsquo;s first goal with England&rsquo;s forward #09 Harry Kane during the 2026 World Cup round of 16 football match between Mexico and England at the Mexico City Stadium in Mexico City on July 5, 2026. (Photo by CARL DE SOUZA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland&rsquo;s defenders are used to facing Norway hotshot Erling Haaland in the Premier League &mdash; but whether they can handle him is another story.\u003C/p\u003E\u003Cp\u003EThomas Tuchel&rsquo;s men arrived in the United States among the favourites to win the tournament for just the second time in their history.\u003C/p\u003E\u003Cp\u003ECaptain Harry Kane and Jude Bellingham have been the standout players so far, scoring 10 of the team&rsquo;s 11 goals, including all three in a gripping 3-2 win against Mexico.\u003C/p\u003E\u003Cfigure id=\"attachment_1039323\" aria-describedby=\"caption-attachment-1039323\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039323\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039323\" class=\"wp-caption-text\"\u003EErling Braut Haaland plays the drum as Norway celebrates winning the 2026 World Cup round of 16 football match between Brazil and Norway at the New York/New Jersey Stadium in East Rutherford on July 5, 2026. (Photo by MAURO PIMENTEL / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland, reduced to 10 men, had to dig deep to see off the co-hosts in a result that will infuse them with confidence ahead of their meeting with Norway.\u003C/p\u003E\u003Cp\u003EBut they will come up against a team in Miami led by the irrepressible Haaland, who has scored seven goals so far as he chases the Golden Boot.\u003C/p\u003E\u003Cp\u003EThe Manchester City man has netted in each of his past 14 competitive outings for Norway &mdash; 27 goals in total &mdash; and is bound to create problems for England&rsquo;s shaky defence.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EArgentina v&nbsp;Switzerland\u003C/h2\u003E\u003Cfigure id=\"attachment_1038885\" aria-describedby=\"caption-attachment-1038885\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038885\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038885\" class=\"wp-caption-text\"\u003EArgentina&rsquo;s forward #10 Lionel Messi celebrates next to teammates after winning the 2026 World Cup round of 32 football match between Argentina and Cabo Verde at the Miami Stadium in Miami Gardens on July 3, 2026. (Photo by CHANDAN KHANNA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003ELionel Messi&rsquo;s Argentina have come through two almighty scares to set up a quarter-final against Switzerland.\u003C/p\u003E\u003Cp\u003EThe defending champions were taken to extra-time by World Cup debutants Cape Verde before prevailing 3-2.\u003C/p\u003E\u003Cp\u003EThen in the last 16 they looked down and out when trailing 2-0 against Egypt before an astonishing comeback, with Messi at the centre of the action.\u003C/p\u003E\u003Cfigure id=\"attachment_1036621\" aria-describedby=\"caption-attachment-1036621\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1036621\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Switz-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1036621\" class=\"wp-caption-text\"\u003EVANCOUVER, BRITISH COLUMBIA &ndash; JUNE 24: Players of Switzerland applaud fans after the team&rsquo;s 2-1 victory in the FIFA World Cup 2026 Group B match between Switzerland and Canada at BC Place Vancouver on June 24, 2026 in Vancouver, British Columbia. (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EHead coach Lionel Scaloni will know his team cannot keep testing fate as they chase a fourth World Cup crown, but they have shown they can never be counted out.\u003C/p\u003E\u003Cp\u003ENow they face Switzerland in Kansas City, who beat Colombia on penalties in Vancouver after a goalless draw.\u003C/p\u003E\u003Cp\u003EThe Swiss, who are into the last eight for the first time since they hosted the tournament in 1954, are an organised outfit and will likely be tough to break down.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/\"\u003EWorld Cup: Eight Teams Remain In The Hunt For Glory\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "&nbsp;The World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.AFP Sport looks at the match-ups, all of which are taking place in the ...",
+          "url": "https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 10:46:24 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "cup",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "width",
+            "650px",
+            "class"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "Eight",
+            "Teams",
+            "Remain"
+          ],
+          "hash": "quffmq"
+        },
+        {
+          "id": "rss-channels-tv-x1zz6",
+          "title": "Tinubu, Afreximbank Discuss Strengthening Economic Cooperation Across Africa",
+          "content": "\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EPresident Bola Tinubu on Tuesday urged the leadership of African Export-Import Bank (Afreximbank) to intensify efforts to mobilise and deploy the continent&rsquo;s vast human, financial, and natural resources for the collective economic advancement of Africans.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EHe spoke during a visit by a delegation from Afrieximbank, led by its President and Chairman of Board, Dr George Elombi, to State House, Abuja.\u003C/p\u003E\u003Cp\u003EAccording to him, Africa&rsquo;s drive for industrialisation could not remain a subject of theoretical discussion.\u003C/p\u003E\u003Cp\u003ETinubu stressed that Africa possessed enormous potential and must move beyond endless conversations about development to practical actions that drive industrial growth, expand trade, create jobs, add value, and improve the living standards of its people.\u003C/p\u003E\u003Cp\u003EA structured financial backing and reliable infrastructure, he explained, were essential for building the continent.\u003C/p\u003E\u003Cp\u003EAccording to him, his administration&rsquo;s recent economic reforms, such as ending the fuel subsidy and tackling multiple exchange rates, were essential steps to combat corruption and ensure economic survival.\u003C/p\u003E\u003Cp\u003EThe president stated, &ldquo;The conscience and the future of Africa depend on what you and your team can do and will do for Africa as a whole, and the time has come for us to start doing things together as Africans.\u003C/p\u003E\u003Cp\u003E&ldquo;We have what it takes to build this continent. Do we continue to exploit and export raw materials without value addition? That answer is no.\u003C/p\u003E\u003Cp\u003E&ldquo;We have solid mineral deposits such as lithium and others that can be used, and you, as the financial partner, should be able to come with investment guarantees for the production and value addition in batteries and other manufacturing ecosystems.&rdquo;\u003C/p\u003E\u003Cp\u003ETinubu stressed the need for Afreximbank to synergise with the Bank of Agriculture, make more investments in the production of crops, such as cocoa, palm kernel, and palm oil, among others, and ensure that agricultural value chains translate into tangible benefits for the future.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cfigure id=\"attachment_1039910\" aria-describedby=\"caption-attachment-1039910\" style=\"width: 619px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\" wp-image-1039910\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Tinubu-and-Afreximbank1-300x162.jpg\" alt=\"\" width=\"619\" height=\"334\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Tinubu-and-Afreximbank1-300x162.jpg 300w, https://www.channelstv.com/wp-content/uploads/2026/07/Tinubu-and-Afreximbank1.jpg 650w\" sizes=\"(max-width: 619px) 100vw, 619px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039910\" class=\"wp-caption-text\"\u003ETinubu and Afreximbank&rsquo;s Team\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EREAD ALSO: \u003Ca href=\"https://www.channelstv.com/2026/07/08/oil-jumps-5-after-trump-says-iran-ceasefire-over/\"\u003EOil Jumps 5% After Trump Says Iran Ceasefire Over\u003C/a\u003E\u003C/p\u003E\u003Cp\u003ECommenting on farmer-herder clashes, the president told the visitors that his government had turned the longstanding conflict between farmers and herders into an economic opportunity for citizens through the introduction of the Federal Ministry of Livestock Development.\u003C/p\u003E\u003Cp\u003EHe stated, &ldquo;I created the livestock ministry to create economic opportunities for Africans.\u003C/p\u003E\u003Cp\u003E&ldquo;The cotton, ginnery and garment industries are job creators. If we partner well and incorporate these ideas and do less talking and really put our heads into developmental programmes, we can turn it around.&rdquo;\u003C/p\u003E\u003Cp\u003EIn his remarks, Minister of State for Industry, Senator John Enoh, explained the president&rsquo;s bold economic diversification policies, describing the administration&rsquo;s Eight-Point Renewed Hope Agenda as a transformative blueprint that is repositioning Nigeria for sustainable economic growth, industrial expansion, and shared prosperity.\u003C/p\u003E\u003Cp\u003EEnoh said the Tinubu&rsquo;s commitment to industrialisation, particularly through the development of the solid minerals sector, oil and gas, manufacturing, agriculture, the digital economy, and value-added exports, was laying the foundation for a resilient economy less dependent on crude oil revenues.\u003C/p\u003E\u003Cp\u003EElombi said he and his team were at State House to thank the president for his support, which led to his election as the president of the bank, as well as to brief him on the bank&rsquo;s portfolios and activities in Nigeria.\u003C/p\u003E\u003Cp\u003EAccording to him, the bank has investments across trade, agricultural processing, value chain, and healthcare.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EREAD ALSO: \u003Ca href=\"https://www.channelstv.com/2026/07/08/naira-down-to-%e2%82%a61379-per-dollar/\"\u003ENaira Down To &#8358;1,379 Per Dollar\u003C/a\u003E\u003C/p\u003E\u003Cp\u003EHe informed Tinubu of the bank&rsquo;s efforts to reverse health tourism on the continent, highlighting that the bank has invested between US$15 and US$20 billion in the Nigerian economy over the last five years.\u003C/p\u003E\u003Cp\u003EHe also briefed the president on the bank&rsquo;s investment in the Lagos-Calabar Coastal Highway and the Kano-Maradi Railway line, and that the Afreximbank had committed US$2 billion to support Nigeria&rsquo;s cotton and garment industry.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/tinubu-afreximbank-discuss-strengthening-economic-cooperation-across-africa/\"\u003ETinubu, Afreximbank Discuss Strengthening Economic Cooperation Across Africa\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "&nbsp;President Bola Tinubu on Tuesday urged the leadership of African Export-Import Bank (Afreximbank) to intensify efforts to mobilise and deploy the continent&rsquo;s vast human, financial, and nat...",
+          "url": "https://www.channelstv.com/2026/07/08/tinubu-afreximbank-discuss-strengthening-economic-cooperation-across-africa/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 09:36:57 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "tinubu",
+            "rsquo",
+            "economic",
+            "president",
+            "bank",
+            "afreximbank",
+            "africa",
+            "https",
+            "www",
+            "channelstv"
+          ],
+          "entities": [
+            "Tinubu",
+            "Afreximbank",
+            "Discuss",
+            "Strengthening",
+            "Economic"
+          ],
+          "hash": "x1zz6"
+        }
+      ]
+    },
+    {
+      "id": "trend-nature",
+      "topic": "nature",
+      "keywords": [
+        "nature",
+        "nature",
+        "d41586",
+        "026",
+        "01673"
+      ],
+      "frequency": 73,
+      "uniqueSources": 1,
+      "credibilityScore": 0.950000000000001,
+      "recencyScore": 0.999722453703704,
+      "trendScore": 22.5899444907407,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-nature-ay0lvt",
+          "title": "I want to see a prison-to-PhD pipeline",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-01673-8\"\u003Edoi:10.1038/d41586-026-01673-8\u003C/a\u003E\u003C/p\u003ERyan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-01673-8Ryan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "url": "https://www.nature.com/articles/d41586-026-01673-8",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "nature",
+            "d41586",
+            "026",
+            "01673",
+            "1038",
+            "2026",
+            "want",
+            "see",
+            "prison",
+            "phd"
+          ],
+          "entities": [
+            "Nature",
+            "Published",
+            "July",
+            "Ryan",
+            "Rising"
+          ],
+          "hash": "ay0lvt"
+        },
+        {
+          "id": "rss-nature-bfy22",
+          "title": "How to advance revolutionary science: high turnover, high risk and a licence to fail",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02090-7\"\u003Edoi:10.1038/d41586-026-02090-7\u003C/a\u003E\u003C/p\u003EKathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-02090-7Kathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency...",
+          "url": "https://www.nature.com/articles/d41586-026-02090-7",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "science",
+            "high",
+            "nature",
+            "d41586",
+            "026",
+            "02090",
+            "1038",
+            "2026",
+            "advance",
+            "revolutionary"
+          ],
+          "entities": [
+            "How",
+            "Nature",
+            "Published",
+            "July",
+            "Kathleen"
+          ],
+          "hash": "bfy22"
+        },
+        {
+          "id": "rss-nature-seumw9",
+          "title": "Publisher Correction: A 98-qubit trapped-ion quantum computer with all-to-all connectivity",
+          "content": "\n                \u003Cp\u003ENature, Published online: 07 July 2026; \u003Ca href=\"https://www.nature.com/articles/s41586-026-10882-0\"\u003Edoi:10.1038/s41586-026-10882-0\u003C/a\u003E\u003C/p\u003EPublisher Correction: A 98-qubit trapped-ion quantum computer with all-to-all connectivity",
+          "summary": "Nature, Published online: 07 July 2026; doi:10.1038/s41586-026-10882-0Publisher Correction: A 98-qubit trapped-ion quantum computer with all-to-all connectivity",
+          "url": "https://www.nature.com/articles/s41586-026-10882-0",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "10882",
+            "publisher",
+            "correction",
+            "qubit",
+            "trapped",
+            "ion",
+            "quantum",
+            "computer",
+            "connectivity",
+            "nature"
+          ],
+          "entities": [
+            "Publisher",
+            "Correction",
+            "Nature",
+            "Published",
+            "July"
+          ],
+          "hash": "seumw9"
+        }
+      ]
+    },
+    {
+      "id": "trend-026",
+      "topic": "026",
+      "keywords": [
+        "026",
+        "nature",
+        "d41586",
+        "026",
+        "01673"
+      ],
+      "frequency": 68,
+      "uniqueSources": 1,
+      "credibilityScore": 0.950000000000001,
+      "recencyScore": 0.999722453703704,
+      "trendScore": 21.0899444907407,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-nature-ay0lvt",
+          "title": "I want to see a prison-to-PhD pipeline",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-01673-8\"\u003Edoi:10.1038/d41586-026-01673-8\u003C/a\u003E\u003C/p\u003ERyan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-01673-8Ryan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "url": "https://www.nature.com/articles/d41586-026-01673-8",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "nature",
+            "d41586",
+            "026",
+            "01673",
+            "1038",
+            "2026",
+            "want",
+            "see",
+            "prison",
+            "phd"
+          ],
+          "entities": [
+            "Nature",
+            "Published",
+            "July",
+            "Ryan",
+            "Rising"
+          ],
+          "hash": "ay0lvt"
+        },
+        {
+          "id": "rss-nature-bfy22",
+          "title": "How to advance revolutionary science: high turnover, high risk and a licence to fail",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02090-7\"\u003Edoi:10.1038/d41586-026-02090-7\u003C/a\u003E\u003C/p\u003EKathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-02090-7Kathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency...",
+          "url": "https://www.nature.com/articles/d41586-026-02090-7",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "science",
+            "high",
+            "nature",
+            "d41586",
+            "026",
+            "02090",
+            "1038",
+            "2026",
+            "advance",
+            "revolutionary"
+          ],
+          "entities": [
+            "How",
+            "Nature",
+            "Published",
+            "July",
+            "Kathleen"
+          ],
+          "hash": "bfy22"
+        },
+        {
+          "id": "rss-nature-s4hvrc",
+          "title": "Listen to Gen Z when it comes to AI in education",
+          "content": "\n                \u003Cp\u003ENature, Published online: 07 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02110-6\"\u003Edoi:10.1038/d41586-026-02110-6\u003C/a\u003E\u003C/p\u003EListen to Gen Z when it comes to AI in education",
+          "summary": "Nature, Published online: 07 July 2026; doi:10.1038/d41586-026-02110-6Listen to Gen Z when it comes to AI in education",
+          "url": "https://www.nature.com/articles/d41586-026-02110-6",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "listen",
+            "gen",
+            "comes",
+            "education",
+            "nature",
+            "d41586",
+            "026",
+            "02110",
+            "1038",
+            "2026"
+          ],
+          "entities": [
+            "Listen",
+            "Gen",
+            "Nature",
+            "Published",
+            "July"
+          ],
+          "hash": "s4hvrc"
+        }
+      ]
+    },
+    {
+      "id": "trend-1038",
+      "topic": "1038",
+      "keywords": [
+        "1038",
+        "nature",
+        "d41586",
+        "026",
+        "01673"
+      ],
+      "frequency": 57,
+      "uniqueSources": 1,
+      "credibilityScore": 0.950000000000001,
+      "recencyScore": 0.999722453703704,
+      "trendScore": 17.7899444907407,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-nature-ay0lvt",
+          "title": "I want to see a prison-to-PhD pipeline",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-01673-8\"\u003Edoi:10.1038/d41586-026-01673-8\u003C/a\u003E\u003C/p\u003ERyan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-01673-8Ryan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "url": "https://www.nature.com/articles/d41586-026-01673-8",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "nature",
+            "d41586",
+            "026",
+            "01673",
+            "1038",
+            "2026",
+            "want",
+            "see",
+            "prison",
+            "phd"
+          ],
+          "entities": [
+            "Nature",
+            "Published",
+            "July",
+            "Ryan",
+            "Rising"
+          ],
+          "hash": "ay0lvt"
+        },
+        {
+          "id": "rss-nature-bfy22",
+          "title": "How to advance revolutionary science: high turnover, high risk and a licence to fail",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02090-7\"\u003Edoi:10.1038/d41586-026-02090-7\u003C/a\u003E\u003C/p\u003EKathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-02090-7Kathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency...",
+          "url": "https://www.nature.com/articles/d41586-026-02090-7",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "science",
+            "high",
+            "nature",
+            "d41586",
+            "026",
+            "02090",
+            "1038",
+            "2026",
+            "advance",
+            "revolutionary"
+          ],
+          "entities": [
+            "How",
+            "Nature",
+            "Published",
+            "July",
+            "Kathleen"
+          ],
+          "hash": "bfy22"
+        },
+        {
+          "id": "rss-nature-s4hvrc",
+          "title": "Listen to Gen Z when it comes to AI in education",
+          "content": "\n                \u003Cp\u003ENature, Published online: 07 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02110-6\"\u003Edoi:10.1038/d41586-026-02110-6\u003C/a\u003E\u003C/p\u003EListen to Gen Z when it comes to AI in education",
+          "summary": "Nature, Published online: 07 July 2026; doi:10.1038/d41586-026-02110-6Listen to Gen Z when it comes to AI in education",
+          "url": "https://www.nature.com/articles/d41586-026-02110-6",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "listen",
+            "gen",
+            "comes",
+            "education",
+            "nature",
+            "d41586",
+            "026",
+            "02110",
+            "1038",
+            "2026"
+          ],
+          "entities": [
+            "Listen",
+            "Gen",
+            "Nature",
+            "Published",
+            "July"
+          ],
+          "hash": "s4hvrc"
+        }
+      ]
+    },
+    {
+      "id": "trend-com",
+      "topic": "com",
+      "keywords": [
+        "com",
+        "2026",
+        "caption",
+        "lampedusa",
+        "https"
+      ],
+      "frequency": 49,
+      "uniqueSources": 7,
+      "credibilityScore": 0.851020408163266,
+      "recencyScore": 0.0065408912037036,
+      "trendScore": 16.9715122598734,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-channels-tv-cdzglt",
+          "title": "Sunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle",
+          "content": "\u003Cp\u003E\u003Cstrong\u003EOnce the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EThe semi-arid outcrop, closer to North Africa than Italy, is a port of call for people attempting the perilous crossing to Europe, and their capsized or abandoned boats dot its emerald depths.\u003C/p\u003E\u003Cfigure id=\"attachment_1039932\" aria-describedby=\"caption-attachment-1039932\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg fetchpriority=\"high\" decoding=\"async\" class=\"size-full wp-image-1039932\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg\" alt=\"A fishing boat is navigated during its' return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ujjujjjj-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039932\" class=\"wp-caption-text\"\u003EA fishing boat is navigated during its&rsquo; return to the port of Lampedusa after a day at sea in Lampedusa on July 8, 2026. .(Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&ldquo;The nets are continuously torn&hellip; there are days when you snag two, three (migrant) boats,&rdquo; 71-year-old fisherman Salvatore Mannino told AFP.\u003C/p\u003E\u003Cp\u003E&ldquo;We map the boats, but they move. They can snag one (fishing boat),&rdquo; and then later, &ldquo;another passes and gets caught too,&rdquo; he said as he and a fellow fisherman mended a broken net while the sun beat down on the pier.\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EREAD ALSO:&nbsp;\u003C/strong\u003E\u003Ca href=\"https://www.channelstv.com/2026/06/28/europe-swelters-as-heatwave-moves-east-excess-deaths-rise/\" target=\"_blank\" rel=\"noopener\"\u003EEurope Swelters As Heatwave Moves East, Excess Deaths Rise\u003C/a\u003E\u003C/p\u003E\u003Cp\u003EMannino comes from generations of fishermen but has told his children they have no future in the sector.\u003C/p\u003E\u003Cp\u003EThe island&rsquo;s economy is based largely on fishing and tourism, though its fishing fleet has &ldquo;shrunk by 50 percent&rdquo; since the early 2000s, according to Salvatore Martello, head of Lampedusa&rsquo;s fishing cooperative.\u003C/p\u003E\u003Ch2\u003EIsland&rsquo;s Identity\u003C/h2\u003E\u003Cfigure id=\"attachment_1039929\" aria-describedby=\"caption-attachment-1039929\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039929\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg\" alt=\"A fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP)\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/ASAS.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/ASAS-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039929\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat returning to the port of Lampedusa, after a day at sea on July 8, 2026.(Photo by TIZIANA FABI / AFP) | TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003ESome from the younger generations have transformed their family boats into pleasure boats for holidaymakers.\u003C/p\u003E\u003Cp\u003EBut fishing &ldquo;gives Lampedusa&rsquo;s tourism its identity,&rdquo; Martello said.\u003C/p\u003E\u003Cp\u003EFailing to support the sector will have &ldquo;an automatic repercussion on tourism, because people come to eat fresh fish,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EFisherman Pietro Riso&rsquo;s sons did follow him into fishing&mdash;catching red mullet, calamari, and rose shrimp&mdash;but just last week clashed with a migrant boat.\u003C/p\u003E\u003Cp\u003E&ldquo;It hit under the stern&hellip; and could have perforated our vessel; it could even have sunk it,&rdquo; the 67-year-old told AFP.\u003C/p\u003E\u003Cp\u003EThe tin or iron boats are either shipwrecked or abandoned after the migrants on board are rescued.\u003C/p\u003E\u003Cp\u003ERun-ins happen between seven and 10 times a year, Riso said. The latest caused up to 4,000 euros worth of damage.\u003C/p\u003E\u003Cp\u003EIt is not the only cost weighing on the sector: fuel prices&mdash;driven up by the Iran war&mdash;are even higher on Italy&rsquo;s islands than the mainland.\u003C/p\u003E\u003Cp\u003EThe fishermen accuse competitors from Tunisia, Algeria, and Egypt of illegally fishing in Italian waters and say some restaurants on the island serve cheaper frozen fish from Spain instead of the local catch.\u003C/p\u003E\u003Cfigure id=\"attachment_1039928\" aria-describedby=\"caption-attachment-1039928\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg decoding=\"async\" class=\"size-full wp-image-1039928\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg\" alt=\"A fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP) \" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/New-Project.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/New-Project-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039928\" class=\"wp-caption-text\"\u003EA fisherman unloads his catch from a fishing boat after returning to the port of Lampedusa, following a day at sea on July 8, 2026. (Photo by TIZIANA FABI / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe Lampedusa fishermen also have to go further out to catch some species due to the warming sea.\u003C/p\u003E\u003Cp\u003EThe Mediterranean is one of the fastest-warming seas in the world, and marine heatwaves are getting longer and more intense due to man-made climate change.\u003C/p\u003E\u003Cp\u003EThat can cause stocks to decline or move elsewhere, making some traditionally fished species harder to find.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EExtreme Temperatures\u003C/h2\u003E\u003Cfigure id=\"attachment_1039930\" aria-describedby=\"caption-attachment-1039930\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039930\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg\" alt=\"A fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026. Photo by TIZIANA FABI / AFP\" width=\"650\" height=\"440\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/aaA.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/aaA-300x203.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039930\" class=\"wp-caption-text\"\u003EA fisherman washes his face as he arrives to unload his catch from a fishing boat returning to the port of Lampedusa, Italy, after a day at sea on July 8, 2026.\u003Cbr\u003EPhoto by TIZIANA FABI / AFP\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E&ldquo;Extreme water temperatures are pushing species past their thermal limits,&rdquo; Giulia Bonino, research scientist at the Euro-Mediterranean Center on Climate Change (CMCC), told AFP.\u003C/p\u003E\u003Cp\u003EThat is &ldquo;hitting Mediterranean aquaculture and fisheries hard, with real economic consequences,&rdquo; she said.\u003C/p\u003E\u003Cp\u003EHeatwaves can also affect fish reproduction and growth, according to the CMCC.\u003C/p\u003E\u003Cp\u003EMartello said the warming sea has caused a &ldquo;shift in the Mediterranean&rsquo;s entire fish production.&rdquo;\u003C/p\u003E\u003Cp\u003EAnd it is an effect of climate change that needs to be acknowledged on a national and European Union level, he said.\u003C/p\u003E\u003Cp\u003EFishermen are banned from a certain area off Lampedusa in September because the eggs laid by red mullets traditionally hatch in that period, Martello said.\u003C/p\u003E\u003Cp\u003E&ldquo;But with the warming water, the red mullets are born earlier,&rdquo; he said.\u003C/p\u003E\u003Cp\u003EWhen the ban comes in, they are no longer young fish that need protecting but are big &mdash; and ready to be caught.\u003C/p\u003E\u003Cp\u003E\u003Cem\u003E\u003Cstrong\u003EAFP\u003C/strong\u003E\u003C/em\u003E\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/\"\u003ESunken Wrecks, Hot Seas Threaten Fishermen On Italian Isle\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "Once the beating heart of this Italian island community, fishermen on Lampedusa are under pressure on multiple fronts, from nets ripped by sunken migrant wrecks to a warming Mediterranean Sea.The semi...",
+          "url": "https://www.channelstv.com/2026/07/08/sunken-wrecks-hot-seas-threaten-fishermen-on-italian-isle/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:25:35 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "lampedusa",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "fishing",
+            "afp",
+            "width"
+          ],
+          "entities": [
+            "Sunken",
+            "Wrecks",
+            "Hot",
+            "Seas",
+            "Threaten"
+          ],
+          "hash": "cdzglt"
+        },
+        {
+          "id": "rss-channels-tv-quffmq",
+          "title": "World Cup: Eight Teams Remain In The Hunt For Glory",
+          "content": "\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003E\u003Cstrong\u003EThe World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EAFP Sport looks at the match-ups, all of which are taking place in the United States.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EFrance v Morocco\u003C/h2\u003E\u003Cfigure id=\"attachment_1039099\" aria-describedby=\"caption-attachment-1039099\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039099\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Mbappe-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039099\" class=\"wp-caption-text\"\u003EFrance&rsquo;s forward #10 Kylian Mbappe celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 16 football match between Paraguay and France at the Philadelphia Stadium in Philadelphia on July 4, 2026. (Photo by CHARLY TRIBALLEAU / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EImperious France have lived up to their billing as World Cup favourites, sweeping through the group stage and swatting aside Sweden before edging past Paraguay in the last 16.\u003C/p\u003E\u003Cp\u003EIt is difficult to see any team keeping Didier Deschamps&rsquo; men quiet, given their embarrassment of riches in attack, including Kylian Mbappe, Ousmane Dembele, Bradley Barcola and the wonderfully creative Michael Olise.\u003C/p\u003E\u003Cp\u003EBut unbeaten Morocco will not be fazed by facing the two-time world champions after seeing off the Netherlands on penalties and crushing co-hosts Canada 3-0 in the last 16.\u003C/p\u003E\u003Cfigure id=\"attachment_1037847\" aria-describedby=\"caption-attachment-1037847\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1037847\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Morocco_World-Cup-1-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1037847\" class=\"wp-caption-text\"\u003EMorocco&rsquo;s defender #14 Issa Diop (C) celebrates scoring his team&rsquo;s first goal during the 2026 World Cup round of 32 football match between the Netherlands and Morocco at the Monterrey Stadium in Guadalupe on June 29, 2026. (Photo by Julio Cesar AGUILAR / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EThe North African team will have revenge on their minds in Boston after they lost to France in the semi-finals four years ago in Qatar.\u003C/p\u003E\u003Cp\u003EThe Atlas Lions created history by becoming the first African team to progress to the last four in 2022 and will be keen to match that feat.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ESpain v Belgium\u003C/h2\u003E\u003Cfigure id=\"attachment_1038622\" aria-describedby=\"caption-attachment-1038622\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038622\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/spain-austria-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038622\" class=\"wp-caption-text\"\u003ESpain&rsquo;s defender #12 Pedro Porro celebrates scoring his team&rsquo;s second goal with Spain&rsquo;s midfielder #15 Alex Baena during the 2026 World Cup round of 32 football match between Spain and Austria at the Los Angeles Stadium in Inglewood on July 2, 2026. (Photo by Frederic J. Brown / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EIn beating Portugal 1-0 on Monday, Spain became the first team in tournament history to record six consecutive World Cup clean sheets.\u003C/p\u003E\u003Cp\u003ELuis de la Fuente&rsquo;s European champions do not always set pulses racing but they are strikingly efficient and comfortable on the ball.\u003C/p\u003E\u003Cp\u003EBarcelona star Lamine Yamal has netted just once in five games but Mikel Oyarzabal has scored four times, including twice in a 3-0 win against Austria in the last 32.\u003C/p\u003E\u003Cfigure id=\"attachment_1038405\" aria-describedby=\"caption-attachment-1038405\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038405\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Belgium-at-2026-World-Cup-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038405\" class=\"wp-caption-text\"\u003EYouri Tielemans of Belgium celebrates with teammate Nicolas Raskin after scoring his team&rsquo;s third goal from the penalty spot during the FIFA World Cup 2026 Round Of 32 match between Belgium and Senegal at Seattle Stadium on July 01, 2026 in Seattle, Washington. Alex Grimm/Getty Images/AFP (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EBelgium go into the match in Los Angeles on the back of a 4-1 thumping of co-hosts the United States.\u003C/p\u003E\u003Cp\u003EThat came after they rallied from two goals down in the last 32 to beat Senegal 3-2 in extra-time.\u003C/p\u003E\u003Cp\u003EThe World Cup is likely the last hurrah for the remainder of the nation&rsquo;s so-called Golden Generation, including Kevin De Bruyne and Romelu Lukaku, who will be desperate to leave the stage on a high.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003ENorway v England\u003C/h2\u003E\u003Cfigure id=\"attachment_1039288\" aria-describedby=\"caption-attachment-1039288\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039288\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/england-mexico-1-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039288\" class=\"wp-caption-text\"\u003EEngland&rsquo;s midfielder #10 Jude Bellingham celebrates scoring his team&rsquo;s first goal with England&rsquo;s forward #09 Harry Kane during the 2026 World Cup round of 16 football match between Mexico and England at the Mexico City Stadium in Mexico City on July 5, 2026. (Photo by CARL DE SOUZA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland&rsquo;s defenders are used to facing Norway hotshot Erling Haaland in the Premier League &mdash; but whether they can handle him is another story.\u003C/p\u003E\u003Cp\u003EThomas Tuchel&rsquo;s men arrived in the United States among the favourites to win the tournament for just the second time in their history.\u003C/p\u003E\u003Cp\u003ECaptain Harry Kane and Jude Bellingham have been the standout players so far, scoring 10 of the team&rsquo;s 11 goals, including all three in a gripping 3-2 win against Mexico.\u003C/p\u003E\u003Cfigure id=\"attachment_1039323\" aria-describedby=\"caption-attachment-1039323\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1039323\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/07/erling-halaand-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1039323\" class=\"wp-caption-text\"\u003EErling Braut Haaland plays the drum as Norway celebrates winning the 2026 World Cup round of 16 football match between Brazil and Norway at the New York/New Jersey Stadium in East Rutherford on July 5, 2026. (Photo by MAURO PIMENTEL / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EEngland, reduced to 10 men, had to dig deep to see off the co-hosts in a result that will infuse them with confidence ahead of their meeting with Norway.\u003C/p\u003E\u003Cp\u003EBut they will come up against a team in Miami led by the irrepressible Haaland, who has scored seven goals so far as he chases the Golden Boot.\u003C/p\u003E\u003Cp\u003EThe Manchester City man has netted in each of his past 14 competitive outings for Norway &mdash; 27 goals in total &mdash; and is bound to create problems for England&rsquo;s shaky defence.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Ch2\u003EArgentina v&nbsp;Switzerland\u003C/h2\u003E\u003Cfigure id=\"attachment_1038885\" aria-describedby=\"caption-attachment-1038885\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1038885\" src=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup.webp 650w, https://www.channelstv.com/wp-content/uploads/2026/07/Argentina_World-cup-300x162.webp 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1038885\" class=\"wp-caption-text\"\u003EArgentina&rsquo;s forward #10 Lionel Messi celebrates next to teammates after winning the 2026 World Cup round of 32 football match between Argentina and Cabo Verde at the Miami Stadium in Miami Gardens on July 3, 2026. (Photo by CHANDAN KHANNA / AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003ELionel Messi&rsquo;s Argentina have come through two almighty scares to set up a quarter-final against Switzerland.\u003C/p\u003E\u003Cp\u003EThe defending champions were taken to extra-time by World Cup debutants Cape Verde before prevailing 3-2.\u003C/p\u003E\u003Cp\u003EThen in the last 16 they looked down and out when trailing 2-0 against Egypt before an astonishing comeback, with Messi at the centre of the action.\u003C/p\u003E\u003Cfigure id=\"attachment_1036621\" aria-describedby=\"caption-attachment-1036621\" style=\"width: 650px\" class=\"wp-caption alignnone\"\u003E\u003Cimg loading=\"lazy\" decoding=\"async\" class=\"size-full wp-image-1036621\" src=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg\" alt=\"\" width=\"650\" height=\"350\" srcset=\"https://www.channelstv.com/wp-content/uploads/2026/06/Switz.jpg 650w, https://www.channelstv.com/wp-content/uploads/2026/06/Switz-300x162.jpg 300w\" sizes=\"(max-width: 650px) 100vw, 650px\"\u003E\u003Cfigcaption id=\"caption-attachment-1036621\" class=\"wp-caption-text\"\u003EVANCOUVER, BRITISH COLUMBIA &ndash; JUNE 24: Players of Switzerland applaud fans after the team&rsquo;s 2-1 victory in the FIFA World Cup 2026 Group B match between Switzerland and Canada at BC Place Vancouver on June 24, 2026 in Vancouver, British Columbia. (Photo by ALEX GRIMM / GETTY IMAGES NORTH AMERICA / Getty Images via AFP)\u003C/figcaption\u003E\u003C/figure\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EHead coach Lionel Scaloni will know his team cannot keep testing fate as they chase a fourth World Cup crown, but they have shown they can never be counted out.\u003C/p\u003E\u003Cp\u003ENow they face Switzerland in Kansas City, who beat Colombia on penalties in Vancouver after a goalless draw.\u003C/p\u003E\u003Cp\u003EThe Swiss, who are into the last eight for the first time since they hosted the tournament in 1954, are an organised outfit and will likely be tough to break down.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/\"\u003EWorld Cup: Eight Teams Remain In The Hunt For Glory\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "&nbsp;The World Cup is down to just eight teams, with a heavyweight line-up set to do battle in the quarter-finals from Thursday.AFP Sport looks at the match-ups, all of which are taking place in the ...",
+          "url": "https://www.channelstv.com/2026/07/08/world-cup-eight-teams-remain-in-the-hunt-for-glory/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 10:46:24 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "2026",
+            "caption",
+            "cup",
+            "https",
+            "www",
+            "channelstv",
+            "com",
+            "width",
+            "650px",
+            "class"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "Eight",
+            "Teams",
+            "Remain"
+          ],
+          "hash": "quffmq"
+        },
+        {
+          "id": "rss-premium-times-6oyams",
+          "title": "2026 FIFA World Cup: How goalkeepers have become defining heroes",
+          "content": "\u003Cimg width=\"1080\" height=\"750\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?fit=1080%2C750&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"Vozinha (CREDIT: FIFA World Cup on X)\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?w=1080&amp;ssl=1 1080w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=503%2C349&amp;ssl=1 503w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=768%2C533&amp;ssl=1 768w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=750%2C521&amp;ssl=1 750w\" sizes=\"(max-width: 1080px) 100vw, 1080px\" /\u003E\u003Cp\u003EFrom world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, often deciding matches with a single save\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html\"\u003E2026 FIFA World Cup: How goalkeepers have become defining heroes\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "From world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, of...",
+          "url": "https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:40:40 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "2026",
+            "https",
+            "premiumtimesng",
+            "world",
+            "media",
+            "content",
+            "files",
+            "untitled",
+            "design"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "How",
+            "Untitled",
+            "Vozinha"
+          ],
+          "hash": "6oyams"
+        }
+      ]
+    },
+    {
+      "id": "trend-href",
+      "topic": "href",
+      "keywords": [
+        "href",
+        "per",
+        "dollar",
+        "naira",
+        "379"
+      ],
+      "frequency": 45,
+      "uniqueSources": 8,
+      "credibilityScore": 0.824444444444444,
+      "recencyScore": 0.0065408912037036,
+      "trendScore": 16.0661970671296,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-channels-tv-qesduh",
+          "title": "Naira Down To ₦1,379 Per Dollar",
+          "content": "\u003Ch1\u003E\u003C/h1\u003E\u003Cp\u003E\u003Cstrong\u003EThe naira Tuesday depreciated to N1,379 per dollar in the Nigerian Foreign Exchange Market (NFEM), according to data from the Central Bank of Nigeria (CBN).\u003C/strong\u003E\u003C/p\u003E\u003Cp\u003EThe currency also slipped to N1,405 per dollar in the parallel market from N1,400 per dollar on Monday.\u003C/p\u003E\u003Cp\u003ECBN data showed that the indicative exchange rate for the market rose slightly to N1,379 per dollar from N1,371 per dollar on Monday, indicating N8 depreciation for the naira.\u003C/p\u003E\u003Cp\u003E&nbsp;\u003C/p\u003E\u003Cp\u003EREAD ALSO: \u003Ca href=\"https://www.channelstv.com/2026/07/08/oil-jumps-5-after-trump-says-iran-ceasefire-over/\"\u003EOil Jumps 5% After Trump Says Iran Ceasefire Over\u003C/a\u003E\u003C/p\u003E\u003Cp\u003EConsequently, the margin between the parallel and official markets narrowed to N26 per dollar from N29 per dollar on Monday.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.channelstv.com/2026/07/08/naira-down-to-%e2%82%a61379-per-dollar/\"\u003ENaira Down To ₦1,379 Per Dollar\u003C/a\u003E appeared first on \u003Ca href=\"https://www.channelstv.com\"\u003EChannels Television\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "The naira Tuesday depreciated to N1,379 per dollar in the Nigerian Foreign Exchange Market (NFEM), according to data from the Central Bank of Nigeria (CBN).The currency also slipped to N1,405 per doll...",
+          "url": "https://www.channelstv.com/2026/07/08/naira-down-to-%e2%82%a61379-per-dollar/",
+          "sourceId": "channels-tv",
+          "sourceName": "Channels TV",
+          "sourceUrl": "https://www.channelstv.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 09:20:11 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "per",
+            "dollar",
+            "naira",
+            "379",
+            "down",
+            "market",
+            "monday",
+            "href",
+            "https",
+            "www"
+          ],
+          "entities": [
+            "Naira",
+            "Down",
+            "Per",
+            "Dollar",
+            "Tuesday"
+          ],
+          "hash": "qesduh"
+        },
+        {
+          "id": "rss-tribune-xelkia",
+          "title": "Why I may not be alive to contest in 2027 — Peter Obi",
+          "content": "\u003Cp\u003EThe presidential candidate of the Nigeria Democratic Congress (NDC) for the 2027 election, Peter Obi, has explained why he believes he might not\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://tribuneonlineng.com/why-i-may-not-be-alive-to-contest-in-2027-peter-obi/\"\u003EWhy I may not be alive to contest in 2027 — Peter Obi\u003C/a\u003E appeared first on \u003Ca href=\"https://tribuneonlineng.com\"\u003ETribune Online\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "The presidential candidate of the Nigeria Democratic Congress (NDC) for the 2027 election, Peter Obi, has explained why he believes he might not\nThe post Why I may not be alive to contest in 2027 — Pe...",
+          "url": "https://tribuneonlineng.com/why-i-may-not-be-alive-to-contest-in-2027-peter-obi/",
+          "sourceId": "tribune",
+          "sourceName": "Tribune",
+          "sourceUrl": "https://tribuneonlineng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:30:19 +0000",
+          "credibilityScore": 0.75,
+          "keywords": [
+            "2027",
+            "peter",
+            "obi",
+            "alive",
+            "contest",
+            "href",
+            "https",
+            "tribuneonlineng",
+            "com",
+            "presidential"
+          ],
+          "entities": [
+            "Why",
+            "Peter",
+            "Obi",
+            "Nigeria",
+            "Democratic"
+          ],
+          "hash": "xelkia"
+        },
+        {
+          "id": "rss-tribune-uhj7ls",
+          "title": "Why I established presidential foreign intervention promotion council — ‘Fake’ agency DG",
+          "content": "\u003Cp\u003EThe Director-General of the Presidential Foreign Intervention Promotion Council (PFIPC), Adeniyi Adeyemi Matthew, has explained why he established the agency, saying\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://tribuneonlineng.com/why-i-established-presidential-foreign-intervention-promotion-council-fake-agency-dg/\"\u003EWhy I established presidential foreign intervention promotion council — ‘Fake’ agency DG\u003C/a\u003E appeared first on \u003Ca href=\"https://tribuneonlineng.com\"\u003ETribune Online\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "The Director-General of the Presidential Foreign Intervention Promotion Council (PFIPC), Adeniyi Adeyemi Matthew, has explained why he established the agency, saying\nThe post Why I established preside...",
+          "url": "https://tribuneonlineng.com/why-i-established-presidential-foreign-intervention-promotion-council-fake-agency-dg/",
+          "sourceId": "tribune",
+          "sourceName": "Tribune",
+          "sourceUrl": "https://tribuneonlineng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:29:49 +0000",
+          "credibilityScore": 0.75,
+          "keywords": [
+            "established",
+            "presidential",
+            "foreign",
+            "intervention",
+            "promotion",
+            "council",
+            "agency",
+            "fake",
+            "href",
+            "https"
+          ],
+          "entities": [
+            "Why",
+            "Fake",
+            "Director",
+            "General",
+            "Presidential"
+          ],
+          "hash": "uhj7ls"
+        }
+      ]
+    },
+    {
+      "id": "trend-d41586",
+      "topic": "d41586",
+      "keywords": [
+        "d41586",
+        "nature",
+        "d41586",
+        "026",
+        "01673"
+      ],
+      "frequency": 42,
+      "uniqueSources": 1,
+      "credibilityScore": 0.95,
+      "recencyScore": 0.999722453703704,
+      "trendScore": 13.2899444907407,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-nature-ay0lvt",
+          "title": "I want to see a prison-to-PhD pipeline",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-01673-8\"\u003Edoi:10.1038/d41586-026-01673-8\u003C/a\u003E\u003C/p\u003ERyan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-01673-8Ryan Rising creates programmes that help people who have been incarcerated to access academic opportunities.",
+          "url": "https://www.nature.com/articles/d41586-026-01673-8",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "nature",
+            "d41586",
+            "026",
+            "01673",
+            "1038",
+            "2026",
+            "want",
+            "see",
+            "prison",
+            "phd"
+          ],
+          "entities": [
+            "Nature",
+            "Published",
+            "July",
+            "Ryan",
+            "Rising"
+          ],
+          "hash": "ay0lvt"
+        },
+        {
+          "id": "rss-nature-bfy22",
+          "title": "How to advance revolutionary science: high turnover, high risk and a licence to fail",
+          "content": "\n                \u003Cp\u003ENature, Published online: 08 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02090-7\"\u003Edoi:10.1038/d41586-026-02090-7\u003C/a\u003E\u003C/p\u003EKathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency.",
+          "summary": "Nature, Published online: 08 July 2026; doi:10.1038/d41586-026-02090-7Kathleen Fisher reveals the recipe for funding innovative science that she brings to the UK Advanced Research and Invention Agency...",
+          "url": "https://www.nature.com/articles/d41586-026-02090-7",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "science",
+            "high",
+            "nature",
+            "d41586",
+            "026",
+            "02090",
+            "1038",
+            "2026",
+            "advance",
+            "revolutionary"
+          ],
+          "entities": [
+            "How",
+            "Nature",
+            "Published",
+            "July",
+            "Kathleen"
+          ],
+          "hash": "bfy22"
+        },
+        {
+          "id": "rss-nature-s4hvrc",
+          "title": "Listen to Gen Z when it comes to AI in education",
+          "content": "\n                \u003Cp\u003ENature, Published online: 07 July 2026; \u003Ca href=\"https://www.nature.com/articles/d41586-026-02110-6\"\u003Edoi:10.1038/d41586-026-02110-6\u003C/a\u003E\u003C/p\u003EListen to Gen Z when it comes to AI in education",
+          "summary": "Nature, Published online: 07 July 2026; doi:10.1038/d41586-026-02110-6Listen to Gen Z when it comes to AI in education",
+          "url": "https://www.nature.com/articles/d41586-026-02110-6",
+          "sourceId": "nature",
+          "sourceName": "Nature",
+          "sourceUrl": "https://www.nature.com",
+          "category": "science",
+          "country": "UK",
+          "publishedAt": "2026-07-08T13:05:59.887Z",
+          "credibilityScore": 0.95,
+          "keywords": [
+            "listen",
+            "gen",
+            "comes",
+            "education",
+            "nature",
+            "d41586",
+            "026",
+            "02110",
+            "1038",
+            "2026"
+          ],
+          "entities": [
+            "Listen",
+            "Gen",
+            "Nature",
+            "Published",
+            "July"
+          ],
+          "hash": "s4hvrc"
+        }
+      ]
+    },
+    {
+      "id": "trend-content",
+      "topic": "content",
+      "keywords": [
+        "content",
+        "com",
+        "2026",
+        "https",
+        "premiumtimesng"
+      ],
+      "frequency": 34,
+      "uniqueSources": 8,
+      "credibilityScore": 0.838235294117648,
+      "recencyScore": 0.0069459837962963,
+      "trendScore": 12.7690362555828,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-premium-times-6oyams",
+          "title": "2026 FIFA World Cup: How goalkeepers have become defining heroes",
+          "content": "\u003Cimg width=\"1080\" height=\"750\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?fit=1080%2C750&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"Vozinha (CREDIT: FIFA World Cup on X)\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?w=1080&amp;ssl=1 1080w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=503%2C349&amp;ssl=1 503w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=768%2C533&amp;ssl=1 768w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Untitled-design-14.jpg?resize=750%2C521&amp;ssl=1 750w\" sizes=\"(max-width: 1080px) 100vw, 1080px\" /\u003E\u003Cp\u003EFrom world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, often deciding matches with a single save\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html\"\u003E2026 FIFA World Cup: How goalkeepers have become defining heroes\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "From world-renowned stars proving why they remain among the game's elite to relatively unknown names becoming overnight sensations, goalkeepers have repeatedly stood between triumph and heartbreak, of...",
+          "url": "https://www.premiumtimesng.com/sports/football/893764-2026-fifa-world-cup-how-goalkeepers-have-become-defining-heroes.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:40:40 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "2026",
+            "https",
+            "premiumtimesng",
+            "world",
+            "media",
+            "content",
+            "files",
+            "untitled",
+            "design"
+          ],
+          "entities": [
+            "World",
+            "Cup",
+            "How",
+            "Untitled",
+            "Vozinha"
+          ],
+          "hash": "6oyams"
+        },
+        {
+          "id": "rss-premium-times-jb1p2i",
+          "title": "House of Reps swears in new member from Kano after by-election victory",
+          "content": "\u003Cimg width=\"2048\" height=\"1364\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?fit=2048%2C1364&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"House of Reps (Lawmakers) (PHOTO CREDIT: @HouseNGR)\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?w=2048&amp;ssl=1 2048w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=524%2C349&amp;ssl=1 524w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=1622%2C1080&amp;ssl=1 1622w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=768%2C512&amp;ssl=1 768w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=1536%2C1023&amp;ssl=1 1536w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=150%2C100&amp;ssl=1 150w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=750%2C500&amp;ssl=1 750w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2024/06/441933646_1017996359689358_8886543464785375474_n.jpg?resize=1140%2C759&amp;ssl=1 1140w\" sizes=\"(max-width: 2048px) 100vw, 2048px\" /\u003E\u003Cp\u003EShuaibu Rabiu won a recent by-election on the platform of the APC to represent the Dawakin Kudu/Warawa Federal Constituency of Kano State.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/news/more-news/893760-house-of-reps-swears-in-new-member-from-kano-after-by-election-victory.html\"\u003EHouse of Reps swears in new member from Kano after by-election victory\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "Shuaibu Rabiu won a recent by-election on the platform of the APC to represent the Dawakin Kudu/Warawa Federal Constituency of Kano State.\nThe post House of Reps swears in new member from Kano after b...",
+          "url": "https://www.premiumtimesng.com/news/more-news/893760-house-of-reps-swears-in-new-member-from-kano-after-by-election-victory.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:06:09 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "https",
+            "premiumtimesng",
+            "2024",
+            "media",
+            "content",
+            "files",
+            "441933646_1017996359689358_8886543464785375474_n",
+            "jpg",
+            "amp"
+          ],
+          "entities": [
+            "House",
+            "Reps",
+            "Kano",
+            "Lawmakers",
+            "Shuaibu"
+          ],
+          "hash": "jb1p2i"
+        },
+        {
+          "id": "rss-premium-times-m45vjk",
+          "title": "Police arrest murder suspect in Oyo-Osun communal clash two years after victim went missing",
+          "content": "\u003Cimg width=\"1020\" height=\"424\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/08757e0f-e10e-4b44-ae4c-781cc2e9270e-e1783510903637.jpg?fit=1020%2C424&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"Oyo and Osun on the map\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/08757e0f-e10e-4b44-ae4c-781cc2e9270e-e1783510903637.jpg?w=1020&amp;ssl=1 1020w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/08757e0f-e10e-4b44-ae4c-781cc2e9270e-e1783510903637.jpg?resize=526%2C219&amp;ssl=1 526w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/08757e0f-e10e-4b44-ae4c-781cc2e9270e-e1783510903637.jpg?resize=768%2C319&amp;ssl=1 768w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/08757e0f-e10e-4b44-ae4c-781cc2e9270e-e1783510903637.jpg?resize=750%2C312&amp;ssl=1 750w\" sizes=\"(max-width: 1020px) 100vw, 1020px\" /\u003E\u003Cp\u003EPolice said investigations are ongoing to apprehend the three remaining suspects allegedly involved in the killing and determine the full circumstances surrounding the incident.\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/news/top-news/893757-police-arrest-murder-suspect-in-oyo-osun-communal-clash-two-years-after-victim-went-missing.html\"\u003EPolice arrest murder suspect in Oyo-Osun communal clash two years after victim went missing\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "Police said investigations are ongoing to apprehend the three remaining suspects allegedly involved in the killing and determine the full circumstances surrounding the incident.\nThe post Police arrest...",
+          "url": "https://www.premiumtimesng.com/news/top-news/893757-police-arrest-murder-suspect-in-oyo-osun-communal-clash-two-years-after-victim-went-missing.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 11:42:46 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "https",
+            "premiumtimesng",
+            "2026",
+            "media",
+            "content",
+            "files",
+            "08757e0f",
+            "e10e",
+            "4b44"
+          ],
+          "entities": [
+            "Police",
+            "Oyo",
+            "Osun",
+            "Premium",
+            "Times"
+          ],
+          "hash": "m45vjk"
+        }
+      ]
+    },
+    {
+      "id": "trend-8217",
+      "topic": "8217",
+      "keywords": [
+        "8217",
+        "com",
+        "chaste",
+        "inegbedion",
+        "https"
+      ],
+      "frequency": 24,
+      "uniqueSources": 9,
+      "credibilityScore": 0.8125,
+      "recencyScore": 0.0368070949074074,
+      "trendScore": 10.0698614189815,
+      "lastUpdated": "2026-07-08T13:06:23.867Z",
+      "sampleArticles": [
+        {
+          "id": "rss-premium-times-xhwlgu",
+          "title": "The fever in Geneva: The world’s biggest AI battle isn’t happening in Silicon Valley, By Chaste Inegbedion",
+          "content": "\u003Cimg width=\"640\" height=\"550\" src=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Chaste-Inegbedion-2.jpg?fit=640%2C550&amp;ssl=1\" class=\"webfeedsFeaturedVisual wp-post-image\" alt=\"\" style=\"display: block; margin: auto; margin-bottom: 5px;max-width: 100%;\" link_thumbnail=\"\" decoding=\"async\" srcset=\"https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Chaste-Inegbedion-2.jpg?w=640&amp;ssl=1 640w, https://i0.wp.com/media.premiumtimesng.com/wp-content/files/2026/07/Chaste-Inegbedion-2.jpg?resize=406%2C349&amp;ssl=1 406w\" sizes=\"(max-width: 640px) 100vw, 640px\" /\u003E\u003Cp\u003EThe real breakthrough this week may not be another frontier model&#8230; It may be something even more valuable: A shared commitment that artificial intelligence should become not only humanity&#8217;s greatest invention — but one of its greatest acts of international cooperation. Nearly every government on Earth has arrived in Geneva to answer one question that [&#8230;]\u003C/p\u003E\n\u003Cp\u003EThe post \u003Ca href=\"https://www.premiumtimesng.com/opinion/893753-the-fever-in-geneva-the-worlds-biggest-ai-battle-isnt-happening-in-silicon-valley-by-chaste-inegbedion.html\"\u003EThe fever in Geneva: The world&#8217;s biggest AI battle isn&#8217;t happening in Silicon Valley, By Chaste Inegbedion\u003C/a\u003E appeared first on \u003Ca href=\"https://www.premiumtimesng.com\"\u003EPremium Times Nigeria\u003C/a\u003E.\u003C/p\u003E\n",
+          "summary": "The real breakthrough this week may not be another frontier model&#8230; It may be something even more valuable: A shared commitment that artificial intelligence should become not only humanity&#8217;...",
+          "url": "https://www.premiumtimesng.com/opinion/893753-the-fever-in-geneva-the-worlds-biggest-ai-battle-isnt-happening-in-silicon-valley-by-chaste-inegbedion.html",
+          "sourceId": "premium-times",
+          "sourceName": "Premium Times",
+          "sourceUrl": "https://www.premiumtimesng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 11:45:38 +0000",
+          "credibilityScore": 0.9,
+          "keywords": [
+            "com",
+            "chaste",
+            "inegbedion",
+            "https",
+            "premiumtimesng",
+            "geneva",
+            "640",
+            "2026",
+            "8217",
+            "fever"
+          ],
+          "entities": [
+            "Geneva",
+            "Silicon",
+            "Valley",
+            "Chaste",
+            "Inegbedion"
+          ],
+          "hash": "xhwlgu"
+        },
+        {
+          "id": "rss-punch-w5tz19",
+          "title": "Rainstorm destroys 20 houses, farmlands in Plateau community",
+          "content": "\n\nA heavy rainstorm in Plateau State&#8217;s Nghassi community destroyed over 20 houses and farmlands, displacing residents. Urgent humanitarian support is needed\n\nRead More: https://punchng.com/rainstorm-destroys-20-houses-farmlands-in-plateau-community/",
+          "summary": "A heavy rainstorm in Plateau State&#8217;s Nghassi community destroyed over 20 houses and farmlands, displacing residents. Urgent humanitarian support is needed\n\nRead More: https://punchng.com/rainsto...",
+          "url": "https://punchng.com/rainstorm-destroys-20-houses-farmlands-in-plateau-community/?utm_source=rss.punchng.com&utm_medium=web",
+          "sourceId": "punch",
+          "sourceName": "Punch",
+          "sourceUrl": "https://punchng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:48:56 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "rainstorm",
+            "houses",
+            "farmlands",
+            "plateau",
+            "community",
+            "destroys",
+            "8217",
+            "heavy",
+            "state",
+            "nghassi"
+          ],
+          "entities": [
+            "Rainstorm",
+            "Plateau",
+            "State",
+            "Nghassi",
+            "Urgent"
+          ],
+          "hash": "w5tz19"
+        },
+        {
+          "id": "rss-punch-w1is8g",
+          "title": "Fulham appoint Arbeloa as Silva’s successor",
+          "content": "\n\nFulham FC announces Álvaro Arbeloa as their new manager on a three-year deal, succeeding Marco Silva. Learn about Arbeloa&#8217;s vision and plans for the club.\n\nRead More: https://punchng.com/fulham-appoint-arbeloa-as-silvas-successor/",
+          "summary": "Fulham FC announces Álvaro Arbeloa as their new manager on a three-year deal, succeeding Marco Silva. Learn about Arbeloa&#8217;s vision and plans for the club.\n\nRead More: https://punchng.com/fulham-...",
+          "url": "https://punchng.com/fulham-appoint-arbeloa-as-silvas-successor/?utm_source=rss.punchng.com&utm_medium=web",
+          "sourceId": "punch",
+          "sourceName": "Punch",
+          "sourceUrl": "https://punchng.com",
+          "category": "news",
+          "country": "NG",
+          "publishedAt": "Wed, 08 Jul 2026 12:42:45 +0000",
+          "credibilityScore": 0.85,
+          "keywords": [
+            "arbeloa",
+            "fulham",
+            "appoint",
+            "silva",
+            "successor",
+            "8217",
+            "announces",
+            "lvaro",
+            "manager",
+            "three"
+          ],
+          "entities": [
+            "Fulham",
+            "Arbeloa",
+            "Silva",
+            "Marco",
+            "Learn"
+          ],
+          "hash": "w1is8g"
+        }
+      ]
+    }
+  ],
+  "total": 20,
+  "timestamp": "2026-07-08T13:13:32.721Z"
+}

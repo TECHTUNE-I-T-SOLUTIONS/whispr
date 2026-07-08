@@ -30,16 +30,35 @@ export default function PersonalizedRecommendations({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userId) {
-      fetchRecommendations();
-    }
-  }, [userId, contentType, limit]);
+    // Fetch RSS trending topics even without userId (public content)
+    fetchRecommendations();
+  }, [contentType, limit]);
 
   const fetchRecommendations = async () => {
     setLoading(true);
     setError(null);
 
     try {
+      // Try to get trending topics from RSS first
+      const trendingResponse = await fetch(`/api/rss/trending?limit=${limit}`);
+      if (trendingResponse.ok) {
+        const trendingData = await trendingResponse.json();
+        
+        // Convert trending topics to recommendation format
+        const trendingRecommendations = trendingData.topics.map((topic: any, idx: number) => ({
+          id: topic.id,
+          title: topic.topic,
+          type: 'trending',
+          url: topic.sampleArticles[0]?.url,
+          score: Math.round(topic.trendScore * 100),
+          reason: `${topic.frequency} mentions across ${topic.uniqueSources} sources`,
+        }));
+
+        setRecommendations(trendingRecommendations);
+        return;
+      }
+
+      // Fallback to AI recommendations if RSS fails
       const params = new URLSearchParams();
       if (userId) params.append('userId', userId);
       if (contentType) params.append('contentType', contentType);
@@ -78,16 +97,6 @@ export default function PersonalizedRecommendations({
     }
   };
 
-  if (!userId) {
-    return (
-      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-6">
-        <div className="text-center text-gray-500 dark:text-gray-400">
-          <Sparkles className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-          <p>Sign in to get personalized recommendations</p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

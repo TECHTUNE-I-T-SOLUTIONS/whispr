@@ -2,8 +2,12 @@ import React, { Suspense } from "react"
 import { PoemsHero } from "@/components/poems-hero"
 import { PoemsList } from "@/components/poems-list"
 import { createSupabaseServer } from "@/lib/supabase-server"
-import { metadata } from "./metadata"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
+
+export const metadata = {
+  title: "Poems - Whispr",
+  description: "Browse and read poems on Whispr",
+}
 
 export const revalidate = 60
 
