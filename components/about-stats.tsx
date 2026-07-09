@@ -89,7 +89,7 @@ export function AboutStats() {
     <section className="w-full py-16 md:py-24 px-4">
         {/* Creator Journey */}
       <div className="max-w-full mx-auto">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-auto mx-auto">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -132,7 +132,7 @@ export function AboutStats() {
 
 
         {/* Platform Stats */}
-        <div className="max-w-6xl mx-auto mb-20">
+        <div className="max-w-auto mx-auto mb-2 mt-20">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}

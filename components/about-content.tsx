@@ -101,7 +101,7 @@ export function AboutContent() {
     <section className="w-full py-16 md:py-24 px-4">
       <div className="max-w-full mx-auto">
         {/* Core Pillars */}
-        <div className="max-w-6xl mx-auto space-y-12 mb-16">
+        <div className="max-w-auto mx-auto space-y-12 mb-16">
           <motion.div 
             className="text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -145,7 +145,7 @@ export function AboutContent() {
         </div>
 
         {/* Core Features Section */}
-        <div className="max-w-6xl mx-auto mb-16">
+        <div className="max-w-auto mx-auto mb-16">
           <motion.div 
             className="mb-10 text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -189,7 +189,7 @@ export function AboutContent() {
         </div>
 
         {/* Our Philosophy */}
-        <div className="max-w-6xl mx-auto mb-16">
+        <div className="max-w-auto mx-auto mb-16">
           <motion.div 
             className="mb-10 text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -229,7 +229,7 @@ export function AboutContent() {
         </div>
 
         {/* For Everyone */}
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-auto mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

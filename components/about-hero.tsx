@@ -22,7 +22,7 @@ export function AboutHero() {
 
   return (
     <section className="w-full py-16 md:py-24 px-4">
-      <div className="max-w-full mx-auto">
+      <div className="max-w-auto mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-4">
@@ -42,7 +42,7 @@ export function AboutHero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                Whispr: Where Your Voice Becomes Your Strength
+                Whispr: From silence to whispers, from whispers to words
               </motion.h1>
 
               <motion.p
@@ -125,7 +125,7 @@ export function AboutHero() {
                 </div>
                 <div className="text-center">
                   <h3 className="font-serif text-3xl font-bold mb-3">Whispr</h3>
-                  <p className="text-lg text-primary font-semibold mb-2">"Your Voice, Your Way"</p>
+                  <p className="text-lg text-primary font-semibold mb-2">"From silence to whispers, from whispers to words"</p>
                   <p className="text-muted-foreground text-sm">
                     Empower your creativity. Build your community. Own your success.
                   </p>
