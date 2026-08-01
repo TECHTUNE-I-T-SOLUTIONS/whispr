@@ -16,6 +16,7 @@ import {
   BookOpen,
   TrendingUp,
   Bell,
+  FileText,
 } from 'lucide-react';
 
 interface ChroniclesSettings {
@@ -446,6 +447,15 @@ export default function AdminChroniclesControl() {
             <div className="text-2xl mb-3">📈</div>
             <p className="font-semibold">Reports</p>
             <p className="text-sm text-muted-foreground">Generate and manage reports</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/admin/chronicles/posts')}
+            className="p-6 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg hover:border-indigo-500 transition-colors text-left"
+          >
+            <FileText className="w-6 h-6 text-indigo-600 mb-3" />
+            <p className="font-semibold">Posts Management</p>
+            <p className="text-sm text-muted-foreground">Manage all posts, chains & stories</p>
           </button>
         </div>
       </div>
