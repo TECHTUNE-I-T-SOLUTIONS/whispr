@@ -47,7 +47,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
           .from("chronicles_creators")
           .select("pen_name, display_name")
           .eq("user_id", user.id)
-          .single()
+          .single() as { data: any }
 
         const name = creator ? (creator.display_name || creator.pen_name) : (user.user_metadata?.full_name || user.email?.split("@")[0] || "Creative Reader")
         setCommenterName(name)

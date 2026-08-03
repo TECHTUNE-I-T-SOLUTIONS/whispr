@@ -168,7 +168,7 @@ export default function ChainEntryDetail({
           .from('chronicles_creators')
           .select('id')
           .eq('user_id', authSession.user.id)
-          .single();
+          .single() as { data: any };
 
         if (!creator) return;
 
