@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PenTool, FileText, ImageIcon, MessageCircle, BookOpen, Trash2, BarChart3, Plus, Sparkles, Bell, User } from "lucide-react"
+import { PenTool, FileText, ImageIcon, MessageCircle, BookOpen, Trash2, BarChart3, Plus, Sparkles, Bell, User, Film } from "lucide-react"
 
 export function QuickActions() {
   const actions = [
@@ -51,6 +51,15 @@ export function QuickActions() {
       color: "text-orange-600",
       bgColor: "bg-orange-50 dark:bg-orange-900/20",
       hoverColor: "hover:bg-orange-100 dark:hover:bg-orange-900/30",
+    },
+    {
+      title: "AI Video Studio",
+      description: "Turn a poem or story into a social teaser video",
+      icon: Film,
+      href: "/admin/ai-studio",
+      color: "text-fuchsia-600",
+      bgColor: "bg-fuchsia-50 dark:bg-fuchsia-900/20",
+      hoverColor: "hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900/30",
     },
     {
       title: "Comments",

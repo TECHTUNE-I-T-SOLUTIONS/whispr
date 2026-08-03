@@ -9,7 +9,7 @@ import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, PenTool, MessageSquareHeart, ArrowUp10,
-  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle
+  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle, Film
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -25,6 +25,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Posts", href: "/admin/posts", icon: FileEdit },
     { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
+    { name: "AI Video Studio", href: "/admin/ai-studio", icon: Film },
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Stories", href: "/admin/stories", icon: PenTool },
     { name: "Stories Metrics", href: "/admin/stories/metrics", icon: ArrowUp10 },

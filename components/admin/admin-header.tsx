@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, Settings, LogOut, Home, PenTool, MessageSquareHeart, MessageCircle,
-  FileText, BarChart3, Bell
+  FileText, BarChart3, Bell, Film
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LogoutModal } from "@/components/admin/logout-modal"
@@ -89,6 +89,7 @@ export function AdminHeader({ admin, onToggleMobileMenu, messagesUnread, notific
     { name: "Posts", href: "/admin/posts", icon: FileEdit },
     { name: "New Post", href: "/admin/posts/new", icon: FilePlus2 },
     { name: "Media", href: "/admin/media", icon: ImageIcon },
+    { name: "AI Video Studio", href: "/admin/ai-studio", icon: Film },
     { name: "Comments", href: "/admin/comments", icon: MessageSquareText },
     { name: "Spoken Words", href: "/admin/spoken-words", icon: PenTool },
     { name: "Whispr Wall", href: "/admin/whispr-wall", icon: MessageSquareHeart },

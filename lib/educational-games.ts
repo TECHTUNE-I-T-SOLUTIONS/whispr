@@ -345,13 +345,13 @@ export class EducationalGamesService {
       await supabase
         .from('chronicles_creator_game_progress')
         .insert({
-          creator_id,
-          game_id,
+          creator_id: creatorId,
+          game_id: gameId,
           best_score: score,
           total_score: score,
           best_streak: streak,
           attempts_count: 1,
-          completed_sessions,
+          completed_sessions: completedSessions,
           last_played_at: new Date().toISOString(),
         })
     }

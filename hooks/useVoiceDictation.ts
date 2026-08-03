@@ -13,7 +13,9 @@ export function useVoiceDictation(options: UseVoiceDictationOptions = {}) {
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  // SpeechRecognition is a browser-only Web Speech API type not present in the
+  // default TS lib; use `any` to stay portable across browsers.
+  const recognitionRef = useRef<any>(null)
 
   const startListening = useCallback(() => {
     if (typeof window === 'undefined') return
@@ -31,9 +33,9 @@ export function useVoiceDictation(options: UseVoiceDictationOptions = {}) {
 
     recognition.onstart = () => setIsListening(true)
     recognition.onend = () => setIsListening(false)
-    recognition.onerror = (e) => setError(`Error: ${e.error}`)
+    recognition.onerror = (e: any) => setError(`Error: ${e.error}`)
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       let interimTranscript = ''
       let finalTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {

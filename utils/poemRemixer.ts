@@ -26,8 +26,8 @@ function paraphraseLine(line: string): string {
   // Use compromise to replace nouns/adjectives with synonyms
   let doc = nlp(line);
   // Replace adjectives and nouns with synonyms if possible
-  doc.match('#Adjective').replaceWith((m) => m.synonyms()[0] || m.text());
-  doc.match('#Noun').replaceWith((m) => m.synonyms()[0] || m.text());
+  doc.match('#Adjective').replaceWith((m: any) => m.synonyms()[0] || m.text());
+  doc.match('#Noun').replaceWith((m: any) => m.synonyms()[0] || m.text());
   return doc.text();
 }
 
