@@ -18,7 +18,7 @@ import { useVoiceDictation } from '@/hooks/useVoiceDictation'
 
 type AdvancedFeaturesModalProps = {
   text: string
-  contentRef: React.RefObject<HTMLElement>
+  contentRef: React.RefObject<HTMLElement | null>
   onAutoScrollChange?: (enabled: boolean) => void
 }
 

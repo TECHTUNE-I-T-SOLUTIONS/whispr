@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { email, password, pen_name, bio, content_type, categories, profile_picture_url } = await req.json();
 
     // 1. Sign up user
-    const { data: authData, error: authError } = await supabase.auth.signUpWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });

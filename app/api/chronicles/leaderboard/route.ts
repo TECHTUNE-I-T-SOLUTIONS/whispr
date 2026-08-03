@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 // Update leaderboard scores (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createSupabaseServer();
     const { category = "weekly" } = await request.json();
 
     // Recalculate all leaderboard scores

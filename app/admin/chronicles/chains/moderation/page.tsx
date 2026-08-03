@@ -25,6 +25,7 @@ interface Post {
   likes_count: number;
   comments_count: number;
   published_at: string;
+  created_at?: string;
   creator: { id: string; pen_name: string; profile_image_url?: string };
   is_flagged?: boolean;
   flag_reason?: string;
@@ -52,6 +53,7 @@ interface ChainEntry {
   comments_count: number;
   sequence: number;
   published_at: string;
+  created_at?: string;
   chain: { id: string; title: string };
   creator: { id: string; pen_name: string; profile_image_url?: string };
   is_flagged?: boolean;
@@ -524,7 +526,7 @@ export default function ChainModerationPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Status</h3>
                   <select
-                    value={selectedItem.status}
+                    value={(selectedItem as Post | ChainEntry).status}
                     onChange={(e) => handleStatusChange(selectedItem.id, e.target.value, activeTab as any)}
                     className="w-full px-3 py-2 border rounded"
                   >
@@ -547,9 +549,9 @@ export default function ChainModerationPage() {
                   <p className="text-muted-foreground">Created</p>
                   <p className="font-medium">
                     {new Date(
-                      activeTab === 'chains' 
-                        ? (selectedItem as Chain).created_at 
-                        : (selectedItem as Post | ChainEntry).published_at || (selectedItem as Post | ChainEntry).created_at
+                      activeTab === 'chains'
+                        ? (selectedItem as Chain).created_at
+                        : (selectedItem as Post | ChainEntry).published_at || (selectedItem as Post | ChainEntry).created_at || Date.now()
                     ).toLocaleString()}
                   </p>
                 </div>

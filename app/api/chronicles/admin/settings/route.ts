@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
       registration_open: false,
       post_moderation_enabled: true,
       notification_digest_frequency: 'daily',
+      max_posts_per_day: 10,
+      min_content_length: 50,
     },
     content_policies: [],
     categories: [],

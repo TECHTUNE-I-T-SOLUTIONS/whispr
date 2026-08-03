@@ -226,7 +226,7 @@ async function generateContentWithRetry(
   }
 }
 
-async function creatorIdForUser(supabase: ReturnType<typeof createClient>, userId: string) {
+async function creatorIdForUser(supabase: any, userId: string) {
   const { data } = await supabase.from('chronicles_creators').select('id').eq('user_id', userId).maybeSingle();
   return data?.id ?? null;
 }

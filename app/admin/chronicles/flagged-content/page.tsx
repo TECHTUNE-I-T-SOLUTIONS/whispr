@@ -32,6 +32,8 @@ interface FlaggedContent {
   flagged_by: string;
   resolved_by?: string;
   resolved_at?: string;
+  action_taken?: string;
+  resolution_reason?: string;
   post?: {
     id: string;
     title: string;

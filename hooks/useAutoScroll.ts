@@ -6,7 +6,7 @@ type AutoScrollOptions = {
   direction?: 'down' | 'up' // scroll direction
 }
 
-export function useAutoScroll(containerRef: React.RefObject<HTMLElement>, options: AutoScrollOptions = {}) {
+export function useAutoScroll(containerRef: React.RefObject<HTMLElement | null>, options: AutoScrollOptions = {}) {
   const { enabled = false, speed = 30, direction = 'up' } = options
   const [isScrolling, setIsScrolling] = useState(false)
   const animationRef = useRef<number | null>(null)

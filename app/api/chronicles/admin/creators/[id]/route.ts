@@ -11,7 +11,7 @@ export async function PATCH(
     const body = await request.json();
 
     // Only allow updating these fields
-    const allowedFields = {
+    const allowedFields: Record<string, any> = {
       is_verified: body.is_verified,
       is_banned: body.is_banned,
     };

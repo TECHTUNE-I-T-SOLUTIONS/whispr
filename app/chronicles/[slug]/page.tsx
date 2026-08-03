@@ -21,6 +21,7 @@ interface Post {
   type: 'blog' | 'poem';
   category: string;
   tags: string[];
+  status?: string;
   coverImageUrl?: string;
   viewCount: number;
   likesCount: number;
@@ -43,8 +44,14 @@ interface Comment {
   id: string;
   content: string;
   createdAt: string;
+  created_at?: string;
   author: {
     name: string;
+    avatar_url?: string;
+  };
+  creator?: {
+    pen_name?: string;
+    profile_image_url?: string;
     avatar_url?: string;
   };
 }

@@ -15,7 +15,7 @@ interface Post {
   cover_image_url?: string;
   category?: string;
   tags?: string[];
-  status: string;
+  status?: string;
 }
 
 interface EditPostModalProps {

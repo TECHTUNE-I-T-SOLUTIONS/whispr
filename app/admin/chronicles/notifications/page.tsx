@@ -117,7 +117,7 @@ export default function AdminNotificationsPage() {
       setError('');
 
       // Fetch creator info for notifications
-      const creatorIds = new Set(
+      const creatorIds = new Set<string>(
         data.notifications
           .filter((n: AdminNotification) => n.creator_id)
           .map((n: AdminNotification) => n.creator_id)

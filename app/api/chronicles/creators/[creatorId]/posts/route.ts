@@ -105,7 +105,7 @@ export async function GET(
     });
 
     if (chroniclesData && chroniclesData.length > 0) {
-      console.log("✅ Got chronicles posts:", chroniclesData.map(p => ({
+      console.log("✅ Got chronicles posts:", chroniclesData.map((p: any) => ({
         id: p.id,
         title: p.title,
         creator_id: p.creator_id,
