@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
+import Link from "next/link"
+import { Lightbulb, ArrowRight } from "lucide-react"
 import { CommunityClient } from "./community-client"
+import { PinnedFeatureRequests } from "./pinned-feature-requests"
 
 export const metadata: Metadata = {
   title: "Community — Whispr",
@@ -9,7 +12,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-export default function CommunityPage() {
+export default async function CommunityPage() {
   return (
     <div className="relative min-h-[calc(100vh-4rem)] bg-background text-foreground">
       <div
@@ -30,6 +33,26 @@ export default function CommunityPage() {
             answered. If not, lodge a new one in seconds. No account required.
           </p>
         </header>
+
+        {/* Feature request cross-link */}
+        <Link
+          href="/feature-requests"
+          className="group mb-6 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 transition hover:border-primary/40 hover:bg-primary/10 sm:mb-8"
+        >
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Lightbulb className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-foreground">Have an idea for a new feature?</span>
+            <span className="block text-xs text-muted-foreground sm:text-sm">
+              Request features, suggest improvements and vote on ideas from the community.
+            </span>
+          </span>
+          <ArrowRight className="h-4 w-4 flex-shrink-0 text-primary transition group-hover:translate-x-0.5" />
+        </Link>
+
+        {/* Admin-pinned feature requests preview */}
+        <PinnedFeatureRequests />
 
         <CommunityClient />
       </div>

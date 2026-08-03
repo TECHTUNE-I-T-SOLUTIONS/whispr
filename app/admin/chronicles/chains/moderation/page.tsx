@@ -154,7 +154,7 @@ export default function ChainModerationPage() {
       const json = await res.json();
       
       if (json.flagged_posts && Array.isArray(json.flagged_posts)) {
-        const flaggedIds = new Set(
+        const flaggedIds = new Set<string>(
           json.flagged_posts
             .map((p: any) => p.post_id || p.chain_entry_post_id)
             .filter(Boolean)
@@ -510,8 +510,8 @@ export default function ChainModerationPage() {
             <div className="space-y-4">
               {(selectedItem as Post).cover_image_url && (
                 <div className="w-full h-64 rounded overflow-hidden relative">
-                  <SafeImage 
-                    src={(selectedItem as Post).cover_image_url} 
+                  <SafeImage
+                    src={(selectedItem as Post).cover_image_url || ''}
                     alt={selectedItem.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

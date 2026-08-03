@@ -5,8 +5,9 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Lightbulb, ArrowRight } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export function FeedbackWidget() {
@@ -61,6 +62,21 @@ export function FeedbackWidget() {
               <div className="text-sm text-muted-foreground mb-2">Tell us about your experience or report a bug.</div>
               <Textarea value={message} onChange={(e: any) => setMessage(e.target.value)} placeholder="Share your experience, bugs, or ideas..." className="mb-4" />
             </div>
+
+            <Link
+              href="/feature-requests"
+              onClick={() => setOpen(false)}
+              className="group mb-2 flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 transition hover:border-primary/40 hover:bg-primary/10"
+            >
+              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Lightbulb className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium text-foreground">Want to request a feature?</span>
+                <span className="block text-xs text-muted-foreground">Share ideas and suggestions on our feature request page.</span>
+              </span>
+              <ArrowRight className="h-4 w-4 flex-shrink-0 text-primary transition group-hover:translate-x-0.5" />
+            </Link>
 
             <DialogFooter>
               <div className="flex items-center justify-end gap-2 w-full">
