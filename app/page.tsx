@@ -9,6 +9,7 @@ import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
 import { AIIntroductorySection } from "@/components/ai-introductory-section"
 import { ControlSystemSection } from "@/components/control-system-section"
+import { CreatorBenefitsSection } from "@/components/creator-benefits-section"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, Wand2, Rocket, Search, Compass, Sparkles } from "lucide-react"
 import TrendingFeed from "@/components/ai/TrendingFeed"
@@ -38,6 +39,11 @@ export default function HomePage() {
 
       {/* Chronicles Feature Section */}
       <ChroniclesFeatureSection />
+
+      {/* Creator Benefits Section */}
+      <section className="container py-12">
+        <CreatorBenefitsSection />
+      </section>
 
       {/* Trending Feed */}
       <section className="container py-12">

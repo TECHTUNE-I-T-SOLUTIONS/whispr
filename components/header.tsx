@@ -11,7 +11,7 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useToast } from '@/hooks/use-toast'
-import { ChroniclesTeaserBanner } from "@/components/chronicles-teaser-banner"
+// import { ChroniclesTeaserBanner } from "@/components/chronicles-teaser-banner"
 import { XIcon } from '@/components/icons/XIcon'
 import dynamic from "next/dynamic"
 
@@ -173,7 +173,7 @@ export function Header() {
 
   return (
     <>
-      <ChroniclesTeaserBanner />
+      {/* <ChroniclesTeaserBanner /> */}
       <header className="sticky header-top-offset z-50 w-full max-w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Sponsored posts ticker */}
       <div className="w-full max-w-full bg-primary/5 border-b">

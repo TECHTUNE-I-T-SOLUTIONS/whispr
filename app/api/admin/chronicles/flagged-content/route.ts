@@ -226,11 +226,16 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Update the flag status
-    const updateData: any = {
-      status,
-      action_taken: action_taken || null,
-    };
+    // Update the flag status. NOTE: the table has a `resolution` text column —
+    // there is no `action_taken` column, so we fold the reason + free-text note
+    // into `resolution` (writing to a non-existent column is what previously
+    // made "Resolved" fail).
+    const updateData: any = { status };
+
+    const resolutionParts = [resolution_reason, action_taken].filter(Boolean);
+    if (resolutionParts.length) {
+      updateData.resolution = resolutionParts.join(' — ');
+    }
 
     if (['resolved', 'dismissed'].includes(status)) {
       updateData.resolved_by = admin.id;
@@ -247,9 +252,42 @@ export async function PUT(req: NextRequest) {
     if (updateError) {
       console.error('[FLAGGED-CONTENT] Update error:', updateError);
       return NextResponse.json(
-        { error: 'Failed to update flag status' },
+        { error: updateError.message || 'Failed to update flag status' },
         { status: 500 }
       );
+    }
+
+    // Resolving/dismissing a flag should bring the content back out of the
+    // `draft` limbo the flag trigger put it in. Republish it so it's publicly
+    // visible again — unless the resolution says the content was removed or the
+    // creator suspended, in which case keep it hidden.
+    if (['resolved', 'dismissed'].includes(status)) {
+      const keepHidden = resolution_reason === 'content_removed'
+        ? 'archived'
+        : resolution_reason === 'creator_suspended'
+          ? 'draft'
+          : null;
+      const restoredStatus = keepHidden ?? 'published';
+
+      if (flagRecord.post_id) {
+        const { error: postErr } = await supabase
+          .from('chronicles_posts')
+          .update({
+            status: restoredStatus,
+            ...(restoredStatus === 'published' ? { published_at: new Date().toISOString() } : {}),
+          })
+          .eq('id', flagRecord.post_id);
+        if (postErr) console.error('[FLAGGED-CONTENT] Failed to restore post status:', postErr);
+      } else if (flagRecord.chain_entry_post_id) {
+        const { error: entryErr } = await supabase
+          .from('chronicles_chain_entry_posts')
+          .update({
+            status: restoredStatus,
+            ...(restoredStatus === 'published' ? { published_at: new Date().toISOString() } : {}),
+          })
+          .eq('id', flagRecord.chain_entry_post_id);
+        if (entryErr) console.error('[FLAGGED-CONTENT] Failed to restore chain entry status:', entryErr);
+      }
     }
 
     // Get flagged content creator info to notify them
