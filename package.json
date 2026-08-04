@@ -44,7 +44,7 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "latest",
     "@tailwindcss/typography": "^0.5.16",
-    "@tanstack/react-table": "latest",
+    "@tanstack/react-table": "8.17.0",
     "ai-text-detector": "^1.0.8",
     "autoprefixer": "^10.4.20",
     "axios": "^1.18.1",

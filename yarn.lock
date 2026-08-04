@@ -2532,22 +2532,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-table@npm:latest":
-  version: 8.21.3
-  resolution: "@tanstack/react-table@npm:8.21.3"
+"@tanstack/react-table@npm:8.17.0":
+  version: 8.17.0
+  resolution: "@tanstack/react-table@npm:8.17.0"
   dependencies:
-    "@tanstack/table-core": "npm:8.21.3"
+    "@tanstack/table-core": "npm:8.16.0"
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: 10c0/85d1d0fcb690ecc011f68a5a61c96f82142e31a0270dcf9cbc699a6f36715b1653fe6ff1518302a6d08b7093351fc4cabefd055a7db3cd8ac01e068956b0f944
+  checksum: 10c0/8661f8ff27ce60ea5b701d916a1f116265a9c9b69cfbbf3d8aa1cab25b6f47c5eca94789faaea49fe2b4e49156fc07b813d829a15c1d533c0483b09002c8b469
   languageName: node
   linkType: hard
 
-"@tanstack/table-core@npm:8.21.3":
-  version: 8.21.3
-  resolution: "@tanstack/table-core@npm:8.21.3"
-  checksum: 10c0/40e3560e6d55e07cc047024aa7f83bd47a9323d21920d4adabba8071fd2d21230c48460b26cedf392588f8265b9edc133abb1b0d6d0adf4dae0970032900a8c9
+"@tanstack/table-core@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@tanstack/table-core@npm:8.16.0"
+  checksum: 10c0/fda4d47d40f61d1c226ecb47051afdcd49faa0b2c6ea2bd5ce138822794b8e0c4ca118aa03a15e1e2bc3882c57c901d5e90067a0c49e3e42a61267b004527434
   languageName: node
   linkType: hard
 
@@ -9623,7 +9623,7 @@ __metadata:
     "@supabase/ssr": "npm:^0.6.1"
     "@supabase/supabase-js": "npm:latest"
     "@tailwindcss/typography": "npm:^0.5.16"
-    "@tanstack/react-table": "npm:latest"
+    "@tanstack/react-table": "npm:8.17.0"
     "@types/caniuse-lite": "npm:^1"
     "@types/file-saver": "npm:^2.0.7"
     "@types/markdown-it": "npm:^14.1.2"
