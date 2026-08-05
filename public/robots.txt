@@ -16,4 +16,33 @@ Disallow: /chronicles/posts/
 Disallow: /chronicles/chains
 Disallow: /chronicles/chains/
 
+# AI Crawler Control
+# Creators retain copyright. AI training prohibited unless permission granted.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: YouBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
 Sitemap: https://whisprwords.com/sitemap.xml

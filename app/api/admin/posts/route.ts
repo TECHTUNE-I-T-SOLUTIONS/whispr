@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { requireAuthFromRequest } from "@/lib/auth-server"
 import { sendPushNotificationToSubscribers } from "@/lib/push-notifications"
+import { CopyrightService } from "@/lib/services/copyright.service"
 
 export async function GET(request: NextRequest) {
   try {
@@ -79,6 +80,31 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Database error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Assign article ID if post is published
+    if (status === "published") {
+      try {
+        await CopyrightService.assignArticleId(data.id, 'post')
+        
+        // Create content fingerprint
+        const canonicalContent = CopyrightService.createCanonicalContent(data)
+        await CopyrightService.createFingerprint(
+          data.id,
+          'post',
+          canonicalContent,
+          admin.id,
+          {
+            title: data.title,
+            excerpt: data.excerpt,
+            slug: data.slug,
+            article_id: data.article_id
+          }
+        )
+      } catch (copyrightError) {
+        console.error("Error creating copyright fingerprint:", copyrightError)
+        // Don't fail the post creation if copyright fails
+      }
     }
 
     // Send push notification if post is published

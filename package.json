@@ -65,6 +65,8 @@
     "framer-motion": "latest",
     "googleapis": "^173.0.0",
     "input-otp": "latest",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "keyword-extractor": "^0.0.28",
     "lucide-react": "^0.454.0",
     "markdown-it": "^14.1.0",

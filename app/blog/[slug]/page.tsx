@@ -10,11 +10,17 @@ import { ShareButtons } from "@/components/share-buttons"
 import { BlogClientPage } from "./blog-client-page"
 import { AppBanner } from "@/components/app-banner"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
+import { generateCopyrightMetadata, generateJsonLd } from "@/components/copyright-metadata"
+import { CopyrightFooter } from "@/components/copyright-footer"
+import { CopyrightService } from "@/lib/services/copyright.service"
 
 
 function buildJsonLd(post: any) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://whisprwords.com"
   const url = `${siteUrl}/blog/${post.slug || post.id}`
+  const author = post.admin?.full_name || post.admin?.username || "Whispr"
+  const publishedYear = new Date(post.published_at || post.created_at).getFullYear()
+  
   const base = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -22,19 +28,33 @@ function buildJsonLd(post: any) {
     description: post.seo_description || post.excerpt || "",
     url,
     datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.published_at || post.created_at,
     author: {
       "@type": "Person",
-      name: post.admin?.full_name || post.admin?.username || "Whispr",
+      name: author,
     },
+    copyrightHolder: {
+      "@type": "Person",
+      name: author,
+    },
+    copyrightYear: publishedYear,
+    publisher: {
+      "@type": "Organization",
+      name: "Whispr",
+      url: siteUrl,
+    },
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    identifier: post.article_id,
   }
 
   if (post.schema_type === "HowTo") {
     return {
       ...base,
       "@type": "HowTo",
-      url,
-      datePublished: post.published_at || post.created_at,
-      author: base.author,
     }
   }
 
@@ -42,9 +62,6 @@ function buildJsonLd(post: any) {
     return {
       ...base,
       "@type": "FAQPage",
-      url,
-      datePublished: post.published_at || post.created_at,
-      author: base.author,
     }
   }
 
@@ -98,6 +115,53 @@ async function getPost(slugOrId: string) {
 
   if (!post) return null
 
+  // Ensure article_id exists
+  if (!post.article_id) {
+    try {
+      post.article_id = await CopyrightService.assignArticleId(post.id, 'post')
+    } catch (error) {
+      console.error('Error assigning article ID:', error)
+    }
+  }
+
+  // Check if fingerprint exists, create if not
+  try {
+    const existingFingerprint = await supabase
+      .from('content_fingerprints')
+      .select('id')
+      .eq('article_id', post.id)
+      .single()
+
+    if (!existingFingerprint.data) {
+      // Create fingerprint for existing published content
+      const canonicalContent = CopyrightService.createCanonicalContent(post)
+      try {
+        await CopyrightService.createFingerprint(
+          post.id,
+          'post',
+          canonicalContent,
+          post.admin_id,
+          {
+            title: post.title,
+            excerpt: post.excerpt,
+            slug: post.slug,
+            article_id: post.article_id
+          }
+        )
+      } catch (fingerprintError: any) {
+        // If duplicate hash error, skip it (content already exists)
+        if (fingerprintError.code === '23505' || fingerprintError.message?.includes('duplicate key')) {
+          console.log('Fingerprint already exists for this content, skipping')
+        } else {
+          console.error('Error creating fingerprint:', fingerprintError)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error checking fingerprint:', error)
+    // Don't fail the page load if fingerprint check fails
+  }
+
   const jsonLd = buildJsonLd(post)
 
   return { post, jsonLd }
@@ -111,10 +175,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (!post || post.status !== "published") return {}
 
-    return {
-      title: `${post.title} - Whispr`,
-      description: post.seo_description || post.excerpt || "",
-    }
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://whisprwords.com"
+    const canonicalUrl = `${siteUrl}/blog/${post.slug || post.id}`
+    const author = post.admin?.full_name || post.admin?.username || "Whispr"
+
+    return generateCopyrightMetadata({
+      articleId: post.article_id,
+      author,
+      title: post.title,
+      publishedDate: post.published_at || post.created_at,
+      modifiedDate: post.updated_at,
+      canonicalUrl,
+      articleType: post.type === 'poem' ? 'poem' : 'blog'
+    })
   } catch {
     return {}
   }
@@ -215,6 +288,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* App Banner for Mobile Users */}
           <div className="border-t pt-6 mb-8">
             <AppBanner postId={post.id} postType="post" />
+          </div>
+
+          {/* Copyright Footer */}
+          <div className="border-t pt-6">
+            <CopyrightFooter
+              articleId={post.article_id}
+              author={post.admin?.full_name || post.admin?.username || "Anonymous"}
+              publishedDate={post.published_at || post.created_at}
+              canonicalUrl={`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/blog/${post.slug || post.id}`}
+              articleType="post"
+            />
           </div>
         </article>
         {/* Adsterra banners below main content */}

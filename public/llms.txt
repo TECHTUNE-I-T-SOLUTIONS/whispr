@@ -1,0 +1,36 @@
+# Whispr AI Crawler Policy
+# Last Updated: 2025-08-05
+
+## Copyright Notice
+All content published on Whispr is protected by copyright law. Content creators retain all copyright ownership to their work. Whispr receives a perpetual, non-exclusive license to host and distribute content on behalf of creators.
+
+## AI Training Policy
+AI crawlers and automated training systems are NOT permitted to:
+- Scrape content for AI training purposes
+- Use content to train machine learning models
+- Reproduce content for AI-generated responses
+- Store content in AI knowledge bases without explicit permission
+
+## Permissions
+AI systems may:
+- Index content for search purposes (standard web crawling)
+- Display snippets in search results (fair use)
+- Access content through official APIs with proper authorization
+
+## Verification
+All published content includes:
+- Unique Article ID (WHP-XXXXXXXX format)
+- SHA-256 content fingerprint
+- Version history tracking
+- Copyright metadata
+
+Content authenticity can be verified at: https://whisprwords.com/verify
+
+## Contact
+For permissions or inquiries, contact: support@whisprwords.com
+
+## Exceptions
+No exceptions without explicit written permission from content creators and Whispr.
+
+## Enforcement
+Whispr actively monitors for unauthorized scraping and reserves all rights to protect creator content.

@@ -60,10 +60,23 @@ export default function TermsOfServicePage() {
       icon: <Heart className="w-6 h-6" />,
       title: 'Content Ownership & Rights',
       content: [
-        'You retain all rights to any content you create and publish on Whispr. By publishing content, you grant Whispr a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and distribute your content for the purposes of operating and promoting the Service.',
+        'You retain all copyright ownership to any content you create and publish on Whispr. Whispr does not acquire ownership of your content.',
+        'By publishing content, you grant Whispr a perpetual, non-exclusive, royalty-free license to host, display, and distribute your content on the platform. This license allows Whispr to operate and promote the Service.',
+        'Every published content receives a unique Article ID (WHP-XXXXXXXX format) and SHA-256 content fingerprint to prove originality and establish publication timestamp.',
         'You represent and warrant that you own or have the necessary rights to all content you upload and that your content does not violate any third-party rights.',
         'Whispr does not claim ownership of user-generated content. However, Whispr reserves the right to remove any content that violates these terms or applicable laws.',
-        'You understand that your content may be viewed by other users and that Whispr is not responsible for how others use your published content.',
+        'Unauthorized reproduction or use of content published on Whispr may violate copyright law. Creators retain all rights to pursue legal action against copyright infringement.',
+      ],
+      subsections: [
+        {
+          title: 'Copyright Protection System',
+          content: [
+            'Whispr provides a comprehensive copyright protection system including content fingerprinting, version history tracking, and verification capabilities.',
+            'Content authenticity can be verified through the /verify page using Article IDs or SHA-256 hashes.',
+            'PDF certificates of authenticity are available for all published content, providing proof of original publication.',
+            'AI crawlers and automated training systems are prohibited from using Whispr content for AI training without explicit permission.',
+          ],
+        },
       ],
     },
     {

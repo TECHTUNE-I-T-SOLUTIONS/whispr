@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Share2, Loader2, AlertCircle, LogIn, X, Send, Edit2 } from 'lucide-react';
 import { AppBanner } from '@/components/app-banner';
+import { CopyrightFooter } from '@/components/copyright-footer';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
 
 const EditPostModal = dynamic(() => import('@/components/edit-post-modal'));
@@ -28,6 +29,7 @@ interface Post {
   commentsCount?: number;
   sharesCount?: number;
   publishedAt: string;
+  article_id?: string;
   flagged_for_review?: boolean;
   flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
   flagReason?: string;
@@ -828,6 +830,17 @@ export default function PublicPostPage() {
         {/* App Banner for Mobile Users */}
         <div className="mt-12">
           <AppBanner postId={post.id} postType="chronicles" />
+        </div>
+
+        {/* Copyright Footer */}
+        <div className="mt-8">
+          <CopyrightFooter
+            articleId={post.article_id}
+            author={post.author?.penName || post.author?.name || 'Anonymous'}
+            publishedDate={post.publishedAt}
+            canonicalUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/chronicles/${post.slug}`}
+            articleType="chronicles_post"
+          />
         </div>
 
         {/* Edit Post Modal */}

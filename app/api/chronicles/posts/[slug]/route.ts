@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server-client';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { CopyrightService } from '@/lib/services/copyright.service';
 
 export async function GET(
   request: NextRequest,
@@ -100,6 +101,55 @@ export async function GET(
       .from('chronicles_posts')
       .update({ views_count: (post.views_count || 0) + 1 })
       .eq('id', post.id);
+
+    // Ensure article_id exists for published posts
+    if (isPublished && !post.article_id) {
+      try {
+        post.article_id = await CopyrightService.assignArticleId(post.id, 'chronicles_post');
+      } catch (error) {
+        console.error('Error assigning article ID:', error);
+      }
+    }
+
+    // Check if fingerprint exists for published posts, create if not
+    if (isPublished) {
+      try {
+        const existingFingerprint = await supabase
+          .from('content_fingerprints')
+          .select('id')
+          .eq('article_id', post.id)
+          .single();
+
+        if (!existingFingerprint.data) {
+          // Create fingerprint for existing published content
+          const canonicalContent = CopyrightService.createCanonicalContent(post);
+          try {
+            await CopyrightService.createFingerprint(
+              post.id,
+              'chronicles_post',
+              canonicalContent,
+              post.creator_id,
+              {
+                title: post.title,
+                excerpt: post.excerpt,
+                slug: post.slug,
+                article_id: post.article_id
+              }
+            );
+          } catch (fingerprintError: any) {
+            // If duplicate hash error, skip it (content already exists)
+            if (fingerprintError.code === '23505' || fingerprintError.message?.includes('duplicate key')) {
+              console.log('Fingerprint already exists for this content, skipping');
+            } else {
+              console.error('Error creating fingerprint:', fingerprintError);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking fingerprint:', error);
+        // Don't fail the request if fingerprint check fails
+      }
+    }
 
     // Fetch flag status
     const { data: flaggedReview } = await supabase
