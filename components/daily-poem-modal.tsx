@@ -14,143 +14,6 @@ type Poem = {
 }
 
 // Fallback poems (used if JSON fails to load)
-const fallbackPoems: Poem[] = [
-  {
-    title: "What We Carry",
-    category: "Life",
-    content: `We carry mornings we couldn't name
-and nights that left their fingerprints on our ribs.
-We carry the quiet chores of becoming—
-how a small kindness can tilt a whole day,
-how grief returns like a tide that knows the shore.
-
-There are rooms we leave the light on for,
-conversations we only finish in our heads,
-and the simple miracle of breath meeting breath—
-someone asking, "How are you?" and waiting for the real answer.
-
-We are not unfinished. We are unfolding.
-We are not late. We are learning the clock of our own hearts.
-And if today all you carried was yourself
-from one moment into the next—
-that's still a kind of sun rising.`,
-  },
-  {
-    title: "Between Your Name and Mine",
-    category: "Relationships",
-    content: `We learned to talk in weather—the warm fronts,
-your laughter; the storm warning, my silence.
-Some evenings we were windows reflecting windows;
-some mornings we were a door that opened.
-
-There is a country between your name and mine
-where ordinary things become holy:
-the cup you set down, the minute that lingers,
-the hand that doesn't forget how to return.
-
-If love is a grammar, we are still syntaxing,
-still choosing the gentle conjunctions—
-and yet, and also, despite, still.
-Come sit with me in the soft grammar of us,
-where we keep discovering new ways to say home.`,
-  },
-  {
-    title: "The Ledger",
-    category: "Regrets",
-    content: `I kept a ledger of almosts:
-calls unsaid, doors unknocked, roads unwalked.
-It was a heavy book, and I kept it close,
-as if shame were a kind of passport.
-
-But one day I counted backwards—
-how every almost taught me a tenderness,
-how every no saved a soft portion of me
-for a truer yes I hadn't met yet.
-
-I do not forgive the past. I befriend it.
-We share a bench. We watch the river.
-When it asks if I would change anything,
-I say: only the distance I kept from my own heart.`,
-  },
-  {
-    title: "Study Break",
-    category: "School",
-    content: `Some nights the book is heavier than its pages,
-and the clock forgets mercy.
-You measure your worth in highlighters and margins,
-in the slim applause of checkmarks.
-
-Listen: your brain is not a machine—it is a meadow.
-It needs sky, and a minute with wind in it,
-and a friend who reminds you your name isn't a grade.
-
-Let the problem rest in its own ink.
-Let your shoulders remember what ease feels like.
-There is a kind of learning that happens
-only when you look up and briefly love the world again.`,
-  },
-  {
-    title: "When It Piles Up",
-    category: "Problems",
-    content: `It doesn't rain for days—it stacks.
-Plates in the sink of the soul, emails like hail.
-So many small futures asking to be answered.
-
-Start with a square inch of possible:
-one breath, a glass of water, a corner cleared.
-Call a friend and borrow their horizon.
-Let the list forgive you for being human.
-
-Remember: mountains are moved by knees and minutes,
-by the humble choreography of now.
-You do not have to fix your life.
-You only have to love one piece of it long enough to stay.`,
-  },
-  {
-    title: "Practice of Light",
-    category: "Positivity",
-    content: `This is not denial. This is discipline—
-to name the small lamps as they appear:
-steam rising from a cup, a bird insisting on morning,
-your own pulse counting you worthy.
-
-Hope is not a mood; it's a practice.
-Like watering plants that haven't bloomed yet,
-like saving a seat for someone you haven't met.
-Today, let your faith be ordinary and stubborn—
-the way the sun keeps showing up for windows.`,
-  },
-  {
-    title: "People I Have Been",
-    category: "People",
-    content: `I have been the loud room and the quiet chair,
-the last to leave and the first to worry.
-I have been both apology and echo,
-and I have learned to bless each version.
-
-If you meet me on a day I am small,
-know I am saving space for someone else inside me.
-If you meet me on a day I am bright,
-know you are seeing the light that others handed me.
-
-We are a relay of kindness, a hand-to-hand dawn.
-And even when we forget each other,
-we keep the sky lit for the next traveler.`,
-  },
-  {
-    title: "After the Storm",
-    category: "Healing",
-    content: `You don't have to hurry your mending.
-Even the shore negotiates with the sea.
-Pick up the pieces that know your name,
-leave the ones that belonged to the wave.
-
-One day, you will laugh and not flinch at the echo.
-One day, tenderness will knock and you will let it in.
-Until then, be a harbor to yourself—
-deep enough for rest, shallow enough for light.`,
-  },
-]
 
 function getDailyPoem(list: Poem[], today = new Date()): Poem {
   const start = new Date(today.getFullYear(), 0, 0)
@@ -166,7 +29,8 @@ export default function DailyPoemModal() {
   const [typed, setTyped] = useState("")
   const [done, setDone] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement | null>(null)
-  const [poems, setPoems] = useState<Poem[]>(fallbackPoems)
+  const [poems, setPoems] = useState<Poem[]>([])
+  const [loading, setLoading] = useState(true)
   const [offset, setOffset] = useState(0) // rotation within the day
   const [ambientOn, setAmbientOn] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -180,13 +44,18 @@ export default function DailyPoemModal() {
     let active = true
     ;(async () => {
       try {
-        const res = await fetch("/data/daiy-poems.json", { cache: "force-cache" })
+        const res = await fetch("/data/daiy-poems.json", { cache: "no-store" })
         if (res.ok) {
           const list = (await res.json()) as Poem[]
-          if (active && Array.isArray(list) && list.length > 0) setPoems(list)
+          if (active && Array.isArray(list) && list.length > 0) {
+            setPoems(list)
+          }
         }
       } catch {
-        // ignore and keep fallback
+        // If JSON fails, show error but don't use fallback
+        console.error("Failed to load poems from JSON")
+      } finally {
+        if (active) setLoading(false)
       }
     })()
     return () => {
@@ -195,6 +64,7 @@ export default function DailyPoemModal() {
   }, [])
 
   const poem = useMemo(() => {
+    if (poems.length === 0) return null
     // Weighted categories by weekday
     const day = new Date().getDay() // 0=Sun
     const weights: Record<number, string[]> = {
@@ -224,22 +94,23 @@ export default function DailyPoemModal() {
 
   // Decide whether to open on first load
   useEffect(() => {
+    if (loading) return
     try {
       const suppressed = localStorage.getItem(storageKey)
-      if (!suppressed) setOpen(true)
+      if (!suppressed && poem) setOpen(true)
       const savedOffset = localStorage.getItem(offsetKey)
       if (savedOffset) setOffset(parseInt(savedOffset, 10) || 0)
       const savedBg = localStorage.getItem(bgKey) as typeof bgMode | null
       if (savedBg === "river" || savedBg === "beach" || savedBg === "waves" || savedBg === "night" || savedBg === "lake" || savedBg === "none") setBgMode(savedBg)
     } catch {}
-  }, [storageKey, offsetKey])
+  }, [storageKey, offsetKey, loading, poem])
 
   // Typewriter effect with gentle pacing and auto-scroll; respect prefers-reduced-motion
   useEffect(() => {
-    if (!open) return
+    if (!open || !poem) return
     setTyped("")
     setDone(false)
-    const text = poem.content
+    const text = poem!.content
     let i = 0
     let cancelled = false
     const reduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -287,7 +158,7 @@ export default function DailyPoemModal() {
       cancelled = true
       clearTimeout(t)
     }
-  }, [open, poem.content])
+  }, [open, poem?.content])
 
   const dontShowAgainToday = () => {
     try {
@@ -334,10 +205,15 @@ export default function DailyPoemModal() {
     }
   }, [open, ambientOn])
 
+  // Don't render modal if still loading or no poem available
+  if (loading || !poem) {
+    return null
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl md:max-w-2xl p-4 overflow-hidden border-0 bg-secondary/30 shadow-2xl">
+        <DialogContent className="max-w-[95vw] w-[90vw] md:max-w-2xl md:w-auto p-3 md:p-4 overflow-hidden border-0 bg-secondary/30 shadow-2xl">
           <div className="relative rounded-lg overflow-hidden">
             {/* Water background layer */}
             <div aria-hidden className={`absolute inset-0 ${bgMode === 'none' ? '' : 'opacity-95'}`}>
@@ -367,45 +243,45 @@ export default function DailyPoemModal() {
             <div className="absolute -inset-[1px] rounded-lg bg-[conic-gradient(var(--tw-gradient-stops))] from-fuchsia-500 via-sky-500 to-violet-600 opacity-25 blur-[6px] animate-[spin_14s_linear_infinite]" />
           </div>
 
-          <div className="relative p-6 md:p-8 bg-transparent backdrop-blur-sm">
+          <div className="relative p-4 md:p-8 bg-transparent backdrop-blur-sm">
             <DialogHeader className="space-y-1">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs uppercase tracking-wider">
+                <Badge variant="outline" className="text-[10px] md:text-xs uppercase tracking-wider">
                   Today’s Whisper
                 </Badge>
-                <Badge variant="secondary" className="text-xs">{poem.category}</Badge>
+                <Badge variant="secondary" className="text-[10px] md:text-xs">{poem!.category}</Badge>
               </div>
-              <DialogTitle className="text-2xl md:text-3xl font-serif leading-tight">
-                {poem.title}
+              <DialogTitle className="text-xl md:text-3xl font-serif leading-tight">
+                {poem!.title}
               </DialogTitle>
               <DialogDescription className="sr-only">A daily poem to inspire reflection.</DialogDescription>
             </DialogHeader>
 
-            <div className="mt-4">
-              <ScrollArea ref={scrollAreaRef} className="h-64 md:h-80 rounded-md border bg-background/60">
-                <div className="p-4 md:p-6 font-mono text-[0.95rem] leading-7 whitespace-pre-wrap">
+            <div className="mt-3 md:mt-4">
+              <ScrollArea ref={scrollAreaRef} className="h-48 md:h-80 rounded-md border bg-background/60">
+                <div className="p-3 md:p-6 font-mono text-[0.85rem] md:text-[0.95rem] leading-6 md:leading-7 whitespace-pre-wrap">
                   {typed}
                   <span className="ml-0.5 inline-block h-5 align-[-2px] w-[2px] bg-foreground animate-[blink_1s_steps(2,start)_infinite]" />
                 </div>
               </ScrollArea>
             </div>
 
-            <div className="mt-6 flex flex-col gap-2 w-full">
+            <div className="mt-4 md:mt-6 flex flex-col gap-2 w-full">
               <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-2 order-2 sm:order-1 w-full">
                 <Button variant={ambientOn ? "default" : "outline"} onClick={() => setAmbientOn(v => !v)} className="w-full sm:w-auto">
-                  {ambientOn ? <Volume2 className="h-4 w-4 mr-2" /> : <VolumeX className="h-4 w-4 mr-2" />}Ambient sound
+                  {ambientOn ? <Volume2 className="h-4 w-4 mr-2" /> : <VolumeX className="h-4 w-4 mr-2" />}sound
                 </Button>
                 <Button variant="outline" onClick={seeAnother} className="w-full sm:w-auto">
                   <Shuffle className="h-4 w-4 mr-2" /> See another
                 </Button>
                 {/* Background mode selectors */}
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-1 w-full">
-                  <Button variant={bgMode === 'river' ? 'default' : 'outline'} onClick={() => changeBg('river')} className="w-full sm:w-auto text-sm px-3 py-2">River</Button>
+                  {/* <Button variant={bgMode === 'river' ? 'default' : 'outline'} onClick={() => changeBg('river')} className="w-full sm:w-auto text-sm px-3 py-2">River</Button>
                   <Button variant={bgMode === 'beach' ? 'default' : 'outline'} onClick={() => changeBg('beach')} className="w-full sm:w-auto text-sm px-3 py-2">Beach</Button>
                   <Button variant={bgMode === 'waves' ? 'default' : 'outline'} onClick={() => changeBg('waves')} className="w-full sm:w-auto text-sm px-3 py-2">Waves</Button>
                   <Button variant={bgMode === 'night' ? 'default' : 'outline'} onClick={() => changeBg('night')} className="w-full sm:w-auto text-sm px-3 py-2">Night Sea</Button>
                   <Button variant={bgMode === 'lake' ? 'default' : 'outline'} onClick={() => changeBg('lake')} className="w-full sm:w-auto text-sm px-3 py-2">Misty Lake</Button>
-                  <Button variant={bgMode === 'none' ? 'default' : 'outline'} onClick={() => changeBg('none')} className="w-full sm:w-auto text-sm px-3 py-2">None</Button>
+                  <Button variant={bgMode === 'none' ? 'default' : 'outline'} onClick={() => changeBg('none')} className="w-full sm:w-auto text-sm px-3 py-2">None</Button> */}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 order-1 sm:order-2 w-full">
