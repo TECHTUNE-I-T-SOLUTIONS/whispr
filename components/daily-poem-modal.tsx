@@ -42,11 +42,23 @@ export default function DailyPoemModal() {
     let active = true
     ;(async () => {
       try {
-        console.log("Loading poems from /data/daily-poems.json")
-        const res = await fetch("/data/daily-poems.json", { cache: "no-store" })
+        // Add timestamp to bust cache
+        const timestamp = Date.now()
+        console.log("Loading poems from /data/daily-poems.json with timestamp:", timestamp)
+        const res = await fetch(`/data/daily-poems.json?t=${timestamp}`, { cache: "no-store" })
         console.log("Fetch response:", res.ok, res.status)
         if (res.ok) {
-          const list = (await res.json()) as Poem[]
+          const data = await res.json()
+          console.log("Raw data type:", Array.isArray(data) ? 'array' : typeof data)
+          
+          // Handle both array format and object format with poems array
+          let list: Poem[] = []
+          if (Array.isArray(data)) {
+            list = data
+          } else if (data && Array.isArray(data.poems)) {
+            list = data.poems
+          }
+          
           console.log("Loaded poems count:", list.length)
           if (active && Array.isArray(list) && list.length > 0) {
             setPoems(list)
