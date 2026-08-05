@@ -13,8 +13,6 @@ type Poem = {
   content: string
 }
 
-// Fallback poems (used if JSON fails to load)
-
 function getDailyPoem(list: Poem[], today = new Date()): Poem {
   const start = new Date(today.getFullYear(), 0, 0)
   const diff = today.getTime() - start.getTime()
@@ -44,16 +42,24 @@ export default function DailyPoemModal() {
     let active = true
     ;(async () => {
       try {
-        const res = await fetch("/data/daiy-poems.json", { cache: "no-store" })
+        console.log("Loading poems from /data/daily-poems.json")
+        const res = await fetch("/data/daily-poems.json", { cache: "no-store" })
+        console.log("Fetch response:", res.ok, res.status)
         if (res.ok) {
           const list = (await res.json()) as Poem[]
+          console.log("Loaded poems count:", list.length)
           if (active && Array.isArray(list) && list.length > 0) {
             setPoems(list)
+            console.log("Poems loaded successfully")
+          } else {
+            console.error("Invalid poems data format")
           }
+        } else {
+          console.error("Failed to fetch poems:", res.status, res.statusText)
         }
-      } catch {
+      } catch (error) {
         // If JSON fails, show error but don't use fallback
-        console.error("Failed to load poems from JSON")
+        console.error("Failed to load poems from JSON:", error)
       } finally {
         if (active) setLoading(false)
       }
@@ -206,8 +212,20 @@ export default function DailyPoemModal() {
   }, [open, ambientOn])
 
   // Don't render modal if still loading or no poem available
-  if (loading || !poem) {
+  if (loading) {
     return null
+  }
+
+  if (!poem) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md text-center">
+          <p className="text-gray-700 dark:text-gray-300">
+            Unable to load daily poem. Please refresh the page.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
