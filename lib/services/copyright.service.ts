@@ -84,7 +84,7 @@ export class CopyrightService {
       .from('content_fingerprints')
       .select('id, article_id')
       .eq('sha256_hash', sha256Hash)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       // If the existing fingerprint is for the same article, return it
@@ -107,7 +107,7 @@ export class CopyrightService {
       .eq('article_id', articleId)
       .order('article_version', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     const nextVersion = (versionData?.article_version || 0) + 1;
 
@@ -475,12 +475,26 @@ export class CopyrightService {
               chroniclesPost.id,
               'chronicles_post',
               canonicalContent,
-              chroniclesPost.creator_id || null,
+              chroniclesPost.creator_id || 'system',
               { article_id: finalArticleId, title: chroniclesPost.title }
             )
             console.log('Created fingerprint for chronicles post:', chroniclesPost.id)
-          } catch (error) {
-            console.error('Failed to create fingerprint:', error)
+          } catch (error: any) {
+            console.error('Failed to create fingerprint for chronicles post:', error.message)
+            // If it's a duplicate error, try to fetch the existing fingerprint
+            if (error.message?.includes('duplicate') || error.code === '23505') {
+              const { data: existingFp } = await supabase
+                .from('content_fingerprints')
+                .select('*')
+                .eq('article_id', chroniclesPost.id)
+                .order('article_version', { ascending: false })
+                .limit(1)
+                .maybeSingle()
+              if (existingFp) {
+                fingerprint = existingFp
+                console.log('Using existing fingerprint for chronicles post:', chroniclesPost.id)
+              }
+            }
           }
         }
       }
@@ -498,14 +512,14 @@ export class CopyrightService {
         .from('posts')
         .select('title, slug, admin_id, admin:admin_id(full_name, username)')
         .eq('id', fingerprint.article_id)
-        .single()
+        .maybeSingle()
       article = data as any
     } else if (fingerprint.article_type === 'chronicles_post') {
       const { data } = await supabase
         .from('chronicles_posts')
-        .select('title, slug, creator_id, creator:creator_id(pen_name, username)')
+        .select('title, slug, creator_id, creator:chronicles_creators(pen_name, username)')
         .eq('id', fingerprint.article_id)
-        .single()
+        .maybeSingle()
       article = data as any
     }
 
