@@ -2742,6 +2742,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/nodemailer@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "@types/nodemailer@npm:8.0.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/4370ac478a6811faaa64fcf769556515c72b78c66961cde22be75bb975ce8a964cfbe5e7c0988a99250f3250faa34357c73958b019b3c63dd138ea3784442032
+  languageName: node
+  linkType: hard
+
 "@types/pako@npm:^2.0.3":
   version: 2.0.4
   resolution: "@types/pako@npm:2.0.4"
@@ -7366,6 +7375,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nodemailer@npm:^9.0.5":
+  version: 9.0.5
+  resolution: "nodemailer@npm:9.0.5"
+  checksum: 10c0/60f7a21497c98c0d275cd12c488af581ef6aee65db575026319ac249dcac210bdab20edf77fe3158176ed3910f70d8c46d89abcd74f57a7170302727e6d05ee3
+  languageName: node
+  linkType: hard
+
 "nopt@npm:^8.0.0":
   version: 8.1.0
   resolution: "nopt@npm:8.1.0"
@@ -9837,6 +9853,7 @@ __metadata:
     "@types/file-saver": "npm:^2.0.7"
     "@types/markdown-it": "npm:^14.1.2"
     "@types/node": "npm:^22"
+    "@types/nodemailer": "npm:^8.0.1"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@types/web-push": "npm:^3"
@@ -9870,6 +9887,7 @@ __metadata:
     next: "npm:^16.1.4"
     next-themes: "npm:latest"
     node-cron: "npm:^4.5.0"
+    nodemailer: "npm:^9.0.5"
     postcss: "npm:^8.5"
     react: "npm:^19.2.3"
     react-day-picker: "npm:latest"

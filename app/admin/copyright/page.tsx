@@ -293,7 +293,7 @@ export default function CopyrightAdminPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Created At</p>
-                    <p className="text-sm">{new Date(selectedFingerprint.created_at || '').toLocaleString()}</p>
+                    <p className="text-sm">{new Date(selectedFingerprint.created_by || '').toLocaleString()}</p>
                   </div>
                 </TabsContent>
               </Tabs>

@@ -33,13 +33,13 @@ export function generateCopyrightMetadata(props: CopyrightMetadataProps): Metada
     authors: [{ name: author }],
     creator: author,
     publisher: 'Whispr',
-    copyrightYear: publishedYear,
     other: {
       'article-id': articleId || '',
       'article-type': articleType,
       'canonical-url': canonicalUrl,
       'license': 'Perpetual, non-exclusive license to host and distribute',
       'copyright-holder': author,
+      'copyright-year': publishedYear.toString(),
     },
     openGraph: {
       title: `${title} - Whispr`,

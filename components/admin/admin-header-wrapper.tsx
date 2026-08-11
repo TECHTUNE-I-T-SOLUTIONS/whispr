@@ -9,7 +9,7 @@ import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, PenTool, MessageSquareHeart, ArrowUp10,
-  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle, Film
+  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle, Film, Mail
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -39,6 +39,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Push Subscribers", href: "/admin/push-subscribers", icon: User },
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
     { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
+    { name: "Email Testing", href: "/admin/email-testing", icon: Mail },
     { name: "Flagged Content", href: "/admin/chronicles/flagged-content", icon: ClipboardList },
     { name: "Error Logs", href: "/admin/error-logs", icon: AlertTriangle },
     // Ads Control Section

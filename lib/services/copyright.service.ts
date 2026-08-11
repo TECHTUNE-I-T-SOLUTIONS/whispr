@@ -241,23 +241,25 @@ export class CopyrightService {
     if (fingerprint.article_type === 'post') {
       const { data: post } = await supabase
         .from('posts')
-        .select('title, slug, admin_id, admin:admin_id(username, full_name)')
+        .select('title, slug, admin_id, admin!inner(username, full_name)')
         .eq('id', fingerprint.article_id)
         .maybeSingle();
-      
-      if (post) {
-        author = post.admin?.full_name || post.admin?.username || 'Unknown';
+
+      if (post && 'admin' in post) {
+        const adminData = post.admin as any;
+        author = adminData.full_name || adminData.username || 'Unknown';
         slug = post.slug;
       }
     } else if (fingerprint.article_type === 'chronicles_post') {
       const { data: post } = await supabase
         .from('chronicles_posts')
-        .select('title, slug, creator_id, creator:creator_id(pen_name, username)')
+        .select('title, slug, creator_id, creator!inner(pen_name, username)')
         .eq('id', fingerprint.article_id)
         .maybeSingle();
-      
-      if (post) {
-        author = post.creator?.pen_name || post.creator?.username || 'Unknown';
+
+      if (post && 'creator' in post) {
+        const creatorData = post.creator as any;
+        author = creatorData.pen_name || creatorData.username || 'Unknown';
         slug = post.slug;
       }
     }
@@ -272,14 +274,21 @@ export class CopyrightService {
     const articleType = fingerprint.article_type === 'post' ? 'blog' : 'chronicles';
     const originalUrl = slug ? `/${articleType}/${slug}` : null;
 
+    // Transform allVersions to match expected type
+    const transformedVersions = (allVersions || []).map((v: any) => ({
+      version: v.article_version,
+      sha256_hash: v.sha256_hash,
+      published_at: v.published_at
+    }));
+
     return {
       exists: true,
       author,
       published_date: fingerprint.published_at,
       current_version: fingerprint.article_version,
       original_url: originalUrl || undefined,
-      all_versions: allVersions || [],
-      hash_history: allVersions || []
+      all_versions: transformedVersions,
+      hash_history: transformedVersions
     };
   }
 
@@ -430,19 +439,19 @@ export class CopyrightService {
         .select('title, slug, admin_id, admin:admin_id(full_name, username)')
         .eq('id', fingerprint.article_id)
         .single()
-      article = data
+      article = data as any
     } else if (fingerprint.article_type === 'chronicles_post') {
       const { data } = await supabase
         .from('chronicles_posts')
         .select('title, slug, creator_id, creator:creator_id(pen_name, username)')
         .eq('id', fingerprint.article_id)
         .single()
-      article = data
+      article = data as any
     }
 
-    const author = fingerprint.article_type === 'post' 
-      ? article?.admin?.full_name || article?.admin?.username || 'Unknown'
-      : article?.creator?.pen_name || article?.creator?.username || 'Unknown'
+    const author = fingerprint.article_type === 'post'
+      ? (article as any)?.admin?.full_name || (article as any)?.admin?.username || 'Unknown'
+      : (article as any)?.creator?.pen_name || (article as any)?.creator?.username || 'Unknown'
 
     const slug = article?.slug
     const articleType = fingerprint.article_type === 'post' ? 'blog' : 'chronicles'
