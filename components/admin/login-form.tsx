@@ -72,7 +72,7 @@ export function LoginForm() {
       const data = await response.json()
 
       if (response.ok && data.success) {
-        console.log("Login successful, refreshing session...")
+        console.log("Login successful, waiting for cookies to set...")
         toast({
           variant: "success",
           title: "Welcome back! 🎉",
@@ -82,9 +82,14 @@ export function LoginForm() {
         // Show dashboard loader
         setShowDashboardLoader(true)
 
+        // Wait for cookies to be properly set before refreshing session
+        // This ensures the browser has time to process the Set-Cookie headers
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        console.log("Refreshing session after cookie delay...")
         // Refresh session and use the boolean result it returns to avoid
         // relying on a possibly-stale `isAuthenticated` closure value.
-        const authenticated = await refreshSession({ timeoutMs: 5000 })
+        const authenticated = await refreshSession({ timeoutMs: 10000 })
         console.log("Authentication result from refreshSession:", authenticated)
 
         if (authenticated) {
@@ -92,11 +97,24 @@ export function LoginForm() {
           // Keep loader visible for a moment before redirecting
           setTimeout(() => {
             router.push("/admin/dashboard")
-          }, 2000)
+          }, 1500)
         } else {
-          console.log("Authentication not confirmed, staying on login page")
-          setShowDashboardLoader(false)
-          setError("Session not established. Please try logging in again.")
+          console.log("Authentication not confirmed, retrying session check...")
+          // Retry once more with a longer delay
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          const retryAuthenticated = await refreshSession({ timeoutMs: 10000 })
+          console.log("Retry authentication result:", retryAuthenticated)
+
+          if (retryAuthenticated) {
+            console.log("Retry authentication confirmed, navigating to dashboard")
+            setTimeout(() => {
+              router.push("/admin/dashboard")
+            }, 1500)
+          } else {
+            console.log("Authentication failed after retry, staying on login page")
+            setShowDashboardLoader(false)
+            setError("Session not established. Please try logging in again.")
+          }
         }
       } else {
         setError(data.error || "Login failed")
