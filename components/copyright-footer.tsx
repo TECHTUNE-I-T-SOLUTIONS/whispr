@@ -12,7 +12,7 @@ interface CopyrightFooterProps {
   author: string
   publishedDate: string
   canonicalUrl: string
-  articleType?: 'post' | 'chronicles_post' | 'chronicles_chain_entry'
+  articleType?: 'post' | 'chronicles_post' | 'chronicles_chain_entry' | 'story'
 }
 
 export function CopyrightFooter({

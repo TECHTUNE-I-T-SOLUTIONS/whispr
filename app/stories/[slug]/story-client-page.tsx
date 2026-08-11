@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Heart, BookOpen, MessageSquare, Share2, Calendar, Eye, Send, Play, Copy, Mail, HelpCircle } from "lucide-react"
 import { XIcon } from '@/components/icons/XIcon';
+import { CopyrightFooter } from "@/components/copyright-footer"
 
 interface StoryClientPageProps {
   story: any
@@ -423,6 +424,17 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
             </div>
           )}
         </Card>
+
+        {/* Copyright Footer */}
+        <div className="mt-8">
+          <CopyrightFooter
+            articleId={story.id}
+            author={story.author_name || 'Whispr'}
+            publishedDate={story.published_at || story.created_at}
+            canonicalUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/stories/${story.slug}`}
+            articleType="story"
+          />
+        </div>
       </div>
     </div>
   )

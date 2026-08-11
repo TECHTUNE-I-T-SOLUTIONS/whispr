@@ -10,7 +10,7 @@ interface CopyrightMetadataProps {
   publishedDate: string
   modifiedDate?: string
   canonicalUrl: string
-  articleType?: 'blog' | 'chronicles' | 'poem'
+  articleType?: 'blog' | 'chronicles' | 'poem' | 'story'
 }
 
 export function generateCopyrightMetadata(props: CopyrightMetadataProps): Metadata {
@@ -76,7 +76,7 @@ export function generateJsonLd(props: CopyrightMetadataProps) {
 
   const baseJsonLd = {
     '@context': 'https://schema.org',
-    '@type': articleType === 'poem' ? 'CreativeWork' : 'Article',
+    '@type': articleType === 'poem' || articleType === 'story' ? 'CreativeWork' : 'Article',
     headline: title,
     author: {
       '@type': 'Person',
