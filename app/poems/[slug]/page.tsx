@@ -2,6 +2,7 @@ import notFound from "./not-found"
 import PoemClientPage from "./PoemClientPage"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { markdownToHtml } from "@/lib/utils"
+import { generateCopyrightMetadata, generateJsonLd } from "@/components/copyright-metadata"
 
 interface PoemPageProps {
   params: Promise<{
@@ -11,11 +12,18 @@ interface PoemPageProps {
 
 async function getPoem(slugOrId: string) {
   const supabase = createSupabaseServer()
-  
-  // 1. Try fetching by slug
+
+  // 1. Try fetching by slug with admin information
   let { data: poem } = await supabase
     .from("posts")
-    .select("*")
+    .select(`
+      *,
+      admin:admin_id (
+        id,
+        username,
+        full_name
+      )
+    `)
     .eq("slug", slugOrId)
     .eq("type", "poem")
     .eq("status", "published")
@@ -27,7 +35,14 @@ async function getPoem(slugOrId: string) {
     if (isUuid) {
       const { data } = await supabase
         .from("posts")
-        .select("*")
+        .select(`
+          *,
+          admin:admin_id (
+            id,
+            username,
+            full_name
+          )
+        `)
         .eq("id", slugOrId)
         .eq("type", "poem")
         .eq("status", "published")
@@ -49,24 +64,21 @@ export async function generateMetadata({ params }: PoemPageProps) {
     }
   }
 
-  return {
-    title: `${poem.title} - Whispr | Whispr's Poetry`,
-    description: poem.excerpt || poem.content.substring(0, 160),
-    openGraph: {
-      title: poem.title,
-      description: poem.excerpt || poem.content.substring(0, 160),
-      images: poem.featured_image ? [poem.featured_image] : [],
-      type: "article",
-      publishedTime: poem.created_at,
-      authors: ["Whispr"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: poem.title,
-      description: poem.excerpt || poem.content.substring(0, 160),
-      images: poem.featured_image ? [poem.featured_image] : [],
-    },
-  }
+  // Determine author from admin information
+  const author = poem.admin?.full_name || poem.admin?.username || 'Whispr'
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/poems/${poem.slug || poem.id}`
+  const publishedDate = poem.created_at
+  const modifiedDate = poem.updated_at
+
+  return generateCopyrightMetadata({
+    articleId: poem.id,
+    author,
+    title: poem.title,
+    publishedDate,
+    modifiedDate,
+    canonicalUrl,
+    articleType: 'poem',
+  })
 }
 
 export default async function PoemPage({ params }: PoemPageProps) {
@@ -80,6 +92,27 @@ export default async function PoemPage({ params }: PoemPageProps) {
   // Convert poem.content (Markdown) to HTML
   const htmlContent = await markdownToHtml(poem.content || "")
 
+  // Determine author for JSON-LD
+  const author = poem.admin?.full_name || poem.admin?.username || 'Whispr'
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/poems/${poem.slug || poem.id}`
+  const jsonLd = generateJsonLd({
+    articleId: poem.id,
+    author,
+    title: poem.title,
+    publishedDate: poem.created_at,
+    modifiedDate: poem.updated_at,
+    canonicalUrl,
+    articleType: 'poem',
+  })
+
   // Pass HTML content to client page
-  return <PoemClientPage poem={{ ...poem, content: htmlContent }} />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
+      <PoemClientPage poem={{ ...poem, content: htmlContent }} />
+    </>
+  )
 }

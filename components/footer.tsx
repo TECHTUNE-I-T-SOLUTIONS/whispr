@@ -100,6 +100,18 @@ export function Footer() {
             <Link href="/community" className="text-sm hover:text-primary transition-colors font-semibold text-[#911A1B] dark:text-red-100 dark:hover:text-red-500">
               Community
             </Link>
+            <ul className="space-y-2 text-sm text-muted-foreground pt-2">
+              <li>
+                <Link href="/chronicles" className="hover:text-primary transition-colors">
+                  Chronicles
+                </Link>
+              </li>
+              <li>
+                <Link href="/feature-request" className="hover:text-primary transition-colors">
+                  Feature Request
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Legal */}

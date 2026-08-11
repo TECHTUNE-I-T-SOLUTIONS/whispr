@@ -12,6 +12,7 @@ import { SafeImage } from "@/components/SafeImage"
 import { MediaPlayer } from "@/components/media-player"
 import AdvancedFeaturesModal from "@/components/advanced-features-modal"
 import { AppBanner } from "@/components/app-banner"
+import { CopyrightFooter } from "@/components/copyright-footer"
 
 interface PoemClientPageProps {
   poem: any
@@ -159,6 +160,17 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
           {/* App Banner for Mobile Users */}
           <div className="mt-12">
             <AppBanner postId={poem.id} postType="post" />
+          </div>
+
+          {/* Copyright Footer */}
+          <div className="mt-8">
+            <CopyrightFooter
+              articleId={poem.id}
+              author={poem.admin?.full_name || poem.admin?.username || 'Whispr'}
+              publishedDate={poem.created_at}
+              canonicalUrl={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/poems/${poem.slug || poem.id}`}
+              articleType="post"
+            />
           </div>
         </div>
       </div>

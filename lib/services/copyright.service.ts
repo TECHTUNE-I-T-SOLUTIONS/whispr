@@ -411,7 +411,7 @@ export class CopyrightService {
         .eq('metadata->>article_id', articleId)
         .order('article_version', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       fingerprint = data
     } else {
@@ -422,12 +422,72 @@ export class CopyrightService {
         .eq('article_id', articleId)
         .order('article_version', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       fingerprint = data
     }
 
+    // If no fingerprint exists, try to create one from the article
     if (!fingerprint) {
+      console.log('No fingerprint found, attempting to create one for article:', articleId)
+
+      // Try to find the article in posts table
+      const { data: post } = await supabase
+        .from('posts')
+        .select('id, title, slug, content, excerpt, admin_id, created_at, updated_at, article_id, type')
+        .eq('id', articleId)
+        .maybeSingle()
+
+      if (post) {
+        // Assign article_id if not exists
+        const finalArticleId = post.article_id || await this.assignArticleId(post.id, 'post')
+
+        // Create canonical content and fingerprint
+        const canonicalContent = this.createCanonicalContent(post)
+        try {
+          fingerprint = await this.createFingerprint(
+            post.id,
+            'post',
+            canonicalContent,
+            post.admin_id || null,
+            { article_id: finalArticleId, title: post.title }
+          )
+          console.log('Created fingerprint for post:', post.id)
+        } catch (error) {
+          console.error('Failed to create fingerprint:', error)
+        }
+      } else {
+        // Try chronicles_posts
+        const { data: chroniclesPost } = await supabase
+          .from('chronicles_posts')
+          .select('id, title, slug, content, excerpt, creator_id, created_at, updated_at, article_id')
+          .eq('id', articleId)
+          .maybeSingle()
+
+        if (chroniclesPost) {
+          // Assign article_id if not exists
+          const finalArticleId = chroniclesPost.article_id || await this.assignArticleId(chroniclesPost.id, 'chronicles_post')
+
+          // Create canonical content and fingerprint
+          const canonicalContent = this.createCanonicalContent(chroniclesPost)
+          try {
+            fingerprint = await this.createFingerprint(
+              chroniclesPost.id,
+              'chronicles_post',
+              canonicalContent,
+              chroniclesPost.creator_id || null,
+              { article_id: finalArticleId, title: chroniclesPost.title }
+            )
+            console.log('Created fingerprint for chronicles post:', chroniclesPost.id)
+          } catch (error) {
+            console.error('Failed to create fingerprint:', error)
+          }
+        }
+      }
+    }
+
+    if (!fingerprint) {
+      console.log('Still no fingerprint after attempting to create one')
       return null
     }
 
@@ -455,7 +515,7 @@ export class CopyrightService {
 
     const slug = article?.slug
     const articleType = fingerprint.article_type === 'post' ? 'blog' : 'chronicles'
-    const canonicalUrl = slug 
+    const canonicalUrl = slug
       ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whispr.app'}/${articleType}/${slug}`
       : ''
 
