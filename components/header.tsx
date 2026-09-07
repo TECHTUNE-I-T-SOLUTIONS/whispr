@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, LayoutDashboard, Share2, Twitter, Facebook, Copy, MessageSquare as WhatsAppIcon } from "lucide-react"
+import { Menu, X, LayoutDashboard, Share2, Twitter, Facebook, Copy, MessageSquare as WhatsAppIcon, ChevronDown, ChevronRight } from "lucide-react"
 import ReactDOM from 'react-dom'
 import { Button } from "@/components/ui/button"
 import { useState, useEffect, useRef } from "react"
@@ -33,6 +33,7 @@ export function Header() {
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
   const previewRef = useRef<HTMLDivElement | null>(null)
   const [includeTracking, setIncludeTracking] = useState(true)
+  const [expandedDropdowns, setExpandedDropdowns] = useState<Set<string>>(new Set())
 
   useEffect(() => setHasMounted(true), [])
 
@@ -73,15 +74,37 @@ export function Header() {
 
   const navigation = [
     { name: "Home", href: "/" },
-    { name: "Blog", href: "/blog" },
-    { name: "Poems", href: "/poems" },
-    { name: "Stories", href: "/stories" },
-    { name: "Spoken Words", href: "/media" },
+    { 
+      name: "Content", 
+      items: [
+        { name: "Blog", href: "/blog" },
+        { name: "Poems", href: "/poems" },
+        { name: "Stories", href: "/stories" },
+        { name: "Spoken Words", href: "/media" },
+        ...(chroniclesEnabled ? [{ name: "Chronicles", href: "/chronicles" }] : []),
+      ]
+    },
+    { 
+      name: "Community", 
+      items: [
+        { name: "whispr Wall", href: "/whispr-wall" },
+        { name: "Community", href: "/community" },
+      ]
+    },
     { name: "About", href: "/about" },
-    { name: "whispr Wall", href: "/whispr-wall" },
-    { name: "Community", href: "/community" },
-    ...(chroniclesEnabled ? [{ name: "Chronicles", href: "/chronicles" }] : []),
   ]
+
+  const toggleDropdown = (name: string) => {
+    setExpandedDropdowns(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(name)) {
+        newSet.delete(name)
+      } else {
+        newSet.add(name)
+      }
+      return newSet
+    })
+  }
 
   const logoSrc = hasMounted ? (theme === 'dark' ? '/lightlogo.png' : '/darklogo.png') : '/darklogo.png'
 
@@ -200,7 +223,29 @@ export function Header() {
 
         <nav className="hidden lg:flex items-center space-x-6">
           {navigation.map((item) => (
-            <Link key={item.name} href={item.href} className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary border-b-2 border-primary pb-1' : 'text-muted-foreground'}`}>{item.name}</Link>
+            item.items ? (
+              <div key={item.name} className="relative group">
+                <button className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground flex items-center gap-1">
+                  {item.name}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                <div className="absolute top-full left-0 mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="py-1">
+                    {item.items.map((subItem) => (
+                      <Link
+                        key={subItem.name}
+                        href={subItem.href}
+                        className={`block px-4 py-2 text-sm transition-colors hover:bg-muted ${pathname === subItem.href ? 'text-primary bg-muted/50' : 'text-muted-foreground'}`}
+                      >
+                        {subItem.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link key={item.name} href={item.href} className={`text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary border-b-2 border-primary pb-1' : 'text-muted-foreground'}`}>{item.name}</Link>
+            )
           ))}
         </nav>
 
@@ -276,9 +321,45 @@ export function Header() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="lg:hidden border-t bg-background/95 backdrop-blur">
           <nav className="container py-2 space-y-1">
             {navigation.map((item) => (
-              <Link key={item.name} href={item.href} className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`} onClick={() => setMobileMenuOpen(false)}>
-                {item.name}
-              </Link>
+              <div key={item.name}>
+                {item.items ? (
+                  <div>
+                    <button
+                      onClick={() => toggleDropdown(item.name)}
+                      className="w-full flex items-center justify-between py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+                    >
+                      {item.name}
+                      {expandedDropdowns.has(item.name) ? (
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      )}
+                    </button>
+                    {expandedDropdowns.has(item.name) && (
+                      <div className="pl-4 space-y-1 border-l-2 border-primary/20 ml-2">
+                        {item.items.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${pathname === subItem.href ? 'text-primary' : 'text-muted-foreground'}`}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`block py-2 text-sm font-medium transition-colors hover:text-primary ${pathname === item.href ? 'text-primary' : 'text-muted-foreground'}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )}
+              </div>
             ))}
             {chroniclesEnabled && (
               <div className="py-2 border-t mt-1 space-y-1">

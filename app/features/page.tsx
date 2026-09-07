@@ -32,7 +32,8 @@ import {
   Bell,
   Briefcase,
   Gamepad2,
-  Smartphone
+  Smartphone,
+  Book
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -49,6 +50,7 @@ interface Feature {
   fullDescription: string
   benefits: string[]
   isNew?: boolean
+  isComingSoon?: boolean
 }
 
 const features: Feature[] = [
@@ -358,6 +360,28 @@ const features: Feature[] = [
       'App-like experience',
       'Installable PWA'
     ]
+  },
+  {
+    id: 'books-publishing',
+    title: 'Books Publishing',
+    description: 'Premium e-book publishing platform for creators to publish, sell, and distribute their books',
+    icon: Book,
+    category: 'Creator Platform',
+    location: '/books (Coming Soon)',
+    fullDescription: 'A comprehensive e-book publishing platform that allows creators and admins to publish professional e-books with rich formatting. Authors can organize content into chapters, set pricing, offer free samples, and sell their work with secure payment processing. Readers can enjoy books online or download in PDF/EPUB formats.',
+    benefits: [
+      'Rich text editor with formatting',
+      'Chapter organization and management',
+      'Free sample reading for readers',
+      'Secure payment processing',
+      'PDF and EPUB download generation',
+      'Reading progress tracking',
+      'Reviews and ratings system',
+      'Cover image upload and management',
+      'Wishlist functionality',
+      'Copyright protection for all books'
+    ],
+    isComingSoon: true
   }
 ]
 
@@ -413,6 +437,9 @@ export default function FeaturesPage() {
                         {feature.isNew && (
                           <Badge className="bg-green-500 hover:bg-green-600">New</Badge>
                         )}
+                        {feature.isComingSoon && (
+                          <Badge className="bg-purple-500 hover:bg-purple-600">Coming Soon</Badge>
+                        )}
                       </div>
                     </div>
                     <CardTitle className="text-xl mt-4">{feature.title}</CardTitle>
@@ -441,6 +468,9 @@ export default function FeaturesPage() {
                     </div>
                     {feature.isNew && (
                       <Badge className="bg-green-500 hover:bg-green-600">New</Badge>
+                    )}
+                    {feature.isComingSoon && (
+                      <Badge className="bg-purple-500 hover:bg-purple-600">Coming Soon</Badge>
                     )}
                   </div>
                   <DialogTitle className="text-2xl">{feature.title}</DialogTitle>

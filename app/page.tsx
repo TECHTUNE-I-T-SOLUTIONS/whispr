@@ -39,19 +39,19 @@ export default function HomePage() {
 
       {/* Features Overview Section */}
       <section className="container py-12">
-        <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 p-8 shadow-sm backdrop-blur">
+        <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-primary to-primary/90 dark:from-primary-900 dark:to-primary-800 p-8 shadow-sm backdrop-blur">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+              <div className="inline-flex items-center gap-2 rounded-full bg-red-300 dark:bg-red-900/30 px-3 py-1 text-sm font-medium text-red-900 dark:text-red-400">
                 <LayoutGrid className="h-4 w-4" /> Platform Features
               </div>
               <h2 className="text-3xl font-serif font-bold">Explore all Whispr features</h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted dark:text-white">
                 Discover powerful tools for content creation, community engagement, analytics, and more. From copyright protection to AI-powered writing assistance.
               </p>
             </div>
 
-            <Button asChild className="w-fit bg-blue-600 hover:bg-blue-700">
+            <Button asChild className="w-fit bg-red-600 hover:bg-red-700">
               <Link href="/features">
                 View All Features <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
