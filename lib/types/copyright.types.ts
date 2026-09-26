@@ -45,6 +45,7 @@ export interface ArticleProof {
 
 export interface VerificationResult {
   exists: boolean;
+  title?: string;
   author?: string;
   published_date?: string;
   current_version?: number;

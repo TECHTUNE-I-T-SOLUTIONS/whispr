@@ -89,7 +89,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
 
   return (
     <div className="whispr-gradient min-h-screen pb-12 pt-6">
-      <div className="container max-w-7xl mx-auto px-4">
+      <div className="container max-w-auto mx-auto px-4">
         {/* Banner Section */}
         <div className="relative rounded-2xl overflow-hidden mb-10 bg-gradient-to-r from-purple-900/60 via-pink-900/40 to-blue-900/60 p-8 md:p-12 border border-purple-500/20 shadow-2xl backdrop-blur-md animate-fade-in">
           <div className="relative z-10 max-w-2xl">

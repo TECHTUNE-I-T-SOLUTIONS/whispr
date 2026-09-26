@@ -134,6 +134,7 @@ CREATE TABLE public.posts (
   updated_at timestamp with time zone DEFAULT now(),
   published_at timestamp with time zone,
   schema_type character varying DEFAULT 'None'::character varying CHECK (schema_type::text = ANY (ARRAY['None'::character varying, 'Article'::character varying, 'HowTo'::character varying, 'FAQPage'::character varying]::text[])),
+  article_id text UNIQUE,
   CONSTRAINT posts_pkey PRIMARY KEY (id),
   CONSTRAINT posts_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
 );
@@ -376,6 +377,10 @@ CREATE TABLE public.chronicles_creators (
   total_followers integer DEFAULT 0,
   display_name text,
   avatar_url text,
+  location text,
+  current_streak integer DEFAULT 0,
+  total_points integer DEFAULT 0,
+  categories ARRAY DEFAULT ARRAY[]::text[],
   CONSTRAINT chronicles_creators_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_creators_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
   CONSTRAINT chronicles_creators_program_id_fkey FOREIGN KEY (program_id) REFERENCES public.chronicles_programs(id)
@@ -401,6 +406,7 @@ CREATE TABLE public.chronicles_posts (
   scheduled_for timestamp with time zone,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  article_id text UNIQUE,
   CONSTRAINT chronicles_posts_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
 );
@@ -418,7 +424,7 @@ CREATE TABLE public.chronicles_engagement (
 CREATE TABLE public.chronicles_notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL,
-  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text, 'post_flagged_for_review'::text, 'chain_created'::text, 'chain_entry_added'::text, 'post_added_to_chain'::text])),
+  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'follower_left'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text, 'post_flagged_for_review'::text, 'chain_created'::text, 'chain_entry_added'::text, 'post_added_to_chain'::text])),
   title character varying NOT NULL,
   message text NOT NULL,
   related_post_id uuid,
@@ -1255,6 +1261,7 @@ CREATE TABLE public.chronicles_chain_entry_posts (
   published_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  article_id text UNIQUE,
   CONSTRAINT chronicles_chain_entry_posts_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_chain_entry_posts_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES public.chronicles_writing_chains(id),
   CONSTRAINT chronicles_chain_entry_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),

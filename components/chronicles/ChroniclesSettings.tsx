@@ -26,16 +26,33 @@ interface CreatorProfile {
   bio: string;
   profile_image_url?: string;
   email: string;
+  display_name?: string;
+  avatar_url?: string;
+  location?: string;
   content_type: 'blog' | 'poem' | 'both';
   preferred_categories: string[];
+  categories: string[];
   social_links: {
     twitter?: string;
     linkedin?: string;
     website?: string;
+    instagram?: string;
     [key: string]: string | undefined;
   };
   profile_visibility: 'public' | 'private';
   push_notifications_enabled: boolean;
+  email_digest_enabled: boolean;
+  email_on_engagement: boolean;
+}
+
+interface FeedPreferences {
+  id: string;
+  creator_id: string;
+  followed_categories: string[];
+  followed_creators: string[];
+  blocked_creators: string[];
+  feed_algorithm: 'trending' | 'chronological' | 'personalized';
+  show_adult_content: boolean;
 }
 
 export default function CreatorSettings() {
@@ -52,11 +69,26 @@ export default function CreatorSettings() {
     pen_name: '',
     bio: '',
     email: '',
+    display_name: '',
+    location: '',
     content_type: 'blog',
     preferred_categories: [],
+    categories: [],
     social_links: {},
     profile_visibility: 'public',
     push_notifications_enabled: false,
+    email_digest_enabled: true,
+    email_on_engagement: true,
+  });
+
+  const [feedPreferences, setFeedPreferences] = useState<FeedPreferences>({
+    id: '',
+    creator_id: '',
+    followed_categories: [],
+    followed_creators: [],
+    blocked_creators: [],
+    feed_algorithm: 'trending',
+    show_adult_content: false,
   });
 
   const [newSocialLink, setNewSocialLink] = useState({ platform: '', url: '' });
@@ -71,6 +103,13 @@ export default function CreatorSettings() {
       if (!res.ok) throw new Error('Failed to load profile');
       const data = await res.json();
       setProfile(data);
+      
+      // Fetch feed preferences
+      const feedRes = await fetch('/api/chronicles/creator/feed-preferences');
+      if (feedRes.ok) {
+        const feedData = await feedRes.json();
+        setFeedPreferences(feedData);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load profile');
     } finally {
@@ -84,6 +123,7 @@ export default function CreatorSettings() {
     setSuccess('');
 
     try {
+      // Save profile
       const res = await fetch('/api/chronicles/creator/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -91,6 +131,15 @@ export default function CreatorSettings() {
       });
 
       if (!res.ok) throw new Error('Failed to save profile');
+
+      // Save feed preferences
+      const feedRes = await fetch('/api/chronicles/creator/feed-preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(feedPreferences),
+      });
+
+      if (!feedRes.ok) throw new Error('Failed to save feed preferences');
 
       setSuccess('Settings saved successfully');
       setTimeout(() => setSuccess(''), 3000);
@@ -238,12 +287,12 @@ export default function CreatorSettings() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-slate-800">
-          {['profile', 'notifications', 'privacy'].map((tab) => (
+        <div className="flex gap-2 mb-6 border-b border-gray-200 dark:border-slate-800 overflow-x-auto">
+          {['profile', 'notifications', 'privacy', 'feed'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab
                   ? 'border-red-600 text-red-600'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -252,6 +301,7 @@ export default function CreatorSettings() {
               {tab === 'profile' && 'Profile'}
               {tab === 'notifications' && 'Notifications'}
               {tab === 'privacy' && 'Privacy'}
+              {tab === 'feed' && 'Feed Preferences'}
             </button>
           ))}
         </div>
@@ -312,6 +362,16 @@ export default function CreatorSettings() {
             {/* Basic Info */}
             <div className="space-y-4 border-t border-gray-200 dark:border-slate-800 pt-6">
               <div>
+                <label className="block text-sm font-medium mb-2">Display Name</label>
+                <Input
+                  type="text"
+                  value={profile.display_name || ''}
+                  onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+                  placeholder="Your full display name"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium mb-2">Pen Name</label>
                 <Input
                   type="text"
@@ -324,6 +384,16 @@ export default function CreatorSettings() {
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
                 <Input type="email" value={profile.email} disabled className="bg-gray-50 dark:bg-black" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Location</label>
+                <Input
+                  type="text"
+                  value={profile.location || ''}
+                  onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+                  placeholder="Your location"
+                />
               </div>
 
               <div>
@@ -352,17 +422,17 @@ export default function CreatorSettings() {
               <div>
                 <label className="block text-sm font-medium mb-2">Categories</label>
                 <div className="flex flex-wrap gap-2">
-                  {['fiction', 'technology', 'lifestyle', 'personal', 'business', 'education'].map((cat) => (
+                  {['fiction', 'technology', 'lifestyle', 'personal', 'business', 'education', 'fantasy', 'romance', 'mystery', 'science'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => {
-                        const cats = profile.preferred_categories.includes(cat)
-                          ? profile.preferred_categories.filter((c) => c !== cat)
-                          : [...profile.preferred_categories, cat];
-                        setProfile({ ...profile, preferred_categories: cats });
+                        const cats = profile.categories.includes(cat)
+                          ? profile.categories.filter((c) => c !== cat)
+                          : [...profile.categories, cat];
+                        setProfile({ ...profile, categories: cats });
                       }}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        profile.preferred_categories.includes(cat)
+                        profile.categories.includes(cat)
                           ? 'bg-red-600 text-white'
                           : 'bg-gray-200 dark:bg-black text-foreground hover:bg-gray-300 dark:hover:bg-slate-700'
                       }`}
@@ -450,6 +520,52 @@ export default function CreatorSettings() {
               </button>
             </div>
 
+            <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-black/50 rounded-lg">
+              <div>
+                <p className="font-medium">Email Digest</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Receive weekly email digest of your activity
+                </p>
+              </div>
+              <button
+                onClick={() => setProfile({ ...profile, email_digest_enabled: !profile.email_digest_enabled })}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                  profile.email_digest_enabled
+                    ? 'bg-gradient-to-r from-red-600 to-pink-600'
+                    : 'bg-gray-300 dark:bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                    profile.email_digest_enabled ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="flex items-start justify-between p-4 bg-gray-50 dark:bg-black/50 rounded-lg">
+              <div>
+                <p className="font-medium">Email on Engagement</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Receive email when someone engages with your content
+                </p>
+              </div>
+              <button
+                onClick={() => setProfile({ ...profile, email_on_engagement: !profile.email_on_engagement })}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                  profile.email_on_engagement
+                    ? 'bg-gradient-to-r from-red-600 to-pink-600'
+                    : 'bg-gray-300 dark:bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                    profile.email_on_engagement ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
             {profile.push_notifications_enabled && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg space-y-3">
                 <p className="text-sm font-medium">Notification Preferences</p>
@@ -519,6 +635,96 @@ export default function CreatorSettings() {
               <Button variant="destructive" className="w-full">
                 Delete Account
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Feed Preferences Tab */}
+        {activeTab === 'feed' && (
+          <div className="space-y-6 bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
+            <div>
+              <label className="block text-sm font-medium mb-3">Feed Algorithm</label>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-black/50">
+                  <input
+                    type="radio"
+                    name="algorithm"
+                    checked={feedPreferences?.feed_algorithm === 'trending'}
+                    onChange={() => setFeedPreferences({ ...feedPreferences, feed_algorithm: 'trending' })}
+                    className="w-4 h-4"
+                  />
+                  <div>
+                    <p className="font-medium">Trending</p>
+                    <p className="text-xs text-muted-foreground">See trending content across the platform</p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-black/50">
+                  <input
+                    type="radio"
+                    name="algorithm"
+                    checked={feedPreferences?.feed_algorithm === 'chronological'}
+                    onChange={() => setFeedPreferences({ ...feedPreferences, feed_algorithm: 'chronological' })}
+                    className="w-4 h-4"
+                  />
+                  <div>
+                    <p className="font-medium">Chronological</p>
+                    <p className="text-xs text-muted-foreground">See posts in chronological order</p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 border border-gray-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-black/50">
+                  <input
+                    type="radio"
+                    name="algorithm"
+                    checked={feedPreferences?.feed_algorithm === 'personalized'}
+                    onChange={() => setFeedPreferences({ ...feedPreferences, feed_algorithm: 'personalized' })}
+                    className="w-4 h-4"
+                  />
+                  <div>
+                    <p className="font-medium">Personalized</p>
+                    <p className="text-xs text-muted-foreground">See content based on your interests</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-3">Content Preferences</label>
+              <div className="flex items-center justify-between p-4 border border-gray-300 dark:border-slate-700 rounded-lg">
+                <div>
+                  <p className="font-medium">Show Adult Content</p>
+                  <p className="text-xs text-muted-foreground">Display mature content in your feed</p>
+                </div>
+                <button
+                  onClick={() => setFeedPreferences({ ...feedPreferences, show_adult_content: !feedPreferences?.show_adult_content })}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    feedPreferences?.show_adult_content
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600'
+                      : 'bg-gray-300 dark:bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      feedPreferences?.show_adult_content ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-3">Blocked Creators</label>
+              <p className="text-sm text-muted-foreground mb-3">
+                Block creators to hide their content from your feed
+              </p>
+              <div className="text-sm text-muted-foreground">
+                {feedPreferences?.blocked_creators?.length === 0 ? (
+                  <p>No blocked creators</p>
+                ) : (
+                  <p>{feedPreferences?.blocked_creators?.length || 0} blocked creators</p>
+                )}
+              </div>
             </div>
           </div>
         )}

@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 
 interface VerificationResult {
   exists: boolean
+  title?: string
   author?: string
   published_date?: string
   current_version?: number
@@ -147,6 +148,18 @@ export default function VerifyPage() {
 
                       <TabsContent value="overview" className="space-y-4 mt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {result.title && (
+                            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg md:col-span-2">
+                              <FileText className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
+                              <div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Title</p>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                  {result.title}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
                           <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                             <FileText className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
                             <div>

@@ -237,6 +237,7 @@ export class CopyrightService {
     // Get article details based on type
     let author = 'Unknown';
     let slug = null;
+    let title = fingerprint.metadata?.title || 'Unknown';
 
     if (fingerprint.article_type === 'post') {
       const { data: post } = await supabase
@@ -249,18 +250,58 @@ export class CopyrightService {
         const adminData = post.admin as any;
         author = adminData.full_name || adminData.username || 'Unknown';
         slug = post.slug;
+        title = post.title || title;
       }
     } else if (fingerprint.article_type === 'chronicles_post') {
       const { data: post } = await supabase
         .from('chronicles_posts')
-        .select('title, slug, creator_id, creator!inner(pen_name, username)')
+        .select('title, slug, creator_id')
         .eq('id', fingerprint.article_id)
         .maybeSingle();
 
-      if (post && 'creator' in post) {
-        const creatorData = post.creator as any;
-        author = creatorData.pen_name || creatorData.username || 'Unknown';
+      console.log('Chronicles post data:', post);
+
+      if (post) {
+        // Try to find creator by id (chronicles_creators.id)
+        let { data: creator } = await supabase
+          .from('chronicles_creators')
+          .select('pen_name, display_name')
+          .eq('id', post.creator_id)
+          .maybeSingle();
+
+        console.log('Creator by id:', creator);
+
+        // If not found by id, try by user_id (chronicles_creators.user_id)
+        if (!creator) {
+          const result = await supabase
+            .from('chronicles_creators')
+            .select('pen_name, display_name')
+            .eq('user_id', post.creator_id)
+            .maybeSingle();
+          
+          creator = result.data;
+          console.log('Creator by user_id:', creator);
+        }
+
+        // If still not found, try auth.users
+        if (!creator) {
+          const { data: authUser } = await supabase.auth.admin.getUserById(post.creator_id);
+          console.log('Auth user:', authUser);
+          
+          if (authUser.user) {
+            author = authUser.user.user_metadata?.full_name || 
+                     authUser.user.user_metadata?.name || 
+                     authUser.user.email?.split('@')[0] || 
+                     'Unknown';
+          }
+        } else {
+          author = creator.display_name || creator.pen_name || 'Unknown';
+        }
+
         slug = post.slug;
+        title = post.title || title;
+      } else {
+        console.log('No chronicles post found for id:', fingerprint.article_id);
       }
     }
 
@@ -284,6 +325,7 @@ export class CopyrightService {
     return {
       exists: true,
       author,
+      title,
       published_date: fingerprint.published_at,
       current_version: fingerprint.article_version,
       original_url: originalUrl || undefined,
@@ -507,6 +549,9 @@ export class CopyrightService {
 
     // Get article details
     let article
+    let author = 'Unknown'
+    let title = fingerprint.metadata?.title || 'Unknown'
+
     if (fingerprint.article_type === 'post') {
       const { data } = await supabase
         .from('posts')
@@ -514,18 +559,63 @@ export class CopyrightService {
         .eq('id', fingerprint.article_id)
         .maybeSingle()
       article = data as any
+      
+      if (article) {
+        author = article.admin?.full_name || article.admin?.username || 'Unknown'
+        title = article.title || title
+      }
     } else if (fingerprint.article_type === 'chronicles_post') {
       const { data } = await supabase
         .from('chronicles_posts')
-        .select('title, slug, creator_id, creator:chronicles_creators(pen_name, username)')
+        .select('title, slug, creator_id')
         .eq('id', fingerprint.article_id)
         .maybeSingle()
       article = data as any
-    }
+      
+      console.log('Certificate - Chronicles post data:', article);
+      
+      if (article) {
+        // Try to find creator by id (chronicles_creators.id)
+        let { data: creator } = await supabase
+          .from('chronicles_creators')
+          .select('pen_name, display_name')
+          .eq('id', article.creator_id)
+          .maybeSingle();
 
-    const author = fingerprint.article_type === 'post'
-      ? (article as any)?.admin?.full_name || (article as any)?.admin?.username || 'Unknown'
-      : (article as any)?.creator?.pen_name || (article as any)?.creator?.username || 'Unknown'
+        console.log('Certificate - Creator by id:', creator);
+
+        // If not found by id, try by user_id (chronicles_creators.user_id)
+        if (!creator) {
+          const result = await supabase
+            .from('chronicles_creators')
+            .select('pen_name, display_name')
+            .eq('user_id', article.creator_id)
+            .maybeSingle();
+          
+          creator = result.data;
+          console.log('Certificate - Creator by user_id:', creator);
+        }
+
+        // If still not found, try auth.users
+        if (!creator) {
+          const { data: authUser } = await supabase.auth.admin.getUserById(article.creator_id);
+          console.log('Certificate - Auth user:', authUser);
+          
+          if (authUser.user) {
+            author = authUser.user.user_metadata?.full_name || 
+                     authUser.user.user_metadata?.name || 
+                     authUser.user.email?.split('@')[0] || 
+                     'Unknown';
+          }
+        } else {
+          author = creator.display_name || creator.pen_name || 'Unknown'
+        }
+        
+        title = article.title || title
+      } else {
+        console.log('Certificate - No chronicles post found for id:', fingerprint.article_id);
+      }
+    }
 
     const slug = article?.slug
     const articleType = fingerprint.article_type === 'post' ? 'blog' : 'chronicles'
@@ -534,7 +624,7 @@ export class CopyrightService {
       : ''
 
     return {
-      article_title: fingerprint.metadata?.title || article?.title || 'Unknown',
+      article_title: title,
       author,
       article_id: fingerprint.metadata?.article_id || articleId,
       version: fingerprint.article_version,

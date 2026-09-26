@@ -9,7 +9,7 @@ import { MobileSidebar } from "@/components/admin/mobile-sidebar"
 import {
   User, LayoutDashboard, FileEdit, FilePlus2, ImageIcon,
   MessageSquareText, PenTool, MessageSquareHeart, ArrowUp10,
-  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle, Film, Mail
+  Sparkles, BarChart3, Bell, TrendingUp, Sliders, ClipboardList, MessageCircle, AlertTriangle, Film, Mail, Shield
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 
@@ -48,6 +48,9 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Chronicles Analytics", href: "/admin/chronicles/analytics", icon: TrendingUp },
     { name: "Chronicles Settings", href: "/admin/chronicles/settings", icon: Sliders },
     { name: "Chronicles Reports", href: "/admin/chronicles/reports", icon: ClipboardList },
+    { name: "Chronicles Messaging", href: "/admin/chronicles/messaging", icon: Shield },
+    { name: "Messaging Restrictions", href: "/admin/chronicles/messaging/restrictions", icon: Shield },
+    { name: "Message Moderation", href: "/admin/chronicles/messaging/moderation", icon: AlertTriangle },
   ]
 
   const excludedRoutes = ["/admin/login", "/admin/signup", "/admin/forgot-password"]

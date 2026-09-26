@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Users,
@@ -16,6 +16,8 @@ import {
   MapPin,
   Mail,
   Globe,
+  MessageCircle,
+  UserPlus,
 } from 'lucide-react';
 
 interface Creator {
@@ -32,6 +34,9 @@ interface Creator {
   social_links: Record<string, string>;
   content_type: string;
   categories: string[];
+  location?: string;
+  followers_count?: number;
+  following_count?: number;
 }
 
 interface Post {
@@ -48,6 +53,7 @@ interface Post {
 
 export default function CreatorProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const creatorId = params?.id as string;
 
   const [loading, setLoading] = useState(true);
@@ -55,6 +61,7 @@ export default function CreatorProfilePage() {
   const [creator, setCreator] = useState<Creator | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [followed, setFollowed] = useState(false);
+  const [followingBack, setFollowingBack] = useState(false);
 
   useEffect(() => {
     if (creatorId) {
@@ -64,11 +71,51 @@ export default function CreatorProfilePage() {
 
   const fetchCreator = async () => {
     try {
-      // In production: GET /api/chronicles/creators/[id]
+      // GET /api/chronicles/creators/[creatorId]
+      const res = await fetch(`/api/chronicles/creators/${creatorId}`);
+      if (!res.ok) throw new Error('Failed to load creator');
+      
+      const data = await res.json();
+      setCreator(data.creator);
+      setFollowed(data.is_following || false);
+      setFollowingBack(data.is_following_back || false);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load creator');
       setLoading(false);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const res = await fetch('/api/chronicles/creators/follow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId }),
+      });
+
+      if (!res.ok) throw new Error('Failed to follow creator');
+
+      const data = await res.json();
+      setFollowed(data.following);
+      
+      // Update creator stats locally
+      if (creator) {
+        setCreator({
+          ...creator,
+          followers_count: data.following 
+            ? (creator.followers_count || 0) + 1 
+            : Math.max((creator.followers_count || 0) - 1, 0)
+        });
+      }
+    } catch (err) {
+      console.error('Failed to follow creator:', err);
+    }
+  };
+
+  const handleWhispr = () => {
+    if (creator) {
+      router.push(`/chronicles/messages?recipient=${creatorId}&name=${creator.pen_name}`);
     }
   };
 
@@ -94,7 +141,7 @@ export default function CreatorProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-slate-950">
+    <main className="min-h-screen bg-gray-50 dark:bg-black">
       {/* Background Gradient */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
 
@@ -146,6 +193,13 @@ export default function CreatorProfilePage() {
 
               {/* Social Links */}
               <div className="flex gap-3 mb-4">
+                <Link
+                  href={`/chronicles/portfolio/${creator.pen_name}`}
+                  className="p-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg"
+                  title="View Portfolio"
+                >
+                  <BookOpen className="w-4 h-4" />
+                </Link>
                 {creator.social_links?.twitter && (
                   <a
                     href={creator.social_links.twitter}
@@ -181,18 +235,35 @@ export default function CreatorProfilePage() {
                 )}
               </div>
 
-              {/* Follow Button */}
-              <Button
-                className={
-                  followed
-                    ? 'bg-gray-300 dark:bg-slate-700'
-                    : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
-                }
-                onClick={() => setFollowed(!followed)}
-              >
-                <Users className="w-4 h-4 mr-2" />
-                {followed ? 'Following' : 'Follow'}
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button
+                  className={
+                    followed
+                      ? 'bg-gray-300 dark:bg-slate-700'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
+                  }
+                  onClick={handleFollow}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  {followed ? 'Following' : 'Follow'}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleWhispr}
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Whispr
+                </Button>
+              </div>
+
+              {/* Follow Back Indicator */}
+              {followingBack && (
+                <div className="mt-3 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm">
+                  ✓ Follows you back
+                </div>
+              )}
             </div>
           </div>
 

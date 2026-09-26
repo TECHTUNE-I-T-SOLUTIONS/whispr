@@ -41,6 +41,9 @@ export async function GET(request: NextRequest) {
 
     // Get current user if authenticated
     let userId: string | null = null
+    let creatorId: string | null = null
+    let feedPreferences: any = null
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7)
       try {
@@ -58,6 +61,28 @@ export async function GET(request: NextRequest) {
         const { data: { user }, error } = await client.auth.getUser(token)
         if (!error && user) {
           userId = user.id
+          
+          // Get creator_id
+          const { data: creator } = await supabase
+            .from("chronicles_creators")
+            .select("id")
+            .eq("user_id", userId)
+            .single()
+          
+          if (creator) {
+            creatorId = creator.id
+            
+            // Get feed preferences
+            const { data: preferences } = await supabase
+              .from("chronicles_feed_preferences")
+              .select("*")
+              .eq("creator_id", creatorId)
+              .single()
+            
+            if (preferences) {
+              feedPreferences = preferences
+            }
+          }
         }
       } catch (err) {
         console.error("Token verification error:", err)
@@ -66,6 +91,7 @@ export async function GET(request: NextRequest) {
 
     console.log("Feed API - Auth header present:", !!authHeader)
     console.log("Feed API - Authenticated user:", userId)
+    console.log("Feed API - Feed preferences:", feedPreferences)
 
     // Fetch admin posts with likes count
     const { data: adminPosts, error: adminError } = await supabase
@@ -181,7 +207,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Combine and format posts
-    const formattedPosts: any[] = []
+    let formattedPosts: any[] = []
 
     // Format admin posts
     if (processedAdminPosts) {
@@ -274,6 +300,58 @@ export async function GET(request: NextRequest) {
     // Sort combined posts by published date
     formattedPosts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
+    // Apply feed algorithm preferences
+    if (feedPreferences) {
+      // Filter out blocked creators
+      if (feedPreferences.blocked_creators && feedPreferences.blocked_creators.length > 0) {
+        formattedPosts = formattedPosts.filter((post: any) => 
+          !feedPreferences.blocked_creators.includes(post.author.id)
+        )
+      }
+
+      // Filter adult content if disabled
+      if (!feedPreferences.show_adult_content) {
+        // Filter posts tagged as adult (you may need to add this field to your schema)
+        // For now, this is a placeholder
+      }
+
+      // Apply sorting based on algorithm
+      if (feedPreferences.feed_algorithm === 'trending') {
+        // Sort by engagement (likes + views)
+        formattedPosts.sort((a: any, b: any) => {
+          const engagementA = (a.likesCount || 0) + (a.viewCount || 0)
+          const engagementB = (b.likesCount || 0) + (b.viewCount || 0)
+          return engagementB - engagementA
+        })
+      } else if (feedPreferences.feed_algorithm === 'chronological') {
+        // Sort by published date (already done above, keeping for clarity)
+        formattedPosts.sort((a: any, b: any) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      } else if (feedPreferences.feed_algorithm === 'personalized' && creatorId) {
+        // Prioritize followed creators and categories
+        // First, boost posts from followed creators
+        if (feedPreferences.followed_creators && feedPreferences.followed_creators.length > 0) {
+          formattedPosts.sort((a: any, b: any) => {
+            const aFollowed = feedPreferences.followed_creators.includes(a.author.id)
+            const bFollowed = feedPreferences.followed_creators.includes(b.author.id)
+            if (aFollowed && !bFollowed) return -1
+            if (!aFollowed && bFollowed) return 1
+            return 0
+          })
+        }
+
+        // Then, prioritize categories the user follows
+        if (feedPreferences.followed_categories && feedPreferences.followed_categories.length > 0) {
+          formattedPosts.sort((a: any, b: any) => {
+            const aCategoryMatch = a.tags && a.tags.some((tag: string) => feedPreferences.followed_categories.includes(tag))
+            const bCategoryMatch = b.tags && b.tags.some((tag: string) => feedPreferences.followed_categories.includes(tag))
+            if (aCategoryMatch && !bCategoryMatch) return -1
+            if (!aCategoryMatch && bCategoryMatch) return 1
+            return 0
+          })
+        }
+      }
+    }
+
     // Get user reactions for authenticated users
     let userReactions = new Map()
     if (userId) {
@@ -299,24 +377,14 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      // Get creator_id for the current user
-      const { data: creator, error: creatorError } = await supabase
-        .from("chronicles_creators")
-        .select("id")
-        .eq("user_id", userId)
-        .single()
-
-      if (creatorError) {
-        console.log("No creator found for user:", userId)
-      }
-
-      if (creator) {
-        console.log("Found creator:", creator.id)
+      // creatorId is already fetched above
+      if (creatorId) {
+        console.log("Found creator:", creatorId)
         // Get reactions for chronicles posts
         const { data: chroniclesReactions, error: chroniclesError } = await supabase
           .from("chronicles_engagement")
           .select("post_id, engagement_type, user_id")
-          .eq("user_id", creator.id)
+          .eq("user_id", creatorId)
           .eq("engagement_type", "like")
           .in("post_id", postIds)
 

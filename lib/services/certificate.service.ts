@@ -1,8 +1,7 @@
-// PDF Certificate Generation Service
-// Generates professional copyright certificates for published content
+// Certificate Generation Service
+// Generates professional copyright certificates for published content using PDFKit
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import PDFDocument from 'pdfkit';
 import type { CertificateData } from '@/lib/types/copyright.types';
 
 export class CertificateService {
@@ -10,140 +9,156 @@ export class CertificateService {
    * Generate PDF certificate for an article
    */
   static async generateCertificate(data: CertificateData): Promise<Buffer> {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
+    return new Promise((resolve, reject) => {
+      try {
+        const doc = new PDFDocument({
+          layout: 'landscape',
+          size: 'a4',
+          margin: 50
+        });
+
+        const chunks: Buffer[] = [];
+        doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', reject);
+
+        const pageWidth = doc.page.width;
+        const pageHeight = doc.page.height;
+
+        // Add border
+        doc.lineWidth(2)
+          .strokeColor('#DC2626')
+          .rect(10, 10, pageWidth - 20, pageHeight - 20)
+          .stroke();
+
+        // Add header background
+        doc.rect(10, 10, pageWidth - 20, 50)
+          .fillColor('#DC2626')
+          .fill();
+
+        // Add title
+        doc.fillColor('#FFFFFF')
+          .fontSize(20)
+          .font('Helvetica-Bold')
+          .text('Content Authenticity Certificate', pageWidth / 2, 30, { align: 'center' });
+
+        // Add Whispr branding
+        doc.fontSize(11)
+          .font('Helvetica')
+          .text('Whispr - Content Protection System', pageWidth / 2, 42, { align: 'center' });
+
+        // Add certificate content
+        let yPos = 75;
+
+        // Article Title
+        doc.fillColor('#000000')
+          .fontSize(14)
+          .font('Helvetica-Bold')
+          .text('Article Title:', 30, yPos);
+        yPos += 12;
+        doc.fontSize(12)
+          .font('Helvetica')
+          .text(data.article_title, 30, yPos, { width: pageWidth - 100 });
+        yPos += 25;
+
+        // Author
+        doc.fontSize(12)
+          .font('Helvetica-Bold')
+          .text('Author:', 30, yPos);
+        yPos += 12;
+        doc.font('Helvetica')
+          .text(data.author, 30, yPos);
+        yPos += 20;
+
+        // Article ID
+        doc.font('Helvetica-Bold')
+          .text('Article ID:', 30, yPos);
+        yPos += 12;
+        doc.fontSize(10)
+          .font('Helvetica')
+          .text(data.article_id, 30, yPos);
+        yPos += 20;
+
+        // Version
+        doc.fontSize(12)
+          .font('Helvetica-Bold')
+          .text('Version:', 30, yPos);
+        yPos += 12;
+        doc.font('Helvetica')
+          .text(`Version ${data.version}`, 30, yPos);
+        yPos += 20;
+
+        // Publication Date
+        doc.font('Helvetica-Bold')
+          .text('Publication Date:', 30, yPos);
+        yPos += 12;
+        doc.font('Helvetica')
+          .text(new Date(data.publication_date).toLocaleDateString(), 30, yPos);
+        yPos += 20;
+
+        // SHA256 Fingerprint
+        doc.font('Helvetica-Bold')
+          .text('SHA-256 Fingerprint:', 30, yPos);
+        yPos += 12;
+        doc.fontSize(8)
+          .font('Helvetica')
+          .text(data.sha256_fingerprint, 30, yPos, { width: pageWidth - 100 });
+        yPos += 20;
+
+        // Canonical URL
+        doc.fontSize(12)
+          .font('Helvetica-Bold')
+          .text('Canonical URL:', 30, yPos);
+        yPos += 12;
+        doc.fontSize(9)
+          .fillColor('#DC2626')
+          .text(data.canonical_url || 'N/A', 30, yPos, { width: pageWidth - 100, link: data.canonical_url });
+        yPos += 25;
+
+        // Copyright Notice
+        doc.fillColor('#000000')
+          .fontSize(11)
+          .font('Helvetica-Bold')
+          .text('Copyright Notice:', 30, yPos);
+        yPos += 12;
+        doc.fontSize(9)
+          .fillColor('#505050')
+          .font('Helvetica')
+          .text(
+            'This certificate serves as proof of original publication on Whispr. The content creator retains all copyright ownership. Whispr holds a perpetual, non-exclusive license to host and distribute this content. Unauthorized reproduction may violate copyright law.',
+            30,
+            yPos,
+            { width: pageWidth - 60, align: 'justify' }
+          );
+        yPos += 35;
+
+        // Generated Timestamp
+        doc.fillColor('#000000')
+          .fontSize(8)
+          .font('Helvetica-Oblique')
+          .text(
+            `Generated: ${new Date(data.generated_timestamp).toLocaleString()}`,
+            pageWidth - 30,
+            pageHeight - 25,
+            { align: 'right' }
+          );
+
+        // Add verification info
+        doc.lineWidth(0.5)
+          .strokeColor('#C0C0C0')
+          .rect(pageWidth - 50, 65, 35, 35)
+          .stroke();
+        doc.fontSize(7)
+          .font('Helvetica')
+          .fillColor('#808080')
+          .text('Verify at', pageWidth - 32.5, 72, { align: 'center' })
+          .text('/verify', pageWidth - 32.5, 79, { align: 'center' });
+
+        doc.end();
+      } catch (error) {
+        reject(error);
+      }
     });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Add border
-    doc.setDrawColor(59, 130, 246); // Blue border
-    doc.setLineWidth(0.5);
-    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
-
-    // Add header background
-    doc.setFillColor(59, 130, 246);
-    doc.rect(10, 10, pageWidth - 20, 40, 'F');
-
-    // Add title
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Content Authenticity Certificate', pageWidth / 2, 30, { align: 'center' });
-
-    // Add Whispr branding
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Whispr - Content Protection System', pageWidth / 2, 38, { align: 'center' });
-
-    // Add certificate content
-    let yPos = 65;
-
-    // Article Title
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Article Title:', 20, yPos);
-    yPos += 8;
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'normal');
-    const titleLines = doc.splitTextToSize(data.article_title, pageWidth - 80);
-    doc.text(titleLines, 20, yPos);
-    yPos += (titleLines.length * 8) + 10;
-
-    // Author
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Author:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.text(data.author, 20, yPos);
-    yPos += 12;
-
-    // Article ID
-    doc.setFont('helvetica', 'bold');
-    doc.text('Article ID:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.text(data.article_id, 20, yPos);
-    yPos += 12;
-
-    // Version
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Version:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Version ${data.version}`, 20, yPos);
-    yPos += 12;
-
-    // Publication Date
-    doc.setFont('helvetica', 'bold');
-    doc.text('Publication Date:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.text(new Date(data.publication_date).toLocaleDateString(), 20, yPos);
-    yPos += 12;
-
-    // SHA256 Fingerprint
-    doc.setFont('helvetica', 'bold');
-    doc.text('SHA-256 Fingerprint:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    const hashLines = doc.splitTextToSize(data.sha256_fingerprint, pageWidth - 80);
-    doc.text(hashLines, 20, yPos);
-    yPos += (hashLines.length * 5) + 12;
-
-    // Canonical URL
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Canonical URL:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(59, 130, 246);
-    const urlLines = doc.splitTextToSize(data.canonical_url, pageWidth - 80);
-    doc.text(urlLines, 20, yPos);
-    yPos += (urlLines.length * 5) + 15;
-
-    // Copyright Notice
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Copyright Notice:', 20, yPos);
-    yPos += 7;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    const copyrightText = `This certificate serves as proof of original publication on Whispr. The content creator retains all copyright ownership. Whispr holds a perpetual, non-exclusive license to host and distribute this content. Unauthorized reproduction may violate copyright law.`;
-    const copyrightLines = doc.splitTextToSize(copyrightText, pageWidth - 40);
-    doc.text(copyrightLines, 20, yPos);
-    yPos += (copyrightLines.length * 5) + 15;
-
-    // Generated Timestamp
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'italic');
-    doc.text(`Generated: ${new Date(data.generated_timestamp).toLocaleString()}`, pageWidth - 20, pageHeight - 15, { align: 'right' });
-
-    // Add verification QR code placeholder
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.2);
-    doc.rect(pageWidth - 35, 55, 25, 25);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(128, 128, 128);
-    doc.text('Verify at', pageWidth - 22.5, 62.5, { align: 'center' });
-    doc.text('/verify', pageWidth - 22.5, 68, { align: 'center' });
-
-    // Generate buffer
-    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-    return pdfBuffer;
   }
 
   /**

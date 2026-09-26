@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 dark:from-slate-900 dark:to-slate-900/50">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 dark:from-black dark:to-slate-900/50">
       {/* Hero Section */}
       <motion.section
         initial={{ opacity: 0, y: -20 }}

@@ -23,8 +23,8 @@ export async function GET(
     // Generate PDF certificate
     const pdfBuffer = await CertificateService.generateCertificate(certificateData)
 
-    // Return PDF
-    return new NextResponse(pdfBuffer, {
+    // Return as PDF
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="certificate-${certificateData.article_id}.pdf"`,
