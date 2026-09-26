@@ -58,6 +58,7 @@ function proxied(url: string): string {
 type SceneState = VideoScene & {
   imageUrl: string | null // chosen background (proxied/data/blob), null = gradient
   isLogo?: boolean // render imageUrl as a centred Whispr logo, not a cover photo
+  isVideo?: boolean // if true, imageUrl is a video URL
 }
 
 export function AiStudioClient() {
@@ -90,6 +91,7 @@ export function AiStudioClient() {
   const [imgQuery, setImgQuery] = useState("")
   const [imgResults, setImgResults] = useState<StockImage[]>([])
   const [imgLoading, setImgLoading] = useState(false)
+  const [mediaType, setMediaType] = useState<'image' | 'video' | 'all'>('image')
   const uploadRef = useRef<HTMLInputElement>(null)
 
   // ----- audio -----
@@ -103,6 +105,21 @@ export function AiStudioClient() {
   const [renderProgress, setRenderProgress] = useState(0)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoExt, setVideoExt] = useState<"webm" | "mp4">("webm")
+
+  // Load saved video from localStorage on mount
+  useEffect(() => {
+    const savedVideo = localStorage.getItem('ai-studio-last-video')
+    if (savedVideo) {
+      setVideoUrl(savedVideo)
+    }
+  }, [])
+
+  // Save video to localStorage when rendered
+  useEffect(() => {
+    if (videoUrl) {
+      localStorage.setItem('ai-studio-last-video', videoUrl)
+    }
+  }, [videoUrl])
 
   // The narration is exactly the on-screen scene text (in order), so the words
   // heard always match the words shown. Hook/CTA are visual-only, not spoken.
@@ -240,6 +257,14 @@ export function AiStudioClient() {
   // -------------------------------------------------------------------------
   // Image picker
   // -------------------------------------------------------------------------
+  // Re-run search when media type changes
+  useEffect(() => {
+    if (pickerOpenFor !== null && imgQuery) {
+      void runImageSearch(imgQuery)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mediaType])
+
   const openPicker = useCallback((sceneIdx: number) => {
     setPickerOpenFor(sceneIdx)
     const kws = scenes[sceneIdx]?.imageKeywords || []
@@ -251,19 +276,26 @@ export function AiStudioClient() {
 
   async function runImageSearch(q: string) {
     setImgLoading(true)
+    console.log('[AI Studio Client] Searching for:', q, 'with type:', mediaType)
     try {
-      const res = await fetch(`/api/admin/ai-studio/images?q=${encodeURIComponent(q)}&limit=18`)
+      const res = await fetch(`/api/admin/ai-studio/images?q=${encodeURIComponent(q)}&limit=18&type=${mediaType}`)
       const j = await res.json()
-      if (j.ok) setImgResults(j.images)
-    } catch {
-      /* ignore */
+      console.log('[AI Studio Client] Search results:', j)
+      if (j.ok) {
+        console.log('[AI Studio Client] Found', j.images.length, 'items')
+        setImgResults(j.images)
+      } else {
+        console.error('[AI Studio Client] Search failed:', j.error)
+      }
+    } catch (e) {
+      console.error('[AI Studio Client] Search error:', e)
     } finally {
       setImgLoading(false)
     }
   }
 
-  function chooseImage(sceneIdx: number, url: string) {
-    setScenes((prev) => prev.map((s, i) => (i === sceneIdx ? { ...s, imageUrl: url ? proxied(url) : null, isLogo: false } : s)))
+  function chooseImage(sceneIdx: number, url: string, isVideo = false) {
+    setScenes((prev) => prev.map((s, i) => (i === sceneIdx ? { ...s, imageUrl: url ? proxied(url) : null, isLogo: false, isVideo } : s)))
     setPickerOpenFor(null)
   }
 
@@ -343,6 +375,7 @@ export function AiStudioClient() {
         imageUrl: s.imageUrl,
         durationSec: s.durationSec,
         logo: s.isLogo,
+        isVideo: false, // For now, videos in scenes are treated as backgrounds
       }))
       const { blob } = await renderVideo(renderScenes, {
         audioUrl,
@@ -681,14 +714,14 @@ export function AiStudioClient() {
                   {/* inline image picker */}
                   {pickerOpenFor === idx && (
                     <div className="mt-3 rounded-md border bg-muted/30 p-3">
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         <div className="relative min-w-[160px] flex-1">
                           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <Input
                             value={imgQuery}
                             onChange={(e) => setImgQuery(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && runImageSearch(imgQuery)}
-                            placeholder="Search free images (no key needed)…"
+                            placeholder="Search free images or videos…"
                             className="h-9 pl-8"
                           />
                         </div>
@@ -701,11 +734,46 @@ export function AiStudioClient() {
                         <input
                           ref={uploadRef}
                           type="file"
-                          accept="image/*"
+                          accept="image/*,video/*"
                           hidden
                           onChange={(e) => e.target.files?.[0] && onUpload(idx, e.target.files[0])}
                         />
                       </div>
+                      
+                      {/* Media type tabs */}
+                      <div className="flex gap-1 mb-3">
+                        <button
+                          onClick={() => setMediaType('image')}
+                          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                            mediaType === 'image'
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted"
+                          }`}
+                        >
+                          Images
+                        </button>
+                        <button
+                          onClick={() => setMediaType('video')}
+                          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                            mediaType === 'video'
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted"
+                          }`}
+                        >
+                          Videos
+                        </button>
+                        <button
+                          onClick={() => setMediaType('all')}
+                          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                            mediaType === 'all'
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted"
+                          }`}
+                        >
+                          All
+                        </button>
+                      </div>
+                      
                       <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
                         <button
                           onClick={() => chooseImage(idx, "")}
@@ -738,15 +806,40 @@ export function AiStudioClient() {
                             </span>
                           </button>
                         )}
-                        {imgResults.map((img) => (
+                        {imgResults.map((media) => (
                           <button
-                            key={img.id}
-                            onClick={() => chooseImage(idx, img.fullUrl)}
+                            key={media.id}
+                            onClick={() => chooseImage(idx, media.fullUrl, media.type === 'video')}
                             className="group relative aspect-[9/16] overflow-hidden rounded border hover:ring-2 hover:ring-primary"
-                            title={img.author ? `by ${img.author} (${img.provider})` : img.provider}
+                            title={media.author ? `by ${media.author} (${media.provider})` : media.provider}
                           >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={img.thumbUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                            {media.type === 'video' ? (
+                              <video 
+                                ref={(el) => {
+                                  if (el) {
+                                    el.addEventListener('mouseenter', () => {
+                                      el.play().catch(() => {}); // Ignore play interruption
+                                    });
+                                    el.addEventListener('mouseleave', () => {
+                                      el.pause();
+                                      el.currentTime = 0;
+                                    });
+                                  }
+                                }}
+                                src={media.videoUrl} 
+                                className="h-full w-full object-cover"
+                                muted
+                                playsInline
+                              />
+                            ) : (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={media.thumbUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                            )}
+                            {media.type === 'video' && (
+                              <span className="absolute inset-x-0 bottom-0 bg-black/60 py-0.5 text-center text-[9px] text-white">
+                                {media.duration ? `${Math.round(media.duration)}s` : 'Video'}
+                              </span>
+                            )}
                           </button>
                         ))}
                       </div>

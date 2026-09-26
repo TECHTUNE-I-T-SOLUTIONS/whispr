@@ -14,6 +14,7 @@ export type RenderScene = {
   imageUrl: string | null // already same-origin (proxied) or a data/blob URL
   durationSec: number
   logo?: boolean // draw imageUrl as a centred brand logo on a gradient, not cover-fit
+  isVideo?: boolean // if true, imageUrl is a video URL
 }
 
 export type RenderOptions = {
@@ -40,6 +41,19 @@ function loadImage(url: string): Promise<HTMLImageElement> {
     img.onload = () => resolve(img)
     img.onerror = () => reject(new Error("Image load failed"))
     img.src = url
+  })
+}
+
+function loadVideo(url: string): Promise<HTMLVideoElement> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement("video")
+    video.crossOrigin = "anonymous"
+    video.muted = true
+    video.playsInline = true
+    video.loop = true
+    video.onloadeddata = () => resolve(video)
+    video.onerror = () => reject(new Error("Video load failed"))
+    video.src = url
   })
 }
 
@@ -73,6 +87,26 @@ function drawKenBurns(
   const panX = (w - dw) / 2 - (dw - w) * 0.08 * (progress - 0.5)
   const panY = (h - dh) / 2 - (dh - h) * 0.08 * (progress - 0.5)
   ctx.drawImage(img, panX, panY, dw, dh)
+}
+
+// Draw a video with a subtle Ken Burns zoom/pan, cover-fit to canvas.
+function drawVideoKenBurns(
+  ctx: CanvasRenderingContext2D,
+  video: HTMLVideoElement,
+  w: number,
+  h: number,
+  progress: number, // 0..1 within the scene
+) {
+  const zoomStart = 1.05
+  const zoomEnd = 1.18
+  const zoom = zoomStart + (zoomEnd - zoomStart) * progress
+  const scale = Math.max(w / video.videoWidth, h / video.videoHeight) * zoom
+  const dw = video.videoWidth * scale
+  const dh = video.videoHeight * scale
+  // slow diagonal pan
+  const panX = (w - dw) / 2 - (dw - w) * 0.08 * (progress - 0.5)
+  const panY = (h - dh) / 2 - (dh - h) * 0.08 * (progress - 0.5)
+  ctx.drawImage(video, panX, panY, dw, dh)
 }
 
 function drawGradientOverlay(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -258,9 +292,15 @@ export async function renderVideo(scenes: RenderScene[], options: RenderOptions 
   if (!ctx) throw new Error("Canvas 2D context unavailable")
   const c: CanvasRenderingContext2D = ctx
 
-  // Preload scene images (null → gradient-only scene).
-  const images = await Promise.all(
-    scenes.map((s) => (s.imageUrl ? loadImage(s.imageUrl).catch(() => null) : Promise.resolve(null))),
+  // Preload scene images/videos (null → gradient-only scene).
+  const mediaAssets = await Promise.all(
+    scenes.map((s) => {
+      if (!s.imageUrl) return Promise.resolve(null)
+      if (s.isVideo) {
+        return loadVideo(s.imageUrl).catch(() => null)
+      }
+      return loadImage(s.imageUrl).catch(() => null)
+    }),
   )
 
   // Preload the small brand mark shown next to the "Whispr" wordmark.
@@ -356,21 +396,33 @@ export async function renderVideo(scenes: RenderScene[], options: RenderOptions 
         const outroProgress = (elapsed - acc) / Math.max(0.001, OUTRO_SEC)
         if (opts.outro) drawOutro(c, w, h, opts.outro, accent, opts.brand || "Whispr", outroProgress, brandLogo)
       } else {
-        const img = images[idx]
-        if (img && scenes[idx].logo) {
+        const media = mediaAssets[idx]
+        const scene = scenes[idx]
+        if (media && scene.logo) {
           // Branded logo scene: gradient backdrop + centred, contained logo.
           const g = c.createLinearGradient(0, 0, w, h)
           g.addColorStop(0, "#1a1030")
           g.addColorStop(1, "#0b0b12")
           c.fillStyle = g
           c.fillRect(0, 0, w, h)
-          drawLogo(c, img, w, h, sceneProgress)
-          drawText(c, scenes[idx].text, w, h, sceneProgress, accent, 0.72)
+          drawLogo(c, media as HTMLImageElement, w, h, sceneProgress)
+          drawText(c, scene.text, w, h, sceneProgress, accent, 0.72)
           drawBrand(c, w, h, opts.brand || "Whispr", brandLogo)
-        } else if (img) {
-          drawKenBurns(c, img, w, h, sceneProgress)
+        } else if (media) {
+          if (scene.isVideo) {
+            // Video background
+            const video = media as HTMLVideoElement
+            if (video.readyState >= 2) {
+              video.currentTime = (video.duration || 1) * sceneProgress
+              video.play().catch(() => {})
+              drawVideoKenBurns(c, video, w, h, sceneProgress)
+            }
+          } else {
+            // Image background
+            drawKenBurns(c, media as HTMLImageElement, w, h, sceneProgress)
+          }
           drawGradientOverlay(c, w, h)
-          drawText(c, scenes[idx].text, w, h, sceneProgress, accent)
+          drawText(c, scene.text, w, h, sceneProgress, accent)
           drawBrand(c, w, h, opts.brand || "Whispr", brandLogo)
         } else {
           const g = c.createLinearGradient(0, 0, w, h)
@@ -379,7 +431,7 @@ export async function renderVideo(scenes: RenderScene[], options: RenderOptions 
           c.fillStyle = g
           c.fillRect(0, 0, w, h)
           drawGradientOverlay(c, w, h)
-          drawText(c, scenes[idx].text, w, h, sceneProgress, accent)
+          drawText(c, scene.text, w, h, sceneProgress, accent)
           drawBrand(c, w, h, opts.brand || "Whispr", brandLogo)
         }
       }

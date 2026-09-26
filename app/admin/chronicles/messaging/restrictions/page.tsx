@@ -34,14 +34,6 @@ interface Restriction {
     pen_name: string;
     profile_image_url?: string;
   };
-  restricted_by_admin?: {
-    id: string;
-    username: string;
-  };
-  lifted_by_admin?: {
-    id: string;
-    username: string;
-  };
 }
 
 export default function MessagingRestrictionsPage() {

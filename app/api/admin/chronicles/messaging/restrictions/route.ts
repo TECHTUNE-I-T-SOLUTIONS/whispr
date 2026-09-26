@@ -19,14 +19,6 @@ export async function GET(request: NextRequest) {
           id,
           pen_name,
           profile_image_url
-        ),
-        restricted_by_admin:admin!chronicles_messaging_restrictions_restricted_by_fkey(
-          id,
-          username
-        ),
-        lifted_by_admin:admin!chronicles_messaging_restrictions_lifted_by_fkey(
-          id,
-          username
         )
       `)
       .order("created_at", { ascending: false });

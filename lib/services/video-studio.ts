@@ -49,8 +49,11 @@ export type StockImage = {
   thumbUrl: string
   fullUrl: string
   author: string | null
-  source: string // 'openverse' | 'picsum'
+  source: string // 'openverse' | 'picsum' | 'unsplash'
   provider: string
+  type: 'image' | 'video'
+  videoUrl?: string // for videos
+  duration?: number // for videos in seconds
 }
 
 export type GeneratePlanInput = {
@@ -282,6 +285,7 @@ async function searchUnsplash(query: string, limit: number): Promise<StockImage[
     author: r.user?.name || null,
     source: "unsplash",
     provider: "unsplash",
+    type: 'image' as const,
   }))
 }
 
@@ -298,6 +302,7 @@ async function searchOpenverse(query: string, limit: number): Promise<StockImage
     author: r.creator || null,
     source: "openverse",
     provider: r.source || "openverse",
+    type: 'image' as const,
   }))
 }
 
@@ -314,13 +319,198 @@ function picsumFallback(query: string, limit: number): StockImage[] {
       author: "Lorem Picsum",
       source: "picsum",
       provider: "picsum",
+      type: 'image' as const,
     }
   })
 }
 
-export async function searchImages(query: string, limit = 12): Promise<StockImage[]> {
+// Pexels - free stock videos (requires API key)
+async function searchPexelsVideos(query: string, limit: number): Promise<StockImage[]> {
+  const apiKey = process.env.PEXELS_API_KEY
+  if (!apiKey) {
+    console.log('[AI Studio] PEXELS_API_KEY not configured, skipping Pexels videos')
+    return []
+  }
+  
+  try {
+    const url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${limit}&orientation=portrait&size=small`
+    const res = await fetch(url, {
+      headers: { Authorization: apiKey },
+    })
+    if (!res.ok) {
+      console.log('[AI Studio] Pexels API error:', res.status)
+      return []
+    }
+    const json: any = await res.json()
+    console.log('[AI Studio] Pexels returned', json.videos?.length || 0, 'videos')
+    return (json.videos || []).map((v: any) => ({
+      id: `px_${v.id}`,
+      thumbUrl: v.image || v.video_files?.[0]?.link || '',
+      fullUrl: v.video_files?.[0]?.link || '',
+      author: v.user?.name || null,
+      source: 'pexels',
+      provider: 'pexels',
+      type: 'video' as const,
+      videoUrl: v.video_files?.[0]?.link || '',
+      duration: v.duration || 0,
+    }))
+  } catch (e) {
+    console.log('[AI Studio] Pexels search error:', e)
+    return []
+  }
+}
+
+// Unsplash - NOTE: Unsplash does not have a public video search API (404 on /search/videos)
+// We skip Unsplash for videos and use Pexels/Pixabay instead
+async function searchUnsplashVideos(query: string, limit: number): Promise<StockImage[]> {
+  console.log('[AI Studio] Skipping Unsplash videos (API endpoint not available)')
+  return []
+}
+
+// Pixabay - free stock videos (requires API key but generous free tier)
+async function searchPixabayVideos(query: string, limit: number): Promise<StockImage[]> {
+  const apiKey = process.env.PIXABAY_API_KEY
+  if (!apiKey) {
+    console.log('[AI Studio] PIXABAY_API_KEY not configured, skipping Pixabay videos')
+    return []
+  }
+  
+  try {
+    const url = `https://pixabay.com/api/videos/?key=${apiKey}&q=${encodeURIComponent(query)}&per_page=${limit}&video_type=film&orientation=vertical&safesearch=true`
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.log('[AI Studio] Pixabay API error:', res.status)
+      return []
+    }
+    const json: any = await res.json()
+    console.log('[AI Studio] Pixabay returned', json.hits?.length || 0, 'videos')
+    return (json.hits || []).map((v: any) => ({
+      id: `pxb_${v.id}`,
+      thumbUrl: v.videos?.tiny?.url || v.videos?.small?.url || '',
+      fullUrl: v.videos?.medium?.url || v.videos?.small?.url || '',
+      author: v.user || null,
+      source: 'pixabay',
+      provider: 'pixabay',
+      type: 'video' as const,
+      videoUrl: v.videos?.medium?.url || v.videos?.small?.url || '',
+      duration: v.duration || 0,
+    }))
+  } catch (e) {
+    console.log('[AI Studio] Pixabay search error:', e)
+    return []
+  }
+}
+
+// Fallback to sample videos when no API keys are available
+function videoFallback(query: string, limit: number): StockImage[] {
+  console.log('[AI Studio] Using video fallback (no API keys configured)')
+  const sampleVideos = [
+    {
+      id: 'fb_1',
+      thumbUrl: 'https://images.pexels.com/videos/2759477/free-video-2759477.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/2759477/2759477-uhd_2560_1440_24fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/2759477/2759477-uhd_2560_1440_24fps.mp4',
+      duration: 15,
+    },
+    {
+      id: 'fb_2',
+      thumbUrl: 'https://images.pexels.com/videos/3129671/free-video-3129671.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_25fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_25fps.mp4',
+      duration: 20,
+    },
+    {
+      id: 'fb_3',
+      thumbUrl: 'https://images.pexels.com/videos/853809/free-video-853809.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/853809/853809-uhd_2560_1440_25fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/853809/853809-uhd_2560_1440_25fps.mp4',
+      duration: 12,
+    },
+    {
+      id: 'fb_4',
+      thumbUrl: 'https://images.pexels.com/videos/2869519/free-video-2869519.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/2869519/2869519-uhd_2560_1440_25fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/2869519/2869519-uhd_2560_1440_25fps.mp4',
+      duration: 18,
+    },
+    {
+      id: 'fb_5',
+      thumbUrl: 'https://images.pexels.com/videos/2759493/free-video-2759493.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/2759493/2759493-uhd_2560_1440_25fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/2759493/2759493-uhd_2560_1440_25fps.mp4',
+      duration: 14,
+    },
+    {
+      id: 'fb_6',
+      thumbUrl: 'https://images.pexels.com/videos/2600265/free-video-2600265.jpg?auto=compress&cs=tinysrgb&dpr=1&w=400',
+      fullUrl: 'https://videos.pexels.com/video-files/2600265/2600265-uhd_2560_1440_25fps.mp4',
+      author: 'Pexels',
+      source: 'fallback',
+      provider: 'fallback',
+      type: 'video' as const,
+      videoUrl: 'https://videos.pexels.com/video-files/2600265/2600265-uhd_2560_1440_25fps.mp4',
+      duration: 16,
+    },
+  ]
+  return sampleVideos.slice(0, limit)
+}
+
+export async function searchImages(query: string, limit = 12, type: 'image' | 'video' | 'all' = 'image'): Promise<StockImage[]> {
   const q = (query || "").trim()
+  console.log('[AI Studio] searchImages called with query:', q, 'type:', type, 'limit:', limit)
   if (!q) return picsumFallback("whispr", limit)
+
+  // If requesting videos specifically, try multiple providers
+  if (type === 'video') {
+    console.log('[AI Studio] Searching for videos with query:', q)
+    
+    // Try Unsplash first (if API key exists)
+    const usVideos = await searchUnsplashVideos(q, limit)
+    console.log('[AI Studio] Unsplash returned', usVideos.length, 'videos')
+    if (usVideos.length >= 3) return usVideos
+    
+    // Try Pexels (if API key exists)
+    const pxVideos = await searchPexelsVideos(q, limit)
+    console.log('[AI Studio] Pexels returned', pxVideos.length, 'videos')
+    if (pxVideos.length >= 3) return pxVideos
+    
+    // Try Pixabay (if API key exists)
+    const pxbVideos = await searchPixabayVideos(q, limit)
+    console.log('[AI Studio] Pixabay returned', pxbVideos.length, 'videos')
+    if (pxbVideos.length >= 3) return pxbVideos
+    
+    // If no API keys or all failed, use fallback
+    console.log('[AI Studio] No video API keys configured or all failed, using fallback')
+    return videoFallback(q, limit)
+  }
+
+  // If requesting both, mix images and videos
+  if (type === 'all') {
+    console.log('[AI Studio] Searching for images and videos with query:', q)
+    const images = await searchImages(q, limit, 'image')
+    const videos = await searchImages(q, Math.floor(limit / 2), 'video')
+    return [...images, ...videos].slice(0, limit)
+  }
 
   // 1) Unsplash first — most relevant when a key is configured.
   try {

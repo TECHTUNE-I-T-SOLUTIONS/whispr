@@ -10,7 +10,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const q = searchParams.get("q") || ""
     const limit = Math.min(Number(searchParams.get("limit") || 12), 24)
-    const images = await searchImages(q, limit)
+    const type = (searchParams.get("type") || "image") as "image" | "video" | "all"
+    const images = await searchImages(q, limit, type)
     return NextResponse.json({ ok: true, images })
   } catch (e: any) {
     if (e?.message === "Authentication required") {
