@@ -78,8 +78,8 @@ const postTypeConfig = {
   chain_entry: {
     label: 'Chain Post',
     icon: Link2,
-    color: 'bg-purple-100 dark:bg-black text-purple-800 dark:text-purple-200 border-purple-200',
-    bgColor: 'bg-purple-50 dark:bg-black text-purple-800 dark:text-purple-200',
+    color: 'bg-red-100 dark:bg-black text-red-800 dark:text-red-200 border-red-200',
+    bgColor: 'bg-red-50 dark:bg-black text-red-800 dark:text-red-200',
   },
   story: {
     label: 'Story',
@@ -91,7 +91,7 @@ const postTypeConfig = {
 
 const sourceConfig = {
   chronicles: { label: 'Chronicles', color: 'bg-gray-100 dark:bg-black text-gray-700 dark:text-gray-200' },
-  chain: { label: 'Writing Chain', color: 'bg-purple-100 dark:bg-black text-purple-700 dark:text-purple-200' },
+  chain: { label: 'Writing Chain', color: 'bg-red-100 dark:bg-black text-red-700 dark:text-red-200' },
   story: { label: 'Story', color: 'bg-blue-100 dark:bg-black text-blue-700 dark:text-blue-200' },
 };
 
@@ -293,9 +293,9 @@ export default function AdminPostsManagement() {
           <div className="text-sm text-red-600 font-medium">Flagged</div>
           <div className="text-2xl font-bold text-red-900">{stats.flagged}</div>
         </div>
-        <div className="bg-purple-50 dark:bg-black border border-purple-200 rounded-lg p-4">
-          <div className="text-sm text-purple-600 font-medium">Total Views</div>
-          <div className="text-2xl font-bold text-purple-900">
+        <div className="bg-red-50 dark:bg-black border border-red-200 rounded-lg p-4">
+          <div className="text-sm text-red-600 font-medium">Total Views</div>
+          <div className="text-2xl font-bold text-red-900">
             {posts.reduce((sum, post) => sum + (post.views_count || 0), 0).toLocaleString()}
           </div>
         </div>
@@ -535,7 +535,7 @@ export default function AdminPostsManagement() {
                               {post.title}
                             </div>
                             {post.source === 'chain' && post.chain_title && (
-                              <div className="text-xs text-purple-600 font-medium mt-1">
+                              <div className="text-xs text-red-600 font-medium mt-1">
                                 📚 {post.chain_title}
                               </div>
                             )}

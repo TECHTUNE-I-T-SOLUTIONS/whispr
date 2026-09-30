@@ -93,7 +93,7 @@ export default function MessagingModerationPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <Shield className="w-8 h-8 text-purple-600" />
+          <Shield className="w-8 h-8 text-red-600" />
           <h1 className="text-3xl font-bold">Message Moderation</h1>
         </div>
         <p className="text-muted-foreground">Review and moderate flagged messages and reports</p>
@@ -151,7 +151,7 @@ export default function MessagingModerationPage() {
                     <span className={`px-2 py-1 rounded-full text-xs ${priorityColors[item.priority]}`}>
                       {item.priority}
                     </span>
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs">
+                    <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-xs">
                       {item.flag_reason}
                     </span>
                     {item.ai_flagged && (

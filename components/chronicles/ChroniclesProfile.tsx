@@ -72,7 +72,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-20">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-red-600" />
           <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 pt-20 pb-12">
       {/* Cover Image */}
-      <div className="relative h-48 sm:h-64 bg-gradient-to-r from-purple-600 to-pink-600">
+      <div className="relative h-48 sm:h-64 bg-gradient-to-r from-red-600 to-pink-600">
         {profile.cover_image_url ? (
           <Image
             src={profile.cover_image_url}
@@ -105,7 +105,7 @@ export default function ProfilePage() {
             className="object-cover"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600" />
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-pink-600 to-red-600" />
         )}
         <div className="absolute inset-0 bg-black/30"></div>
 
@@ -140,7 +140,7 @@ export default function ProfilePage() {
                   className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover border-4 border-white dark:border-slate-900 shadow-lg"
                 />
               ) : (
-                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center">
+                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gradient-to-br from-red-600 to-pink-600 border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center">
                   <span className="text-4xl sm:text-5xl font-bold text-white">
                     {profile.pen_name.charAt(0).toUpperCase()}
                   </span>
@@ -194,7 +194,7 @@ export default function ProfilePage() {
                   href={profile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-purple-600 dark:text-purple-400 hover:underline"
+                  className="flex items-center gap-2 text-red-600 dark:text-red-400 hover:underline"
                 >
                   <LinkIcon className="w-4 h-4" />
                   <span className="text-sm">Website</span>
@@ -208,7 +208,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
-              <BookOpen className="w-5 h-5 text-purple-600" />
+              <BookOpen className="w-5 h-5 text-red-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Posts</span>
             </div>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -257,7 +257,7 @@ export default function ProfilePage() {
               {profile.preferred_categories.map((category) => (
                 <span
                   key={category}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium"
+                  className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium"
                 >
                   {category}
                 </span>

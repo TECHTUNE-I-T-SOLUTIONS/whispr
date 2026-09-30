@@ -450,7 +450,7 @@ export default function StoryChaptersManagerPage() {
 
         {/* Story Outline Header Banner */}
         {story && (
-          <div className="relative rounded-2xl overflow-hidden mb-8 bg-gradient-to-r from-purple-950/60 to-slate-900/60 border border-purple-500/25 p-6 md:p-8 shadow-xl">
+          <div className="relative rounded-2xl overflow-hidden mb-8 bg-gradient-to-r from-red-950/60 to-slate-900/60 border border-red-500/25 p-6 md:p-8 shadow-xl">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-primary/20 text-primary border-primary/20">{story.genre}</Badge>

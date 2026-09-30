@@ -281,7 +281,7 @@ export default function ChapterClientPage({
     <div className={`whispr-gradient min-h-screen pb-16 transition-all duration-500 ${immersiveMode ? "pt-4" : "pt-8"}`}>
       {/* 1. SCROLL PROGRESS BAR */}
       <div
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 z-50 transition-all duration-75"
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-red-500 via-pink-500 to-blue-500 z-50 transition-all duration-75"
         style={{ width: `${scrollProgress}%` }}
       />
 

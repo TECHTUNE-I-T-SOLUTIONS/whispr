@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold">{data?.aggregated.totalPosts.toLocaleString()}</span>
-              <MessageSquare className="w-8 h-8 text-purple-500 opacity-50" />
+              <MessageSquare className="w-8 h-8 text-red-500 opacity-50" />
             </div>
             <p className="text-sm text-muted-foreground mt-2">Across all creators</p>
           </CardContent>

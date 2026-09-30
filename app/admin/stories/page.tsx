@@ -440,7 +440,7 @@ export default function AdminStoriesDashboard() {
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1.5">
-                            <Badge className="bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">{story.genre}</Badge>
+                            <Badge className="bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">{story.genre}</Badge>
                             <span className="text-xs text-muted-foreground">
                               by <strong className="text-foreground">@{story.creator?.pen_name}</strong>
                             </span>

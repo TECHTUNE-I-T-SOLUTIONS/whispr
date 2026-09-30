@@ -219,11 +219,11 @@ export default function AdminStoriesMetricsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-border/10 bg-gradient-to-br from-purple-950/20 to-slate-900/40 backdrop-blur rounded-xl">
+              <Card className="border border-border/10 bg-gradient-to-br from-red-950/20 to-slate-900/40 backdrop-blur rounded-xl">
                 <CardContent className="p-5 flex flex-col justify-between h-28">
                   <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
                     <span>Global Comments</span>
-                    <MessageSquare className="h-4 w-4 text-purple-400" />
+                    <MessageSquare className="h-4 w-4 text-red-400" />
                   </div>
                   <div className="text-2xl md:text-3xl font-bold font-serif">{totalComments}</div>
                 </CardContent>
@@ -337,7 +337,7 @@ export default function AdminStoriesMetricsPage() {
                           </td>
                           <td className="px-6 py-4 text-center text-blue-400 font-semibold">{s.views_count || 0}</td>
                           <td className="px-6 py-4 text-center text-pink-500 font-semibold">{s.likes_count || 0}</td>
-                          <td className="px-6 py-4 text-center text-purple-400 font-semibold">{s.comments_count || 0}</td>
+                          <td className="px-6 py-4 text-center text-red-400 font-semibold">{s.comments_count || 0}</td>
                           <td className="px-6 py-4 text-center text-emerald-400 font-semibold">{s.shares_count || 0}</td>
                         </tr>
                       ))}

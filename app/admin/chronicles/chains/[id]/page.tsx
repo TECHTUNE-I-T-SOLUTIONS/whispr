@@ -487,7 +487,7 @@ export default function ChainDetailPage() {
               </div>
               <div className="text-center">
                 <p className="text-gray-600 dark:text-gray-400">Views</p>
-                <p className="text-xl font-bold text-purple-600">{(chain as any).stats.totalViews}</p>
+                <p className="text-xl font-bold text-red-600">{(chain as any).stats.totalViews}</p>
               </div>
               <div className="text-center">
                 <p className="text-gray-600 dark:text-gray-400">Contributors</p>
@@ -675,10 +675,10 @@ export default function ChainDetailPage() {
                 <p className="text-xs text-gray-600 dark:text-gray-400">Shares</p>
               </div>
               <div className="text-center">
-                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-1 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                  <Eye className="w-4 h-4 text-purple-600" />
+                <div className="flex items-center justify-center w-8 h-8 mx-auto mb-1 rounded-full bg-red-100 dark:bg-red-900/30">
+                  <Eye className="w-4 h-4 text-red-600" />
                 </div>
-                <p className="text-xl font-bold text-purple-600">{selectedEntry.views_count || 0}</p>
+                <p className="text-xl font-bold text-red-600">{selectedEntry.views_count || 0}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">Views</p>
               </div>
             </div>

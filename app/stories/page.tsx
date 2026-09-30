@@ -37,7 +37,7 @@ function getGenreIcon(name: string) {
     case "Wand2": return <Wand2 className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-amber-400" />
     case "Rocket": return <Rocket className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-blue-400" />
     case "Heart": return <Heart className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-pink-500 fill-pink-500/20" />
-    case "Search": return <Search className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-purple-400" />
+    case "Search": return <Search className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-red-400" />
     case "Compass": return <Compass className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-emerald-400" />
     case "Smile": return <Smile className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-yellow-400" />
     case "Zap": return <Zap className="h-3.5 w-3.5 mr-1.5 inline-block shrink-0 text-rose-400" />
@@ -52,7 +52,7 @@ function getGenreBadgeIcon(genre: string) {
     case "Fantasy": return <Wand2 className="h-3 w-3 mr-1 inline-block shrink-0 text-amber-400" />
     case "Sci-Fi": return <Rocket className="h-3 w-3 mr-1 inline-block shrink-0 text-blue-400" />
     case "Romance": return <Heart className="h-3 w-3 mr-1 inline-block shrink-0 text-pink-500 fill-pink-500/20" />
-    case "Mystery": return <Search className="h-3 w-3 mr-1 inline-block shrink-0 text-purple-400" />
+    case "Mystery": return <Search className="h-3 w-3 mr-1 inline-block shrink-0 text-red-400" />
     case "Adventure": return <Compass className="h-3 w-3 mr-1 inline-block shrink-0 text-emerald-400" />
     case "Comedy": return <Smile className="h-3 w-3 mr-1 inline-block shrink-0 text-yellow-400" />
     case "Thriller": return <Zap className="h-3 w-3 mr-1 inline-block shrink-0 text-rose-400" />
@@ -91,7 +91,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
     <div className="whispr-gradient min-h-screen pb-12 pt-6">
       <div className="container max-w-auto mx-auto px-4">
         {/* Banner Section */}
-        <div className="relative rounded-2xl overflow-hidden mb-10 bg-gradient-to-r from-purple-900/60 via-pink-900/40 to-blue-900/60 p-8 md:p-12 border border-purple-500/20 shadow-2xl backdrop-blur-md animate-fade-in">
+        <div className="relative rounded-2xl overflow-hidden mb-10 bg-gradient-to-r from-red-900/60 via-pink-900/40 to-blue-900/60 p-8 md:p-12 border border-red-500/20 shadow-2xl backdrop-blur-md animate-fade-in">
           <div className="relative z-10 max-w-2xl">
             <Badge className="bg-primary/20 text-primary border-primary/30 mb-4 px-3 py-1 text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 w-fit">
               <BookOpen className="h-3.5 w-3.5" />
@@ -242,7 +242,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
                               className="h-5 w-5 rounded-full object-cover border border-white/20"
                             />
                           ) : (
-                            <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-[9px] text-white font-bold">
+                            <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-red-500 to-indigo-500 flex items-center justify-center text-[9px] text-white font-bold">
                               {story.author_name?.charAt(0).toUpperCase() || "W"}
                             </div>
                           )}
@@ -305,7 +305,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
           {/* Sidebar - Right 1 col */}
           <div className="space-y-6">
             {/* Creator CTA */}
-            <Card className="border-0 bg-gradient-to-br from-indigo-950/60 to-purple-950/40 p-5 rounded-xl shadow-lg border border-purple-500/20 text-center">
+            <Card className="border-0 bg-gradient-to-br from-indigo-950/60 to-red-950/40 p-5 rounded-xl shadow-lg border border-red-500/20 text-center">
               <PenTool className="h-8 w-8 text-primary mx-auto mb-3" />
               <h4 className="font-serif text-lg font-bold mb-1">Become a Chronicle Creator</h4>
               <p className="text-xs text-muted-foreground mb-4">

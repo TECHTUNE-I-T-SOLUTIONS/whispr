@@ -129,7 +129,7 @@ export function AppBanner({ postId, postType = 'chronicles' }: AppBannerProps) {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg">
       <div className="max-w-full mx-auto px-4 py-4 sm:py-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -150,7 +150,7 @@ export function AppBanner({ postId, postType = 'chronicles' }: AppBannerProps) {
             {postId && postType && (
               <button
                 onClick={handleOpenInApp}
-                className="bg-white text-purple-600 hover:bg-gray-100 px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center gap-2"
+                className="bg-white text-red-600 hover:bg-gray-100 px-3 sm:px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center gap-2"
                 aria-label="Open in app"
               >
                 <ArrowUpRight className="w-4 h-4 hidden sm:inline" />

@@ -217,7 +217,7 @@ export default function ChroniclesMessagesPage() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <MessageCircle className="w-8 h-8 text-purple-600" />
+            <MessageCircle className="w-8 h-8 text-red-600" />
             <h1 className="text-3xl font-bold">Messages</h1>
           </div>
           <p className="text-muted-foreground">Connect and collaborate with fellow creators</p>
@@ -262,12 +262,12 @@ export default function ChroniclesMessagesPage() {
                       onClick={() => setSelectedConversation(conv)}
                       className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors ${
                         selectedConversation?.id === conv.id
-                          ? 'bg-purple-50 dark:bg-purple-900/20'
+                          ? 'bg-red-50 dark:bg-red-900/20'
                           : ''
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           {conv.recipient_avatar ? (
                             <img
                               src={conv.recipient_avatar}
@@ -282,7 +282,7 @@ export default function ChroniclesMessagesPage() {
                           <div className="flex items-center justify-between mb-1">
                             <h3 className="font-semibold truncate">{conv.recipient_name}</h3>
                             {conv.unread_count > 0 && (
-                              <span className="px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
+                              <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded-full">
                                 {conv.unread_count}
                               </span>
                             )}
@@ -306,7 +306,7 @@ export default function ChroniclesMessagesPage() {
               <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 h-[600px] flex flex-col">
                 {/* Chat Header */}
                 <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
                     {selectedConversation.recipient_avatar ? (
                       <img
                         src={selectedConversation.recipient_avatar}
@@ -340,7 +340,7 @@ export default function ChroniclesMessagesPage() {
                         <div
                           className={`max-w-xs md:max-w-md rounded-lg p-3 ${
                             message.is_from_me
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-red-600 text-white'
                               : 'bg-gray-100 dark:bg-slate-800'
                           }`}
                         >

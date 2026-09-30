@@ -99,8 +99,10 @@ CREATE TABLE public.notifications (
   message text NOT NULL,
   read boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
+  prompt_id uuid,
   CONSTRAINT notifications_pkey PRIMARY KEY (id),
-  CONSTRAINT notifications_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
+  CONSTRAINT notifications_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id),
+  CONSTRAINT notifications_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id)
 );
 CREATE TABLE public.post_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -135,8 +137,11 @@ CREATE TABLE public.posts (
   published_at timestamp with time zone,
   schema_type character varying DEFAULT 'None'::character varying CHECK (schema_type::text = ANY (ARRAY['None'::character varying, 'Article'::character varying, 'HowTo'::character varying, 'FAQPage'::character varying]::text[])),
   article_id text UNIQUE,
+  is_challenge_entry boolean DEFAULT false,
+  prompt_entry_id uuid,
   CONSTRAINT posts_pkey PRIMARY KEY (id),
-  CONSTRAINT posts_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
+  CONSTRAINT posts_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id),
+  CONSTRAINT posts_prompt_entry_id_fkey FOREIGN KEY (prompt_entry_id) REFERENCES public.chronicles_prompt_entries(id)
 );
 CREATE TABLE public.reactions (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -407,8 +412,11 @@ CREATE TABLE public.chronicles_posts (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   article_id text UNIQUE,
+  is_challenge_entry boolean DEFAULT false,
+  prompt_entry_id uuid,
   CONSTRAINT chronicles_posts_pkey PRIMARY KEY (id),
-  CONSTRAINT chronicles_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+  CONSTRAINT chronicles_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_posts_prompt_entry_id_fkey FOREIGN KEY (prompt_entry_id) REFERENCES public.chronicles_prompt_entries(id)
 );
 CREATE TABLE public.chronicles_engagement (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -424,7 +432,7 @@ CREATE TABLE public.chronicles_engagement (
 CREATE TABLE public.chronicles_notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL,
-  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'follower_left'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text, 'post_flagged_for_review'::text, 'chain_created'::text, 'chain_entry_added'::text, 'post_added_to_chain'::text])),
+  type text NOT NULL CHECK (type = ANY (ARRAY['new_post_published'::text, 'post_liked'::text, 'post_commented'::text, 'post_shared'::text, 'follower_joined'::text, 'follower_left'::text, 'badge_earned'::text, 'streak_milestone'::text, 'sub_admin_offered'::text, 'engagement_summary'::text, 'comment_reply'::text, 'system'::text, 'post_flagged_for_review'::text, 'chain_created'::text, 'chain_entry_added'::text, 'post_added_to_chain'::text, 'new_challenge_available'::text, 'challenge_won'::text, 'challenge_entry_approved'::text, 'challenge_winner_announced'::text])),
   title character varying NOT NULL,
   message text NOT NULL,
   related_post_id uuid,
@@ -433,10 +441,12 @@ CREATE TABLE public.chronicles_notifications (
   read boolean DEFAULT false,
   read_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  prompt_id uuid,
   CONSTRAINT chronicles_notifications_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_notifications_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
   CONSTRAINT chronicles_notifications_related_post_id_fkey FOREIGN KEY (related_post_id) REFERENCES public.chronicles_posts(id),
-  CONSTRAINT chronicles_notifications_related_creator_id_fkey FOREIGN KEY (related_creator_id) REFERENCES public.chronicles_creators(id)
+  CONSTRAINT chronicles_notifications_related_creator_id_fkey FOREIGN KEY (related_creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_notifications_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id)
 );
 CREATE TABLE public.chronicles_admin_activity_log (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -651,7 +661,7 @@ CREATE TABLE public.chronicles_ad_analytics (
 );
 CREATE TABLE public.chronicles_admin_notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['creator_signup'::text, 'creator_milestone'::text, 'post_viral'::text, 'post_reported'::text, 'post_flagged'::text, 'comment_flagged'::text, 'high_engagement'::text, 'low_quality_post'::text, 'creator_banned'::text, 'revenue_milestone'::text, 'subscriber_milestone'::text, 'admin_action_needed'::text, 'system_alert'::text])),
+  notification_type text NOT NULL CHECK (notification_type = ANY (ARRAY['creator_signup'::text, 'creator_milestone'::text, 'post_viral'::text, 'post_reported'::text, 'post_flagged'::text, 'comment_flagged'::text, 'high_engagement'::text, 'low_quality_post'::text, 'creator_banned'::text, 'revenue_milestone'::text, 'subscriber_milestone'::text, 'admin_action_needed'::text, 'system_alert'::text, 'challenge_created'::text, 'challenge_ended'::text, 'challenge_entry_submitted'::text, 'challenge_ai_generated'::text, 'challenge_winner_announced'::text])),
   title character varying NOT NULL,
   message text NOT NULL,
   creator_id uuid,
@@ -664,11 +674,13 @@ CREATE TABLE public.chronicles_admin_notifications (
   action_taken text,
   data jsonb DEFAULT '{}'::jsonb,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  prompt_id uuid,
   CONSTRAINT chronicles_admin_notifications_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_admin_notifications_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
   CONSTRAINT chronicles_admin_notifications_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
   CONSTRAINT chronicles_admin_notifications_comment_id_fkey FOREIGN KEY (comment_id) REFERENCES public.chronicles_comments(id),
-  CONSTRAINT chronicles_admin_notifications_read_by_fkey FOREIGN KEY (read_by) REFERENCES auth.users(id)
+  CONSTRAINT chronicles_admin_notifications_read_by_fkey FOREIGN KEY (read_by) REFERENCES auth.users(id),
+  CONSTRAINT chronicles_admin_notifications_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id)
 );
 CREATE TABLE public.chronicles_admin_notification_settings (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -1262,10 +1274,13 @@ CREATE TABLE public.chronicles_chain_entry_posts (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   article_id text UNIQUE,
+  is_challenge_entry boolean DEFAULT false,
+  prompt_entry_id uuid,
   CONSTRAINT chronicles_chain_entry_posts_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_chain_entry_posts_chain_id_fkey FOREIGN KEY (chain_id) REFERENCES public.chronicles_writing_chains(id),
   CONSTRAINT chronicles_chain_entry_posts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
-  CONSTRAINT chronicles_chain_entry_posts_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.chronicles_creators(id)
+  CONSTRAINT chronicles_chain_entry_posts_added_by_fkey FOREIGN KEY (added_by) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_chain_entry_posts_prompt_entry_id_fkey FOREIGN KEY (prompt_entry_id) REFERENCES public.chronicles_prompt_entries(id)
 );
 CREATE TABLE public.chronicles_chain_entry_post_likes (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -1535,4 +1550,1264 @@ CREATE TABLE public.chronicles_game_rounds (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT chronicles_game_rounds_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_game_rounds_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.chronicles_game_sessions(id)
+);
+CREATE TABLE public.chronicles_creator_game_progress (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  best_score integer NOT NULL DEFAULT 0,
+  total_score integer NOT NULL DEFAULT 0,
+  best_streak integer NOT NULL DEFAULT 0,
+  attempts_count integer NOT NULL DEFAULT 0,
+  completed_sessions integer NOT NULL DEFAULT 0,
+  last_played_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_progress_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_progress_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.chronicles_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  description text,
+  icon text,
+  points_reward integer NOT NULL DEFAULT 0,
+  condition_type text NOT NULL,
+  condition_value integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_achievements_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chronicles_creator_game_achievements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  achievement_id uuid NOT NULL,
+  earned_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_creator_game_achievements_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_creator_game_achievements_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_creator_game_achievements_achievement_id_fkey FOREIGN KEY (achievement_id) REFERENCES public.chronicles_game_achievements(id)
+);
+CREATE TABLE public.job_opportunity_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  icon text,
+  color text,
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT job_opportunity_categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.job_opportunities (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  category_id uuid NOT NULL,
+  created_by_admin_id uuid,
+  title text NOT NULL,
+  slug text NOT NULL UNIQUE,
+  summary text NOT NULL,
+  description text NOT NULL,
+  organization_name text NOT NULL,
+  organization_website text,
+  opportunity_type text NOT NULL DEFAULT 'job'::text CHECK (opportunity_type = ANY (ARRAY['job'::text, 'freelance'::text, 'internship'::text, 'grant'::text, 'residency'::text, 'competition'::text, 'commission'::text, 'call_for_submissions'::text, 'volunteer'::text])),
+  location text,
+  remote_type text DEFAULT 'any'::text CHECK (remote_type = ANY (ARRAY['onsite'::text, 'hybrid'::text, 'remote'::text, 'any'::text])),
+  compensation text,
+  application_url text NOT NULL,
+  source_url text,
+  contact_email text,
+  image_url text,
+  image_alt text,
+  tags ARRAY DEFAULT ARRAY[]::text[],
+  requirements ARRAY DEFAULT ARRAY[]::text[],
+  benefits ARRAY DEFAULT ARRAY[]::text[],
+  featured boolean DEFAULT false,
+  status text DEFAULT 'draft'::text CHECK (status = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  deadline_at timestamp with time zone,
+  published_at timestamp with time zone,
+  view_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT job_opportunities_pkey PRIMARY KEY (id),
+  CONSTRAINT job_opportunities_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.job_opportunity_categories(id),
+  CONSTRAINT job_opportunities_created_by_admin_id_fkey FOREIGN KEY (created_by_admin_id) REFERENCES public.admin(id)
+);
+CREATE TABLE public.hashtags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name character varying NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hashtags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.admin_stories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  admin_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL UNIQUE,
+  description text,
+  excerpt text,
+  genre character varying NOT NULL,
+  cover_image_url text,
+  status character varying DEFAULT 'draft'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  views_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  shares_count integer DEFAULT 0,
+  seo_title character varying,
+  seo_description text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  published_at timestamp with time zone,
+  CONSTRAINT admin_stories_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_stories_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id)
+);
+CREATE TABLE public.admin_story_chapters (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL,
+  content text NOT NULL,
+  sequence integer NOT NULL,
+  status character varying DEFAULT 'published'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  comments_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  dislikes_count integer DEFAULT 0,
+  CONSTRAINT admin_story_chapters_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_chapters_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id)
+);
+CREATE TABLE public.chronicles_stories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL UNIQUE,
+  description text,
+  excerpt text,
+  genre character varying NOT NULL,
+  cover_image_url text,
+  status character varying DEFAULT 'draft'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text, 'archived'::text])),
+  views_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  shares_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  published_at timestamp with time zone,
+  CONSTRAINT chronicles_stories_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_stories_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_story_chapters (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  title character varying NOT NULL,
+  slug character varying NOT NULL,
+  content text NOT NULL,
+  sequence integer NOT NULL,
+  status character varying DEFAULT 'published'::character varying CHECK (status::text = ANY (ARRAY['draft'::text, 'published'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  comments_count integer DEFAULT 0,
+  likes_count integer DEFAULT 0,
+  dislikes_count integer DEFAULT 0,
+  CONSTRAINT chronicles_story_chapters_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_chapters_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id)
+);
+CREATE TABLE public.admin_story_hashtags (
+  story_id uuid NOT NULL,
+  hashtag_id uuid NOT NULL,
+  CONSTRAINT admin_story_hashtags_pkey PRIMARY KEY (story_id, hashtag_id),
+  CONSTRAINT admin_story_hashtags_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_hashtags_hashtag_id_fkey FOREIGN KEY (hashtag_id) REFERENCES public.hashtags(id)
+);
+CREATE TABLE public.chronicles_story_hashtags (
+  story_id uuid NOT NULL,
+  hashtag_id uuid NOT NULL,
+  CONSTRAINT chronicles_story_hashtags_pkey PRIMARY KEY (story_id, hashtag_id),
+  CONSTRAINT chronicles_story_hashtags_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_hashtags_hashtag_id_fkey FOREIGN KEY (hashtag_id) REFERENCES public.hashtags(id)
+);
+CREATE TABLE public.admin_story_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_likes_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_story_likes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_likes_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_likes_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.admin_story_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid,
+  commenter_name character varying NOT NULL,
+  commenter_email character varying,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  status character varying DEFAULT 'approved'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT admin_story_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.admin_story_comments(id)
+);
+CREATE TABLE public.chronicles_story_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  user_id uuid,
+  creator_id uuid,
+  commenter_name character varying NOT NULL,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  status character varying DEFAULT 'approved'::character varying CHECK (status::text = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT chronicles_story_comments_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_story_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.chronicles_story_comments(id)
+);
+CREATE TABLE public.admin_story_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  shared_to character varying NOT NULL DEFAULT 'link'::character varying,
+  share_metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_story_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_shares_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id)
+);
+CREATE TABLE public.chronicles_story_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  story_id uuid NOT NULL,
+  creator_id uuid,
+  shared_to character varying NOT NULL DEFAULT 'link'::character varying,
+  share_metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT chronicles_story_shares_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_shares_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_shares_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_game_challenges (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  game_id uuid NOT NULL,
+  challenge_order integer NOT NULL,
+  question text NOT NULL,
+  context text,
+  options jsonb NOT NULL DEFAULT '[]'::jsonb,
+  correct_answer text NOT NULL,
+  explanation text NOT NULL,
+  teaching_point text,
+  difficulty text NOT NULL DEFAULT 'beginner'::text,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT chronicles_game_challenges_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_game_challenges_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.billing_plans (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  price_monthly numeric NOT NULL DEFAULT 0,
+  price_yearly numeric NOT NULL DEFAULT 0,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  paystack_monthly_price_code text,
+  paystack_yearly_price_code text,
+  trial_days integer NOT NULL DEFAULT 7,
+  active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  features jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plans_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  key text NOT NULL UNIQUE,
+  name text NOT NULL,
+  description text,
+  category text DEFAULT 'general'::text,
+  coming_soon boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_features_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_plan_features (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  plan_id uuid NOT NULL,
+  feature_id uuid NOT NULL,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_features_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_features_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id),
+  CONSTRAINT billing_plan_features_feature_id_fkey FOREIGN KEY (feature_id) REFERENCES public.billing_features(id)
+);
+CREATE TABLE public.billing_plan_limits (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  plan_id uuid NOT NULL UNIQUE,
+  daily_chat_limit integer,
+  monthly_chat_limit integer,
+  daily_token_limit bigint,
+  monthly_token_limit bigint,
+  daily_image_limit integer,
+  monthly_image_limit integer,
+  voice_minutes integer,
+  storage_mb integer,
+  priority_level integer DEFAULT 1,
+  max_response_length integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_limits_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_limits_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_user_subscriptions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  provider text NOT NULL DEFAULT 'paystack'::text,
+  provider_customer_id text,
+  provider_subscription_id text,
+  provider_price_id text,
+  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['trialing'::text, 'active'::text, 'past_due'::text, 'paused'::text, 'cancelled'::text, 'expired'::text, 'incomplete'::text])),
+  billing_interval text CHECK (billing_interval = ANY (ARRAY['monthly'::text, 'yearly'::text])),
+  trial_ends_at timestamp with time zone,
+  started_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  current_period_start timestamp with time zone,
+  current_period_end timestamp with time zone,
+  cancel_at_period_end boolean DEFAULT false,
+  cancelled_at timestamp with time zone,
+  trial_used boolean DEFAULT false,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_subscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_subscriptions_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_user_entitlements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  feature_key text NOT NULL,
+  granted boolean NOT NULL DEFAULT false,
+  expires_at timestamp with time zone,
+  source_subscription_id uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_entitlements_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_entitlements_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_entitlements_source_subscription_id_fkey FOREIGN KEY (source_subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_ai_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  month text NOT NULL,
+  tokens_used bigint NOT NULL DEFAULT 0,
+  input_tokens bigint NOT NULL DEFAULT 0,
+  output_tokens bigint NOT NULL DEFAULT 0,
+  chat_count integer NOT NULL DEFAULT 0,
+  completion_count integer NOT NULL DEFAULT 0,
+  image_requests integer NOT NULL DEFAULT 0,
+  voice_minutes integer NOT NULL DEFAULT 0,
+  research_requests integer NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_ai_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_ai_usage_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  provider text NOT NULL,
+  model text NOT NULL,
+  feature text NOT NULL,
+  request_tokens bigint NOT NULL DEFAULT 0,
+  response_tokens bigint NOT NULL DEFAULT 0,
+  total_tokens bigint NOT NULL DEFAULT 0,
+  estimated_cost numeric DEFAULT 0,
+  response_time_ms integer,
+  status text DEFAULT 'success'::text,
+  error_message text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_usage_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_ai_usage_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_ai_models (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  provider text NOT NULL,
+  model_name text NOT NULL,
+  display_name text NOT NULL,
+  input_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  output_cost_per_1m_tokens numeric NOT NULL DEFAULT 0,
+  supports_images boolean DEFAULT false,
+  supports_voice boolean DEFAULT false,
+  supports_streaming boolean DEFAULT true,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_ai_models_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_feature_flags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  key text NOT NULL UNIQUE,
+  enabled boolean NOT NULL DEFAULT false,
+  description text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_feature_flags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_payment_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  transaction_type text NOT NULL CHECK (transaction_type = ANY (ARRAY['subscription'::text, 'upgrade'::text, 'downgrade'::text, 'renewal'::text, 'refund'::text, 'trial_start'::text])),
+  amount numeric NOT NULL,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'completed'::text, 'failed'::text, 'refunded'::text])),
+  provider_transaction_id text,
+  provider_payment_method text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  completed_at timestamp with time zone,
+  CONSTRAINT billing_payment_transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_payment_transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_payment_transactions_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  premium_enabled boolean NOT NULL DEFAULT true,
+  ai_premium_enabled boolean NOT NULL DEFAULT true,
+  games_premium_enabled boolean NOT NULL DEFAULT true,
+  free_trial_enabled boolean NOT NULL DEFAULT true,
+  trial_days integer NOT NULL DEFAULT 7,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  exchange_rate_to_ngn numeric NOT NULL DEFAULT 1500,
+  paystack_public_key text,
+  paystack_secret_key text,
+  auto_renewal_enabled boolean NOT NULL DEFAULT true,
+  grace_period_days integer NOT NULL DEFAULT 3,
+  dunning_enabled boolean NOT NULL DEFAULT true,
+  max_retry_attempts integer NOT NULL DEFAULT 3,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_settings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_admin_subscription_actions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  admin_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  action_type text NOT NULL CHECK (action_type = ANY (ARRAY['manual_upgrade'::text, 'manual_downgrade'::text, 'extend_trial'::text, 'grant_free_access'::text, 'revoke_access'::text, 'refund'::text, 'adjust_quota'::text, 'pause_subscription'::text, 'resume_subscription'::text])),
+  action_details jsonb DEFAULT '{}'::jsonb,
+  reason text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_admin_subscription_actions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_admin_subscription_actions_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id),
+  CONSTRAINT billing_admin_subscription_actions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_subscription_disputes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  dispute_type text NOT NULL CHECK (dispute_type = ANY (ARRAY['unauthorized_charge'::text, 'service_not_received'::text, 'quality_issue'::text, 'billing_error'::text, 'refund_request'::text, 'other'::text])),
+  description text NOT NULL,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'resolved'::text, 'rejected'::text, 'escalated'::text])),
+  provider_dispute_id text,
+  resolution text,
+  resolved_by uuid,
+  resolved_at timestamp with time zone,
+  refund_amount numeric,
+  refund_currency text DEFAULT 'USD'::text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_subscription_disputes_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_subscription_disputes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_subscription_disputes_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id),
+  CONSTRAINT billing_subscription_disputes_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.billing_coupons (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  code text NOT NULL UNIQUE,
+  description text,
+  discount_type text NOT NULL CHECK (discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])),
+  discount_value numeric NOT NULL,
+  applicable_plans ARRAY,
+  max_uses integer,
+  uses_count integer NOT NULL DEFAULT 0,
+  valid_from timestamp with time zone NOT NULL,
+  valid_until timestamp with time zone NOT NULL,
+  active boolean NOT NULL DEFAULT true,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupons_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_coupons_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.billing_coupon_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  coupon_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  subscription_id uuid,
+  discount_amount numeric NOT NULL,
+  used_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_coupon_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_coupon_usage_coupon_id_fkey FOREIGN KEY (coupon_id) REFERENCES public.billing_coupons(id),
+  CONSTRAINT billing_coupon_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_coupon_usage_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.billing_user_subscriptions(id)
+);
+CREATE TABLE public.billing_referrals (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  referrer_id uuid NOT NULL,
+  referral_code text NOT NULL UNIQUE,
+  total_referrals integer NOT NULL DEFAULT 0,
+  successful_referrals integer NOT NULL DEFAULT 0,
+  total_rewards_earned numeric NOT NULL DEFAULT 0,
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referrals_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_referrals_referrer_id_fkey FOREIGN KEY (referrer_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_referral_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  referral_id uuid NOT NULL,
+  referred_user_id uuid,
+  reward_type text NOT NULL CHECK (reward_type = ANY (ARRAY['tokens'::text, 'free_days'::text, 'discount'::text, 'cash'::text])),
+  reward_value numeric NOT NULL,
+  reward_currency text DEFAULT 'USD'::text,
+  status text NOT NULL DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'granted'::text, 'expired'::text, 'revoked'::text])),
+  granted_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_referral_transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_referral_transactions_referral_id_fkey FOREIGN KEY (referral_id) REFERENCES public.billing_referrals(id),
+  CONSTRAINT billing_referral_transactions_referred_user_id_fkey FOREIGN KEY (referred_user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.billing_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  date date NOT NULL UNIQUE,
+  total_subscribers integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  cancelled_subscribers integer NOT NULL DEFAULT 0,
+  churned_subscribers integer NOT NULL DEFAULT 0,
+  trial_users integer NOT NULL DEFAULT 0,
+  mrr numeric NOT NULL DEFAULT 0,
+  arr numeric NOT NULL DEFAULT 0,
+  total_revenue numeric NOT NULL DEFAULT 0,
+  refunds numeric NOT NULL DEFAULT 0,
+  failed_payments integer NOT NULL DEFAULT 0,
+  conversion_rate numeric DEFAULT 0,
+  avg_revenue_per_user numeric DEFAULT 0,
+  total_ai_cost numeric DEFAULT 0,
+  profit_margin numeric DEFAULT 0,
+  active_plans jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_analytics_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.billing_plan_revenue (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  analytics_id uuid NOT NULL,
+  plan_id uuid NOT NULL,
+  subscriber_count integer NOT NULL DEFAULT 0,
+  new_subscribers integer NOT NULL DEFAULT 0,
+  revenue numeric NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_plan_revenue_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_plan_revenue_analytics_id_fkey FOREIGN KEY (analytics_id) REFERENCES public.billing_analytics(id),
+  CONSTRAINT billing_plan_revenue_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.billing_plans(id)
+);
+CREATE TABLE public.billing_games_config (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  game_id uuid NOT NULL,
+  premium_required boolean NOT NULL DEFAULT false,
+  is_free boolean NOT NULL DEFAULT false,
+  required_feature_key text,
+  minimum_plan_slug text,
+  free_daily_plays integer NOT NULL DEFAULT 1,
+  premium_daily_plays integer NOT NULL DEFAULT '-1'::integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_games_config_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_games_config_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.billing_user_game_usage (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  game_id uuid NOT NULL,
+  date date NOT NULL,
+  plays_count integer NOT NULL DEFAULT 0,
+  premium_plays_count integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT billing_user_game_usage_pkey PRIMARY KEY (id),
+  CONSTRAINT billing_user_game_usage_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT billing_user_game_usage_game_id_fkey FOREIGN KEY (game_id) REFERENCES public.chronicles_games(id)
+);
+CREATE TABLE public.admin_story_chapter_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chapter_id uuid NOT NULL,
+  story_id uuid NOT NULL,
+  user_id uuid,
+  commenter_name text NOT NULL,
+  commenter_email text,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  likes_count integer DEFAULT 0,
+  replies_count integer DEFAULT 0,
+  status text DEFAULT 'approved'::text CHECK (status = ANY (ARRAY['approved'::text, 'pending'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT admin_story_chapter_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_chapter_comments_chapter_id_fkey FOREIGN KEY (chapter_id) REFERENCES public.admin_story_chapters(id),
+  CONSTRAINT admin_story_chapter_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id),
+  CONSTRAINT admin_story_chapter_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.admin_story_chapter_comments(id)
+);
+CREATE TABLE public.chronicles_story_chapter_comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chapter_id uuid NOT NULL,
+  story_id uuid NOT NULL,
+  user_id uuid,
+  creator_id uuid,
+  commenter_name text NOT NULL,
+  commenter_email text,
+  content text NOT NULL,
+  parent_comment_id uuid,
+  likes_count integer DEFAULT 0,
+  replies_count integer DEFAULT 0,
+  status text DEFAULT 'approved'::text CHECK (status = ANY (ARRAY['approved'::text, 'pending'::text, 'rejected'::text, 'hidden'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_story_chapter_comments_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_chapter_comments_chapter_id_fkey FOREIGN KEY (chapter_id) REFERENCES public.chronicles_story_chapters(id),
+  CONSTRAINT chronicles_story_chapter_comments_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_chapter_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.chronicles_story_chapter_comments(id),
+  CONSTRAINT chronicles_story_chapter_comments_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.admin_story_chapter_reactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chapter_id uuid NOT NULL,
+  story_id uuid NOT NULL,
+  user_id uuid,
+  reaction_type text NOT NULL DEFAULT 'like'::text CHECK (reaction_type = ANY (ARRAY['like'::text, 'dislike'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  user_ip text,
+  CONSTRAINT admin_story_chapter_reactions_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_story_chapter_reactions_chapter_id_fkey FOREIGN KEY (chapter_id) REFERENCES public.admin_story_chapters(id),
+  CONSTRAINT admin_story_chapter_reactions_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.admin_stories(id)
+);
+CREATE TABLE public.chronicles_story_chapter_reactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  chapter_id uuid NOT NULL,
+  story_id uuid NOT NULL,
+  user_id uuid,
+  creator_id uuid,
+  reaction_type text NOT NULL DEFAULT 'like'::text CHECK (reaction_type = ANY (ARRAY['like'::text, 'dislike'::text])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  user_ip text,
+  CONSTRAINT chronicles_story_chapter_reactions_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_story_chapter_reactions_chapter_id_fkey FOREIGN KEY (chapter_id) REFERENCES public.chronicles_story_chapters(id),
+  CONSTRAINT chronicles_story_chapter_reactions_story_id_fkey FOREIGN KEY (story_id) REFERENCES public.chronicles_stories(id),
+  CONSTRAINT chronicles_story_chapter_reactions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.cached_searches (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cache_key text NOT NULL UNIQUE,
+  provider text NOT NULL,
+  payload jsonb NOT NULL,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  last_accessed_at timestamp with time zone DEFAULT now(),
+  hit_count integer DEFAULT 0,
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'expired'::text, 'invalidated'::text])),
+  CONSTRAINT cached_searches_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.cached_news (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cache_key text NOT NULL UNIQUE,
+  provider text NOT NULL,
+  payload jsonb NOT NULL,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  last_accessed_at timestamp with time zone DEFAULT now(),
+  hit_count integer DEFAULT 0,
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'expired'::text, 'invalidated'::text])),
+  CONSTRAINT cached_news_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.cached_ai (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cache_key text NOT NULL UNIQUE,
+  provider text NOT NULL,
+  payload jsonb NOT NULL,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  last_accessed_at timestamp with time zone DEFAULT now(),
+  hit_count integer DEFAULT 0,
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'expired'::text, 'invalidated'::text])),
+  CONSTRAINT cached_ai_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.cached_research (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cache_key text NOT NULL UNIQUE,
+  provider text NOT NULL,
+  payload jsonb NOT NULL,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  last_accessed_at timestamp with time zone DEFAULT now(),
+  hit_count integer DEFAULT 0,
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'expired'::text, 'invalidated'::text])),
+  CONSTRAINT cached_research_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.cached_trending (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cache_key text NOT NULL UNIQUE,
+  provider text NOT NULL,
+  payload jsonb NOT NULL,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  last_accessed_at timestamp with time zone DEFAULT now(),
+  hit_count integer DEFAULT 0,
+  status text DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'expired'::text, 'invalidated'::text])),
+  CONSTRAINT cached_trending_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.knowledge_documents (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  provider text NOT NULL,
+  title text NOT NULL,
+  summary text,
+  content text,
+  category text,
+  tags ARRAY DEFAULT ARRAY[]::text[],
+  keywords ARRAY DEFAULT ARRAY[]::text[],
+  source_url text,
+  published_at timestamp with time zone,
+  updated_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone,
+  language text DEFAULT 'en'::text,
+  country text,
+  credibility_score numeric DEFAULT 0.5 CHECK (credibility_score >= 0::numeric AND credibility_score <= 1::numeric),
+  trending_score numeric DEFAULT 0 CHECK (trending_score >= 0::numeric),
+  hash text UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT knowledge_documents_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.provider_health (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  provider text NOT NULL UNIQUE,
+  healthy boolean DEFAULT true,
+  average_response_time numeric DEFAULT 0,
+  last_success timestamp with time zone,
+  last_failure timestamp with time zone,
+  cache_hit_rate numeric DEFAULT 0,
+  estimated_quota_remaining integer,
+  error_count integer DEFAULT 0,
+  success_count integer DEFAULT 0,
+  last_checked_at timestamp with time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT provider_health_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.provider_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  provider text NOT NULL,
+  endpoint text,
+  method text,
+  status_code integer,
+  response_time_ms numeric,
+  success boolean,
+  error_message text,
+  cache_hit boolean DEFAULT false,
+  timestamp timestamp with time zone DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT provider_logs_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.recommendation_profiles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL UNIQUE,
+  profile_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  last_updated_at timestamp with time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT recommendation_profiles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.recommendation_scores (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  content_id uuid NOT NULL,
+  content_type text NOT NULL,
+  score numeric NOT NULL,
+  reason text,
+  calculated_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone,
+  CONSTRAINT recommendation_scores_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_interests (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  interest text NOT NULL,
+  weight numeric DEFAULT 1.0,
+  source text DEFAULT 'manual'::text CHECK (source = ANY (ARRAY['manual'::text, 'inferred'::text, 'behavior'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_interests_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_topics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  topic text NOT NULL,
+  follow_count integer DEFAULT 0,
+  last_engaged_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_topics_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_search_history (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  query text NOT NULL,
+  results_count integer DEFAULT 0,
+  clicked_result_id uuid,
+  clicked_result_type text,
+  timestamp timestamp with time zone DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT user_search_history_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.search_analytics (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  query text NOT NULL,
+  result_count integer DEFAULT 0,
+  has_results boolean DEFAULT true,
+  search_type text DEFAULT 'general'::text,
+  timestamp timestamp with time zone DEFAULT now(),
+  user_id uuid,
+  session_id text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT search_analytics_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.ai_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  provider text NOT NULL,
+  model text,
+  prompt_tokens integer DEFAULT 0,
+  completion_tokens integer DEFAULT 0,
+  total_tokens integer DEFAULT 0,
+  latency_ms numeric,
+  success boolean DEFAULT true,
+  error_message text,
+  feature text NOT NULL,
+  timestamp timestamp with time zone DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT ai_logs_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.feature_flags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  flag_name text NOT NULL UNIQUE,
+  enabled boolean DEFAULT false,
+  description text,
+  rollout_percentage numeric DEFAULT 0 CHECK (rollout_percentage >= 0::numeric AND rollout_percentage <= 100::numeric),
+  user_whitelist ARRAY DEFAULT ARRAY[]::uuid[],
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT feature_flags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.prompt_versions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  prompt_name text NOT NULL,
+  version text NOT NULL,
+  content text NOT NULL,
+  is_active boolean DEFAULT true,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  created_by uuid,
+  CONSTRAINT prompt_versions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.system_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  setting_key text NOT NULL UNIQUE,
+  setting_value text,
+  setting_type text DEFAULT 'string'::text CHECK (setting_type = ANY (ARRAY['string'::text, 'number'::text, 'boolean'::text, 'json'::text])),
+  description text,
+  is_public boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  updated_by uuid,
+  CONSTRAINT system_settings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.ai_content_config (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  authenticity_threshold integer NOT NULL DEFAULT 80,
+  section_threshold numeric NOT NULL DEFAULT 0.5,
+  max_paragraph_length integer NOT NULL DEFAULT 800,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT ai_content_config_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.rss_feed_health (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  source_id character varying NOT NULL UNIQUE,
+  source_name character varying NOT NULL,
+  healthy boolean DEFAULT true,
+  last_success timestamp with time zone,
+  last_failure timestamp with time zone,
+  consecutive_failures integer DEFAULT 0,
+  total_fetches integer DEFAULT 0,
+  success_rate numeric DEFAULT 1.0,
+  average_response_time numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT rss_feed_health_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.feature_requests (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  description text NOT NULL,
+  category text NOT NULL DEFAULT 'feature'::text CHECK (category = ANY (ARRAY['feature'::text, 'improvement'::text, 'integration'::text, 'ui_ux'::text, 'content'::text, 'suggestion'::text, 'other'::text])),
+  status text NOT NULL DEFAULT 'open'::text CHECK (status = ANY (ARRAY['open'::text, 'under_review'::text, 'planned'::text, 'in_progress'::text, 'shipped'::text, 'declined'::text])),
+  tags ARRAY NOT NULL DEFAULT '{}'::text[],
+  author_name text,
+  author_email text,
+  author_token text,
+  upvote_count integer NOT NULL DEFAULT 0,
+  is_pinned boolean NOT NULL DEFAULT false,
+  admin_note text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT feature_requests_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.feature_request_votes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  request_id uuid NOT NULL,
+  voter_token text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT feature_request_votes_pkey PRIMARY KEY (id),
+  CONSTRAINT feature_request_votes_request_fkey FOREIGN KEY (request_id) REFERENCES public.feature_requests(id)
+);
+CREATE TABLE public.content_fingerprints (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  article_id uuid NOT NULL,
+  article_type text NOT NULL CHECK (article_type = ANY (ARRAY['post'::text, 'chronicles_post'::text, 'chronicles_chain_entry'::text])),
+  article_version integer NOT NULL DEFAULT 1,
+  sha256_hash text NOT NULL UNIQUE,
+  content_length integer NOT NULL,
+  published_at timestamp with time zone NOT NULL,
+  created_by uuid NOT NULL,
+  algorithm text NOT NULL DEFAULT 'sha-256'::text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT content_fingerprints_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.chronicles_follows (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  follower_id uuid NOT NULL,
+  following_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_follows_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_follows_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_follows_following_id_fkey FOREIGN KEY (following_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_conversations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  participant_1_id uuid NOT NULL,
+  participant_2_id uuid NOT NULL,
+  last_message_at timestamp with time zone,
+  last_message_preview text,
+  message_count integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  is_archived_by_1 boolean DEFAULT false,
+  is_archived_by_2 boolean DEFAULT false,
+  encryption_key_id text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_conversations_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_conversations_participant_1_id_fkey FOREIGN KEY (participant_1_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_conversations_participant_2_id_fkey FOREIGN KEY (participant_2_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  conversation_id uuid NOT NULL,
+  sender_id uuid NOT NULL,
+  encrypted_content text NOT NULL,
+  content_iv text NOT NULL,
+  encryption_version text DEFAULT 'v1'::text,
+  message_type text DEFAULT 'text'::text CHECK (message_type = ANY (ARRAY['text'::text, 'image'::text, 'file'::text, 'audio'::text, 'video'::text, 'system'::text])),
+  reply_to_id uuid,
+  is_deleted boolean DEFAULT false,
+  is_edited boolean DEFAULT false,
+  edited_at timestamp with time zone,
+  deleted_at timestamp with time zone,
+  read_by_1 boolean DEFAULT false,
+  read_by_1_at timestamp with time zone,
+  read_by_2 boolean DEFAULT false,
+  read_by_2_at timestamp with time zone,
+  moderation_status text DEFAULT 'pending'::text CHECK (moderation_status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'flagged'::text])),
+  moderated_by uuid,
+  moderated_at timestamp with time zone,
+  moderation_reason text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.chronicles_conversations(id),
+  CONSTRAINT chronicles_messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_messages_reply_to_id_fkey FOREIGN KEY (reply_to_id) REFERENCES public.chronicles_messages(id),
+  CONSTRAINT chronicles_messages_moderated_by_fkey FOREIGN KEY (moderated_by) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_message_attachments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  message_id uuid NOT NULL,
+  file_name text NOT NULL,
+  file_type text NOT NULL,
+  file_size integer NOT NULL,
+  storage_path text NOT NULL,
+  encrypted boolean DEFAULT false,
+  encryption_key_id text,
+  processing_status text DEFAULT 'pending'::text CHECK (processing_status = ANY (ARRAY['pending'::text, 'processing'::text, 'completed'::text, 'failed'::text])),
+  processing_error text,
+  thumbnail_path text,
+  preview_url text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_message_attachments_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_message_attachments_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.chronicles_messages(id)
+);
+CREATE TABLE public.chronicles_messaging_restrictions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  restriction_type text NOT NULL CHECK (restriction_type = ANY (ARRAY['temporary'::text, 'permanent'::text, 'warning'::text])),
+  reason text NOT NULL,
+  restricted_by uuid,
+  starts_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  ends_at timestamp with time zone,
+  can_send_messages boolean DEFAULT false,
+  can_receive_messages boolean DEFAULT false,
+  can_send_attachments boolean DEFAULT false,
+  can_create_conversations boolean DEFAULT false,
+  is_active boolean DEFAULT true,
+  lifted_by uuid,
+  lifted_at timestamp with time zone,
+  lift_reason text,
+  user_notified boolean DEFAULT false,
+  notified_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_messaging_restrictions_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_messaging_restrictions_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_messaging_restrictions_restricted_by_fkey FOREIGN KEY (restricted_by) REFERENCES auth.users(id),
+  CONSTRAINT chronicles_messaging_restrictions_lifted_by_fkey FOREIGN KEY (lifted_by) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_message_moderation_queue (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  message_id uuid NOT NULL,
+  conversation_id uuid NOT NULL,
+  reported_by uuid,
+  priority text DEFAULT 'normal'::text CHECK (priority = ANY (ARRAY['low'::text, 'normal'::text, 'high'::text, 'urgent'::text])),
+  flag_reason text NOT NULL CHECK (flag_reason = ANY (ARRAY['spam'::text, 'harassment'::text, 'inappropriate_content'::text, 'scam'::text, 'other'::text])),
+  additional_notes text,
+  ai_flagged boolean DEFAULT false,
+  ai_confidence numeric,
+  ai_reason text,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  review_action text CHECK (review_action = ANY (ARRAY['approve'::text, 'reject'::text, 'delete'::text, 'warn_user'::text, 'restrict_user'::text])),
+  review_notes text,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'resolved'::text, 'dismissed'::text])),
+  resolved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_message_moderation_queue_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_message_moderation_queue_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.chronicles_messages(id),
+  CONSTRAINT chronicles_message_moderation_queue_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.chronicles_conversations(id),
+  CONSTRAINT chronicles_message_moderation_queue_reported_by_fkey FOREIGN KEY (reported_by) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_message_moderation_queue_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_message_reports (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  reporter_id uuid NOT NULL,
+  message_id uuid NOT NULL,
+  conversation_id uuid NOT NULL,
+  reported_user_id uuid NOT NULL,
+  report_type text NOT NULL CHECK (report_type = ANY (ARRAY['harassment'::text, 'spam'::text, 'inappropriate'::text, 'scam'::text, 'threat'::text, 'other'::text])),
+  description text NOT NULL,
+  attachment_urls ARRAY,
+  admin_reviewed_by uuid,
+  admin_reviewed_at timestamp with time zone,
+  admin_action text CHECK (admin_action = ANY (ARRAY['no_action'::text, 'warning'::text, 'temporary_restriction'::text, 'permanent_restriction'::text, 'ban_user'::text])),
+  admin_notes text,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'resolved'::text, 'dismissed'::text])),
+  resolved_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_message_reports_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_message_reports_reporter_id_fkey FOREIGN KEY (reporter_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_message_reports_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.chronicles_messages(id),
+  CONSTRAINT chronicles_message_reports_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.chronicles_conversations(id),
+  CONSTRAINT chronicles_message_reports_reported_user_id_fkey FOREIGN KEY (reported_user_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_message_reports_admin_reviewed_by_fkey FOREIGN KEY (admin_reviewed_by) REFERENCES auth.users(id)
+);
+CREATE TABLE public.chronicles_messaging_notices (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL,
+  notice_type text NOT NULL CHECK (notice_type = ANY (ARRAY['restriction_applied'::text, 'restriction_lifted'::text, 'warning_issued'::text, 'content_removed'::text, 'account_suspended'::text])),
+  title text NOT NULL,
+  message text NOT NULL,
+  related_message_id uuid,
+  related_conversation_id uuid,
+  restriction_id uuid,
+  is_dismissible boolean DEFAULT true,
+  requires_acknowledgment boolean DEFAULT false,
+  acknowledged_at timestamp with time zone,
+  is_read boolean DEFAULT false,
+  read_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  expires_at timestamp with time zone,
+  CONSTRAINT chronicles_messaging_notices_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_messaging_notices_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_messaging_notices_related_message_id_fkey FOREIGN KEY (related_message_id) REFERENCES public.chronicles_messages(id),
+  CONSTRAINT chronicles_messaging_notices_related_conversation_id_fkey FOREIGN KEY (related_conversation_id) REFERENCES public.chronicles_conversations(id),
+  CONSTRAINT chronicles_messaging_notices_restriction_id_fkey FOREIGN KEY (restriction_id) REFERENCES public.chronicles_messaging_restrictions(id)
+);
+CREATE TABLE public.chronicles_writing_prompts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  description text NOT NULL,
+  prompt_type text NOT NULL CHECK (prompt_type = ANY (ARRAY['blog'::text, 'poem'::text, 'story'::text])),
+  content text NOT NULL,
+  challenge_type text NOT NULL DEFAULT 'daily'::text CHECK (challenge_type = ANY (ARRAY['daily'::text, 'weekly'::text, 'monthly'::text])),
+  is_ai_generated boolean DEFAULT false,
+  ai_generation_model text,
+  created_by uuid,
+  edited_by uuid,
+  status text DEFAULT 'draft'::text CHECK (status = ANY (ARRAY['draft'::text, 'active'::text, 'ended'::text, 'archived'::text])),
+  starts_at timestamp with time zone,
+  ends_at timestamp with time zone,
+  submission_deadline timestamp with time zone,
+  max_entries_per_user integer DEFAULT 1,
+  evaluation_criteria jsonb DEFAULT '{"passion": 20, "integrity": 30, "sincerity": 30, "engagement": 20}'::jsonb,
+  tags ARRAY DEFAULT ARRAY[]::text[],
+  featured_image_url text,
+  prize_description text,
+  published_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_writing_prompts_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_writing_prompts_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id),
+  CONSTRAINT chronicles_writing_prompts_edited_by_fkey FOREIGN KEY (edited_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.chronicles_prompt_entries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  prompt_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  post_id uuid,
+  chain_entry_post_id uuid,
+  admin_post_id uuid,
+  entry_type text NOT NULL CHECK (entry_type = ANY (ARRAY['chronicles_post'::text, 'chain_entry_post'::text, 'admin_post'::text])),
+  status text DEFAULT 'submitted'::text CHECK (status = ANY (ARRAY['submitted'::text, 'under_review'::text, 'approved'::text, 'rejected'::text, 'flagged'::text])),
+  is_ai_generated boolean DEFAULT false,
+  ai_confidence_score numeric,
+  ai_flagged boolean DEFAULT false,
+  ai_flag_reason text,
+  submitted_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at timestamp with time zone,
+  reviewed_by uuid,
+  review_notes text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_prompt_entries_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_prompt_entries_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id),
+  CONSTRAINT chronicles_prompt_entries_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id),
+  CONSTRAINT chronicles_prompt_entries_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.chronicles_posts(id),
+  CONSTRAINT chronicles_prompt_entries_chain_entry_post_id_fkey FOREIGN KEY (chain_entry_post_id) REFERENCES public.chronicles_chain_entry_posts(id),
+  CONSTRAINT chronicles_prompt_entries_admin_post_id_fkey FOREIGN KEY (admin_post_id) REFERENCES public.posts(id),
+  CONSTRAINT chronicles_prompt_entries_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.chronicles_prompt_evaluations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  entry_id uuid NOT NULL,
+  evaluated_by uuid NOT NULL,
+  integrity_score integer CHECK (integrity_score >= 0 AND integrity_score <= 100),
+  sincerity_score integer CHECK (sincerity_score >= 0 AND sincerity_score <= 100),
+  passion_score integer CHECK (passion_score >= 0 AND passion_score <= 100),
+  engagement_score integer CHECK (engagement_score >= 0 AND engagement_score <= 100),
+  total_score integer,
+  comments text,
+  recommendation text CHECK (recommendation = ANY (ARRAY['winner'::text, 'runner_up'::text, 'honorable_mention'::text, 'not_selected'::text])),
+  is_final boolean DEFAULT false,
+  evaluated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_prompt_evaluations_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_prompt_evaluations_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES public.chronicles_prompt_entries(id),
+  CONSTRAINT chronicles_prompt_evaluations_evaluated_by_fkey FOREIGN KEY (evaluated_by) REFERENCES public.admin(id)
+);
+CREATE TABLE public.chronicles_challenge_winners (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  prompt_id uuid NOT NULL,
+  entry_id uuid NOT NULL,
+  creator_id uuid NOT NULL,
+  rank integer NOT NULL CHECK (rank >= 1 AND rank <= 3),
+  prize_awarded text,
+  prize_value numeric,
+  badge_awarded text,
+  announced_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_challenge_winners_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_challenge_winners_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id),
+  CONSTRAINT chronicles_challenge_winners_entry_id_fkey FOREIGN KEY (entry_id) REFERENCES public.chronicles_prompt_entries(id),
+  CONSTRAINT chronicles_challenge_winners_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_leaderboard_winners (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  creator_id uuid NOT NULL UNIQUE,
+  total_wins integer DEFAULT 0,
+  first_place_wins integer DEFAULT 0,
+  second_place_wins integer DEFAULT 0,
+  third_place_wins integer DEFAULT 0,
+  total_points_earned integer DEFAULT 0,
+  last_win_at timestamp with time zone,
+  best_rank_achievement text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_leaderboard_winners_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_leaderboard_winners_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.chronicles_creators(id)
+);
+CREATE TABLE public.chronicles_prompt_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  ai_auto_generation_enabled boolean DEFAULT false,
+  ai_generation_frequency text DEFAULT 'daily'::text CHECK (ai_generation_frequency = ANY (ARRAY['daily'::text, 'weekly'::text, 'monthly'::text])),
+  ai_generation_schedule_time time without time zone DEFAULT '00:00:00'::time without time zone,
+  ai_generation_day_of_week integer,
+  ai_generation_day_of_month integer,
+  last_ai_generation_at timestamp with time zone,
+  next_ai_generation_at timestamp with time zone,
+  ai_model_preference text DEFAULT 'gemini-3.5-pro'::text,
+  allow_admin_edit_ai_prompts boolean DEFAULT true,
+  default_challenge_type text DEFAULT 'daily'::text,
+  default_evaluation_criteria jsonb DEFAULT '{"passion": 20, "integrity": 30, "sincerity": 30, "engagement": 20}'::jsonb,
+  max_active_challenges integer DEFAULT 3,
+  auto_end_challenges boolean DEFAULT true,
+  auto_announce_winners boolean DEFAULT true,
+  winner_announcement_delay_hours integer DEFAULT 24,
+  created_by uuid,
+  updated_by uuid,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chronicles_prompt_settings_pkey PRIMARY KEY (id),
+  CONSTRAINT chronicles_prompt_settings_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id),
+  CONSTRAINT chronicles_prompt_settings_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.admin(id)
 );

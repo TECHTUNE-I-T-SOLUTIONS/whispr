@@ -71,7 +71,7 @@ export function MediaSelector({ onSelect, selectedMedia, trigger }: MediaSelecto
 
   const getFileIcon = (fileType: string) => {
     if (fileType.startsWith("image/")) return <ImageIcon className="h-6 w-6 text-blue-500" />
-    if (fileType.startsWith("video/")) return <Video className="h-6 w-6 text-purple-500" />
+    if (fileType.startsWith("video/")) return <Video className="h-6 w-6 text-red-500" />
     if (fileType.startsWith("audio/")) return <Music className="h-6 w-6 text-green-500" />
     return <FileText className="h-6 w-6 text-gray-500" />
   }

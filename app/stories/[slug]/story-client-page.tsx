@@ -220,7 +220,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
             {story.cover_image_url ? (
               <Image src={story.cover_image_url} alt={story.title} fill className="object-cover" priority />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/60 via-purple-950/40 to-pink-900/40 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/60 via-red-950/40 to-pink-900/40 flex items-center justify-center">
                 <BookOpen className="h-24 w-24 text-white/10" />
               </div>
             )}
@@ -244,7 +244,7 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
                     className="h-10 w-10 rounded-full object-cover border border-white/20 shadow-md"
                   />
                 ) : (
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-sm text-white font-bold shadow-md">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-red-500 to-indigo-500 flex items-center justify-center text-sm text-white font-bold shadow-md">
                     {story.author_name?.charAt(0).toUpperCase() || "W"}
                   </div>
                 )}

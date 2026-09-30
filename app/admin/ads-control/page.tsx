@@ -228,7 +228,7 @@ export default function AdsControlPage() {
           <TabsContent value="ai" className="space-y-6">
             <Card>
               <CardHeader>
-                <Sparkles className="w-8 h-8 text-purple-500 mb-2" />
+                <Sparkles className="w-8 h-8 text-red-500 mb-2" />
                 <CardTitle>AI Engines</CardTitle>
                 <CardDescription>Control AI-powered features and engines</CardDescription>
               </CardHeader>
@@ -239,7 +239,7 @@ export default function AdsControlPage() {
                   return (
                     <div key={feature.name} className="flex items-center justify-between p-4 bg-muted/50 dark:bg-muted/30 rounded-lg border border-border dark:border-border/50">
                       <div className="flex items-start gap-3">
-                        <Icon className="w-5 h-5 text-purple-500 mt-0.5" />
+                        <Icon className="w-5 h-5 text-red-500 mt-0.5" />
                         <div>
                           <span className="font-medium">{feature.label}</span>
                           <p className="text-sm text-muted-foreground mt-1">{feature.desc}</p>
@@ -249,7 +249,7 @@ export default function AdsControlPage() {
                         checked={flag?.enabled || false}
                         disabled={savingFlags[feature.name]}
                         onCheckedChange={(checked) => handleFeatureToggle(feature.name, checked)}
-                        className="data-[state=checked]:bg-purple-600"
+                        className="data-[state=checked]:bg-red-600"
                       />
                     </div>
                   );

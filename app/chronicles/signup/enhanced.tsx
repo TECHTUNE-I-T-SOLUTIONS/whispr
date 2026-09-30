@@ -232,10 +232,10 @@ export default function EnhancedChroniclesSignup() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
             Join Whispr Chronicles
           </h1>
           <p className="text-muted-foreground">
@@ -249,7 +249,7 @@ export default function EnhancedChroniclesSignup() {
               key={s}
               className={`flex-1 h-2 rounded-full transition-all ${
                 s <= step
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                  ? 'bg-gradient-to-r from-red-600 to-pink-600'
                   : 'bg-gray-200 dark:bg-slate-800'
               }`}
             ></div>
@@ -301,14 +301,14 @@ export default function EnhancedChroniclesSignup() {
                 <div>
                   <label className="block text-sm font-medium mb-3">Profile Picture (Optional)</label>
                   {formData.profileImageUrl ? (
-                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-purple-600 mb-4">
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-red-600 mb-4">
                       <Image src={formData.profileImageUrl} alt="Profile" fill className="object-cover" />
                       <button type="button" onClick={removeProfileImage} className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-lg p-6 text-center cursor-pointer hover:border-purple-600">
+                    <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-lg p-6 text-center cursor-pointer hover:border-red-600">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm font-medium mb-1">Click to upload</p>
                       <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB</p>
@@ -330,7 +330,7 @@ export default function EnhancedChroniclesSignup() {
                         type="button"
                         onClick={() => setFormData({ ...formData, contentType: type })}
                         className={`p-4 rounded-lg border-2 transition ${
-                          formData.contentType === type ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20' : 'border-gray-200 dark:border-slate-700'
+                          formData.contentType === type ? 'border-red-600 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-slate-700'
                         }`}
                       >
                         <div className="text-lg font-bold mb-1">{type === 'blog' ? '📝' : type === 'poem' ? '✨' : '🎯'}</div>
@@ -349,7 +349,7 @@ export default function EnhancedChroniclesSignup() {
                         onClick={() => handleCategoryToggle(cat)}
                         className={`p-3 rounded-lg border-2 transition text-sm capitalize ${
                           formData.categories.includes(cat)
-                            ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                            ? 'border-red-600 bg-red-50 dark:bg-red-900/20'
                             : 'border-gray-200 dark:border-slate-700'
                         }`}
                       >
@@ -363,7 +363,7 @@ export default function EnhancedChroniclesSignup() {
 
             {step === 5 && (
               <div className="space-y-6">
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-900/50">
+                <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-900/50">
                   <h3 className="font-bold mb-3">Your Profile Summary</h3>
                   <div className="space-y-2 text-sm">
                     <div><span className="text-muted-foreground">Pen Name:</span> <span className="ml-2 font-medium">{formData.penName}</span></div>
@@ -373,7 +373,7 @@ export default function EnhancedChroniclesSignup() {
                 </div>
                 <div className="flex items-start gap-3">
                   <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms} onChange={handleInputChange} className="mt-1" />
-                  <label className="text-sm">I agree to <Link href="/terms" className="text-purple-600 hover:underline">Terms</Link> and <Link href="/privacy" className="text-purple-600 hover:underline">Privacy</Link></label>
+                  <label className="text-sm">I agree to <Link href="/terms" className="text-red-600 hover:underline">Terms</Link> and <Link href="/privacy" className="text-red-600 hover:underline">Privacy</Link></label>
                 </div>
               </div>
             )}
@@ -385,11 +385,11 @@ export default function EnhancedChroniclesSignup() {
                 </Button>
               )}
               {step < 5 ? (
-                <Button type="button" className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white" onClick={handleNextStep}>
+                <Button type="button" className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white" onClick={handleNextStep}>
                   Next <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               ) : (
-                <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white" disabled={loading}>
+                <Button type="submit" className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white" disabled={loading}>
                   {loading ? <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Creating...
@@ -402,7 +402,7 @@ export default function EnhancedChroniclesSignup() {
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account? <Link href="/chronicles/login" className="text-purple-600 hover:underline font-medium">Sign in</Link>
+            Already have an account? <Link href="/chronicles/login" className="text-red-600 hover:underline font-medium">Sign in</Link>
           </p>
         </div>
       </div>

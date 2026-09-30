@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Loader2, AlertCircle, Eye, Heart, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import WritingChallengeCard from './WritingChallengeCard';
 
 interface Author {
   id: string;
@@ -111,7 +112,7 @@ export default function FeedPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-20">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-red-600" />
           <p className="text-gray-600 dark:text-gray-400">Loading feed...</p>
         </div>
       </div>
@@ -141,6 +142,11 @@ export default function FeedPage() {
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Chronicles Feed</h1>
           <p className="text-gray-600 dark:text-gray-400">Latest posts from creators and admins</p>
+        </div>
+
+        {/* Writing Challenge Card */}
+        <div className="mb-8">
+          <WritingChallengeCard />
         </div>
 
         <div className="space-y-6">
@@ -191,7 +197,7 @@ export default function FeedPage() {
                           }}
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
                           {authorInitials}
                         </div>
                       )}

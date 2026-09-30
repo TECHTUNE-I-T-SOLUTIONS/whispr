@@ -46,7 +46,7 @@ export default function ChroniclesLanding() {
 
   if (!featureEnabled) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <Lock className="w-16 h-16 mx-auto mb-6 text-muted-foreground opacity-50" />
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Coming Soon</h1>
@@ -88,7 +88,7 @@ export default function ChroniclesLanding() {
           <p className="mb-4">
             Ready to join the Chronicles community?
           </p>
-          <Link href="/chronicles/feed" className="text-purple-600 hover:underline font-medium">
+          <Link href="/chronicles/feed" className="text-red-600 hover:underline font-medium">
             Visit the Chronicles Feed →
           </Link>
         </div>

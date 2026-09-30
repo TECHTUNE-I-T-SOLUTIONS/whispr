@@ -45,7 +45,7 @@ export default function AdminMessagingDashboard() {
   const StatCard = ({ icon: Icon, label, value, color, onClick }: any) => (
     <button
       onClick={onClick}
-      className="bg-white dark:bg-slate-900 rounded-lg border p-6 hover:border-purple-500 transition-colors text-left w-full"
+      className="bg-white dark:bg-slate-900 rounded-lg border p-6 hover:border-red-500 transition-colors text-left w-full"
     >
       <div className="flex items-start justify-between">
         <div>
@@ -72,7 +72,7 @@ export default function AdminMessagingDashboard() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <MessageSquare className="w-8 h-8 text-purple-600" />
+          <MessageSquare className="w-8 h-8 text-red-600" />
           <h1 className="text-3xl font-bold">Messaging Management</h1>
         </div>
         <p className="text-muted-foreground">Monitor and manage chronicles messaging system</p>
@@ -84,7 +84,7 @@ export default function AdminMessagingDashboard() {
           icon={MessageSquare}
           label="Total Conversations"
           value={stats.total_conversations}
-          color="bg-gradient-to-br from-purple-600 to-purple-700"
+          color="bg-gradient-to-br from-red-600 to-red-700"
           onClick={() => router.push('/admin/chronicles/messaging/conversations')}
         />
         <StatCard
@@ -114,16 +114,16 @@ export default function AdminMessagingDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button
           onClick={() => router.push('/admin/chronicles/messaging/restrictions')}
-          className="p-6 bg-white dark:bg-slate-900 border rounded-lg hover:border-purple-500 transition-colors text-left"
+          className="p-6 bg-white dark:bg-slate-900 border rounded-lg hover:border-red-500 transition-colors text-left"
         >
-          <Shield className="w-6 h-6 text-purple-600 mb-3" />
+          <Shield className="w-6 h-6 text-red-600 mb-3" />
           <p className="font-semibold">Manage Restrictions</p>
           <p className="text-sm text-muted-foreground">View and manage creator messaging restrictions</p>
         </button>
 
         <button
           onClick={() => router.push('/admin/chronicles/messaging/moderation')}
-          className="p-6 bg-white dark:bg-slate-900 border rounded-lg hover:border-purple-500 transition-colors text-left"
+          className="p-6 bg-white dark:bg-slate-900 border rounded-lg hover:border-red-500 transition-colors text-left"
         >
           <AlertTriangle className="w-6 h-6 text-orange-600 mb-3" />
           <p className="font-semibold">Moderation Queue</p>

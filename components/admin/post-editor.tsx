@@ -1316,7 +1316,7 @@ export function PostEditor({ type: initialType, postId, initialData }: PostEdito
           <Card className="border-0 bg-card/50 backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-500" />
+                <Sparkles className="h-5 w-5 text-red-500" />
                 AI Writing Assistant
               </CardTitle>
             </CardHeader>

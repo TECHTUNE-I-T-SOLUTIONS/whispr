@@ -102,7 +102,7 @@ export default function MessagingRestrictionsPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <Shield className="w-8 h-8 text-purple-600" />
+          <Shield className="w-8 h-8 text-red-600" />
           <h1 className="text-3xl font-bold">Messaging Restrictions</h1>
         </div>
         <p className="text-muted-foreground">Manage creator messaging permissions and restrictions</p>
@@ -161,7 +161,7 @@ export default function MessagingRestrictionsPage() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                     {restriction.creator.profile_image_url ? (
                       <img
                         src={restriction.creator.profile_image_url}

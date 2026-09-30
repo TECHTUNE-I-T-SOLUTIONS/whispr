@@ -17,6 +17,7 @@ import {
   Eye,
   TrendingUp,
 } from 'lucide-react';
+import WritingChallengeCard from './WritingChallengeCard';
 
 interface CreatorStats {
   totalPosts: number;
@@ -134,12 +135,12 @@ function DashboardContent() {
           </div>
           <div className="flex gap-2 shrink-0">
             <Link href="/chronicles/stories/new">
-              <Button variant="outline" className="border-purple-600/40 hover:bg-purple-50 dark:hover:bg-purple-950/20 text-purple-600 dark:text-purple-400 rounded-lg">
+              <Button variant="outline" className="border-red-600/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg">
                 <Plus className="w-4 h-4 mr-2" /> New Story
               </Button>
             </Link>
             <Link href="/chronicles/write">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg">
+              <Button className="bg-red-600 hover:bg-red-700 text-white rounded-lg">
                 <Plus className="w-4 h-4 mr-2" /> New Post
               </Button>
             </Link>
@@ -159,7 +160,7 @@ function DashboardContent() {
                 <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Total Posts</h3>
-                    <BookOpen className="w-5 h-5 text-purple-600" />
+                    <BookOpen className="w-5 h-5 text-red-600" />
                   </div>
                   <p className="text-3xl font-bold">{stats.totalPosts}</p>
                 </div>
@@ -204,7 +205,7 @@ function DashboardContent() {
                   {stats.badges.map((badge) => (
                     <span
                       key={badge}
-                      className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium"
+                      className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium"
                     >
                       ✨ {badge}
                     </span>
@@ -212,6 +213,9 @@ function DashboardContent() {
                 </div>
               </div>
             )}
+
+            {/* Writing Challenge Card */}
+            <WritingChallengeCard />
 
             {/* Posts Section */}
             <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden">
@@ -228,7 +232,7 @@ function DashboardContent() {
                     <h3 className="font-bold mb-2">No posts yet</h3>
                     <p className="text-muted-foreground mb-4">Start your writing journey with your first post!</p>
                     <Link href="/chronicles/write">
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Button className="bg-red-600 hover:bg-red-700 text-white">
                         <Plus className="w-4 h-4 mr-2" /> Write Your First Post
                       </Button>
                     </Link>

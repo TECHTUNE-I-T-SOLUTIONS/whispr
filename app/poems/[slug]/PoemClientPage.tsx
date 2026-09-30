@@ -40,7 +40,7 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
               <span>{Math.ceil((poem.content || "").split(" ").length / 200)} min read</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
               {poem.title}
             </h1>
 

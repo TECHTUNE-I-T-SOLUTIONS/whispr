@@ -263,7 +263,7 @@ export function Header() {
 
           {chroniclesEnabled && !isCreator && (
             <div className="hidden sm:flex md:hidden lg:flex items-center gap-1 md:gap-2">
-              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-lg shadow-sm">
+              <Button size="sm" asChild className="bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-lg shadow-sm">
                 <Link href="/chronicles/waitlist">Join Chronicles</Link>
               </Button>
             </div>
@@ -365,7 +365,7 @@ export function Header() {
               <div className="py-2 border-t mt-1 space-y-1">
                 <Link href="/chronicles/feed" className="block py-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Chronicles Feed</Link>
                 {!isCreator && (
-                  <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-purple-400 hover:text-purple-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
+                  <Link href="/chronicles/waitlist" className="block py-2 text-sm font-semibold text-red-400 hover:text-red-300" onClick={() => setMobileMenuOpen(false)}>Join Chronicles</Link>
                 )}
               </div>
             )}

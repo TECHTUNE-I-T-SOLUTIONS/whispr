@@ -56,7 +56,7 @@ export function HeroSection() {
       {/* Floating sparkles layer */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         {/* Decorative gradient blobs */}
-        <div className="absolute -top-32 -left-20 w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-20 -z-10 animate-pulse-slow" />
+        <div className="absolute -top-32 -left-20 w-72 h-72 bg-red-500 rounded-full blur-3xl opacity-20 -z-10 animate-pulse-slow" />
         <div className="absolute top-1/3 right-0 w-60 h-60 bg-pink-400 rounded-full blur-2xl opacity-10 -z-10 animate-pulse-slower" />
 
         {hasMounted &&

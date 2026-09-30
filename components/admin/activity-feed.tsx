@@ -77,7 +77,7 @@ export function ActivityFeed() {
       case "reaction_received":
         return <Heart className="h-4 w-4 text-red-600" />
       case "post_viewed":
-        return <Eye className="h-4 w-4 text-purple-600" />
+        return <Eye className="h-4 w-4 text-red-600" />
       case "whispr_wall_posted":
         return <Bell className="h-4 w-4 text-blue-600" />
       case "wall_comment_received":
@@ -98,7 +98,7 @@ export function ActivityFeed() {
       case "reaction_received":
         return "bg-red-50 dark:bg-red-900/20"
       case "post_viewed":
-        return "bg-purple-50 dark:bg-purple-900/20"
+        return "bg-red-50 dark:bg-red-900/20"
       case "whispr_wall_posted":
         return "bg-blue-100 dark:bg-blue-900/30"
       case "wall_comment_received":

@@ -143,7 +143,7 @@ export default function CreatorProfilePage() {
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-black">
       {/* Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-red-600/10 to-pink-600/10"></div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 relative">
         {/* Profile Header */}
@@ -151,7 +151,7 @@ export default function CreatorProfilePage() {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-4xl overflow-hidden">
+              <div className="w-32 h-32 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-4xl overflow-hidden">
                 {creator.profile_picture_url ? (
                   <Image
                     src={creator.profile_picture_url}
@@ -184,7 +184,7 @@ export default function CreatorProfilePage() {
                 {creator.categories.map((cat) => (
                   <span
                     key={cat}
-                    className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm"
+                    className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm"
                   >
                     {cat}
                   </span>
@@ -241,7 +241,7 @@ export default function CreatorProfilePage() {
                   className={
                     followed
                       ? 'bg-gray-300 dark:bg-slate-700'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
+                      : 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white'
                   }
                   onClick={handleFollow}
                 >
@@ -270,7 +270,7 @@ export default function CreatorProfilePage() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gray-200 dark:border-slate-800">
             <div className="text-center">
-              <p className="text-3xl font-bold text-purple-600">{creator.post_count}</p>
+              <p className="text-3xl font-bold text-red-600">{creator.post_count}</p>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
                 <BookOpen className="w-4 h-4" /> Posts
               </p>
@@ -307,13 +307,13 @@ export default function CreatorProfilePage() {
             <div className="grid gap-6">
               {posts.map((post) => (
                 <Link key={post.id} href={`/chronicles/${post.slug}`}>
-                  <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6 hover:border-purple-600 dark:hover:border-purple-400 transition-colors cursor-pointer">
+                  <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-6 hover:border-red-600 dark:hover:border-red-400 transition-colors cursor-pointer">
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h3 className="text-xl font-bold mb-2">{post.title}</h3>
                         <p className="text-muted-foreground line-clamp-2">{post.excerpt}</p>
                       </div>
-                      <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium flex-shrink-0">
+                      <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium flex-shrink-0">
                         {post.post_type === 'poem' ? '📝' : '📖'} {post.category}
                       </span>
                     </div>

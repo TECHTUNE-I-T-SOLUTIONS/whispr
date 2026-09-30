@@ -130,7 +130,7 @@ export default async function UserPage({ params }: { params: Promise<{ pen_name:
                 className="rounded-full border-4 border-white dark:border-slate-900 shadow-lg"
               />
             ) : (
-              <div className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white text-5xl font-bold border-4 border-white dark:border-slate-900 shadow-lg">
+              <div className="w-40 h-40 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center text-white text-5xl font-bold border-4 border-white dark:border-slate-900 shadow-lg">
                 {creator.pen_name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -188,7 +188,7 @@ export default async function UserPage({ params }: { params: Promise<{ pen_name:
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow">
-            <div className="text-2xl font-bold text-purple-600">{creator.total_posts}</div>
+            <div className="text-2xl font-bold text-red-600">{creator.total_posts}</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Total Posts</div>
             <div className="text-xs text-gray-500 mt-1">{creator.total_blog_posts} blogs, {creator.total_poems} poems</div>
           </div>
@@ -253,7 +253,7 @@ export default async function UserPage({ params }: { params: Promise<{ pen_name:
           {chainsCreated && chainsCreated.length > 0 ? (
             <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow">
               <div className="flex items-center gap-2 mb-4">
-                <PenTool className="w-5 h-5 text-purple-600" />
+                <PenTool className="w-5 h-5 text-red-600" />
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">Writing Chains Created</h3>
               </div>
               <ul className="space-y-2">
@@ -261,7 +261,7 @@ export default async function UserPage({ params }: { params: Promise<{ pen_name:
                   <li key={c.id}>
                     <Link 
                       href={`/chronicles/chains/${c.id}`} 
-                      className="text-purple-600 hover:text-purple-700 dark:hover:text-purple-400 hover:underline font-medium"
+                      className="text-red-600 hover:text-red-700 dark:hover:text-red-400 hover:underline font-medium"
                     >
                       → {c.title}
                     </Link>
@@ -307,20 +307,20 @@ export default async function UserPage({ params }: { params: Promise<{ pen_name:
                 <Link
                   key={post.id}
                   href={`/chronicles/${post.slug}`}
-                  className="group block p-5 bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg hover:border-l-4 hover:border-purple-600 transition-all"
+                  className="group block p-5 bg-white dark:bg-slate-800 rounded-lg shadow hover:shadow-lg hover:border-l-4 hover:border-red-600 transition-all"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-grow">
                       <div className="flex items-center gap-2 mb-2">
                         <span className={`text-xs font-semibold px-2 py-1 rounded ${
                           post.post_type === 'poem' 
-                            ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                             : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                         }`}>
                           {post.post_type === 'poem' ? '✨ Poem' : '📝 Blog'}
                         </span>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition">
                         {post.title}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">

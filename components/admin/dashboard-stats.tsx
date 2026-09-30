@@ -78,8 +78,8 @@ export function DashboardStats() {
       value: stats.totalViews,
       icon: Eye,
       description: "Content reach",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 dark:bg-purple-900/20",
+      color: "text-red-600",
+      bgColor: "bg-red-50 dark:bg-red-900/20",
     },
     {
       title: "This Month",

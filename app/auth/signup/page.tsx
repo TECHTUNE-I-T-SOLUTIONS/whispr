@@ -219,7 +219,7 @@ export default function ChroniclesSignup() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -235,7 +235,7 @@ export default function ChroniclesSignup() {
               <div
                 key={s}
                 className={`flex-1 h-1 rounded-full transition-colors ${
-                  step >= s ? 'bg-purple-600' : 'bg-gray-200 dark:bg-slate-700'
+                  step >= s ? 'bg-red-600' : 'bg-gray-200 dark:bg-slate-700'
                 }`}
               ></div>
             ))}
@@ -276,13 +276,13 @@ export default function ChroniclesSignup() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+              <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white">
                 Continue <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
 
               <p className="text-sm text-center text-muted-foreground">
                 Already have an account?{' '}
-                <Link href="/auth/login" className="text-purple-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-red-600 hover:underline font-medium">
                   Sign in
                 </Link>
               </p>
@@ -389,7 +389,7 @@ export default function ChroniclesSignup() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white">
+                <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
                   Next <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
@@ -409,7 +409,7 @@ export default function ChroniclesSignup() {
                       onClick={() => setFormData((prev) => ({ ...prev, contentType: type }))}
                       className={`p-3 rounded-lg border-2 transition-colors capitalize ${
                         formData.contentType === type
-                          ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                          ? 'border-red-600 bg-red-50 dark:bg-red-900/20'
                           : 'border-gray-200 dark:border-slate-700'
                       }`}
                     >
@@ -429,7 +429,7 @@ export default function ChroniclesSignup() {
                       onClick={() => handleCategoryToggle(category)}
                       className={`p-2 rounded-lg border-2 transition-colors text-sm ${
                         formData.preferredCategories.includes(category)
-                          ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                          ? 'border-red-600 bg-red-50 dark:bg-red-900/20'
                           : 'border-gray-200 dark:border-slate-700'
                       }`}
                     >
@@ -452,7 +452,7 @@ export default function ChroniclesSignup() {
                       onClick={() => setFormData((prev) => ({ ...prev, profileVisibility: visibility }))}
                       className={`p-3 rounded-lg border-2 transition-colors capitalize ${
                         formData.profileVisibility === visibility
-                          ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20'
+                          ? 'border-red-600 bg-red-50 dark:bg-red-900/20'
                           : 'border-gray-200 dark:border-slate-700'
                       }`}
                     >
@@ -478,7 +478,7 @@ export default function ChroniclesSignup() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white">
+                <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700 text-white">
                   Next <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
@@ -574,7 +574,7 @@ export default function ChroniclesSignup() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white" disabled={loading}>
+                <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700 text-white" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -594,11 +594,11 @@ export default function ChroniclesSignup() {
         {/* Footer */}
         <p className="text-center text-sm text-muted-foreground mt-6">
           By signing up, you agree to our{' '}
-          <Link href="/terms" className="text-purple-600 hover:underline">
+          <Link href="/terms" className="text-red-600 hover:underline">
             Terms
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="text-purple-600 hover:underline">
+          <Link href="/privacy" className="text-red-600 hover:underline">
             Privacy Policy
           </Link>
         </p>

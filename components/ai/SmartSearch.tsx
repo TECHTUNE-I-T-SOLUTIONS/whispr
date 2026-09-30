@@ -145,7 +145,7 @@ export default function SmartSearch({ onResultClick, userId, placeholder = 'Sear
           className="w-full h-10 pl-12 pr-12 py-4 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-lg bg-transparent dark:bg-transparent text-gray-900 dark:text-white"
         />
         {loading && (
-          <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-500 animate-spin" />
+          <Loader2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500 animate-spin" />
         )}
       </div>
 
@@ -153,7 +153,7 @@ export default function SmartSearch({ onResultClick, userId, placeholder = 'Sear
         <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg max-h-[600px] overflow-y-auto z-50">
           {loading ? (
             <div className="p-8 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+              <Loader2 className="w-6 h-6 animate-spin text-red-500" />
               <span className="ml-2 text-gray-600 dark:text-gray-400">Searching...</span>
             </div>
           ) : (

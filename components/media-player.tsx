@@ -280,7 +280,7 @@ export function MediaPlayer({
         {isAudio && (
           <div className="p-8 flex items-center justify-center min-h-[200px] cursor-pointer" onClick={showControls ? undefined : handlePlayPause}>
             <div className="text-center">
-              <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center">
                 {isPlaying ? <Pause className="h-12 w-12 text-white" /> : <Play className="h-12 w-12 text-white" />}
               </div>
               <audio

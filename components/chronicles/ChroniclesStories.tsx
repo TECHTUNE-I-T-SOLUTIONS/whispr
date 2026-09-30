@@ -215,7 +215,7 @@ export default function CreatorStoriesPage() {
                         <Heart className="h-3.5 w-3.5 text-pink-500" /> {story.likes_count || 0}
                       </span>
                       <span className="flex items-center gap-1" title="Reader Comments">
-                        <MessageSquare className="h-3.5 w-3.5 text-purple-400" /> {story.comments_count || 0}
+                        <MessageSquare className="h-3.5 w-3.5 text-red-400" /> {story.comments_count || 0}
                       </span>
                       <span className="flex items-center gap-1" title="Total Shares">
                         <Share2 className="h-3.5 w-3.5 text-emerald-400" /> {story.shares_count || 0}

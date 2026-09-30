@@ -23,6 +23,8 @@ import {
   Moon,
   Bot,
   Plus,
+  Trophy,
+  Target,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -119,6 +121,8 @@ export default function ChroniclesHeader({
     { label: 'Analytics', href: '/chronicles/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/chronicles/settings', icon: Settings },
     { label: 'Whispr AI', href: '/chronicles/whispr-ai', icon: Bot },
+    { label: 'Writing Challenges', href: '/chronicles/writing-challenges', icon: Target },
+    { label: 'Challenge Leaderboard', href: '/chronicles/challenge-leaderboard', icon: Trophy },
   ];
 
   const handleLogout = async () => {
@@ -159,10 +163,10 @@ export default function ChroniclesHeader({
     <>
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white dark:bg-black border-b border-gray-200 dark:border-slate-800">
-        <div className="flex items-center justify-between h-16 px-4 md:px-6">
+        <div className="flex items-center justify-between h-14 px-4 md:px-6">
           {/* Logo & Branding */}
           <Link href="/chronicles" className="flex items-center gap-2 flex-shrink-0">
-            <div className="bg-transparent rounded-full w-12 h-12 flex items-center justify-center">
+            <div className="bg-transparent rounded-full w-8 h-8 flex items-center justify-center">
               {mounted && (
                 <Image
                   src={resolvedTheme === 'dark' ? '/lightlogo.png' : '/darklogo.png'}
@@ -175,38 +179,26 @@ export default function ChroniclesHeader({
               )}
             </div>
 
-            <span className="hidden sm:inline font-bold text-lg">Chronicles</span>
+            <span className="hidden sm:inline font-bold text-sm">Chronicles</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop: Only show essential items in header */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-3 py-2 rounded-lg transition-colors text-sm font-medium flex items-center gap-2 ${isActive(item.href)
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                  }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            ))}
+            {/* Empty - navigation moved to sidebar */}
           </nav>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2 ml-auto">
             {/* Notifications */}
             <button
               onClick={() => router.push('/chronicles/notifications')}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors relative"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors relative"
               title="Notifications"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <Bell className="w-4 h-4 text-gray-700 dark:text-gray-300" />
               {notifications > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
               )}
             </button>
 
@@ -214,7 +206,7 @@ export default function ChroniclesHeader({
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                className="hidden sm:flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
               >
                 {mounted && (profile?.profile_image_url || profileImage) && (
                   <Image
@@ -222,58 +214,58 @@ export default function ChroniclesHeader({
                     alt={profile?.pen_name || creatorName}
                     width={24}
                     height={24}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-5 h-5 rounded-full object-cover"
                   />
                 )}
                 {!mounted || (!profile?.profile_image_url && !profileImage) && (
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center">
+                    <span className="text-white text-[10px] font-bold">
                       {(profile?.pen_name || creatorName).charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
-                <span className="hidden sm:inline text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="hidden sm:inline text-xs font-medium text-gray-700 dark:text-gray-300">
                   {profile?.pen_name || creatorName}
                 </span>
-                <ChevronDown className="w-4 h-4 text-gray-700 dark:text-gray-300" />
+                <ChevronDown className="w-3 h-3 text-gray-700 dark:text-gray-300" />
               </button>
 
               {/* Mobile/Tablet menu icon for user dropdown */}
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-red-600 transition-colors"
+                className="sm:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 title="User menu"
                 aria-label="User menu"
               >
-                <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <User className="w-4 h-4 text-gray-700 dark:text-gray-300" />
               </button>
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-black rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
                   <Link
                     href="/chronicles/settings"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                    className="block px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    <Settings className="w-4 h-4" />
+                    <Settings className="w-3.5 h-3.5" />
                     Settings
                   </Link>
                   <Link
                     href="/chronicles/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                    className="block px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    <User className="w-4 h-4" />
+                    <User className="w-3.5 h-3.5" />
                     Profile
                   </Link>
                   {profile?.pen_name && (
                     <Link
                       href={`/chronicles/portfolio/${profile.pen_name}`}
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
+                      className="block px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-2"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      <BookOpen className="w-4 h-4" />
+                      <BookOpen className="w-3.5 h-3.5" />
                       Portfolio
                     </Link>
                   )}
@@ -283,9 +275,9 @@ export default function ChroniclesHeader({
                       setDropdownOpen(false);
                       setLogoutModalOpen(true);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-3.5 h-3.5" />
                     Logout
                   </button>
                 </div>
@@ -295,52 +287,51 @@ export default function ChroniclesHeader({
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
             >
               {sidebarOpen ? (
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="w-4 h-4" />
               )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Always visible on lg screens */}
       <div
-        className={`hidden lg:fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-30 overflow-y-auto flex flex-col ${sidebarOpen ? 'translate-x-0' : 'translate-x-0'
-          }`}
+        className="hidden lg:flex fixed left-0 top-14 h-[calc(100vh-56px)] w-56 bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-slate-700 z-30 flex-col"
       >
-        <nav className="p-4 space-y-2 flex-1">
+        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${isActive(item.href)
-                  ? 'bg-purple-600 text-white'
+              className={`px-2.5 py-2 rounded-md transition-colors flex items-center gap-2 text-xs ${isActive(item.href)
+                  ? 'bg-red-600 text-white'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
                 }`}
             >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              <span className="font-medium">{item.label}</span>
+              <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="font-medium truncate">{item.label}</span>
             </Link>
           ))}
         </nav>
 
         {/* Theme Toggle at Bottom of Sidebar */}
-        <div className="p-4 border-t border-gray-200 dark:border-slate-700">
+        <div className="p-2 border-t border-gray-200 dark:border-slate-700">
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="w-full px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+            className="w-full px-2.5 py-2 rounded-md transition-colors flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700"
           >
             {mounted && resolvedTheme === 'light' ? (
-              <Moon className="w-5 h-5 flex-shrink-0" />
+              <Moon className="w-3.5 h-3.5 flex-shrink-0" />
             ) : (
-              <Sun className="w-5 h-5 flex-shrink-0" />
+              <Sun className="w-3.5 h-3.5 flex-shrink-0" />
             )}
             <span className="font-medium">
-              {mounted && resolvedTheme === 'light' ? 'Dark Mode' : 'Light Mode'}
+              {mounted && resolvedTheme === 'light' ? 'Dark' : 'Light'}
             </span>
           </button>
         </div>
@@ -349,55 +340,55 @@ export default function ChroniclesHeader({
       {/* Mobile Sidebar */}
       {mounted && sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 top-16 z-20 bg-black/50"
+          className="lg:hidden fixed inset-0 top-14 z-20 bg-black/50"
           onClick={() => setSidebarOpen(false)}
         >
           <div
             ref={sidebarRef}
-            className="w-64 h-full bg-white dark:bg-black border border-gray-200 dark:border-slate-700 dark:shadow-2xl dark:shadow-white/40 shadow-lg animate-slideIn flex flex-col"
+            className="w-56 h-full bg-white dark:bg-black border border-gray-200 dark:border-slate-700 dark:shadow-2xl dark:shadow-white/40 shadow-lg animate-slideIn flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <nav className="p-4 space-y-2 flex-1">
+            <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
               {navigationItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${isActive(item.href)
+                  className={`px-2.5 py-2 rounded-md transition-colors flex items-center gap-2 text-xs ${isActive(item.href)
                       ? 'bg-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                     }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="font-medium truncate">{item.label}</span>
                 </Link>
               ))}
             </nav>
-            <div className="p-4 space-y-2 border-t border-gray-200 dark:border-slate-700">
+            <div className="p-2 space-y-0.5 border-t border-gray-200 dark:border-slate-700">
               <button
                 onClick={() => {
                   setTheme(theme === 'light' ? 'dark' : 'light');
                 }}
-                className="w-full px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
+                className="w-full px-2.5 py-2 rounded-md transition-colors flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
               >
                 {mounted && resolvedTheme === 'light' ? (
-                  <Moon className="w-5 h-5 flex-shrink-0" />
+                  <Moon className="w-3.5 h-3.5 flex-shrink-0" />
                 ) : (
-                  <Sun className="w-5 h-5 flex-shrink-0" />
+                  <Sun className="w-3.5 h-3.5 flex-shrink-0" />
                 )}
                 <span className="font-medium">
-                  {mounted && resolvedTheme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                  {mounted && resolvedTheme === 'light' ? 'Dark' : 'Light'}
                 </span>
               </button>
-              <hr className="my-2 border-gray-200 dark:border-slate-700" />
+              <hr className="my-1 border-gray-200 dark:border-slate-700" />
               <button
                 onClick={() => {
                   setSidebarOpen(false);
                   setLogoutModalOpen(true);
                 }}
-                className="w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="w-full text-left px-2.5 py-2 rounded-md transition-colors flex items-center gap-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
-                <LogOut className="w-5 h-5 flex-shrink-0" />
+                <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="font-medium">Logout</span>
               </button>
             </div>

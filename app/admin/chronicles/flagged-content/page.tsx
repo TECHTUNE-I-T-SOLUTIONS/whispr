@@ -223,7 +223,7 @@ export default function FlaggedContentPage() {
                 {content.status}
               </span>
               {content.action_taken && (
-                <span className="text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
+                <span className="text-xs px-2 py-1 rounded bg-red-100 text-red-800">
                   Action: {content.action_taken}
                 </span>
               )}

@@ -112,7 +112,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                     <Button
                       asChild
                       size="lg"
-                      className="bg-white text-purple-600 hover:bg-white/90 font-semibold"
+                      className="bg-white text-red-600 hover:bg-white/90 font-semibold"
                     >
                       <Link href="/chronicles/waitlist" className="flex items-center gap-2">
                         Join Now

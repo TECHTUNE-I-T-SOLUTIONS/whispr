@@ -63,7 +63,7 @@ export default function ChroniclesLayout({ children }: ChroniclesLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black">
       {!isPublicPage && <ChroniclesHeader />}
-      <main>
+      <main className={!isPublicPage ? 'lg:ml-56' : ''}>
         {children}
       </main>
     </div>

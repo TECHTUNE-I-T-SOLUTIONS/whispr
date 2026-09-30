@@ -76,7 +76,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
             {/* Main Content Container with organic shape */}
             <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-slate-900 shadow-2xl">
               {/* Decorative blobs */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl -mr-20 -mt-20" />
+              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-red-200/20 to-pink-200/20 rounded-full blur-3xl -mr-20 -mt-20" />
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl -ml-20 -mb-20" />
 
               {/* Close Button */}
@@ -108,7 +108,7 @@ export function ChroniclesFeatureModal({ isOpen, onClose, feature = 'all' }: Fea
                         >
                           <Icon className="w-6 h-6" />
                         </motion.div>
-                        <PartyPopper className="w-5 h-5 text-purple-500 animate-pulse" />
+                        <PartyPopper className="w-5 h-5 text-red-500 animate-pulse" />
                       </div>
                       <h2 className="text-3xl md:text-4xl font-bold mb-2">{currentFeature.title}</h2>
                       <p className="text-lg text-muted-foreground">{currentFeature.subtitle}</p>

@@ -233,7 +233,7 @@ export default function EnhancedChroniclesEditor() {
               Save Draft
             </Button>
             <Button
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
               onClick={handlePublish}
               disabled={publishing}
             >
@@ -341,7 +341,7 @@ export default function EnhancedChroniclesEditor() {
               {postData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium flex items-center gap-2"
+                  className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium flex items-center gap-2"
                 >
                   {tag}
                   <button onClick={() => handleRemoveTag(tag)} className="hover:opacity-70">
@@ -401,7 +401,7 @@ export default function EnhancedChroniclesEditor() {
                 ref={editorRef}
                 contentEditable
                 onInput={(e) => setPostData({ ...postData, content: e.currentTarget.innerHTML })}
-                className="min-h-96 p-4 border border-gray-300 dark:border-slate-700 rounded-md font-mono text-sm focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                className="min-h-96 p-4 border border-gray-300 dark:border-slate-700 rounded-md font-mono text-sm focus:ring-2 focus:ring-red-600 focus:border-transparent outline-none"
                 suppressContentEditableWarning
               >
                 {postData.content || 'Start writing...'}

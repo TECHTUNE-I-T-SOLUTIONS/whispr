@@ -102,7 +102,7 @@ export default function PersonalizedRecommendations({
     return (
       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-6">
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+          <Loader2 className="w-6 h-6 animate-spin text-red-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading recommendations...</span>
         </div>
       </div>
@@ -140,7 +140,7 @@ export default function PersonalizedRecommendations({
     <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-500" />
+          <Sparkles className="w-5 h-5 text-red-500" />
           <h3 className="font-semibold text-gray-800 dark:text-white">Recommended for You</h3>
         </div>
         <button
@@ -163,7 +163,7 @@ export default function PersonalizedRecommendations({
             className="p-4 hover:bg-gray-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
           >
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full font-bold text-sm">
                 {idx + 1}
               </div>
               <div className="flex-1 min-w-0">

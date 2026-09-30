@@ -115,7 +115,7 @@ export default function TrendingFeed({
       case 'youtube':
         return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
       default:
-        return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30';
+        return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
     }
   };
 
@@ -164,7 +164,7 @@ export default function TrendingFeed({
     return (
       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-6">
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+          <Loader2 className="w-6 h-6 animate-spin text-red-500" />
           <span className="ml-2 text-gray-600 dark:text-gray-400">Loading trending content...</span>
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function TrendingFeed({
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-purple-500/20 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-b-2 border-purple-500'
+                  ? 'bg-red-500/20 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-b-2 border-red-500'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-500/20 dark:hover:bg-slate-800'
               }`}
             >
@@ -247,7 +247,7 @@ export default function TrendingFeed({
               className="p-4 hover:bg-gray-500/20 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             >
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full font-bold text-sm">
+                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full font-bold text-sm">
                   {idx + 1}
                 </div>
                 <div className="flex-1 min-w-0">

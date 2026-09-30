@@ -528,7 +528,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
         {/* Post Header */}
         <div className="mb-8">
           <div className="flex gap-2 mb-4 flex-wrap">
-            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
+            <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium">
               {post.type === 'poem' ? '📝 Poem' : '📖 Blog Post'}
             </span>
             {post.category && (
@@ -566,7 +566,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
           {post.author && (
             <div className="flex items-center justify-between gap-4 p-4 bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800">
               <div className="flex items-center gap-4 flex-1">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden flex-shrink-0">
                   {post.author.avatar_url ? (
                     <img 
                       src={post.author.avatar_url}
@@ -583,7 +583,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                 </div>
                 <div className="flex-1">
                   <Link href={`/chronicles/portfolio/${post.author.penName}`}>
-                    <p className="font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer">
+                    <p className="font-semibold text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-400 cursor-pointer">
                       {post.author.name}
                     </p>
                   </Link>
@@ -624,7 +624,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
         </div>
 
         {/* Content */}
-        <div className="prose prose-purple dark:prose-invert max-w-none mb-8 leading-relaxed text-gray-900 dark:text-white">
+        <div className="prose prose-red dark:prose-invert max-w-none mb-8 leading-relaxed text-gray-900 dark:text-white">
           <div className="whitespace-pre-wrap break-words">
             {post.content}
           </div>
@@ -712,7 +712,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Share your thoughts on this post..."
-                  className="flex-1 p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded resize-none focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white"
+                  className="flex-1 p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded resize-none focus:outline-none focus:ring-2 focus:ring-red-600 dark:text-white"
                   rows={3}
                 />
               </div>
@@ -727,7 +727,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                 <Button
                   onClick={handleAddComment}
                   disabled={!newComment.trim() || submittingComment}
-                  className="bg-purple-600 hover:bg-purple-700"
+                  className="bg-red-600 hover:bg-red-700"
                 >
                   {submittingComment ? (
                     <>
@@ -786,7 +786,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                         }}
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
                         {comment.creator?.pen_name?.charAt(0).toUpperCase() || 'A'}
                       </div>
                     )}
@@ -860,8 +860,8 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
               </button>
 
               <div className="mb-6">
-                <div className="flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full mx-auto mb-4">
-                  <LogIn className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-4">
+                  <LogIn className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
                   Join Chronicles
@@ -873,7 +873,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
 
               <div className="space-y-3 mb-4">
                 <Link href="/auth/login" className="block w-full">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                  <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
                     <LogIn className="w-4 h-4 mr-2" />
                     Login to Chronicles
                   </Button>

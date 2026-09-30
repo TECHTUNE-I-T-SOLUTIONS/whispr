@@ -44,7 +44,7 @@ const PILLARS = [
     id: "critique",
     title: "AI May Critique",
     icon: MessageSquareCode,
-    color: "from-purple-500 to-primary",
+    color: "from-red-500 to-primary",
     bgColor: "rgba(139, 92, 246, 0.1)",
     borderColor: "rgba(139, 92, 246, 0.3)",
     activeBorderColor: "rgb(139, 92, 246)",

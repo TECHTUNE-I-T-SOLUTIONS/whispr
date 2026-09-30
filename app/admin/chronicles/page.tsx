@@ -168,7 +168,7 @@ export default function AdminChroniclesControl() {
         {/* Header */}
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-purple-600" />
+            <Settings className="w-8 h-8 text-red-600" />
             <h1 className="text-4xl font-bold">Chronicles Control Panel</h1>
           </div>
           <p className="text-muted-foreground">Manage the Chronicles platform settings and monitor activity</p>
@@ -181,7 +181,7 @@ export default function AdminChroniclesControl() {
               icon={Users}
               label="Total Creators"
               value={stats.total_creators}
-              color="bg-gradient-to-br from-purple-600 to-purple-700"
+              color="bg-gradient-to-br from-red-600 to-red-700"
             />
             <StatCard
               icon={BookOpen}
@@ -237,7 +237,7 @@ export default function AdminChroniclesControl() {
                   onClick={() => setSettings({ ...settings, feature_enabled: !settings.feature_enabled })}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                     settings.feature_enabled
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600'
                       : 'bg-gray-300 dark:bg-slate-700'
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function AdminChroniclesControl() {
                   onClick={() => setSettings({ ...settings, registration_open: !settings.registration_open })}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                     settings.registration_open
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600'
                       : 'bg-gray-300 dark:bg-slate-700'
                   }`}
                 >
@@ -281,7 +281,7 @@ export default function AdminChroniclesControl() {
                   onClick={() => setSettings({ ...settings, require_email_verification: !settings.require_email_verification })}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                     settings.require_email_verification
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600'
                       : 'bg-gray-300 dark:bg-slate-700'
                   }`}
                 >
@@ -303,7 +303,7 @@ export default function AdminChroniclesControl() {
                   onClick={() => setSettings({ ...settings, allow_anonymous_comments: !settings.allow_anonymous_comments })}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                     settings.allow_anonymous_comments
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600'
                       : 'bg-gray-300 dark:bg-slate-700'
                   }`}
                 >
@@ -365,7 +365,7 @@ export default function AdminChroniclesControl() {
               Cancel
             </Button>
             <Button
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
               onClick={handleSave}
               disabled={saving}
             >
@@ -379,9 +379,9 @@ export default function AdminChroniclesControl() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button
             onClick={() => router.push('/admin/chronicles/notifications')}
-            className="p-6 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg hover:border-purple-500 transition-colors text-left"
+            className="p-6 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-lg hover:border-red-500 transition-colors text-left"
           >
-            <Bell className="w-6 h-6 text-purple-600 mb-3" />
+            <Bell className="w-6 h-6 text-red-600 mb-3" />
             <p className="font-semibold">Notifications</p>
             <p className="text-sm text-muted-foreground">View admin alerts and actions</p>
           </button>

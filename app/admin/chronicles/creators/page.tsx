@@ -51,7 +51,7 @@ const statusColors = {
   verified: 'bg-green-50 border-green-200 text-green-900',
   banned: 'bg-red-50 border-red-200 text-red-900',
   new: 'bg-blue-50 border-blue-200 text-blue-900',
-  active: 'bg-purple-50 border-purple-200 text-purple-900',
+  active: 'bg-red-50 border-red-200 text-red-900',
   inactive: 'bg-gray-50 border-gray-200 text-gray-900',
 };
 
@@ -353,9 +353,9 @@ export default function AdminCreatorsPage() {
               <div className="text-sm text-red-600 font-medium">Banned</div>
               <div className="text-2xl font-bold text-red-900">{stats.banned_creators}</div>
             </div>
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <div className="text-sm text-purple-600 font-medium">Avg Posts</div>
-              <div className="text-2xl font-bold text-purple-900">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="text-sm text-red-600 font-medium">Avg Posts</div>
+              <div className="text-2xl font-bold text-red-900">
                 {stats.avg_posts_per_creator ? stats.avg_posts_per_creator.toFixed(1) : '0.0'}
               </div>
             </div>
@@ -610,7 +610,7 @@ export default function AdminCreatorsPage() {
                           {/* Post type badge */}
                           <span className={`inline-block px-2 py-0.5 rounded font-medium ${
                             post.post_type === 'chain_entry'
-                              ? 'bg-purple-100 text-purple-800'
+                              ? 'bg-red-100 text-red-800'
                               : post.post_type === 'poem'
                               ? 'bg-pink-100 text-pink-800'
                               : post.post_type === 'blog'
@@ -634,7 +634,7 @@ export default function AdminCreatorsPage() {
                         
                         {/* Chain info if applicable */}
                         {post.post_type === 'chain_entry' && post.chain_info && (
-                          <div className="text-xs text-purple-600 font-medium mt-1">
+                          <div className="text-xs text-red-600 font-medium mt-1">
                             📚 {post.chain_info.title}
                           </div>
                         )}

@@ -438,7 +438,7 @@ export default function FeaturesPage() {
                           <Badge className="bg-green-500 hover:bg-green-600">New</Badge>
                         )}
                         {feature.isComingSoon && (
-                          <Badge className="bg-purple-500 hover:bg-purple-600">Coming Soon</Badge>
+                          <Badge className="bg-red-500 hover:bg-red-600">Coming Soon</Badge>
                         )}
                       </div>
                     </div>
@@ -470,7 +470,7 @@ export default function FeaturesPage() {
                       <Badge className="bg-green-500 hover:bg-green-600">New</Badge>
                     )}
                     {feature.isComingSoon && (
-                      <Badge className="bg-purple-500 hover:bg-purple-600">Coming Soon</Badge>
+                      <Badge className="bg-red-500 hover:bg-red-600">Coming Soon</Badge>
                     )}
                   </div>
                   <DialogTitle className="text-2xl">{feature.title}</DialogTitle>

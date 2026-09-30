@@ -70,8 +70,8 @@ export default function ChroniclesWaitlist() {
     {
       icon: Award,
       title: "Exclusive Verified Creator Badge",
-      desc: "Get auto-verified with a premium purple launch badge visible on all your initial posts.",
-      color: "from-purple-500 to-indigo-500"
+      desc: "Get auto-verified with a premium red launch badge visible on all your initial posts.",
+      color: "from-red-500 to-indigo-500"
     },
     {
       icon: Zap,
@@ -256,15 +256,15 @@ export default function ChroniclesWaitlist() {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6 relative overflow-hidden">
         {/* Glow ambient backgrounds */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse" />
 
-        <div className="max-w-xl w-full bg-slate-900/40 border border-purple-500/20 rounded-[32px] p-8 md:p-12 shadow-2xl backdrop-blur-xl text-center relative z-10">
-          <div className="inline-flex p-4 rounded-full bg-gradient-to-tr from-purple-500/20 to-pink-500/20 border border-purple-500/45 text-purple-300 mb-6 animate-bounce">
+        <div className="max-w-xl w-full bg-slate-900/40 border border-red-500/20 rounded-[32px] p-8 md:p-12 shadow-2xl backdrop-blur-xl text-center relative z-10">
+          <div className="inline-flex p-4 rounded-full bg-gradient-to-tr from-red-500/20 to-pink-500/20 border border-red-500/45 text-red-300 mb-6 animate-bounce">
             <PartyPopper className="h-9 w-9" />
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-red-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
             Identity Secured!
           </h1>
           <p className="text-slate-300 text-sm md:text-base mb-8 max-w-sm mx-auto leading-relaxed">
@@ -274,7 +274,7 @@ export default function ChroniclesWaitlist() {
           <div className="bg-slate-950/80 rounded-2xl p-6 border border-white/5 space-y-4 mb-8 text-left shadow-inner">
             <div className="flex items-center justify-between pb-3.5 border-b border-white/5 text-xs text-slate-400">
               <span className="font-semibold flex items-center gap-1.5 tracking-wider">
-                <Bookmark className="h-4 w-4 text-purple-400" /> SECURED CREATOR OUTLINE
+                <Bookmark className="h-4 w-4 text-red-400" /> SECURED CREATOR OUTLINE
               </span>
               <span className="font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-widest text-[9px]">
                 Pending Launch
@@ -301,8 +301,8 @@ export default function ChroniclesWaitlist() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2.5 p-3.5 bg-purple-500/10 border border-purple-500/20 rounded-xl text-xs text-purple-200">
-              <Calendar className="h-4 w-4 shrink-0 text-purple-400" />
+            <div className="flex items-center justify-center gap-2.5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-200">
+              <Calendar className="h-4 w-4 shrink-0 text-red-400" />
               <span>Launch alerts will be delivered straight to <strong>{formData.email}</strong>.</span>
             </div>
 
@@ -320,7 +320,7 @@ export default function ChroniclesWaitlist() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center py-16 px-4 md:px-8 relative overflow-hidden font-sans">
       {/* Background radial gradient lighting */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-red-600/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-pink-600/15 rounded-full blur-[140px] pointer-events-none animate-pulse" />
 
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
@@ -328,11 +328,11 @@ export default function ChroniclesWaitlist() {
         {/* Left Column: Premium Value Props */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-extrabold text-purple-400 bg-purple-900/35 border border-purple-500/30 rounded-full uppercase tracking-widest shadow-lg shadow-purple-900/20">
-              <Sparkles className="h-3.5 w-3.5 animate-spin text-purple-400" /> Exclusive Launch Waitlist
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-extrabold text-red-400 bg-red-900/35 border border-red-500/30 rounded-full uppercase tracking-widest shadow-lg shadow-red-900/20">
+              <Sparkles className="h-3.5 w-3.5 animate-spin text-red-400" /> Exclusive Launch Waitlist
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white">
-              Reserve Your <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">Whispr Identity</span>
+              Reserve Your <span className="bg-gradient-to-r from-red-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">Whispr Identity</span>
             </h1>
             <p className="text-slate-400 text-sm md:text-base max-w-lg leading-relaxed">
               We are opening up the next-generation space for stories, poetry, and blogs. Secure your custom pen name and launch badge today.
@@ -349,7 +349,7 @@ export default function ChroniclesWaitlist() {
             ].map((s) => (
               <div key={s.num} className={`flex gap-3.5 transition-all duration-300 ${step === s.num ? 'opacity-100 scale-102 translation-x-1' : 'opacity-40'}`}>
                 <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${step === s.num
-                  ? 'bg-purple-600 border-purple-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
+                  ? 'bg-red-600 border-red-400 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
                   : step > s.num
                     ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
                     : 'bg-slate-900 border-white/10 text-slate-500'
@@ -390,7 +390,7 @@ export default function ChroniclesWaitlist() {
                 <div
                   key={s}
                   className={`h-2.5 rounded-full transition-all duration-300 ${step === s
-                    ? 'w-8 bg-purple-500'
+                    ? 'w-8 bg-red-500'
                     : step > s
                       ? 'w-2.5 bg-emerald-500'
                       : 'w-2.5 bg-white/10'
@@ -416,7 +416,7 @@ export default function ChroniclesWaitlist() {
                       placeholder="you@example.com"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
+                      className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
                       required
                     />
                   </div>
@@ -429,11 +429,11 @@ export default function ChroniclesWaitlist() {
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
+                      className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
                       required
                     />
                     <span className="text-[10px] text-slate-500 flex items-center gap-1.5 mt-2">
-                      <Lock className="h-3 w-3 text-purple-400" /> Passwords are encrypted utilizing military-grade hashing.
+                      <Lock className="h-3 w-3 text-red-400" /> Passwords are encrypted utilizing military-grade hashing.
                     </span>
                   </div>
                 </div>
@@ -445,13 +445,13 @@ export default function ChroniclesWaitlist() {
                   </div>
                 )}
 
-                <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl h-12 flex items-center justify-center gap-1.5 font-bold transition-all shadow-lg shadow-purple-900/20">
+                <Button type="submit" className="w-full bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 text-white rounded-xl h-12 flex items-center justify-center gap-1.5 font-bold transition-all shadow-lg shadow-red-900/20">
                   Next: Configure Pen Name <ArrowRight className="w-4 h-4" />
                 </Button>
 
                 <p className="text-xs text-center text-slate-400">
                   Already secured an outline?{' '}
-                  <Link href="/" className="text-purple-400 hover:text-purple-300 font-semibold hover:underline">
+                  <Link href="/" className="text-red-400 hover:text-red-300 font-semibold hover:underline">
                     Go Home
                   </Link>
                 </p>
@@ -471,14 +471,14 @@ export default function ChroniclesWaitlist() {
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Pen Name *</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 text-sm font-extrabold">@</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-red-400 text-sm font-extrabold">@</span>
                         <Input
                           type="text"
                           name="penName"
                           placeholder="johndoe"
                           value={formData.penName}
                           onChange={handleInputChange}
-                          className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-12 text-white pl-8 placeholder-slate-600 focus:ring-0 focus-visible:ring-0 font-mono"
+                          className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-12 text-white pl-8 placeholder-slate-600 focus:ring-0 focus-visible:ring-0 font-mono"
                           required
                         />
                       </div>
@@ -492,7 +492,7 @@ export default function ChroniclesWaitlist() {
                         placeholder="John Doe"
                         value={formData.displayName}
                         onChange={handleInputChange}
-                        className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
+                        className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-12 text-white placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
                         required
                       />
                     </div>
@@ -505,7 +505,7 @@ export default function ChroniclesWaitlist() {
                       placeholder="Write a brief intro about your writing philosophy..."
                       value={formData.bio}
                       onChange={handleInputChange}
-                      className="w-full min-h-20 bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm text-white placeholder-slate-600 focus:ring-0 font-serif resize-none"
+                      className="w-full min-h-20 bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm text-white placeholder-slate-600 focus:ring-0 font-serif resize-none"
                     />
                   </div>
 
@@ -536,7 +536,7 @@ export default function ChroniclesWaitlist() {
                           onClick={() => fileInputRef.current?.click()}
                           className="w-full flex flex-col items-center justify-center py-4 cursor-pointer hover:bg-white/5 rounded-lg transition-all"
                         >
-                          <Upload className="w-6 h-6 text-purple-400 mb-1.5" />
+                          <Upload className="w-6 h-6 text-red-400 mb-1.5" />
                           <span className="text-xs font-bold text-white">Choose profile picture</span>
                           <span className="text-[9px] text-slate-500 mt-0.5">PNG or JPG, max 5MB</span>
                         </button>
@@ -568,7 +568,7 @@ export default function ChroniclesWaitlist() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold">
+                  <Button type="submit" className="flex-1 bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 text-white rounded-xl font-bold">
                     Next: Preferences
                   </Button>
                 </div>
@@ -593,7 +593,7 @@ export default function ChroniclesWaitlist() {
                           type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, contentType: type }))}
                           className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${formData.contentType === type
-                            ? 'border-purple-500 bg-purple-500/20 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
+                            ? 'border-red-500 bg-red-500/20 text-red-300 shadow-[0_0_12px_rgba(168,85,247,0.2)]'
                             : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
                             }`}
                         >
@@ -612,12 +612,12 @@ export default function ChroniclesWaitlist() {
                           type="button"
                           onClick={() => handleCategoryToggle(category)}
                           className={`p-2.5 rounded-xl border transition-all text-xs font-medium flex items-center justify-center gap-1.5 ${formData.preferredCategories.includes(category)
-                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            ? 'border-red-500 bg-red-500/20 text-red-300'
                             : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
                             }`}
                         >
                           {formData.preferredCategories.includes(category) && (
-                            <Check className="w-3.5 h-3.5 shrink-0 text-purple-400 font-black" />
+                            <Check className="w-3.5 h-3.5 shrink-0 text-red-400 font-black" />
                           )}
                           {category}
                         </button>
@@ -634,7 +634,7 @@ export default function ChroniclesWaitlist() {
                           type="button"
                           onClick={() => setFormData((prev) => ({ ...prev, profileVisibility: visibility }))}
                           className={`p-3 rounded-xl border transition-all capitalize text-xs font-bold ${formData.profileVisibility === visibility
-                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            ? 'border-red-500 bg-red-500/20 text-red-300'
                             : 'border-white/10 bg-slate-950/40 text-slate-400 hover:bg-white/5'
                             }`}
                         >
@@ -661,7 +661,7 @@ export default function ChroniclesWaitlist() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold">
+                  <Button type="submit" className="flex-1 bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 text-white rounded-xl font-bold">
                     Next: Final Details
                   </Button>
                 </div>
@@ -684,7 +684,7 @@ export default function ChroniclesWaitlist() {
                         name="pushNotifications"
                         checked={formData.pushNotifications}
                         onChange={handleCheckboxChange}
-                        className="w-4 h-4 rounded border-white/10 text-purple-600 focus:ring-purple-500 bg-slate-950"
+                        className="w-4 h-4 rounded border-white/10 text-red-600 focus:ring-red-500 bg-slate-950"
                       />
                       <span>Launch Day Mobile Push Alerts</span>
                     </label>
@@ -694,7 +694,7 @@ export default function ChroniclesWaitlist() {
                         name="emailDigest"
                         checked={formData.emailDigest}
                         onChange={handleCheckboxChange}
-                        className="w-4 h-4 rounded border-white/10 text-purple-600 focus:ring-purple-500 bg-slate-950"
+                        className="w-4 h-4 rounded border-white/10 text-red-600 focus:ring-red-500 bg-slate-950"
                       />
                       <span>Weekly Beta Outlines Digest</span>
                     </label>
@@ -704,7 +704,7 @@ export default function ChroniclesWaitlist() {
                         name="emailOnEngagement"
                         checked={formData.emailOnEngagement}
                         onChange={handleCheckboxChange}
-                        className="w-4 h-4 rounded border-white/10 text-purple-600 focus:ring-purple-500 bg-slate-950"
+                        className="w-4 h-4 rounded border-white/10 text-red-600 focus:ring-red-500 bg-slate-950"
                       />
                       <span>Notify on VIP partner invites</span>
                     </label>
@@ -720,7 +720,7 @@ export default function ChroniclesWaitlist() {
                           placeholder="twitter_handle"
                           value={formData.socialLinks.twitter}
                           onChange={(e) => handleSocialChange('twitter', e.target.value)}
-                          className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-11 text-white pl-10 placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
+                          className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-11 text-white pl-10 placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
                         />
                       </div>
                       <div className="relative">
@@ -730,7 +730,7 @@ export default function ChroniclesWaitlist() {
                           placeholder="instagram_handle"
                           value={formData.socialLinks.instagram}
                           onChange={(e) => handleSocialChange('instagram', e.target.value)}
-                          className="w-full bg-slate-950/60 border-white/10 focus:border-purple-500 rounded-xl text-sm h-11 text-white pl-10 placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
+                          className="w-full bg-slate-950/60 border-white/10 focus:border-red-500 rounded-xl text-sm h-11 text-white pl-10 placeholder-slate-600 focus:ring-0 focus-visible:ring-0"
                         />
                       </div>
                     </div>
@@ -754,7 +754,7 @@ export default function ChroniclesWaitlist() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-extrabold h-12 shadow-lg shadow-purple-900/25" disabled={loading}>
+                  <Button type="submit" className="flex-1 bg-gradient-to-r from-red-600 to-indigo-600 hover:from-red-500 hover:to-indigo-500 text-white rounded-xl font-extrabold h-12 shadow-lg shadow-red-900/25" disabled={loading}>
                     {loading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -774,11 +774,11 @@ export default function ChroniclesWaitlist() {
           {/* Legal statement */}
           <p className="text-center text-xs text-slate-500 mt-6 leading-relaxed">
             By reserving your pen name, you agree to the Whispr{' '}
-            <Link href="/terms" className="text-purple-400 hover:underline">
+            <Link href="/terms" className="text-red-400 hover:underline">
               Terms of Use
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-purple-400 hover:underline">
+            <Link href="/privacy" className="text-red-400 hover:underline">
               Privacy Policy
             </Link>.
           </p>

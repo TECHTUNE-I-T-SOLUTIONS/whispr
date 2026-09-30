@@ -46,7 +46,7 @@ const getNotificationIcon = (type: string | undefined) => {
     return <Heart className="h-5 w-5 text-red-600" />
   }
   if (['milestone', 'badge_earned', 'streak_milestone'].includes(normalizedType)) {
-    return <Eye className="h-5 w-5 text-purple-600" />
+    return <Eye className="h-5 w-5 text-red-600" />
   }
   
   return <Bell className="h-5 w-5 text-blue-600" />
@@ -63,7 +63,7 @@ const getNotificationBg = (type: string | undefined): string => {
     return "bg-red-50"
   }
   if (['milestone', 'badge_earned', 'streak_milestone'].includes(normalizedType)) {
-    return "bg-purple-50"
+    return "bg-red-50"
   }
   
   return "bg-blue-50"

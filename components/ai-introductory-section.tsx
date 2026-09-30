@@ -22,7 +22,7 @@ const FEATURES = [
     icon: PenTool,
     title: "Write Better",
     description: "Get real-time suggestions and feedback. Learn writing techniques while AI helps you articulate your thoughts more effectively.",
-    color: "from-purple-500 to-pink-500",
+    color: "from-red-500 to-pink-500",
     bgColor: "rgba(168, 85, 247, 0.1)",
     borderColor: "rgba(168, 85, 247, 0.3)"
   },
@@ -462,7 +462,7 @@ export function AIIntroductorySection() {
                     <span><strong>AI May Suggest:</strong> Offer stylistic alternatives and vocabulary</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="w-2 h-2 rounded-full mt-2 bg-purple-500/50" />
+                    <span className="w-2 h-2 rounded-full mt-2 bg-red-500/50" />
                     <span><strong>AI May Critique:</strong> Provide feedback on structure and flow</span>
                   </li>
                   <li className="flex items-start gap-2">

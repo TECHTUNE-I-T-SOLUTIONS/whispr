@@ -107,7 +107,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/feature-request" className="hover:text-primary transition-colors">
+                <Link href="/feature-requests" className="hover:text-primary transition-colors">
                   Feature Request
                 </Link>
               </li>

@@ -298,7 +298,7 @@ export default function WelcomePage() {
 
           {loadingTrending ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-red-600" />
             </div>
           ) : trendingTopics.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

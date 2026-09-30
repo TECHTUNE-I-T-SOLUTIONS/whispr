@@ -20,7 +20,7 @@ const reactionTypes = [
   { type: "like", icon: ThumbsUp, label: "Like 👍", color: "hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950" },
   { type: "love", icon: Heart, label: "Love ❤️", color: "hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950" },
   { type: "smile", icon: Smile, label: "Smile 😊", color: "hover:bg-yellow-50 hover:text-yellow-600 dark:hover:bg-yellow-950" },
-  { type: "wow", icon: Zap, label: "Wow 😮", color: "hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-950" },
+  { type: "wow", icon: Zap, label: "Wow 😮", color: "hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950" },
   { type: "star", icon: Star, label: "Star ⭐", color: "hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950" },
 ]
 

@@ -104,7 +104,7 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black pt-20">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-red-600" />
           <p className="text-gray-600 dark:text-gray-400">Loading analytics...</p>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
 
           <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-3 mb-2">
-              <Eye className="w-5 h-5 text-purple-600" />
+              <Eye className="w-5 h-5 text-red-600" />
               <span className="text-gray-600 dark:text-gray-400 text-sm">Total Views</span>
             </div>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -331,7 +331,7 @@ export default function AnalyticsPage() {
                       <td className="text-right py-3 px-4 text-gray-600 dark:text-gray-400">
                         {cat.engagement.toLocaleString()}
                       </td>
-                      <td className="text-right py-3 px-4 text-purple-600 dark:text-purple-400 font-semibold">
+                      <td className="text-right py-3 px-4 text-red-600 dark:text-red-400 font-semibold">
                         {Math.round(cat.engagement / cat.count)}
                       </td>
                     </tr>

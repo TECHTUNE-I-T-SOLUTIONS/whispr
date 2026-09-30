@@ -86,7 +86,7 @@ export function CreatorBenefitsModal({ isOpen, onClose }: CreatorBenefitsModalPr
       subtitle: 'Everything you need to succeed',
       description: 'Write, edit, and publish with intuitive tools designed for creators. From drafting to distribution, we streamline your creative process.',
       icon: Zap,
-      color: 'from-purple-500 to-violet-500',
+      color: 'from-red-500 to-violet-500',
       highlights: [
         'Easy publishing',
         'Rich text editor',
@@ -138,7 +138,7 @@ export function CreatorBenefitsModal({ isOpen, onClose }: CreatorBenefitsModalPr
             {/* Main Content Container */}
             <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-slate-900 shadow-2xl">
               {/* Decorative blobs */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-red-200/20 to-pink-200/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none" />
 
               {/* Close Button */}

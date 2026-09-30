@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
-import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon, Image } from 'lucide-react';
+import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link as LinkIcon, Image, Target, Clock, Users } from 'lucide-react';
 import { marked } from 'marked';
 // Use marked.parse for synchronous parsing (ensure string output)
 const parseMarkdown = (md: string) => typeof marked.parse === 'function' ? marked.parse(md) : '';
@@ -20,6 +20,25 @@ import { Save, Send, ArrowLeft, Loader2, AlertCircle, ShieldCheck, AlertTriangle
 import { useToast } from '@/hooks/use-toast';
 import { SEOAnalyzer } from '@/components/seo/seo-analyzer';
 import { EditorSuggestions } from '@/components/editor/EditorSuggestions';
+
+interface WritingPrompt {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  prompt_type: 'blog' | 'poem' | 'story';
+  challenge_type: 'daily' | 'weekly' | 'monthly';
+  status: 'draft' | 'active' | 'ended' | 'archived';
+  starts_at: string;
+  submission_deadline: string;
+  entries_count: number;
+  max_entries_per_user: number;
+  featured_image_url?: string;
+  tags: string[];
+  prize_description?: string;
+  user_entries_count?: number;
+  has_user_entered?: boolean;
+}
 
 interface PostData {
   id?: string;
@@ -85,6 +104,13 @@ function ChroniclesWriteContent() {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 });
 
+  // Challenge selection state
+  const [activeChallenges, setActiveChallenges] = useState<WritingPrompt[]>([]);
+  const [selectedChallenge, setSelectedChallenge] = useState<WritingPrompt | null>(null);
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
+  const [loadingChallenges, setLoadingChallenges] = useState(false);
+  const urlPromptId = searchParams?.get('prompt') as string | null;
+
   // All useRef calls
   const contentRef = useRef<HTMLDivElement>(null);
   const isUpdatingContent = useRef(false);
@@ -105,6 +131,34 @@ function ChroniclesWriteContent() {
     };
     getAuthToken();
   }, []);
+
+  // Load active challenges
+  useEffect(() => {
+    const loadChallenges = async () => {
+      setLoadingChallenges(true);
+      try {
+        const response = await fetch('/api/chronicles/writing-prompts');
+        if (!response.ok) throw new Error('Failed to fetch challenges');
+        const data = await response.json();
+        const challenges = data.prompts || [];
+        setActiveChallenges(challenges);
+        
+        // If prompt is in URL, select it
+        if (urlPromptId) {
+          const selected = challenges.find((c: WritingPrompt) => c.id === urlPromptId);
+          if (selected) {
+            setSelectedChallenge(selected);
+            setSelectedPromptId(urlPromptId);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading challenges:', error);
+      } finally {
+        setLoadingChallenges(false);
+      }
+    };
+    loadChallenges();
+  }, [urlPromptId]);
 
   useEffect(() => {
     if (postId && authToken) {
@@ -466,6 +520,31 @@ function ChroniclesWriteContent() {
       });
 
       if (!res.ok) throw new Error('Failed to publish');
+      
+      const data = await res.json();
+
+      // If a challenge is selected, create a prompt entry
+      if (selectedChallenge && data.id) {
+        try {
+          const entryRes = await fetch('/api/chronicles/prompt-entries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              prompt_id: selectedChallenge.id,
+              post_id: data.id,
+              entry_type: 'chronicles_post'
+            }),
+          });
+
+          if (!entryRes.ok) {
+            console.error('Failed to create challenge entry, but post was published');
+          }
+        } catch (entryError) {
+          console.error('Error creating challenge entry:', entryError);
+        }
+      }
+
       router.push('/chronicles/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to publish');
@@ -491,7 +570,8 @@ function ChroniclesWriteContent() {
       }
 
       const data = await res.json();
-      toast({
+      const { toast: showToast } = await import('@/hooks/use-toast');
+      showToast({
         title: 'Appeal Submitted',
         description: data.message || 'Your appeal has been submitted successfully.',
         duration: 5000,
@@ -505,7 +585,8 @@ function ChroniclesWriteContent() {
         setFlaggedReason('');
       }
     } catch (err) {
-      toast({
+      const { toast: showToast } = await import('@/hooks/use-toast');
+      showToast({
         title: 'Appeal Failed',
         description: err instanceof Error ? err.message : 'Failed to submit appeal',
         variant: 'destructive',
@@ -549,7 +630,7 @@ function ChroniclesWriteContent() {
               Save Draft
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handlePublish}
               disabled={publishing || (isFlagged && (flagStatus === 'pending' || flagStatus === 'under_review'))}
               title={
@@ -730,6 +811,59 @@ function ChroniclesWriteContent() {
             <option value="other">Other</option>
           </select>          
         </div>
+
+        {/* Challenge Selection */}
+        {activeChallenges.length > 0 && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <h3 className="font-semibold text-red-900 dark:text-red-100">Enter a Writing Challenge</h3>
+            </div>
+            
+            <div className="mb-3">
+              <select
+                value={selectedPromptId || ''}
+                onChange={(e) => {
+                  const promptId = e.target.value;
+                  setSelectedPromptId(promptId || null);
+                  const challenge = activeChallenges.find(c => c.id === promptId);
+                  setSelectedChallenge(challenge || null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md bg-white dark:bg-black text-base"
+              >
+                <option value="">Select a challenge (optional)</option>
+                {activeChallenges
+                  .filter(c => c.prompt_type === postData.post_type)
+                  .map(challenge => (
+                    <option key={challenge.id} value={challenge.id}>
+                      {challenge.title} ({challenge.challenge_type}) - {challenge.has_user_entered ? '✓ Already entered' : `${challenge.user_entries_count || 0}/${challenge.max_entries_per_user} entries`}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {selectedChallenge && (
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                  <Clock className="w-4 h-4" />
+                  <span>Deadline: {new Date(selectedChallenge.submission_deadline).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                  <Users className="w-4 h-4" />
+                  <span>{selectedChallenge.entries_count || 0} entries so far</span>
+                </div>
+                <p className="text-red-600 dark:text-red-400 mt-2 p-2 bg-white dark:bg-black rounded">
+                  {selectedChallenge.description}
+                </p>
+                {selectedChallenge.prize_description && (
+                  <p className="text-yellow-700 dark:text-yellow-300 mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                    🏆 {selectedChallenge.prize_description}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         {/* Editor */}
         <div className="bg-white dark:bg-black rounded-lg border border-gray-200 dark:border-slate-800 p-8">
           {/* Title */}
@@ -811,7 +945,7 @@ function ChroniclesWriteContent() {
                     setShowSuggestions(false)
                   }
                 }}
-                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-black text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-purple-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
+                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-black text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-red-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
                 aria-label="Post content editor"
               />
               
@@ -862,7 +996,7 @@ function ChroniclesWriteContent() {
             {postData.content && (
               <div>
                 <label className="block mt-6 mb-2 font-medium">Live Preview</label>
-                <div className="prose prose-purple dark:prose-invert max-w-none border rounded-md p-4 bg-muted/30" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(postData.content) }} />
+                <div className="prose prose-red dark:prose-invert max-w-none border rounded-md p-4 bg-muted/30" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(postData.content) }} />
               </div>
             )} */}
           </div>
@@ -884,7 +1018,7 @@ function ChroniclesWriteContent() {
               {postData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium flex items-center gap-2"
+                  className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-medium flex items-center gap-2"
                 >
                   {tag}
                   <button onClick={() => handleRemoveTag(tag)} className="hover:opacity-70">
@@ -932,7 +1066,7 @@ function ChroniclesWriteContent() {
                 contentEditable
                 suppressContentEditableWarning
                 onInput={() => setPostData((prev) => ({ ...prev, content: contentRef.current?.innerHTML || '' }))}
-                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-black text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-purple-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
+                className={`min-h-[300px] p-4 border border-gray-300 dark:border-slate-700 rounded-md prose max-w-none bg-white dark:bg-black text-black dark:text-white ${postData.post_type === 'poem' ? 'font-serif text-center text-lg leading-relaxed bg-gradient-to-b from-red-50 to-white dark:from-slate-900 dark:to-slate-950' : ''}`}
                 aria-label="Post content editor"
               />
               {(!postData.content || postData.content === '<p><br></p>') && (
@@ -981,7 +1115,7 @@ function ChroniclesWriteContent() {
                   <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </Button>
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-3xl font-extrabold mb-2 text-purple-700 dark:text-purple-300">{postData.title}</h2>
+                  <h2 className="text-3xl font-extrabold mb-2 text-red-700 dark:text-red-300">{postData.title}</h2>
                   {(fetchedImage || imagePreview) && (
                     <img src={fetchedImage || imagePreview} alt="Preview" className="h-40 w-full object-cover rounded-lg shadow border mb-4" />
                   )}
@@ -994,7 +1128,7 @@ function ChroniclesWriteContent() {
                   </div>
                   <hr className="my-4" />
                   <div
-                    className="prose prose-purple dark:prose-invert max-w-none text-lg"
+                    className="prose prose-red dark:prose-invert max-w-none text-lg"
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(parseMarkdown(postData.content || ''))) }}
                   />
                 </div>

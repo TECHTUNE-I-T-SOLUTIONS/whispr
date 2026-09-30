@@ -97,7 +97,7 @@ export function MediaLibrary() {
 
   const getFileIcon = (fileType: string) => {
     if (fileType.startsWith("image/")) return <ImageIcon className="h-8 w-8 text-blue-500" />
-    if (fileType.startsWith("video/")) return <Video className="h-8 w-8 text-purple-500" />
+    if (fileType.startsWith("video/")) return <Video className="h-8 w-8 text-red-500" />
     if (fileType.startsWith("audio/")) return <Music className="h-8 w-8 text-green-500" />
     return <FileText className="h-8 w-8 text-gray-500" />
   }

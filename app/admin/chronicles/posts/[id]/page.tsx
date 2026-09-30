@@ -287,7 +287,7 @@ export default function AdminPostDetail({ params }: { params: Promise<{ id: stri
       case 'poem':
         return 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200';
       case 'chain_entry':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       case 'story':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       default:

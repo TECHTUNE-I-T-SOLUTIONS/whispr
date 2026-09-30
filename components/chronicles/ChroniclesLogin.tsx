@@ -88,7 +88,7 @@ export default function ChroniclesLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Brand */}
         <div className="text-center mb-8">
@@ -207,7 +207,7 @@ export default function ChroniclesLogin() {
           <div className="mt-6 text-center text-sm">
             <p className="text-gray-600 dark:text-gray-400">
               Need help?{' '}
-              <Link href="/" className="text-purple-600 dark:text-purple-400 hover:underline font-medium">
+              <Link href="/" className="text-red-600 dark:text-red-400 hover:underline font-medium">
                 Go back to Home
               </Link>
             </p>

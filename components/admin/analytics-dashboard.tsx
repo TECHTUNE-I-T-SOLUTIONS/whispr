@@ -138,8 +138,8 @@ export function AnalyticsDashboard() {
       value: `${analytics.overview.avgReadingTime}m`,
       icon: Clock,
       growth: 0,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 dark:bg-purple-900/20",
+      color: "text-red-600",
+      bgColor: "bg-red-50 dark:bg-red-900/20",
     },
     {
       title: "Total Shares",

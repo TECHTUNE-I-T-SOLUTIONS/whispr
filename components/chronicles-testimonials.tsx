@@ -99,7 +99,7 @@ export function ChroniclesTestimonials() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-100/10 to-transparent rounded-full blur-3xl"
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-red-100/10 to-transparent rounded-full blur-3xl"
         />
       </div>
 
@@ -218,7 +218,7 @@ export function ChroniclesTestimonials() {
                   }}
                   className={`rounded-full transition-all ${
                     i === currentIndex
-                      ? 'w-10 h-3 bg-gradient-to-r from-purple-600 to-pink-600'
+                      ? 'w-10 h-3 bg-gradient-to-r from-red-600 to-pink-600'
                       : 'w-3 h-3 bg-gray-300 dark:bg-slate-700 hover:bg-gray-400'
                   }`}
                   whileHover={{ scale: 1.2 }}

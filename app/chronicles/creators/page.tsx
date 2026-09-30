@@ -349,7 +349,7 @@ export default function CreatorsDiscoveryPage() {
                     {creator.categories.slice(0, 3).map((cat) => (
                       <span
                         key={cat}
-                        className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs"
+                        className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-xs"
                       >
                         {cat}
                       </span>
@@ -364,7 +364,7 @@ export default function CreatorsDiscoveryPage() {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 mb-4 text-center">
                     <div>
-                      <p className="text-lg font-bold text-purple-600">{creator.post_count}</p>
+                      <p className="text-lg font-bold text-red-600">{creator.post_count}</p>
                       <p className="text-xs text-muted-foreground">Posts</p>
                     </div>
                     <div>

@@ -63,7 +63,7 @@ const statusColors = {
 const transactionTypeIcons = {
   ad_revenue: <TrendingUp className="w-4 h-4 text-green-600" />,
   tip: <DollarSign className="w-4 h-4 text-blue-600" />,
-  subscription: <CheckCircle className="w-4 h-4 text-purple-600" />,
+  subscription: <CheckCircle className="w-4 h-4 text-red-600" />,
   payout: <ArrowDownLeft className="w-4 h-4 text-orange-600" />,
   refund: <ArrowUpRight className="w-4 h-4 text-red-600" />,
 };
@@ -196,9 +196,9 @@ export default function AdminMonetizationPage() {
             <div className="text-sm text-blue-600 font-medium">Active Creators</div>
             <div className="text-2xl font-bold text-blue-900">{activeCreators}</div>
           </div>
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <div className="text-sm text-purple-600 font-medium">Total Creators</div>
-            <div className="text-2xl font-bold text-purple-900">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="text-sm text-red-600 font-medium">Total Creators</div>
+            <div className="text-2xl font-bold text-red-900">
               {monetizations.length}
             </div>
           </div>
