@@ -48,20 +48,43 @@ function parseReleaseBody(body: string) {
 
   const lines = body.split('\n');
   let currentSection: 'features' | 'enhancements' | 'fixes' | null = null;
+  let skipNextLines = false;
 
   for (const line of lines) {
     const trimmed = line.trim();
     
-    if (trimmed.startsWith('## New Features') || trimmed.startsWith('## Features')) {
+    // Skip metadata lines
+    if (trimmed.startsWith('Workflow Changes:') || 
+        trimmed.startsWith('Engineer:') ||
+        trimmed.startsWith('Generated with') ||
+        trimmed.startsWith('Co-Authored-By') ||
+        trimmed.startsWith('Complete Release Notes') ||
+        trimmed.startsWith('Changes in this release:')) {
+      skipNextLines = true;
+      continue;
+    }
+    
+    // Stop skipping if we hit a new section
+    if ((trimmed.startsWith('##') || trimmed.startsWith('###')) && skipNextLines) {
+      skipNextLines = false;
+    }
+    
+    if (skipNextLines) continue;
+    
+    // Handle both ## and ### headers
+    if (trimmed.startsWith('## New Features') || trimmed.startsWith('### New Features') || trimmed.startsWith('## Features')) {
       currentSection = 'features';
       continue;
-    } else if (trimmed.startsWith('## Improvements') || trimmed.startsWith('## Enhancements')) {
+    } else if (trimmed.startsWith('## Improvements') || trimmed.startsWith('### Improvements') || trimmed.startsWith('## Enhancements') || trimmed.startsWith('### Enhancements')) {
       currentSection = 'enhancements';
       continue;
-    } else if (trimmed.startsWith('## Bug Fixes') || trimmed.startsWith('## Fixes')) {
+    } else if (trimmed.startsWith('## Bug Fixes') || trimmed.startsWith('### Bug Fixes') || trimmed.startsWith('## Fixes') || trimmed.startsWith('### Fixes')) {
       currentSection = 'fixes';
       continue;
-    } else if (trimmed.startsWith('##')) {
+    } else if (trimmed.startsWith('## Database Changes') || trimmed.startsWith('### Database Changes')) {
+      currentSection = null;
+      continue;
+    } else if (trimmed.startsWith('##') || trimmed.startsWith('###')) {
       currentSection = null;
       continue;
     }
@@ -145,11 +168,11 @@ export default async function ChangelogPage() {
                         </div>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        {release.name || release.tag_name}
+                        {release.name && release.name !== release.tag_name ? release.name : `Release ${release.tag_name}`}
                       </h2>
                       {release.body && (
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {release.body.split('\n')[0] || release.name}
+                          {release.body.split('\n').find((line: string) => line.trim() && !line.startsWith('#') && !line.startsWith('-')) || ''}
                         </p>
                       )}
                     </div>
@@ -223,9 +246,14 @@ export default async function ChangelogPage() {
                   {/* Full body as fallback if no parsed sections */}
                   {features.length === 0 && enhancements.length === 0 && fixes.length === 0 && release.body && (
                     <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
-                        {release.body}
-                      </pre>
+                      <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                        {release.body.split('\n').filter((line: string) => 
+                          !line.trim().startsWith('Workflow Changes:') &&
+                          !line.trim().startsWith('Engineer:') &&
+                          !line.trim().startsWith('Generated with') &&
+                          !line.trim().startsWith('Co-Authored-By')
+                        ).join('\n')}
+                      </div>
                     </div>
                   )}
                 </div>
