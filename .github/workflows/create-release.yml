@@ -2,8 +2,6 @@ name: Create Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 
@@ -13,7 +11,6 @@ permissions:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
       - name: Checkout code
@@ -44,19 +41,20 @@ jobs:
             # Generate default release notes
             echo "notes<<EOF" >> $GITHUB_OUTPUT
             echo "## Version ${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
             echo "Changes in this release:" >> $GITHUB_OUTPUT
             echo "$COMMIT_MSG" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ steps.get_version.outputs.version }}
           body: ${{ steps.release_notes.outputs.notes }}
           draft: false
           prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
