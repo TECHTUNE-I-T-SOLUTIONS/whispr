@@ -49,6 +49,23 @@ function parseReleaseBody(body: string) {
   const lines = body.split('\n');
   let currentSection: 'features' | 'enhancements' | 'fixes' | null = null;
   let skipNextLines = false;
+  let hasMainSections = false;
+
+  // First pass: check if there are proper main section headers
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('## New Features') || trimmed.startsWith('### New Features') || 
+        trimmed.startsWith('## Improvements') || trimmed.startsWith('### Improvements') ||
+        trimmed.startsWith('## Bug Fixes') || trimmed.startsWith('### Bug Fixes')) {
+      hasMainSections = true;
+      break;
+    }
+  }
+
+  // If no main sections, return empty to trigger fallback display
+  if (!hasMainSections) {
+    return { features: [], enhancements: [], fixes: [] };
+  }
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -59,19 +76,20 @@ function parseReleaseBody(body: string) {
         trimmed.startsWith('Generated with') ||
         trimmed.startsWith('Co-Authored-By') ||
         trimmed.startsWith('Complete Release Notes') ||
-        trimmed.startsWith('Changes in this release:')) {
+        trimmed.startsWith('Changes in this release:') ||
+        trimmed.startsWith('**Full Changelog**')) {
       skipNextLines = true;
       continue;
     }
     
-    // Stop skipping if we hit a new section
+    // Stop skipping if we hit a header
     if ((trimmed.startsWith('##') || trimmed.startsWith('###')) && skipNextLines) {
       skipNextLines = false;
     }
     
     if (skipNextLines) continue;
     
-    // Handle both ## and ### headers
+    // Handle both ## and ### headers for main sections
     if (trimmed.startsWith('## New Features') || trimmed.startsWith('### New Features') || trimmed.startsWith('## Features')) {
       currentSection = 'features';
       continue;
@@ -85,6 +103,7 @@ function parseReleaseBody(body: string) {
       currentSection = null;
       continue;
     } else if (trimmed.startsWith('##') || trimmed.startsWith('###')) {
+      // If we hit any other header, reset current section
       currentSection = null;
       continue;
     }
@@ -246,13 +265,40 @@ export default async function ChangelogPage() {
                   {/* Full body as fallback if no parsed sections */}
                   {features.length === 0 && enhancements.length === 0 && fixes.length === 0 && release.body && (
                     <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
                         {release.body.split('\n').filter((line: string) => 
                           !line.trim().startsWith('Workflow Changes:') &&
                           !line.trim().startsWith('Engineer:') &&
                           !line.trim().startsWith('Generated with') &&
-                          !line.trim().startsWith('Co-Authored-By')
-                        ).join('\n')}
+                          !line.trim().startsWith('Co-Authored-By') &&
+                          !line.trim().startsWith('Complete Release Notes') &&
+                          !line.trim().startsWith('Changes in this release:') &&
+                          !line.trim().startsWith('**Full Changelog**')
+                        ).map((line: string, idx: number) => {
+                          const trimmed = line.trim();
+                          if (!trimmed) return <br key={idx} />;
+                          
+                          // Handle headers
+                          if (trimmed.startsWith('###')) {
+                            return <h3 key={idx} className="text-lg font-bold mt-4 mb-2">{trimmed.replace(/^###\s*/, '')}</h3>;
+                          }
+                          if (trimmed.startsWith('##')) {
+                            return <h2 key={idx} className="text-xl font-bold mt-6 mb-2">{trimmed.replace(/^##\s*/, '')}</h2>;
+                          }
+                          
+                          // Handle bold text
+                          if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+                            return <p key={idx} className="font-semibold mb-2">{trimmed.replace(/\*\*/g, '')}</p>;
+                          }
+                          
+                          // Handle bullet points
+                          if (trimmed.startsWith('-')) {
+                            return <li key={idx} className="ml-4 mb-1">{trimmed.replace(/^-\s*/, '')}</li>;
+                          }
+                          
+                          // Handle regular paragraphs
+                          return <p key={idx} className="mb-2">{trimmed}</p>;
+                        })}
                       </div>
                     </div>
                   )}
