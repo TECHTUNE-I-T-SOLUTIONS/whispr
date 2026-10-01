@@ -22,6 +22,7 @@ export interface ChroniclesPost {
   created_at: string
   updated_at: string
   article_id?: string
+  is_challenge_entry?: boolean
   flagged_for_review?: boolean
   flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null
   flagReason?: string
@@ -92,6 +93,7 @@ export async function getChroniclesPostBySlug(slug: string): Promise<ChroniclesP
     created_at: postData.created_at,
     updated_at: postData.updated_at,
     article_id: postData.article_id,
+    is_challenge_entry: postData.is_challenge_entry || false,
     flagged_for_review: postData.flagged_for_review,
     flagStatus: postData.flag_status,
     flagReason: postData.flag_reason,
@@ -164,6 +166,7 @@ export async function getChroniclesPostById(id: string): Promise<ChroniclesPost 
     created_at: postData.created_at,
     updated_at: postData.updated_at,
     article_id: postData.article_id,
+    is_challenge_entry: postData.is_challenge_entry || false,
     flagged_for_review: postData.flagged_for_review,
     flagStatus: postData.flag_status,
     flagReason: postData.flag_reason,

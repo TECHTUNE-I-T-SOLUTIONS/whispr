@@ -169,6 +169,7 @@ export async function GET(request: NextRequest) {
         shares_count,
         views_count,
         published_at,
+        is_challenge_entry,
         creator:chronicles_creators!creator_id(id, pen_name, profile_image_url, user_id)
       `)
       .eq("status", "published")
@@ -256,6 +257,7 @@ export async function GET(request: NextRequest) {
           coverImageUrl: post.cover_image_url,
           createdAt: post.published_at,
           publishedAt: post.published_at,
+          is_challenge_entry: post.is_challenge_entry || false,
           author: {
             id: post.author?.id,
             name: post.author?.name,

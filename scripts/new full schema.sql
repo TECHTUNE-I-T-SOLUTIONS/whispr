@@ -100,6 +100,7 @@ CREATE TABLE public.notifications (
   read boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   prompt_id uuid,
+  data jsonb DEFAULT '{}'::jsonb,
   CONSTRAINT notifications_pkey PRIMARY KEY (id),
   CONSTRAINT notifications_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admin(id),
   CONSTRAINT notifications_prompt_id_fkey FOREIGN KEY (prompt_id) REFERENCES public.chronicles_writing_prompts(id)
@@ -2502,7 +2503,7 @@ CREATE TABLE public.feature_request_votes (
 CREATE TABLE public.content_fingerprints (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   article_id uuid NOT NULL,
-  article_type text NOT NULL CHECK (article_type = ANY (ARRAY['post'::text, 'chronicles_post'::text, 'chronicles_chain_entry'::text])),
+  article_type text NOT NULL CHECK (article_type = ANY (ARRAY['post'::text, 'chronicles_post'::text, 'chronicles_chain_entry'::text, 'story'::text, 'story_chapter'::text])),
   article_version integer NOT NULL DEFAULT 1,
   sha256_hash text NOT NULL UNIQUE,
   content_length integer NOT NULL,
@@ -2705,6 +2706,7 @@ CREATE TABLE public.chronicles_writing_prompts (
   published_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  entries_count integer DEFAULT 0,
   CONSTRAINT chronicles_writing_prompts_pkey PRIMARY KEY (id),
   CONSTRAINT chronicles_writing_prompts_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id),
   CONSTRAINT chronicles_writing_prompts_edited_by_fkey FOREIGN KEY (edited_by) REFERENCES public.admin(id)

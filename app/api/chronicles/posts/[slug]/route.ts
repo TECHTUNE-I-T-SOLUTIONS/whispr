@@ -54,7 +54,25 @@ export async function GET(
     let query = supabase
       .from('chronicles_posts')
       .select(`
-        *,
+        id,
+        title,
+        slug,
+        content,
+        excerpt,
+        post_type,
+        category,
+        tags,
+        status,
+        cover_image_url,
+        likes_count,
+        comments_count,
+        shares_count,
+        views_count,
+        created_at,
+        published_at,
+        updated_at,
+        is_challenge_entry,
+        prompt_entry_id,
         creator:chronicles_creators(
           id,
           pen_name,
@@ -180,6 +198,7 @@ export async function GET(
       createdAt: post.created_at,
       publishedAt: post.published_at,
       updatedAt: post.updated_at,
+      is_challenge_entry: post.is_challenge_entry || false,
       flagged_for_review: !!flaggedReview,
       flagStatus: flaggedReview?.status || null,
       flagReason: flaggedReview?.reason || null,
@@ -192,6 +211,12 @@ export async function GET(
         avatar_url: post.creator.avatar_url || post.creator.profile_image_url,
         followers: post.creator.total_followers || 0,
       } : null,
+    };
+
+    console.log('Formatted post response:', {
+      is_challenge_entry: formattedPost.is_challenge_entry,
+      title: formattedPost.title,
+    });
     };
 
     return NextResponse.json({ success: true, data: formattedPost });

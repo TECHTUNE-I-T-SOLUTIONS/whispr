@@ -30,17 +30,10 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    // Calculate entries count for each prompt
-    const prompts = await Promise.all((data || []).map(async (prompt) => {
-      const { count } = await supabase
-        .from('chronicles_prompt_entries')
-        .select('*', { count: 'exact', head: true })
-        .eq('prompt_id', prompt.id);
-
-      return {
-        ...prompt,
-        entries_count: count || 0
-      };
+    // Use the database entries_count column instead of calculating
+    const prompts = (data || []).map((prompt) => ({
+      ...prompt,
+      entries_count: prompt.entries_count || 0
     }));
 
     return NextResponse.json({ prompts });

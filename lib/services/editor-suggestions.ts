@@ -17,11 +17,7 @@ class EditorSuggestionsService {
   ]);
 
   private transitions = [
-    'however', 'therefore', 'furthermore', 'moreover', 'consequently',
-    'in addition', 'meanwhile', 'nevertheless', 'nonetheless', 'on the other hand',
-    'in contrast', 'similarly', 'likewise', 'for instance', 'for example',
-    'in particular', 'specifically', 'to illustrate', 'in conclusion', 'finally',
-    'ultimately', 'in summary', 'to summarize', 'as a result', 'thus', 'hence'
+    'however', 'therefore', 'thus', 'hence', 'meanwhile', 'ultimately'
   ];
 
   private descriptiveWords = [
@@ -57,10 +53,10 @@ class EditorSuggestionsService {
     const transitionSuggestions = this.getTransitionSuggestions(textBeforeCursor);
     suggestions.push(...transitionSuggestions);
 
-    // Sort by confidence and limit to top 10
+    // Sort by confidence and limit to top 5 (reduced from 10)
     return suggestions
       .sort((a, b) => b.confidence - a.confidence)
-      .slice(0, 10);
+      .slice(0, 5);
   }
 
   private getCurrentWord(text: string): string {
@@ -112,20 +108,20 @@ class EditorSuggestionsService {
     const suggestions: Suggestion[] = [];
     const lowerText = text.toLowerCase();
 
-    // Common phrase patterns
+    // Short, common phrase patterns
     const phrasePatterns = [
-      { trigger: 'in order to', suggestion: 'in order to', confidence: 0.85 },
-      { trigger: 'as well as', suggestion: 'as well as', confidence: 0.85 },
-      { trigger: 'at the same time', suggestion: 'at the same time', confidence: 0.8 },
-      { trigger: 'on the other hand', suggestion: 'on the other hand', confidence: 0.8 },
-      { trigger: 'in the end', suggestion: 'in the end', confidence: 0.75 },
-      { trigger: 'in the beginning', suggestion: 'in the beginning', confidence: 0.75 },
-      { trigger: 'first of all', suggestion: 'first of all', confidence: 0.75 },
-      { trigger: 'last but not least', suggestion: 'last but not least', confidence: 0.7 },
+      { trigger: 'in', suggestion: 'in order to', confidence: 0.85 },
+      { trigger: 'as', suggestion: 'as well as', confidence: 0.85 },
+      { trigger: 'at', suggestion: 'at the same time', confidence: 0.7 },
+      { trigger: 'on', suggestion: 'on the other hand', confidence: 0.7 },
+      { trigger: 'in the', suggestion: 'in the end', confidence: 0.65 },
+      { trigger: 'in the', suggestion: 'in the beginning', confidence: 0.6 },
+      { trigger: 'first', suggestion: 'first of all', confidence: 0.6 },
+      { trigger: 'last', suggestion: 'last but not least', confidence: 0.55 },
     ];
 
     phrasePatterns.forEach(pattern => {
-      if (lowerText.endsWith(pattern.trigger.substring(0, -3)) || 
+      if (lowerText.endsWith(pattern.trigger) || 
           lowerText.includes(pattern.trigger)) {
         suggestions.push({
           text: pattern.suggestion,

@@ -76,6 +76,12 @@ export default function WritingChallengesPage() {
     return `${hours}h remaining`;
   };
 
+  const isChallengeEnded = (deadline: string) => {
+    const now = new Date();
+    const end = new Date(deadline);
+    return end.getTime() <= now.getTime();
+  };
+
   const getPromptTypeIcon = (type: string) => {
     switch (type) {
       case 'blog': return <BookOpen className="w-5 h-5" />;
@@ -215,7 +221,12 @@ export default function WritingChallengesPage() {
                 )}
 
                 <div className="flex gap-2">
-                  {prompt.has_user_entered ? (
+                  {isChallengeEnded(prompt.submission_deadline) ? (
+                    <Button variant="outline" className="flex-1" disabled>
+                      <Clock className="w-4 h-4 mr-2" />
+                      Challenge Ended
+                    </Button>
+                  ) : prompt.has_user_entered ? (
                     <Button variant="outline" className="flex-1" disabled>
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Already Entered

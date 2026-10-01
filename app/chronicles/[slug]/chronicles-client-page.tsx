@@ -10,6 +10,7 @@ import { Heart, MessageCircle, Share2, Loader2, AlertCircle, LogIn, X, Send, Edi
 import { AppBanner } from '@/components/app-banner';
 import { CopyrightFooter } from '@/components/copyright-footer';
 import { createSupabaseBrowser } from '@/lib/supabase-browser';
+import DOMPurify from 'dompurify';
 
 const EditPostModal = dynamic(() => import('@/components/edit-post-modal'));
 
@@ -33,6 +34,7 @@ interface Post {
   flagged_for_review?: boolean;
   flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
   flagReason?: string;
+  is_challenge_entry?: boolean;
   author?: {
     id: string;
     name: string;
@@ -119,15 +121,20 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
       
       if (session && session.access_token) {
         setAuthToken(session.access_token);
-      }
-      
-      const res = await fetch('/api/session');
-      if (res.ok) {
-        const data = await res.json();
-        const isAuth = data.authenticated && data.creator;
-        setIsAuthenticated(isAuth);
-        if (isAuth) {
-          setCurrentCreator(data.creator);
+        
+        // Get creator data using the session
+        const { data: creator } = await supabase
+          .from('chronicles_creators')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (creator) {
+          setIsAuthenticated(true);
+          setCurrentCreator(creator);
+        } else {
+          setIsAuthenticated(false);
+          setCurrentCreator(null);
         }
       } else {
         setIsAuthenticated(false);
@@ -172,6 +179,12 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
       setPost(postData);
       setEngagementCount(postData.likesCount || 0);
       setSharesCount(postData.sharesCount || 0);
+      
+      console.log('Post data loaded:', {
+        is_challenge_entry: postData.is_challenge_entry,
+        title: postData.title,
+        fullPost: postData,
+      });
       
       if (postData.flagStatus) {
         setFlagStatus(postData.flagStatus);
@@ -536,6 +549,11 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                 {post.category}
               </span>
             )}
+            {post.is_challenge_entry && (
+              <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
+                🎯 Challenge Entry
+              </span>
+            )}
             {flagStatus && (
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -625,9 +643,7 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
 
         {/* Content */}
         <div className="prose prose-red dark:prose-invert max-w-none mb-8 leading-relaxed text-gray-900 dark:text-white">
-          <div className="whitespace-pre-wrap break-words">
-            {post.content}
-          </div>
+          <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
         </div>
 
         {/* Tags */}
@@ -642,6 +658,27 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
                 #{tag}
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Challenge Entry Banner */}
+        {post.is_challenge_entry && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white text-2xl">
+                  🎯
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  Challenge Entry
+                </h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  This post was submitted as part of a writing challenge.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -815,8 +852,17 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
             <div className="p-8 text-center bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-800">
               <MessageCircle className="w-8 h-8 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-600 dark:text-gray-400">
-                {isAuthenticated ? 'No comments yet. Be the first to comment!' : 'Log in to see and post comments'}
+                {checkingAuth ? 'Loading...' : isAuthenticated ? 'No comments yet. Be the first to comment!' : 'Log in to see and post comments'}
               </p>
+              {!isAuthenticated && !checkingAuth && (
+                <Button
+                  onClick={() => router.push('/chronicles/login')}
+                  className="mt-4 bg-red-600 hover:bg-red-700"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Log In
+                </Button>
+              )}
             </div>
           )}
         </div>

@@ -109,6 +109,7 @@ export async function GET(req: NextRequest) {
         isFlagged: flaggedReviewsMap.has(post.id),
         flagStatus: flaggedReviewsMap.get(post.id)?.status || null,
         flagReason: flaggedReviewsMap.get(post.id)?.reason || null,
+        is_challenge_entry: post.is_challenge_entry || false,
       })),
     });
   } catch (error) {
@@ -219,6 +220,10 @@ export async function POST(req: NextRequest) {
 
     const slug = body.slug || generateSlug(body.title);
 
+    // Check if this is a challenge entry
+    const promptId = body.promptId || body.selectedPromptId || null;
+    const isChallengeEntry = !!promptId;
+
     // Build insert object carefully
     const postData = {
       creator_id: creator.id,
@@ -233,9 +238,12 @@ export async function POST(req: NextRequest) {
       formatting_data: body.formatting_data || {},
       status: body.status || 'draft',
       published_at: body.status === 'published' ? new Date().toISOString() : null,
+      is_challenge_entry: isChallengeEntry,
     };
 
     console.log('Post data to insert:', postData);
+    console.log('Is challenge entry:', isChallengeEntry);
+    console.log('Prompt ID:', promptId);
 
     // Create post using service role client to bypass RLS
     const { data: post, error: postError } = await supabase
@@ -275,6 +283,35 @@ export async function POST(req: NextRequest) {
         }
       }
       throw postError;
+    }
+
+    // If this is a challenge entry, create the prompt entry record
+    if (isChallengeEntry && promptId && post) {
+      console.log('Creating challenge prompt entry...');
+      const { data: entryData, error: entryError } = await supabase
+        .from('chronicles_prompt_entries')
+        .insert({
+          prompt_id: promptId,
+          creator_id: creator.id,
+          post_id: post.id,
+          entry_type: 'chronicles_post',
+          status: 'submitted',
+        })
+        .select('id')
+        .single();
+
+      if (entryError) {
+        console.error('Failed to create prompt entry:', entryError);
+        // Don't fail the request if prompt entry creation fails
+        // Log it but return the post anyway
+      } else {
+        console.log('Challenge prompt entry created successfully with ID:', entryData.id);
+        // Update the post with the prompt_entry_id
+        await supabase
+          .from('chronicles_posts')
+          .update({ prompt_entry_id: entryData.id })
+          .eq('id', post.id);
+      }
     }
 
     return NextResponse.json(post, { status: 201 });

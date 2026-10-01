@@ -44,6 +44,7 @@ interface Post {
   isFlagged?: boolean;
   flagStatus?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null;
   flagReason?: string;
+  is_challenge_entry?: boolean;
 }
 
 function DashboardContent() {
@@ -256,6 +257,11 @@ function DashboardContent() {
                             >
                               {post.status}
                             </span>
+                            {post.is_challenge_entry && (
+                              <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                🎯 Challenge Entry
+                              </span>
+                            )}
                             {post.isFlagged && post.flagStatus && (
                               <span
                                 className={`px-2 py-0.5 rounded text-xs font-medium ${

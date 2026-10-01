@@ -114,6 +114,7 @@ function ChroniclesWriteContent() {
   // All useRef calls
   const contentRef = useRef<HTMLDivElement>(null);
   const isUpdatingContent = useRef(false);
+  const hasLoadedPost = useRef(false);
 
   // All useEffect calls
   useEffect(() => {
@@ -161,8 +162,9 @@ function ChroniclesWriteContent() {
   }, [urlPromptId]);
 
   useEffect(() => {
-    if (postId && authToken) {
+    if (postId && authToken && !hasLoadedPost.current) {
       fetchPost();
+      hasLoadedPost.current = true;
     } else if (postId && !authToken) {
       // Wait for auth token
       const timer = setTimeout(() => {
@@ -185,58 +187,7 @@ function ChroniclesWriteContent() {
     }
   }, [postData.cover_image_url]);
 
-  // Use useEffect (not useLayoutEffect) with retry logic
-  useEffect(() => {
-    console.log('=== EFFECT START ===');
-    
-    let retries = 0;
-    const maxRetries = 5;
-    
-    const attemptUpdate = () => {
-      console.log(`Attempt ${retries + 1}/${maxRetries}`);
-      
-      let element = contentRef.current;
-      if (!element) {
-        element = document.getElementById('chronicles-content-editor') as HTMLDivElement;
-      }
 
-      console.log('element found:', !!element);
-      console.log('postData.content length:', postData.content?.length);
-      
-      if (element && postData.content) {
-        console.log('>> Setting innerHTML');
-        isUpdatingContent.current = true;
-        element.innerHTML = postData.content;
-        
-        const actualInnerHTML = element.innerHTML;
-        console.log('>> Success! innerHTML length:', actualInnerHTML?.length);
-        
-        setTimeout(() => {
-          isUpdatingContent.current = false;
-          console.log('>> Flag reset');
-        }, 0);
-      } else if (!element && retries < maxRetries) {
-        console.log('Element not found, retrying...');
-        retries++;
-        setTimeout(attemptUpdate, 100); // Retry after 100ms
-      } else if (!element) {
-        console.log('ERROR: Element still not found after retries');
-        // Try a fallback - directly manipulate the DOM
-        console.log('Trying alternative approach...');
-        const allDivs = document.querySelectorAll('[contenteditable="true"]');
-        console.log('Found', allDivs.length, 'contenteditable divs');
-        if (allDivs.length > 0) {
-          console.log('Using first contenteditable div');
-          isUpdatingContent.current = true;
-          allDivs[0].innerHTML = postData.content;
-          setTimeout(() => { isUpdatingContent.current = false; }, 0);
-        }
-      }
-    };
-    
-    attemptUpdate();
-    console.log('=== EFFECT END ===');
-  }, [postData.content]);
 
   // All other functions
   const fetchPost = async () => {
@@ -287,6 +238,16 @@ function ChroniclesWriteContent() {
         status: data.status || 'draft',
         flagged_for_review: data.flagged_for_review || false,
       });
+      
+      // Set editor content directly after state update - only once
+      const editorElement = document.getElementById('chronicles-content-editor') as HTMLDivElement;
+      if (editorElement && fetchedContent) {
+        isUpdatingContent.current = true;
+        editorElement.innerHTML = fetchedContent;
+        setTimeout(() => {
+          isUpdatingContent.current = false;
+        }, 0);
+      }
       
       console.log('State updated, waiting for effect to run...');
 
@@ -380,6 +341,7 @@ function ChroniclesWriteContent() {
           tags: postData.tags,
           excerpt: postData.excerpt,
           cover_image_url: postData.cover_image_url,
+          selectedPromptId: selectedPromptId, // Include selected challenge
         }),
       });
 
@@ -420,7 +382,10 @@ function ChroniclesWriteContent() {
       const editor = document.getElementById('chronicles-content-editor');
       if (editor) {
         const newContent = editor.innerHTML;
-        setPostData((prev) => ({ ...prev, content: newContent }));
+        // Only update state if content actually changed to prevent cursor jumping
+        if (newContent !== postData.content) {
+          setPostData((prev) => ({ ...prev, content: newContent }));
+        }
         
         // Get cursor position for suggestions
         const sel = window.getSelection();
@@ -516,34 +481,13 @@ function ChroniclesWriteContent() {
           tags: postData.tags,
           excerpt: postData.excerpt,
           cover_image_url: postData.cover_image_url,
+          selectedPromptId: selectedPromptId, // Include selected challenge
         }),
       });
 
       if (!res.ok) throw new Error('Failed to publish');
       
       const data = await res.json();
-
-      // If a challenge is selected, create a prompt entry
-      if (selectedChallenge && data.id) {
-        try {
-          const entryRes = await fetch('/api/chronicles/prompt-entries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-              prompt_id: selectedChallenge.id,
-              post_id: data.id,
-              entry_type: 'chronicles_post'
-            }),
-          });
-
-          if (!entryRes.ok) {
-            console.error('Failed to create challenge entry, but post was published');
-          }
-        } catch (entryError) {
-          console.error('Error creating challenge entry:', entryError);
-        }
-      }
 
       router.push('/chronicles/dashboard');
     } catch (err) {

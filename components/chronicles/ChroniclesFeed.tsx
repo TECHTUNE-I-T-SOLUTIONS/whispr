@@ -33,6 +33,7 @@ interface FeedPost {
   author: Author;
   userReaction?: string | null;
   slug?: string;
+  is_challenge_entry?: boolean;
 }
 
 // Helper function to strip HTML tags from content
@@ -256,23 +257,30 @@ export default function FeedPage() {
                     </div>
 
                     {/* Tags */}
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {post.tags.slice(0, 3).map((tag, idx) => (
-                          <span 
-                            key={idx}
-                            className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                        {post.tags.length > 3 && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            +{post.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {post.is_challenge_entry && (
+                        <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded font-medium">
+                          🎯 Challenge Entry
+                        </span>
+                      )}
+                      {post.tags && post.tags.length > 0 && (
+                        <>
+                          {post.tags.slice(0, 3).map((tag, idx) => (
+                            <span 
+                              key={idx}
+                              className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              +{post.tags.length - 3} more
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </article>

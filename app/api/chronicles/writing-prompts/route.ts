@@ -59,14 +59,8 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    // Calculate entries count and user entries for each prompt
+    // Calculate user entries for each prompt (entries_count now comes from database column)
     const prompts = await Promise.all((data || []).map(async (prompt) => {
-      // Get total entries count
-      const { count: totalEntries } = await supabase
-        .from('chronicles_prompt_entries')
-        .select('*', { count: 'exact', head: true })
-        .eq('prompt_id', prompt.id);
-
       // Get user entries count
       let userEntriesCount = 0;
       let hasUserEntered = false;
@@ -84,7 +78,7 @@ export async function GET(request: NextRequest) {
 
       return {
         ...prompt,
-        entries_count: totalEntries || 0,
+        entries_count: prompt.entries_count || 0, // Use database column instead of calculating
         user_entries_count: userEntriesCount,
         has_user_entered: hasUserEntered
       };

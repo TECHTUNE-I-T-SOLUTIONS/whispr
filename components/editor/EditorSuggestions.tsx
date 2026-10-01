@@ -64,15 +64,16 @@ export function EditorSuggestions({ content, cursorPosition, onApplySuggestion, 
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -5 }}
-      className="inline-flex items-center gap-2 px-2 py-1 rounded border shadow-sm ml-1 z-50"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border shadow-lg ml-1 z-50 max-w-md"
       style={{
         backgroundColor: theme === 'dark' ? 'rgba(15, 15, 15, 0.95)' : 'rgba(253, 253, 253, 0.95)',
-        borderColor: `${accentColor}60`
+        borderColor: `${accentColor}60`,
+        backdropFilter: 'blur(8px)'
       }}
     >
-      <Sparkles className="h-3 w-3" style={{ color: accentColor }} />
+      <Sparkles className="h-3 w-3 flex-shrink-0" style={{ color: accentColor }} />
       <AnimatePresence mode="popLayout">
-        {suggestions.map((suggestion, idx) => (
+        {suggestions.slice(0, 5).map((suggestion, idx) => (
           <motion.button
             key={`${suggestion.text}-${idx}`}
             initial={{ opacity: 0, x: -5 }}
@@ -80,31 +81,22 @@ export function EditorSuggestions({ content, cursorPosition, onApplySuggestion, 
             exit={{ opacity: 0, x: 5 }}
             transition={{ delay: idx * 0.03 }}
             onClick={() => onApplySuggestion(suggestion.text)}
-            className={`px-2 py-0.5 rounded text-xs sm:text-sm transition-colors ${
+            className={`px-2 py-0.5 rounded text-xs transition-colors whitespace-nowrap ${
               idx === selectedIndex
                 ? 'bg-primary/10'
                 : 'hover:bg-muted/50'
             }`}
           >
-            <span className="text-xs sm:text-sm">{suggestion.text}</span>
-            <span className="text-[9px] sm:text-[10px] px-1 py-0.5 rounded ml-1" style={{
-              backgroundColor: `${accentColor}20`,
-              color: accentColor
-            }}>
-              {suggestion.type}
-            </span>
+            <span className="text-xs font-medium">{suggestion.text}</span>
           </motion.button>
         ))}
       </AnimatePresence>
       <button
         onClick={onClose}
-        className="p-1 rounded hover:bg-muted/50 transition-colors"
+        className="p-1 rounded hover:bg-muted/50 transition-colors flex-shrink-0"
       >
         <X className="h-3 w-3 text-muted-foreground" />
       </button>
-      <span className="text-[9px] sm:text-[10px] text-muted-foreground hidden sm:inline">
-        Tab/Enter
-      </span>
     </motion.div>
   )
 }

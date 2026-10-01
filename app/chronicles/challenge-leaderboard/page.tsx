@@ -3,28 +3,47 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
-import { Trophy, Medal, Award, TrendingUp, Users, Crown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Trophy, Medal, Award, TrendingUp, Users, Crown, BookOpen, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface LeaderboardEntry {
   id: string;
   creator_id: string;
   pen_name: string;
+  display_name?: string;
   profile_image_url?: string;
   total_wins: number;
   first_place_wins: number;
   second_place_wins: number;
   third_place_wins: number;
   total_points_earned: number;
-  best_rank_achievement: number;
+  best_rank_achievement: string;
   last_win_at?: string;
+  winners?: Array<{
+    prompt_id: string;
+    entry_id: string;
+    rank: number;
+    announced_at: string;
+    post?: {
+      id: string;
+      title: string;
+      slug: string;
+      post_type: string;
+      cover_image_url?: string;
+    };
+  }>;
 }
 
 export default function ChallengeLeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     loadLeaderboard();
@@ -180,6 +199,18 @@ export default function ChallengeLeaderboardPage() {
                   <div className="mt-2 text-xs text-muted-foreground">
                     Last win: {entry.last_win_at ? new Date(entry.last_win_at).toLocaleDateString() : 'Never'}
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-3"
+                    onClick={() => {
+                      setSelectedEntry(entry);
+                      setShowDialog(true);
+                    }}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    View Winning Entries
+                  </Button>
                 </Card>
               ))
             )}
@@ -247,6 +278,19 @@ export default function ChallengeLeaderboardPage() {
                       <TableCell>
                         {entry.last_win_at ? new Date(entry.last_win_at).toLocaleDateString() : 'Never'}
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedEntry(entry);
+                            setShowDialog(true);
+                          }}
+                        >
+                          <BookOpen className="w-4 h-4 mr-2" />
+                          View Wins
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -255,6 +299,63 @@ export default function ChallengeLeaderboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Winning Entries Dialog */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Winning Entries - {selectedEntry?.display_name || selectedEntry?.pen_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {selectedEntry?.winners && selectedEntry.winners.length > 0 ? (
+              selectedEntry.winners.map((winner) => (
+                <Card key={winner.entry_id} className="p-4">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                      winner.rank === 1 ? 'bg-yellow-500 text-white' :
+                      winner.rank === 2 ? 'bg-gray-400 text-white' :
+                      winner.rank === 3 ? 'bg-orange-500 text-white' :
+                      'bg-gray-300 text-gray-700'
+                    }`}>
+                      {winner.rank}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {winner.post ? (
+                        <>
+                          <h4 className="font-medium mb-1">{winner.post.title}</h4>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {winner.post.post_type} • Announced {new Date(winner.announced_at).toLocaleDateString()}
+                          </p>
+                          <Link
+                            href={`/chronicles/${winner.post.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button variant="outline" size="sm">
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              View Post
+                            </Button>
+                          </Link>
+                        </>
+                      ) : winner.entryNotFound ? (
+                        <p className="text-sm text-muted-foreground">
+                          Entry data not available (entry may have been deleted)
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Post details not available</p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              <p className="text-center text-muted-foreground py-8">No winning entries found</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

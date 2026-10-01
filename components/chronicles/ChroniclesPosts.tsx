@@ -6,13 +6,22 @@ import Image from 'next/image';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Helper to extract first image from HTML content
+function extractFirstImageFromContent(content: string): string | null {
+  if (!content) return null;
+  const imgMatch = content.match(/<img[^>]+src="([^"]+)"/i);
+  return imgMatch ? imgMatch[1] : null;
+}
+
 interface Post {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
+  content?: string;
   cover_image_url?: string;
   published_at?: string;
+  is_challenge_entry?: boolean;
 }
 
 export default function MyPostsPage() {
@@ -75,30 +84,41 @@ export default function MyPostsPage() {
             <div className="text-center py-12 text-gray-600 dark:text-gray-400">No posts yet</div>
           )}
 
-          {posts.map((post) => (
-            <article key={post.id} className="bg-white dark:bg-black rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 dark:hover:shadow-white dark:hover:shadow-sm overflow-hidden">
-              <div className="md:flex">
-                {post.cover_image_url && (
-                  <div className="md:w-1/3 relative h-44 md:h-auto">
-                    <Image src={post.cover_image_url} alt={post.title} fill className="object-cover" />
-                  </div>
-                )}
-                <div className="p-4 md:flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    <Link href={`/chronicles/${post.slug}`}>{post.title}</Link>
-                  </h2>
-                  <p className="text-gray-700 dark:text-gray-300 mb-3">{post.excerpt}</p>
+          {posts.map((post) => {
+            const thumbnail = post.cover_image_url || extractFirstImageFromContent(post.content);
+            
+            return (
+              <article key={post.id} className="bg-white dark:bg-black rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 dark:hover:shadow-white dark:hover:shadow-sm overflow-hidden">
+                <div className="md:flex">
+                  {thumbnail && (
+                    <div className="md:w-1/3 relative h-44 md:h-auto">
+                      <Image src={thumbnail} alt={post.title} fill className="object-cover" />
+                    </div>
+                  )}
+                  <div className="p-4 md:flex-1">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <Link href={`/chronicles/${post.slug}`}>{post.title}</Link>
+                      </h2>
+                      {post.is_challenge_entry && (
+                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                          🎯 Challenge Entry
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 mb-3">{post.excerpt}</p>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span>{post.published_at ? new Date(post.published_at).toLocaleDateString() : ''}</span>
-                    <Link href={`/chronicles/${post.slug}`} className="ml-auto">
-                      <Button size="sm" variant="ghost">View</Button>
-                    </Link>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <span>{post.published_at ? new Date(post.published_at).toLocaleDateString() : ''}</span>
+                      <Link href={`/chronicles/${post.slug}`} className="ml-auto">
+                        <Button size="sm" variant="ghost">View</Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </div>
     </div>
