@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { generateWritingPrompt, generateTags } from '@/lib/services/gemini.service';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt_type = 'blog', challenge_type = 'daily', custom_topic } = body;
+    const { prompt_type = 'blog', challenge_type = 'daily', custom_topic, save_to_db = false } = body;
 
     // Validate prompt type
     const validTypes = ['blog', 'poem', 'story'];
@@ -52,11 +58,98 @@ export async function POST(request: NextRequest) {
       tags = defaultTags[prompt_type] || ['writing', 'creativity'];
     }
 
-    // Return the generated content and tags without saving to database
-    return NextResponse.json({ 
-      success: true,
+    // Generate title from content
+    const title = generateTitleFromContent(content, prompt_type);
+    
+    // Generate description
+    const description = generateDescriptionFromContent(content, prompt_type);
+    
+    // Generate featured image URL (using Unsplash for now)
+    const featured_image_url = generateFeaturedImageUrl(prompt_type);
+
+    const promptData = {
+      title,
+      description,
       content,
       tags,
+      featured_image_url,
+      prompt_type,
+      challenge_type,
+      is_ai_generated: true,
+      ai_generation_model: model,
+    };
+
+    // If save_to_db is true, save to database
+    let savedPrompt = null;
+    if (save_to_db) {
+      const startsAt = new Date();
+      startsAt.setHours(5, 0, 0, 0);
+      
+      const endsAt = new Date();
+      endsAt.setHours(23, 59, 59, 999);
+      
+      const submissionDeadline = new Date();
+      submissionDeadline.setHours(23, 59, 59, 999);
+
+      const { data: newPrompt, error: insertError } = await supabase
+        .from('chronicles_writing_prompts')
+        .insert({
+          title,
+          description,
+          prompt_type,
+          content,
+          challenge_type,
+          is_ai_generated: true,
+          ai_generation_model: model,
+          created_by: '8ac41ab5-c544-4068-a628-426593a2d4e2',
+          status: 'active',
+          starts_at: startsAt.toISOString(),
+          ends_at: endsAt.toISOString(),
+          submission_deadline: submissionDeadline.toISOString(),
+          max_entries_per_user: 1,
+          evaluation_criteria: '{"passion": 20, "integrity": 30, "sincerity": 30, "engagement": 20}',
+          tags,
+          featured_image_url,
+          prize_description: 'Recognition',
+          published_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error saving prompt:', insertError);
+        return NextResponse.json(
+          { success: false, error: 'Failed to save prompt to database' },
+          { status: 500 }
+        );
+      }
+
+      // Save to prompt_versions table
+      const version = new Date().toISOString().replace(/[:.]/g, '').slice(0, 15);
+      await supabase
+        .from('prompt_versions')
+        .insert({
+          prompt_name: newPrompt.id,
+          version,
+          content,
+          is_active: true,
+          metadata: {
+            title,
+            status: 'active',
+            ai_generation_model: model,
+            prompt_type,
+            challenge_type,
+          },
+          created_by: '8ac41ab5-c544-4068-a628-426593a2d4e2',
+        });
+
+      savedPrompt = newPrompt;
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      prompt: promptData,
+      saved: savedPrompt,
       model,
       warning
     });
@@ -67,6 +160,54 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function generateTitleFromContent(content: string, prompt_type: string): string {
+  // Extract or generate a title from the content
+  const sentences = content.split(/[.!?]/);
+  const firstSentence = sentences[0]?.trim() || '';
+  
+  // Take first 8-12 words as title
+  const words = firstSentence.split(' ').slice(0, 10);
+  let title = words.join(' ');
+  
+  // Remove "Write a" or similar prefixes
+  title = title.replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+  title = title.replace(/^(blog post|poem|story)\s+(about|that|which)\s+/i, '');
+  
+  // Capitalize first letter
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  // Add prompt type prefix
+  const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
+                    prompt_type === 'poem' ? 'Daily Poem' : 'Daily Story';
+  
+  return `${typePrefix}: ${title}`;
+}
+
+function generateDescriptionFromContent(content: string, prompt_type: string): string {
+  // Generate a description from the content
+  const words = content.split(' ');
+  const excerpt = words.slice(0, 30).join(' ');
+  
+  const typeDescription = prompt_type === 'blog' ? 
+    'A daily blog writing challenge' :
+    prompt_type === 'poem' ?
+    'A daily poetry writing challenge' :
+    'A daily story writing challenge';
+  
+  return `${typeDescription} about ${excerpt}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+}
+
+function generateFeaturedImageUrl(prompt_type: string): string {
+  // Generate relevant Unsplash image URLs based on prompt type
+  const images: Record<string, string> = {
+    blog: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1074&auto=format&fit=crop',
+    poem: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1074&auto=format&fit=crop',
+    story: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1074&auto=format&fit=crop',
+  };
+  
+  return images[prompt_type] || images.blog;
 }
 
 /**

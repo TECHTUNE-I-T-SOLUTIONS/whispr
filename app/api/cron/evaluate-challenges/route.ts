@@ -30,8 +30,61 @@ export async function GET(request: NextRequest) {
       challenges_processed: 0,
       entries_evaluated: 0,
       winners_selected: 0,
+      challenges_created: 0,
       errors: [] as string[],
     };
+
+    // First, check if there's an active daily challenge for today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const { data: existingDailyChallenge } = await supabase
+      .from('chronicles_writing_prompts')
+      .select('*')
+      .eq('challenge_type', 'daily')
+      .eq('status', 'active')
+      .gte('starts_at', todayStart.toISOString())
+      .lte('starts_at', todayEnd.toISOString())
+      .single();
+
+    // If no daily challenge exists for today, create one using AI
+    if (!existingDailyChallenge) {
+      try {
+        console.log('No daily challenge found for today, creating one...');
+        
+        // Call the AI generation API
+        const generateRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/admin/chronicles/writing-prompts/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt_type: 'blog',
+            challenge_type: 'daily',
+            save_to_db: true, // Save directly to database
+          }),
+        });
+
+        if (generateRes.ok) {
+          const generateData = await generateRes.json();
+          
+          if (generateData.saved) {
+            console.log('Daily challenge created successfully:', generateData.saved.id);
+            results.challenges_created++;
+          } else {
+            console.error('Failed to save generated challenge');
+            results.errors.push('Failed to save generated challenge to database');
+          }
+        } else {
+          console.error('Failed to generate challenge:', generateRes.status);
+          results.errors.push('Failed to generate daily challenge');
+        }
+      } catch (error) {
+        console.error('Error creating daily challenge:', error);
+        results.errors.push(`Error creating daily challenge: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
 
     // Find challenges that ended yesterday
     const yesterday = new Date();
@@ -250,7 +303,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Challenge evaluation completed',
-      results,
+      results: {
+        ...results,
+        message: `Processed ${results.challenges_processed} challenges, evaluated ${results.entries_evaluated} entries, selected ${results.winners_selected} winners, created ${results.challenges_created} new challenges`,
+      },
     });
   } catch (error) {
     console.error('Error in cron job:', error);
