@@ -217,7 +217,6 @@ export async function GET(
       is_challenge_entry: formattedPost.is_challenge_entry,
       title: formattedPost.title,
     });
-    };
 
     return NextResponse.json({ success: true, data: formattedPost });
   } catch (error) {
