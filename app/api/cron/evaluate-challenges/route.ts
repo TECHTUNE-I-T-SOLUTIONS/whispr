@@ -87,10 +87,16 @@ export async function GET(request: NextRequest) {
         const title = generateTitleFromContent(content, prompt_type);
         const description = generateDescriptionFromContent(content, prompt_type);
         const featured_image_url = generateFeaturedImageUrl(prompt_type);
+        
+        // Validate that the generated content is complete and sensible
+        if (content.length < 50 || title.length < 15) {
+          console.log('[Cron] AI content too short, using fallback');
+          content = generateFallbackPrompt(prompt_type);
+        }
 
         // Set dates
         const startsAt = new Date();
-        startsAt.setHours(5, 0, 0, 0);
+        startsAt.setHours(0, 1, 0, 0);
         
         const endsAt = new Date();
         endsAt.setHours(23, 59, 59, 999);
@@ -506,8 +512,18 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
     .replace(/^(The|A|An)\s+/i, '');
   
   // Take first 8-12 words as title
-  const words = cleanContent.split(' ').slice(0, 10);
+  const words = cleanContent.split(' ').filter(w => w.length > 0).slice(0, 10);
   let title = words.join(' ');
+  
+  // If title is too short or empty, use a fallback
+  if (title.length < 10) {
+    const fallbackTitles: Record<string, string[]> = {
+      blog: ['Daily Blog Challenge', 'Writing Prompt Today', 'Blog Writing Task'],
+      poem: ['Daily Poem Challenge', 'Poetry Writing Today', 'Poem Prompt'],
+      story: ['Daily Story Challenge', 'Story Writing Today', 'Narrative Prompt']
+    };
+    title = fallbackTitles[prompt_type]?.[Math.floor(Math.random() * 3)] || 'Daily Writing Challenge';
+  }
   
   // Capitalize first letter
   title = title.charAt(0).toUpperCase() + title.slice(1);
@@ -535,10 +551,22 @@ function generateDescriptionFromContent(content: string, prompt_type: string): s
     .replace(/^(The|A|An)\s+/i, '');
   
   // Take first 20-30 words as excerpt
-  const words = cleanContent.split(' ').slice(0, 25).join(' ');
+  const words = cleanContent.split(' ').filter(w => w.length > 0).slice(0, 25);
+  
+  // If not enough words, use a fallback description
+  if (words.length < 5) {
+    const fallbackDescriptions: Record<string, string> = {
+      blog: 'A daily blog writing challenge to inspire creativity and self-expression',
+      poem: 'A daily poetry writing challenge to explore emotions and imagery',
+      story: 'A daily story writing challenge to develop narrative skills'
+    };
+    return fallbackDescriptions[prompt_type] || 'A daily writing challenge to inspire creativity';
+  }
+  
+  let excerpt = words.join(' ');
   
   // Remove trailing period
-  let excerpt = words.replace(/\.$/, '');
+  excerpt = excerpt.replace(/\.$/, '');
   
   const typeDescription = prompt_type === 'blog' ? 
     'A daily blog writing challenge' :
