@@ -9,6 +9,9 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
 import { 
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle 
+} from '@/components/ui/dialog';
+import { 
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
@@ -16,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 interface WritingPrompt {
   id: string;
@@ -35,10 +39,13 @@ interface WritingPrompt {
 
 export default function WritingChallengesPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [prompts, setPrompts] = useState<WritingPrompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     loadPrompts();
@@ -84,18 +91,42 @@ export default function WritingChallengesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this challenge?')) return;
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
 
     try {
-      const res = await fetch(`/api/admin/chronicles/writing-prompts/${id}`, {
+      const res = await fetch(`/api/admin/chronicles/writing-prompts/${deleteId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
+      
       if (res.ok) {
+        toast({
+          title: 'Challenge deleted',
+          description: 'The writing challenge has been deleted successfully.',
+        });
         loadPrompts();
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Failed to delete',
+          description: 'Could not delete the challenge. Please try again.',
+        });
       }
     } catch (error) {
       console.error('Error deleting prompt:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while deleting the challenge.',
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     }
   };
 
@@ -322,6 +353,26 @@ export default function WritingChallengesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Writing Challenge</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this writing challenge? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

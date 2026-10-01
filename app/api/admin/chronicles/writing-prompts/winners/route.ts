@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuthFromRequest } from '@/lib/auth-server';
+import { sendChallengeWinnerEmail } from '@/lib/email-service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -86,6 +87,47 @@ export async function POST(request: NextRequest) {
           prize_awarded: prize_awarded || 'Recognition',
         },
       });
+
+    // Send email notification to winner
+    const { data: creator } = await supabase
+      .from('chronicles_creators')
+      .select('email, display_name, pen_name')
+      .eq('id', creator_id)
+      .single();
+    
+    if (creator && creator.email) {
+      let postTitle = 'Your entry';
+      let postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`;
+      
+      // Try to get post details
+      const { data: entry } = await supabase
+        .from('chronicles_prompt_entries')
+        .select('entry_type, post_id')
+        .eq('id', entry_id)
+        .single();
+      
+      if (entry) {
+        if (entry.entry_type === 'chronicles_post' && entry.post_id) {
+          const { data: post } = await supabase
+            .from('chronicles_posts')
+            .select('title, slug')
+            .eq('id', entry.post_id)
+            .maybeSingle();
+          if (post) {
+            postTitle = post.title;
+            postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/${post.slug}`;
+          }
+        }
+      }
+      
+      sendChallengeWinnerEmail(creator.email, {
+        recipientName: creator.display_name || creator.pen_name || 'Winner',
+        winnerRank: `${rank}${rank === 1 ? 'st' : rank === 2 ? 'nd' : 'rd'}`,
+        winnerPrize: prize_awarded || 'Recognition',
+        winningPostTitle: postTitle,
+        winningPostUrl: postUrl,
+      });
+    }
 
     return NextResponse.json({ success: true, winner: data });
   } catch (error) {

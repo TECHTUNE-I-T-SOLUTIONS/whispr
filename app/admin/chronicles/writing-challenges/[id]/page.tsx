@@ -47,6 +47,7 @@ interface PromptEntry {
   submitted_at: string;
   is_ai_generated: boolean;
   ai_confidence_score?: number;
+  rank?: number;
   creator?: {
     id: string;
     pen_name: string;

@@ -186,17 +186,20 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
 }
 
 function generateDescriptionFromContent(content: string, prompt_type: string): string {
-  // Generate a description from the content
-  const words = content.split(' ');
-  const excerpt = words.slice(0, 30).join(' ');
+  // Remove common prefixes from the content
+  let cleanContent = content
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+  
+  const words = cleanContent.split(' ').slice(0, 30).join(' ');
   
   const typeDescription = prompt_type === 'blog' ? 
     'A daily blog writing challenge' :
     prompt_type === 'poem' ?
     'A daily poetry writing challenge' :
     'A daily story writing challenge';
-  
-  return `${typeDescription} about ${excerpt}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+    
+  return `${typeDescription} about ${words}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
 }
 
 function generateFeaturedImageUrl(prompt_type: string): string {

@@ -105,7 +105,8 @@ export async function GET(
 
     // Check if post is viewable: must be published OR user must own it
     const isPublished = post.status === 'published';
-    const isOwner = currentCreatorId && post.creator_id === currentCreatorId;
+    const creatorId = Array.isArray(post.creator) && post.creator[0] ? post.creator[0].id : null;
+    const isOwner = currentCreatorId && creatorId === currentCreatorId;
     
     if (!isPublished && !isOwner) {
       return NextResponse.json(
@@ -121,9 +122,9 @@ export async function GET(
       .eq('id', post.id);
 
     // Ensure article_id exists for published posts
-    if (isPublished && !post.article_id) {
+    if (isPublished && !('article_id' in post)) {
       try {
-        post.article_id = await CopyrightService.assignArticleId(post.id, 'chronicles_post');
+        (post as any).article_id = await CopyrightService.assignArticleId(post.id, 'chronicles_post');
       } catch (error) {
         console.error('Error assigning article ID:', error);
       }
@@ -146,12 +147,12 @@ export async function GET(
               post.id,
               'chronicles_post',
               canonicalContent,
-              post.creator_id,
+              creatorId,
               {
                 title: post.title,
                 excerpt: post.excerpt,
                 slug: post.slug,
-                article_id: post.article_id
+                article_id: (post as any).article_id
               }
             );
           } catch (fingerprintError: any) {
@@ -202,14 +203,14 @@ export async function GET(
       flagged_for_review: !!flaggedReview,
       flagStatus: flaggedReview?.status || null,
       flagReason: flaggedReview?.reason || null,
-      author: post.creator ? {
-        id: post.creator.id,
-        name: post.creator.display_name || post.creator.pen_name,
-        username: post.creator.pen_name?.toLowerCase().replace(/\s+/g, ''),
-        penName: post.creator.pen_name,
-        bio: post.creator.bio,
-        avatar_url: post.creator.avatar_url || post.creator.profile_image_url,
-        followers: post.creator.total_followers || 0,
+      author: post.creator && Array.isArray(post.creator) && post.creator[0] ? {
+        id: post.creator[0].id,
+        name: post.creator[0].display_name || post.creator[0].pen_name,
+        username: post.creator[0].pen_name?.toLowerCase().replace(/\s+/g, ''),
+        penName: post.creator[0].pen_name,
+        bio: post.creator[0].bio,
+        avatar_url: post.creator[0].avatar_url || post.creator[0].profile_image_url,
+        followers: post.creator[0].total_followers || 0,
       } : null,
     };
 

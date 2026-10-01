@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateWritingPrompt, generateTags } from '@/lib/services/gemini.service';
+import { sendDailyChallengeEmail, sendChallengeWinnerEmail } from '@/lib/email-service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
         let content: string;
         let model: string;
 
-        const result = await generateWritingPrompt(prompt_type, null);
+        const result = await generateWritingPrompt(prompt_type, undefined);
 
         if (!result.success) {
           console.error('Gemini generation failed:', result.error);
@@ -149,6 +150,27 @@ export async function GET(request: NextRequest) {
             });
           
           results.challenges_created++;
+          
+          // Send email notification to all active creators
+          const { data: creators } = await supabase
+            .from('chronicles_creators')
+            .select('email, display_name, pen_name')
+            .eq('status', 'active');
+          
+          if (creators && creators.length > 0) {
+            for (const creator of creators) {
+              if (creator.email) {
+                sendDailyChallengeEmail(creator.email, {
+                  recipientName: creator.display_name || creator.pen_name || 'Writer',
+                  challengeTitle: title,
+                  challengeDescription: description,
+                  challengeType: 'Daily',
+                  challengeUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`,
+                  challengeDeadline: endsAt.toLocaleDateString(),
+                });
+              }
+            }
+          }
         }
       } catch (error) {
         console.error('Error creating daily challenge:', error);
@@ -355,6 +377,39 @@ export async function GET(request: NextRequest) {
               },
             });
 
+          // Send email notification to winner
+          const { data: creator } = await supabase
+            .from('chronicles_creators')
+            .select('email, display_name, pen_name')
+            .eq('id', entry.creator_id)
+            .single();
+          
+          if (creator && creator.email) {
+            let postTitle = 'Your entry';
+            let postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`;
+            
+            // Try to get post details
+            if (entry.entry_type === 'chronicles_post' && entry.post_id) {
+              const { data: post } = await supabase
+                .from('chronicles_posts')
+                .select('title, slug')
+                .eq('id', entry.post_id)
+                .maybeSingle();
+              if (post) {
+                postTitle = post.title;
+                postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/${post.slug}`;
+              }
+            }
+            
+            sendChallengeWinnerEmail(creator.email, {
+              recipientName: creator.display_name || creator.pen_name || 'Winner',
+              winnerRank: `${entry.rank}${entry.rank === 1 ? 'st' : entry.rank === 2 ? 'nd' : 'rd'}`,
+              winnerPrize: challenge.prize_description || 'Recognition',
+              winningPostTitle: postTitle,
+              winningPostUrl: postUrl,
+            });
+          }
+
           results.winners_selected++;
         }
 
@@ -403,12 +458,21 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
 function generateDescriptionFromContent(content: string, prompt_type: string): string {
   const words = content.split(' ');
   const excerpt = words.slice(0, 30).join(' ');
+  
+  // Remove common prefixes from the content
+  let cleanContent = content
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+  
+  const cleanWords = cleanContent.split(' ').slice(0, 30).join(' ');
+  
   const typeDescription = prompt_type === 'blog' ? 
     'A daily blog writing challenge' :
     prompt_type === 'poem' ?
     'A daily poetry writing challenge' :
     'A daily story writing challenge';
-  return `${typeDescription} about ${excerpt}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+    
+  return `${typeDescription} about ${cleanWords}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
 }
 
 function generateFeaturedImageUrl(prompt_type: string): string {

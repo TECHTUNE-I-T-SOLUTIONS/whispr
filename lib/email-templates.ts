@@ -31,6 +31,17 @@ export interface EmailTemplateData {
   // Support
   supportTicketId?: string;
   supportMessage?: string;
+  // Daily challenge
+  challengeTitle?: string;
+  challengeDescription?: string;
+  challengeType?: string;
+  challengeUrl?: string;
+  challengeDeadline?: string;
+  // Challenge winner
+  winnerRank?: string;
+  winnerPrize?: string;
+  winningPostTitle?: string;
+  winningPostUrl?: string;
 }
 
 export interface EmailTemplate {
@@ -519,5 +530,94 @@ export function getSupportEmail(data: EmailTemplateData): EmailTemplate {
     subject: safeSupportTicketId ? `Support Request #${safeSupportTicketId} Received` : 'Support Request Received',
     html: wrapEmail(htmlContent),
     text: `Support Request Received\n${safeSupportTicketId ? `\nTicket ID: ${safeSupportTicketId}` : ''}\n\nHi ${safeRecipientName},\n\nWe've received your support request and our team will get back to you as soon as possible.\n\n${safeSupportMessage ? `Your message:\n"${safeSupportMessage}"\n\n` : ''}For immediate assistance, you can also reach us at support@whisprwords.com\n\n© ${new Date().getFullYear()} Whispr. All rights reserved.\n\nVisit us at: ${PROD_URL}`
+  };
+}
+
+/**
+ * Daily challenge email template
+ */
+export function getDailyChallengeEmail(data: EmailTemplateData): EmailTemplate {
+  const recipientName = data.recipientName || 'Writer';
+  const safeRecipientName = sanitizeHtml(recipientName);
+  const challengeTitle = data.challengeTitle || 'New Writing Challenge';
+  const safeChallengeTitle = sanitizeHtml(challengeTitle);
+  const challengeDescription = data.challengeDescription || '';
+  const safeChallengeDescription = sanitizeHtml(challengeDescription);
+  const challengeType = data.challengeType || 'Daily';
+  const safeChallengeType = sanitizeHtml(challengeType);
+  const challengeUrl = data.challengeUrl || `${PROD_URL}/chronicles/writing-challenges`;
+  const safeChallengeUrl = sanitizeHtml(challengeUrl);
+  const challengeDeadline = data.challengeDeadline || 'today';
+  const safeChallengeDeadline = sanitizeHtml(challengeDeadline);
+
+  const htmlContent = `
+    <h1 style="margin: 0 0 0 0; font-size: 28px; color: #111827; line-height: 1.3;">${safeChallengeType} Writing Challenge Available! 🎯</h1>
+    <p style="margin: 20px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
+      Hi ${safeRecipientName},
+    </p>
+    <p style="margin: 0 0 20px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
+      A new writing challenge is now live! This is your chance to showcase your creativity and compete with other writers.
+    </p>
+    <div style="margin: 0 0 25px 0; padding: 20px; background-color: #f0f9ff; border-left: 4px solid #2563eb; border-radius: 4px;">
+      <h2 style="margin: 0 0 10px 0; font-size: 20px; color: #1e40af;">${safeChallengeTitle}</h2>
+      <p style="margin: 0; font-size: 15px; color: #374151; line-height: 1.6;">${safeChallengeDescription}</p>
+    </div>
+    <p style="margin: 0 0 20px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
+      <strong>Deadline:</strong> ${safeChallengeDeadline}
+    </p>
+    ${createButton('Enter Challenge', safeChallengeUrl)}
+    <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
+      Happy writing! 📝
+    </p>
+  `;
+
+  return {
+    subject: `${safeChallengeType} Writing Challenge: ${safeChallengeTitle}`,
+    html: wrapEmail(htmlContent),
+    text: `${safeChallengeType} Writing Challenge: ${safeChallengeTitle}\n\nHi ${recipientName},\n\nA new writing challenge is now live! This is your chance to showcase your creativity and compete with other writers.\n\n${safeChallengeTitle}\n${safeChallengeDescription}\n\nDeadline: ${challengeDeadline}\n\nEnter Challenge: ${challengeUrl}\n\nHappy writing! 📝\n\n© ${new Date().getFullYear()} Whispr. All rights reserved.\nThis is an automated message from Whispr. Please do not reply to this email.\n\nVisit us at: ${PROD_URL}`
+  };
+}
+
+/**
+ * Challenge winner email template
+ */
+export function getChallengeWinnerEmail(data: EmailTemplateData): EmailTemplate {
+  const recipientName = data.recipientName || 'Winner';
+  const safeRecipientName = sanitizeHtml(recipientName);
+  const winnerRank = data.winnerRank || 'Top';
+  const safeWinnerRank = sanitizeHtml(winnerRank);
+  const winnerPrize = data.winnerPrize || 'Recognition';
+  const safeWinnerPrize = sanitizeHtml(winnerPrize);
+  const winningPostTitle = data.winningPostTitle || 'Your entry';
+  const safeWinningPostTitle = sanitizeHtml(winningPostTitle);
+  const winningPostUrl = data.winningPostUrl || `${PROD_URL}/chronicles/writing-challenges`;
+  const safeWinningPostUrl = sanitizeHtml(winningPostUrl);
+
+  const htmlContent = `
+    <h1 style="margin: 0 0 0 0; font-size: 28px; color: #111827; line-height: 1.6;">🏆 Congratulations, ${safeRecipientName}!</h1>
+    <p style="margin: 20px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
+      You've achieved ${safeWinnerRank} place in the writing challenge!
+    </p>
+    <div style="margin: 0 0 25px 0; padding: 20px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+      <h2 style="margin: 0 0 10px 0; font-size: 20px; color: #92400e;">🎉 Your Achievement</h2>
+      <p style="margin: 0; font-size: 15px; color: #374151; line-height: 1.6;">
+        <strong>Rank:</strong> ${safeWinnerRank}<br>
+        <strong>Prize:</strong> ${safeWinnerPrize}<br>
+        <strong>Winning Entry:</strong> ${safeWinningPostTitle}
+      </p>
+    </div>
+    <p style="margin: 0 0 20px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
+      Your creativity and writing skills have truly stood out. Thank you for participating and sharing your work with the community!
+    </p>
+    ${createButton('View Your Winning Entry', safeWinningPostUrl)}
+    <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.6;">
+      Keep writing and inspiring others! ✨
+    </p>
+  `;
+
+  return {
+    subject: `🏆 You Won ${safeWinnerRank} Place in the Writing Challenge!`,
+    html: wrapEmail(htmlContent),
+    text: `🏆 Congratulations, ${recipientName}!\n\nYou've achieved ${winnerRank} place in the writing challenge!\n\n🎉 Your Achievement\nRank: ${winnerRank}\nPrize: ${winnerPrize}\nWinning Entry: ${winningPostTitle}\n\nYour creativity and writing skills have truly stood out. Thank you for participating and sharing your work with the community!\n\nView Your Winning Entry: ${winningPostUrl}\n\nKeep writing and inspiring others! ✨\n\n© ${new Date().getFullYear()} Whispr. All rights reserved.\nThis is an automated message from Whispr. Please do not reply to this email.\n\nVisit us at: ${PROD_URL}`
   };
 }

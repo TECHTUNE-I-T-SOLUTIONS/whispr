@@ -14,6 +14,8 @@ import {
   getNewLikeEmail,
   getNotificationEmail,
   getSupportEmail,
+  getDailyChallengeEmail,
+  getChallengeWinnerEmail,
   type EmailTemplateData,
   type EmailTemplate
 } from './email-templates';
@@ -30,6 +32,8 @@ export enum EmailType {
   NEW_LIKE = 'new_like',
   NOTIFICATION = 'notification',
   SUPPORT = 'support',
+  DAILY_CHALLENGE = 'daily_challenge',
+  CHALLENGE_WINNER = 'challenge_winner',
 }
 
 /**
@@ -54,6 +58,8 @@ const EMAIL_TYPE_TO_SENDER: Record<EmailType, EmailSender> = {
   [EmailType.NEW_LIKE]: EmailSender.NOTIFICATIONS,
   [EmailType.NOTIFICATION]: EmailSender.NOTIFICATIONS,
   [EmailType.SUPPORT]: EmailSender.SUPPORT,
+  [EmailType.DAILY_CHALLENGE]: EmailSender.NOTIFICATIONS,
+  [EmailType.CHALLENGE_WINNER]: EmailSender.NOTIFICATIONS,
 };
 
 /**
@@ -68,6 +74,8 @@ const EMAIL_TYPE_TO_TEMPLATE: Record<EmailType, (data: EmailTemplateData) => Ema
   [EmailType.NEW_LIKE]: getNewLikeEmail,
   [EmailType.NOTIFICATION]: getNotificationEmail,
   [EmailType.SUPPORT]: getSupportEmail,
+  [EmailType.DAILY_CHALLENGE]: getDailyChallengeEmail,
+  [EmailType.CHALLENGE_WINNER]: getChallengeWinnerEmail,
 };
 
 /**
@@ -309,6 +317,20 @@ export function sendNotificationEmail(to: string, data?: EmailTemplateData): voi
  */
 export function sendSupportEmail(to: string, data?: EmailTemplateData): void {
   sendEmail({ type: EmailType.SUPPORT, to, data });
+}
+
+/**
+ * Send daily challenge notification
+ */
+export function sendDailyChallengeEmail(to: string, data?: EmailTemplateData): void {
+  sendEmail({ type: EmailType.DAILY_CHALLENGE, to, data });
+}
+
+/**
+ * Send challenge winner notification
+ */
+export function sendChallengeWinnerEmail(to: string, data?: EmailTemplateData): void {
+  sendEmail({ type: EmailType.CHALLENGE_WINNER, to, data });
 }
 
 /**

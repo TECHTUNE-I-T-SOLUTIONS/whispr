@@ -339,12 +339,10 @@ export default function ChallengeLeaderboardPage() {
                             </Button>
                           </Link>
                         </>
-                      ) : winner.entryNotFound ? (
-                        <p className="text-sm text-muted-foreground">
-                          Entry data not available (entry may have been deleted)
-                        </p>
                       ) : (
-                        <p className="text-sm text-muted-foreground">Post details not available</p>
+                        <p className="text-sm text-muted-foreground">
+                          Post details not available
+                        </p>
                       )}
                     </div>
                   </div>

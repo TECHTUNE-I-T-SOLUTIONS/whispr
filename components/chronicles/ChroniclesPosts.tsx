@@ -85,7 +85,7 @@ export default function MyPostsPage() {
           )}
 
           {posts.map((post) => {
-            const thumbnail = post.cover_image_url || extractFirstImageFromContent(post.content);
+            const thumbnail = post.cover_image_url || (post.content ? extractFirstImageFromContent(post.content) : undefined);
             
             return (
               <article key={post.id} className="bg-white dark:bg-black rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 dark:hover:shadow-white dark:hover:shadow-sm overflow-hidden">
