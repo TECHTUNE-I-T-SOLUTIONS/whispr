@@ -57,8 +57,9 @@ export async function GET(request: NextRequest) {
       try {
         console.log('No daily challenge found for today, creating one...');
         
-        // Generate prompt directly
-        const prompt_type = 'blog';
+        // Randomly choose between blog, poem, or story
+        const promptTypes = ['blog', 'poem', 'story'];
+        const prompt_type = promptTypes[Math.floor(Math.random() * promptTypes.length)] as 'blog' | 'poem' | 'story';
         const challenge_type = 'daily';
         let content: string;
         let model: string;
@@ -511,8 +512,8 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
     .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '')
     .replace(/^(The|A|An)\s+/i, '');
   
-  // Take first 8-12 words as title
-  const words = cleanContent.split(' ').filter(w => w.length > 0).slice(0, 10);
+  // Take first 15-20 words as title to capture the full prompt
+  const words = cleanContent.split(' ').filter(w => w.length > 0).slice(0, 18);
   let title = words.join(' ');
   
   // If title is too short or empty, use a fallback
@@ -530,11 +531,6 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
   
   // Remove trailing period
   title = title.replace(/\.$/, '');
-  
-  // Limit to 50 characters max
-  if (title.length > 50) {
-    title = title.substring(0, 47) + '...';
-  }
   
   // Add prompt type prefix
   const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
