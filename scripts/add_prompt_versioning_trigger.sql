@@ -41,7 +41,7 @@ BEGIN
     created_at,
     created_by
   ) VALUES (
-    NEW.id,  -- Use prompt ID as prompt_name for linking
+    NEW.title,  -- Use title as prompt_name since it's a text field
     v_version,
     NEW.content,
     true,  -- New version is active
@@ -53,7 +53,7 @@ BEGIN
   -- Mark previous versions as inactive
   UPDATE prompt_versions
   SET is_active = false
-  WHERE prompt_name = NEW.id
+  WHERE prompt_name = NEW.title
     AND version != v_version;
   
   RETURN NEW;
@@ -83,7 +83,7 @@ INSERT INTO prompt_versions (
   created_by
 )
 SELECT 
-  id,
+  title,
   to_char(updated_at, 'YYYYMMDD-HH24MISS'),
   content,
   true,
@@ -102,7 +102,8 @@ SELECT
   updated_at,
   COALESCE(edited_by, created_by)
 FROM chronicles_writing_prompts
-WHERE id = 'da708a01-7372-430e-9398-d80930af6f05';
+WHERE id = 'da708a01-7372-430e-9398-d80930af6f05'
+ON CONFLICT (prompt_name, version) DO NOTHING;  -- Handle duplicate versions
 
 -- Verify the version was created
 SELECT 
@@ -112,5 +113,5 @@ SELECT
   is_active,
   created_at
 FROM prompt_versions
-WHERE prompt_name = 'da708a01-7372-430e-9398-d80930af6f05'
+WHERE prompt_name = (SELECT title FROM chronicles_writing_prompts WHERE id = 'da708a01-7372-430e-9398-d80930af6f05')
 ORDER BY created_at DESC;

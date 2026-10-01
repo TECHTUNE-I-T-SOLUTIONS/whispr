@@ -13,10 +13,25 @@ export async function GET(
   try {
     const { id } = await params;
 
+    // First get the prompt title to use as prompt_name
+    const { data: prompt } = await supabase
+      .from('chronicles_writing_prompts')
+      .select('title')
+      .eq('id', id)
+      .single();
+
+    if (!prompt) {
+      return NextResponse.json(
+        { error: 'Prompt not found' },
+        { status: 404 }
+      );
+    }
+
+    // Fetch versions using the title as prompt_name
     const { data, error } = await supabase
       .from('prompt_versions')
       .select('*')
-      .eq('prompt_name', id)
+      .eq('prompt_name', prompt.title)
       .order('created_at', { ascending: false });
 
     if (error) throw error;

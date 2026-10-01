@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('prompt_versions')
         .insert({
-          prompt_name: newPrompt.id,
+          prompt_name: title, // Use title instead of UUID since prompt_name is text
           version,
           content,
           is_active: true,
