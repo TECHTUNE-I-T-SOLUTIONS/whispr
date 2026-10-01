@@ -157,9 +157,12 @@ export async function GET(request: NextRequest) {
             .select('email, display_name, pen_name')
             .eq('status', 'active');
           
+          console.log(`[Cron Email] Found ${creators?.length || 0} active creators to notify about new challenge`);
+          
           if (creators && creators.length > 0) {
             for (const creator of creators) {
               if (creator.email) {
+                console.log(`[Cron Email] Sending daily challenge email to ${creator.email}`);
                 sendDailyChallengeEmail(creator.email, {
                   recipientName: creator.display_name || creator.pen_name || 'Writer',
                   challengeTitle: title,
@@ -168,8 +171,12 @@ export async function GET(request: NextRequest) {
                   challengeUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`,
                   challengeDeadline: endsAt.toLocaleDateString(),
                 });
+              } else {
+                console.log(`[Cron Email] Creator ${creator.display_name || creator.pen_name} has no email`);
               }
             }
+          } else {
+            console.log('[Cron Email] No active creators found to notify');
           }
         }
       } catch (error) {
@@ -385,6 +392,8 @@ export async function GET(request: NextRequest) {
             .single();
           
           if (creator && creator.email) {
+            console.log(`[Cron Email] Sending winner email to ${creator.email} for rank ${entry.rank}`);
+            
             let postTitle = 'Your entry';
             let postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`;
             
@@ -408,6 +417,8 @@ export async function GET(request: NextRequest) {
               winningPostTitle: postTitle,
               winningPostUrl: postUrl,
             });
+          } else {
+            console.log(`[Cron Email] Creator ${entry.creator_id} not found or has no email`);
           }
 
           results.winners_selected++;
