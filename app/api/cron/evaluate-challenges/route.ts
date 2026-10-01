@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { generateWritingPrompt, generateTags } from '@/lib/services/gemini.service';
-import { sendDailyChallengeEmail, sendChallengeWinnerEmail } from '@/lib/email-service';
+import { sendDailyChallengeEmail, sendChallengeWinnerEmail, EmailType, sendEmailSync } from '@/lib/email-service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -163,14 +163,23 @@ export async function GET(request: NextRequest) {
             for (const creator of creators) {
               if (creator.email) {
                 console.log(`[Cron Email] Sending daily challenge email to ${creator.email}`);
-                sendDailyChallengeEmail(creator.email, {
-                  recipientName: creator.display_name || creator.pen_name || 'Writer',
-                  challengeTitle: title,
-                  challengeDescription: description,
-                  challengeType: 'Daily',
-                  challengeUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`,
-                  challengeDeadline: endsAt.toLocaleDateString(),
-                });
+                try {
+                  const result = await sendEmailSync({
+                    type: EmailType.DAILY_CHALLENGE,
+                    to: creator.email,
+                    data: {
+                      recipientName: creator.display_name || creator.pen_name || 'Writer',
+                      challengeTitle: title,
+                      challengeDescription: description,
+                      challengeType: 'Daily',
+                      challengeUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/chronicles/writing-challenges`,
+                      challengeDeadline: endsAt.toLocaleDateString(),
+                    },
+                  });
+                  console.log(`[Cron Email] Email send result:`, result);
+                } catch (error) {
+                  console.error(`[Cron Email] Failed to send email to ${creator.email}:`, error);
+                }
               } else {
                 console.log(`[Cron Email] Creator ${creator.display_name || creator.pen_name} has no email`);
               }
@@ -454,28 +463,41 @@ export async function GET(request: NextRequest) {
 }
 
 function generateTitleFromContent(content: string, prompt_type: string): string {
-  const sentences = content.split(/[.!?]/);
-  const firstSentence = sentences[0]?.trim() || '';
-  const words = firstSentence.split(' ').slice(0, 10);
+  // Remove common prefixes completely
+  let cleanContent = content
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '')
+    .replace(/^(The|A|An)\s+/i, '');
+  
+  // Take first 8-12 words as title
+  const words = cleanContent.split(' ').slice(0, 10);
   let title = words.join(' ');
-  title = title.replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
-  title = title.replace(/^(blog post|poem|story)\s+(about|that|which)\s+/i, '');
+  
+  // Capitalize first letter
   title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  // Remove trailing period
+  title = title.replace(/\.$/, '');
+  
+  // Add prompt type prefix
   const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
                     prompt_type === 'poem' ? 'Daily Poem' : 'Daily Story';
+  
   return `${typePrefix}: ${title}`;
 }
 
 function generateDescriptionFromContent(content: string, prompt_type: string): string {
-  const words = content.split(' ');
-  const excerpt = words.slice(0, 30).join(' ');
-  
-  // Remove common prefixes from the content
+  // Remove common prefixes from the content completely
   let cleanContent = content
     .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
-    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '')
+    .replace(/^(The|A|An)\s+/i, '');
   
-  const cleanWords = cleanContent.split(' ').slice(0, 30).join(' ');
+  // Take first 20-30 words as excerpt
+  const words = cleanContent.split(' ').slice(0, 25).join(' ');
+  
+  // Remove trailing period
+  let excerpt = words.replace(/\.$/, '');
   
   const typeDescription = prompt_type === 'blog' ? 
     'A daily blog writing challenge' :
@@ -483,7 +505,7 @@ function generateDescriptionFromContent(content: string, prompt_type: string): s
     'A daily poetry writing challenge' :
     'A daily story writing challenge';
     
-  return `${typeDescription} about ${cleanWords}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+  return `${typeDescription} focused on ${excerpt.toLowerCase()}. Participants are encouraged to express their creativity and unique perspective on this theme.`;
 }
 
 function generateFeaturedImageUrl(prompt_type: string): string {

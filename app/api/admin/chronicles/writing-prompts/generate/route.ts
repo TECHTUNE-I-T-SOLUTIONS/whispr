@@ -163,20 +163,21 @@ export async function POST(request: NextRequest) {
 }
 
 function generateTitleFromContent(content: string, prompt_type: string): string {
-  // Extract or generate a title from the content
-  const sentences = content.split(/[.!?]/);
-  const firstSentence = sentences[0]?.trim() || '';
+  // Remove common prefixes completely
+  let cleanContent = content
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '')
+    .replace(/^(The|A|An)\s+/i, '');
   
   // Take first 8-12 words as title
-  const words = firstSentence.split(' ').slice(0, 10);
+  const words = cleanContent.split(' ').slice(0, 10);
   let title = words.join(' ');
-  
-  // Remove "Write a" or similar prefixes
-  title = title.replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
-  title = title.replace(/^(blog post|poem|story)\s+(about|that|which)\s+/i, '');
   
   // Capitalize first letter
   title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  // Remove trailing period
+  title = title.replace(/\.$/, '');
   
   // Add prompt type prefix
   const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
@@ -186,12 +187,17 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
 }
 
 function generateDescriptionFromContent(content: string, prompt_type: string): string {
-  // Remove common prefixes from the content
+  // Remove common prefixes from the content completely
   let cleanContent = content
     .replace(/^(Write a|Create a|Write an|Generate a)\s+(blog post|poem|story)\s+(about|that|which)\s+/i, '')
-    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+    .replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '')
+    .replace(/^(The|A|An)\s+/i, '');
   
-  const words = cleanContent.split(' ').slice(0, 30).join(' ');
+  // Take first 20-30 words as excerpt
+  const words = cleanContent.split(' ').slice(0, 25).join(' ');
+  
+  // Remove trailing period
+  let excerpt = words.replace(/\.$/, '');
   
   const typeDescription = prompt_type === 'blog' ? 
     'A daily blog writing challenge' :
@@ -199,7 +205,7 @@ function generateDescriptionFromContent(content: string, prompt_type: string): s
     'A daily poetry writing challenge' :
     'A daily story writing challenge';
     
-  return `${typeDescription} about ${words}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+  return `${typeDescription} focused on ${excerpt.toLowerCase()}. Participants are encouraged to express their creativity and unique perspective on this theme.`;
 }
 
 function generateFeaturedImageUrl(prompt_type: string): string {
