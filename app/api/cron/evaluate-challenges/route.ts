@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { generateWritingPrompt, generateTags } from '@/lib/services/gemini.service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -55,30 +56,98 @@ export async function GET(request: NextRequest) {
       try {
         console.log('No daily challenge found for today, creating one...');
         
-        // Call the AI generation API
-        const generateRes = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/admin/chronicles/writing-prompts/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt_type: 'blog',
-            challenge_type: 'daily',
-            save_to_db: true, // Save directly to database
-          }),
-        });
+        // Generate prompt directly
+        const prompt_type = 'blog';
+        let content: string;
+        let model: string;
 
-        if (generateRes.ok) {
-          const generateData = await generateRes.json();
-          
-          if (generateData.saved) {
-            console.log('Daily challenge created successfully:', generateData.saved.id);
-            results.challenges_created++;
-          } else {
-            console.error('Failed to save generated challenge');
-            results.errors.push('Failed to save generated challenge to database');
-          }
+        const result = await generateWritingPrompt(prompt_type, null);
+
+        if (!result.success) {
+          console.error('Gemini generation failed:', result.error);
+          content = generateFallbackPrompt(prompt_type);
+          model = 'template-fallback';
         } else {
-          console.error('Failed to generate challenge:', generateRes.status);
-          results.errors.push('Failed to generate daily challenge');
+          content = result.text;
+          model = result.model || 'gemini';
+        }
+
+        // Generate tags
+        let tags: string[] = [];
+        try {
+          tags = await generateTags(content, prompt_type);
+        } catch (error) {
+          console.error('Tag generation failed:', error);
+          tags = ['writing', 'personal', 'creativity'];
+        }
+
+        // Generate title
+        const title = generateTitleFromContent(content, prompt_type);
+        const description = generateDescriptionFromContent(content, prompt_type);
+        const featured_image_url = generateFeaturedImageUrl(prompt_type);
+
+        // Set dates
+        const startsAt = new Date();
+        startsAt.setHours(5, 0, 0, 0);
+        
+        const endsAt = new Date();
+        endsAt.setHours(23, 59, 59, 999);
+        
+        const submissionDeadline = new Date();
+        submissionDeadline.setHours(23, 59, 59, 999);
+
+        // Save the challenge
+        const { data: newChallenge, error: insertError } = await supabase
+          .from('chronicles_writing_prompts')
+          .insert({
+            title,
+            description,
+            prompt_type,
+            content,
+            challenge_type: 'daily',
+            is_ai_generated: true,
+            ai_generation_model: model,
+            created_by: '8ac41ab5-c544-4068-a628-426593a2d4e2',
+            status: 'active',
+            starts_at: startsAt.toISOString(),
+            ends_at: endsAt.toISOString(),
+            submission_deadline: submissionDeadline.toISOString(),
+            max_entries_per_user: 1,
+            evaluation_criteria: '{"passion": 20, "integrity": 30, "sincerity": 30, "engagement": 20}',
+            tags,
+            featured_image_url,
+            prize_description: 'Recognition',
+            published_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error inserting generated challenge:', insertError);
+          results.errors.push(`Failed to create daily challenge: ${insertError.message}`);
+        } else {
+          console.log('Daily challenge created successfully:', newChallenge.id);
+          
+          // Save to prompt_versions
+          const version = new Date().toISOString().replace(/[:.]/g, '').slice(0, 15);
+          await supabase
+            .from('prompt_versions')
+            .insert({
+              prompt_name: newChallenge.id,
+              version,
+              content,
+              is_active: true,
+              metadata: {
+                title,
+                status: 'active',
+                ai_generation_model: model,
+                prompt_type,
+                challenge_type,
+              },
+              created_by: '8ac41ab5-c544-4068-a628-426593a2d4e2',
+            });
+          
+          results.challenges_created++;
         }
       } catch (error) {
         console.error('Error creating daily challenge:', error);
@@ -315,4 +384,60 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function generateTitleFromContent(content: string, prompt_type: string): string {
+  const sentences = content.split(/[.!?]/);
+  const firstSentence = sentences[0]?.trim() || '';
+  const words = firstSentence.split(' ').slice(0, 10);
+  let title = words.join(' ');
+  title = title.replace(/^(Write a|Create a|Write an|Generate a)\s+/i, '');
+  title = title.replace(/^(blog post|poem|story)\s+(about|that|which)\s+/i, '');
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
+                    prompt_type === 'poem' ? 'Daily Poem' : 'Daily Story';
+  return `${typePrefix}: ${title}`;
+}
+
+function generateDescriptionFromContent(content: string, prompt_type: string): string {
+  const words = content.split(' ');
+  const excerpt = words.slice(0, 30).join(' ');
+  const typeDescription = prompt_type === 'blog' ? 
+    'A daily blog writing challenge' :
+    prompt_type === 'poem' ?
+    'A daily poetry writing challenge' :
+    'A daily story writing challenge';
+  return `${typeDescription} about ${excerpt}... Participants are encouraged to express their creativity and unique perspective on this theme.`;
+}
+
+function generateFeaturedImageUrl(prompt_type: string): string {
+  const images: Record<string, string> = {
+    blog: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1074&auto=format&fit=crop',
+    poem: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1074&auto=format&fit=crop',
+    story: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1074&auto=format&fit=crop',
+  };
+  return images[prompt_type] || images.blog;
+}
+
+function generateFallbackPrompt(prompt_type: string): string {
+  const templates: Record<string, string[]> = {
+    blog: [
+      "Write a blog post about the hidden beauty of everyday moments that explores its significance in modern life",
+      "Create a blog post that teaches readers about finding unexpected joy in ordinary days through personal experience",
+      "Write an opinion piece discussing how small acts of kindness impact our daily lives"
+    ],
+    poem: [
+      "Write a poem about the changing seasons and what they teach us using vivid imagery and emotional depth",
+      "Create a free verse poem that explores the feelings evoked by a childhood memory that shaped who you are",
+      "Write a structured poem about balancing ambition with contentment that captures its essence"
+    ],
+    story: [
+      "Write a short story that begins with the discovery of an unexpected joy and how it changes everything",
+      "Create a narrative about a character experiencing technology changing human connections for the first time",
+      "Write a story where overcoming a personal fear plays a central role in an unexpected way"
+    ]
+  };
+
+  const typeTemplates = templates[prompt_type] || templates.blog;
+  return typeTemplates[Math.floor(Math.random() * typeTemplates.length)];
 }
