@@ -187,6 +187,42 @@ export async function GET(request: NextRequest) {
           } else {
             console.log('[Cron Email] No active creators found to notify');
           }
+          
+          // Send email notification to admins about new challenge
+          const { data: admins } = await supabase
+            .from('admin')
+            .select('email, username, full_name')
+            .eq('is_active', true);
+          
+          console.log(`[Cron Email] Found ${admins?.length || 0} active admins to notify about new challenge`);
+          
+          if (admins && admins.length > 0) {
+            for (const admin of admins) {
+              if (admin.email) {
+                console.log(`[Cron Email] Sending admin notification to ${admin.email}`);
+                try {
+                  const result = await sendEmailSync({
+                    type: EmailType.NOTIFICATION,
+                    to: admin.email,
+                    data: {
+                      recipientName: admin.full_name || admin.username || 'Admin',
+                      notificationTitle: 'New Daily Challenge Created',
+                      notificationMessage: `A new daily writing challenge "${title}" has been automatically created and is now live on the platform. You can review and manage it from the admin dashboard.`,
+                      actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://whisprwords.com'}/admin/chronicles/writing-challenges`,
+                      actionText: 'View in Admin Dashboard',
+                    },
+                  });
+                  console.log(`[Cron Email] Admin email send result:`, result);
+                } catch (error) {
+                  console.error(`[Cron Email] Failed to send admin email to ${admin.email}:`, error);
+                }
+              } else {
+                console.log(`[Cron Email] Admin ${admin.full_name || admin.username} has no email`);
+              }
+            }
+          } else {
+            console.log('[Cron Email] No active admins found to notify');
+          }
         }
       } catch (error) {
         console.error('Error creating daily challenge:', error);
@@ -478,6 +514,11 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
   
   // Remove trailing period
   title = title.replace(/\.$/, '');
+  
+  // Limit to 50 characters max
+  if (title.length > 50) {
+    title = title.substring(0, 47) + '...';
+  }
   
   // Add prompt type prefix
   const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 

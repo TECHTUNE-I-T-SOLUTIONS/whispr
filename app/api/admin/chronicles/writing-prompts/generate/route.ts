@@ -179,6 +179,11 @@ function generateTitleFromContent(content: string, prompt_type: string): string 
   // Remove trailing period
   title = title.replace(/\.$/, '');
   
+  // Limit to 50 characters max
+  if (title.length > 50) {
+    title = title.substring(0, 47) + '...';
+  }
+  
   // Add prompt type prefix
   const typePrefix = prompt_type === 'blog' ? 'Daily Blog' : 
                     prompt_type === 'poem' ? 'Daily Poem' : 'Daily Story';
