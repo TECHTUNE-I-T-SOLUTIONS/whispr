@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
         
         // Generate prompt directly
         const prompt_type = 'blog';
+        const challenge_type = 'daily';
         let content: string;
         let model: string;
 
@@ -141,8 +142,8 @@ export async function GET(request: NextRequest) {
                 title,
                 status: 'active',
                 ai_generation_model: model,
-                prompt_type,
-                challenge_type,
+                prompt_type: 'blog',
+                challenge_type: 'daily',
               },
               created_by: '8ac41ab5-c544-4068-a628-426593a2d4e2',
             });
