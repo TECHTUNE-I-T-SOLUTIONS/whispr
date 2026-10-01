@@ -401,7 +401,10 @@ export default function StoryClientPage({ story, chapters }: StoryClientPageProp
             <div className="bg-muted/15 border border-dashed border-border/40 p-6 rounded-xl text-center mb-8">
               <p className="text-muted-foreground text-sm mb-3">You must be logged in to leave a comment.</p>
               <Button asChild size="sm">
-                <Link href="/login">Log In to Comment</Link>
+                {/* temporarily disabled */}
+                {/* <Link href="/chronicles/login">Log In to Comment</Link> */}
+              {/* for now, we use this */}
+                <Link href="/chronicles/waitlist">Join Waitlist to Comment</Link>
               </Button>
             </div>
           )}
