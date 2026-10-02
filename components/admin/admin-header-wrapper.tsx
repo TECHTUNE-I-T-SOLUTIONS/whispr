@@ -40,6 +40,7 @@ export default function AdminHeaderWrapper({ children }: { children: React.React
     { name: "Create Notification", href: "/admin/create-notification", icon: Bell },
     { name: "Notification History", href: "/admin/push-history", icon: BarChart3 },
     { name: "Email Testing", href: "/admin/email-testing", icon: Mail },
+    { name: "Email Management", href: "/admin/email-management", icon: Mail },
     { name: "Flagged Content", href: "/admin/chronicles/flagged-content", icon: ClipboardList },
     { name: "Error Logs", href: "/admin/error-logs", icon: AlertTriangle },
     // Ads Control Section
