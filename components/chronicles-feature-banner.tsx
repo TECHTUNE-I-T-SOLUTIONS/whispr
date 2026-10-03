@@ -60,24 +60,24 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-gradient-to-r from-foreground to-primary dark:from-gray-600 dark:to-primary opacity-5 rounded-2xl"
+          className="relative overflow-hidden bg-transparent dark:from-gray-600 dark:to-primary opacity-5 rounded-2xl"
         >
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-white/10 to-transparent rounded-full"
+              className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-black/10 to-transparent dark:bg-gradient-to-b dark:from-white/10 dark:to-transparent rounded-full"
             />
             <motion.div
               animate={{ x: [0, 30, -30, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-1/4 left-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl"
+              className="absolute top-1/4 left-1/4 w-72 h-72 bg-black/5 dark:bg-white/5 rounded-full blur-3xl"
             />
             <motion.div
               animate={{ x: [0, -40, 40, 0] }}
               transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl"
+              className="absolute -bottom-1/4 right-1/4 w-96 h-96 bg-black/5 dark:bg-white/5 rounded-full blur-3xl"
             />
           </div>
 
@@ -95,16 +95,16 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                 >
                   <div className="flex items-center gap-2 mb-4">
                     {/* <Sparkles className="w-5 h-5 text-white animate-pulse" /> */}
-                    <span className="text-white font-semibold text-sm uppercase tracking-wider">
+                    <span className="text-black dark:text-white font-semibold text-sm uppercase tracking-wider">
                       Chronicles Launch
                     </span>
                   </div>
 
-                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                  <h2 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4 leading-tight">
                     {currentFeature.title}
                   </h2>
 
-                  <p className="text-white/90 text-lg mb-8">
+                  <p className="text-black dark:text-white/90 text-lg mb-8">
                     {currentFeature.description}
                   </p>
 
@@ -112,7 +112,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                     <Button
                       asChild
                       size="lg"
-                      className="bg-white text-red-600 hover:bg-white/90 font-semibold"
+                      className="bg-black dark:bg-white text-red-600 hover:bg-black/90 dark:hover:bg-white/90 font-semibold"
                     >
                       <Link href="/chronicles/waitlist" className="flex items-center gap-2">
                         Join Now
@@ -122,7 +122,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                     <Button
                       size="lg"
                       onClick={onOpenModal}
-                      className="bg-white/20 text-white border border-white/30 hover:bg-white/30 font-semibold"
+                      className="bg-black/20 dark:bg-white/20 text-black dark:text-white border border-white/30 hover:bg-white/30 font-semibold"
                     >
                       Learn More
                     </Button>
@@ -164,8 +164,8 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                       onClick={() => setActiveFeature(i)}
                       className={`rounded-full transition-all ${
                         i === activeFeature
-                          ? 'w-10 h-3 bg-white'
-                          : 'w-3 h-3 bg-white/40 hover:bg-white/60'
+                          ? 'w-10 h-3 bg-black dark:bg-white'
+                          : 'w-3 h-3 bg-black/40 dark:bg-white/40 hover:bg-black/60 dark:hover:bg-white/60'
                       }`}
                       whileHover={{ scale: 1.2 }}
                       whileTap={{ scale: 0.95 }}
@@ -178,7 +178,7 @@ export function ChroniclesFeatureBanner({ onOpenModal, dismissible = true }: Chr
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsVisible(false)}
-                    className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+                    className="p-2 rounded-full bg-black/20 dark:bg-white/20 text-black dark:text-white hover:bg-black/30 dark:hover:bg-white/30 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </motion.button>

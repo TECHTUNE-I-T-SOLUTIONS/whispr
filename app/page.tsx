@@ -39,14 +39,14 @@ export default function HomePage() {
 
       {/* Features Overview Section */}
       <section className="container py-12">
-        <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-primary to-primary/90 dark:from-primary-900 dark:to-primary-800 p-8 shadow-sm backdrop-blur">
+        <div className="rounded-3xl border border-border/20 bg-transparent dark:bg-background p-8 shadow-sm backdrop-blur">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full bg-red-300 dark:bg-red-900/30 px-3 py-1 text-sm font-medium text-red-900 dark:text-red-400">
                 <LayoutGrid className="h-4 w-4" /> Platform Features
               </div>
               <h2 className="text-3xl font-serif font-bold">Explore all Whispr features</h2>
-              <p className="text-muted dark:text-white">
+              <p className="text-black dark:text-white ">
                 Discover powerful tools for content creation, community engagement, analytics, and more. From copyright protection to AI-powered writing assistance.
               </p>
             </div>
@@ -77,7 +77,7 @@ export default function HomePage() {
 
       {/* Whispering Stories Showcase Section */}
       <section className="container py-12 md:py-16">
-        <div className="relative rounded-3xl border border-primary/20 bg-gradient-to-br from-indigo-950/20 via-background/90 to-purple-950/25 p-8 md:p-12 shadow-2xl backdrop-blur overflow-hidden">
+        <div className="relative rounded-3xl bg-gradient-to-br from-red-950/10 via-background/90 to-red-950/25 p-8 md:p-12 shadow-2xl backdrop-blur overflow-hidden">
           {/* Glowing ambient blobs */}
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
           <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
@@ -119,7 +119,7 @@ export default function HomePage() {
       </section>
 
       <section className="container py-10">
-        <div className="rounded-3xl border border-border/60 bg-background/80 p-8 shadow-sm backdrop-blur">
+        <div className="rounded-3xl bg-background/40 p-8 shadow-sm backdrop-blur">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">

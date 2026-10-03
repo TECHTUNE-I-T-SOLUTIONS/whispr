@@ -28,19 +28,19 @@ export function CreatorBenefitsBanner({ onOpenModal, dismissible = true }: Creat
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-gradient-to-r from-primary/90 to-primary/80 dark:from-primary/95 dark:to-primary/90 rounded-2xl border border-primary/20"
+          className="relative overflow-hidden bg-gradient-to-r from-background/30 to-primary/40 dark:from-primary/95 dark:to-primary/90 rounded-2xl border border-primary/10"
         >
           {/* Animated Background Elements */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-white/10 to-transparent rounded-full"
+              className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-b from-black/10 to-transparent rounded-full"
             />
             <motion.div
               animate={{ x: [0, 30, -30, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-1/4 left-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl"
+              className="absolute top-1/4 left-1/4 w-72 h-72 bg-black/5 rounded-full blur-3xl"
             />
           </div>
 
@@ -52,30 +52,30 @@ export function CreatorBenefitsBanner({ onOpenModal, dismissible = true }: Creat
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
-                    <span className="text-white font-semibold text-sm uppercase tracking-wider">
+                    <span className="text-black dark:text-white font-semibold text-sm uppercase tracking-wider">
                       Why Create on Whispr?
                     </span>
                   </div>
 
-                  <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+                  <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white leading-tight">
                     Your Stories Deserve to Be Heard
                   </h2>
 
-                  <p className="text-white/90 text-base md:text-lg max-w-2xl">
+                  <p className="text-black dark:text-white/90 text-base md:text-lg max-w-2xl">
                     Join a community that values creativity. Publish your work, build your audience, and grow as a creator on a platform designed for storytellers.
                   </p>
 
                   <div className="flex flex-wrap gap-4 pt-2">
-                    <div className="flex items-center gap-2 text-white/80 text-sm">
-                      <Heart className="w-4 h-4 text-rose-300" />
+                    <div className="flex items-center gap-2 text-black dark:text-white/80 text-sm">
+                      <Heart className="w-4 h-4 text-red-800 dark:text-rose-300" />
                       <span>Engaged Audience</span>
                     </div>
-                    <div className="flex items-center gap-2 text-white/80 text-sm">
-                      <TrendingUp className="w-4 h-4 text-emerald-300" />
+                    <div className="flex items-center gap-2 text-black dark:text-white/80 text-sm">
+                      <TrendingUp className="w-4 h-4 text-green-800 dark:text-emerald-300" />
                       <span>Growth Analytics</span>
                     </div>
-                    <div className="flex items-center gap-2 text-white/80 text-sm">
-                      <PenTool className="w-4 h-4 text-blue-300" />
+                    <div className="flex items-center gap-2 text-black dark:text-white/80 text-sm">
+                      <PenTool className="w-4 h-4 text-blue-800 dark:text-blue-300" />
                       <span>Creative Freedom</span>
                     </div>
                   </div>
@@ -86,7 +86,7 @@ export function CreatorBenefitsBanner({ onOpenModal, dismissible = true }: Creat
                   <Button
                     onClick={onOpenModal}
                     size="lg"
-                    className="bg-white text-primary hover:bg-white/90 font-semibold shadow-lg"
+                    className="bg-black dark:bg-white text-white dark:text-primary hover:bg-black/90 dark:hover:bg-white/90 font-semibold shadow-lg"
                   >
                     Discover Why <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -99,7 +99,7 @@ export function CreatorBenefitsBanner({ onOpenModal, dismissible = true }: Creat
           <motion.div
             animate={{ scaleX: [0, 1] }}
             transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
-            className="h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent origin-left"
+            className="h-1 bg-gradient-to-r from-transparent via-black/50 to-transparent origin-left"
           />
         </motion.div>
       )}

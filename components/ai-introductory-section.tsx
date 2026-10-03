@@ -190,7 +190,7 @@ export function AIIntroductorySection() {
                     key={idx}
                     variants={itemVariants}
                     onClick={() => setActiveFeature(idx)}
-                    className={`p-5 rounded-xl border-2 transition-all duration-300 text-left relative overflow-hidden group`}
+                    className={`p-5 rounded-xl border-1 transition-all duration-300 text-left relative overflow-hidden group`}
                     style={{
                       backgroundColor: theme === 'dark' 
                         ? isActive ? 'rgba(15, 15, 15, 0.95)' : 'rgba(15, 15, 15, 0.5)'
@@ -241,7 +241,7 @@ export function AIIntroductorySection() {
               transition={{ duration: 0.4 }}
               className="relative"
             >
-              <div className={`p-8 md:p-10 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden`}
+              <div className={`p-8 md:p-10 rounded-2xl border-1 backdrop-blur-sm relative overflow-hidden`}
                 style={{
                   backgroundColor: theme === 'dark'
                     ? 'rgba(15, 15, 15, 0.8)'
@@ -285,7 +285,7 @@ export function AIIntroductorySection() {
           {/* Main CTA Section */}
           <motion.div
             variants={itemVariants}
-            className={`p-8 md:p-12 rounded-3xl border-2 backdrop-blur-sm relative overflow-hidden`}
+            className={`p-8 md:p-12 rounded-3xl border-1 backdrop-blur-sm relative overflow-hidden`}
             style={{
               backgroundColor: theme === 'dark'
                 ? 'rgba(15, 15, 15, 0.8)'
@@ -425,7 +425,7 @@ export function AIIntroductorySection() {
               }}
             />
             <p className="text-lg font-medium relative z-10">
-              💡 <span>Are you ready to discover what you can create when AI amplifies your creativity?</span>
+              💡 <span>Be ready to discover what you can create when AI amplifies your creativity!</span>
             </p>
           </motion.div>
           </motion.div>

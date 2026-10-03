@@ -213,7 +213,7 @@ export function ControlSystemSection() {
             <div className="lg:col-span-6 space-y-8 flex flex-col justify-center">
               
               {/* Manifesto Box */}
-              <div className="p-6 md:p-8 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/10 shadow-lg backdrop-blur">
+              <div className="p-6 md:p-8 rounded-2xl bg-gradient-to-br from-primary/5 via-background to-primary/10 shadow-lg backdrop-blur">
                 <blockquote className="space-y-4 font-serif text-lg md:text-xl text-foreground italic leading-relaxed">
                   <p className="font-bold not-italic text-primary border-b border-primary/10 pb-2 mb-4">The Manifesto</p>
                   <p className="opacity-90">“The human is always in control.</p>
