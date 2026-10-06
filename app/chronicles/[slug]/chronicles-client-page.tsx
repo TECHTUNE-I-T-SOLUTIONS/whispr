@@ -44,6 +44,26 @@ interface Post {
   };
 }
 
+interface SuggestedPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  type: 'blog' | 'poem';
+  category: string;
+  tags: string[];
+  cover_image_url?: string;
+  published_at: string;
+  view_count: number;
+  likes_count: number;
+  chronicles_creators: {
+    id: string;
+    pen_name: string;
+    display_name: string;
+    profile_image_url?: string;
+  };
+}
+
 interface Comment {
   id: string;
   content: string;
@@ -90,6 +110,8 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [flagStatus, setFlagStatus] = useState<'pending' | 'under_review' | 'resolved' | 'dismissed' | null>(null);
   const [flagReason, setFlagReason] = useState<string>('');
+  const [suggestedPosts, setSuggestedPosts] = useState<SuggestedPost[]>([]);
+  const [loadingSuggested, setLoadingSuggested] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -113,6 +135,30 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
       checkUserLike(post.id);
     }
   }, [post, authToken]);
+
+  // Fetch suggested posts when post loads
+  useEffect(() => {
+    if (post) {
+      fetchSuggestedPosts();
+    }
+  }, [post]);
+
+  const fetchSuggestedPosts = async () => {
+    if (!post) return;
+    
+    setLoadingSuggested(true);
+    try {
+      const res = await fetch(`/api/chronicles/suggested-posts?postId=${post.id}&type=${post.type}&limit=6`);
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestedPosts(data.posts || []);
+      }
+    } catch (err) {
+      console.error('Error fetching suggested posts:', err);
+    } finally {
+      setLoadingSuggested(false);
+    }
+  };
 
   const checkAuthentication = async () => {
     try {
@@ -871,6 +917,71 @@ export default function PublicPostPage({ initialPost }: PublicPostPageProps) {
         <div className="mt-12">
           <AppBanner postId={post.id} postType="chronicles" />
         </div>
+
+        {/* Suggested Posts */}
+        {suggestedPosts.length > 0 && (
+          <div className="mt-12 pt-12 border-t border-gray-200 dark:border-slate-800">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              You Might Also Like
+            </h2>
+            {loadingSuggested ? (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {suggestedPosts.map((suggestedPost) => (
+                  <Link
+                    key={suggestedPost.id}
+                    href={`/chronicles/${suggestedPost.slug}`}
+                    className="group block"
+                  >
+                    <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 overflow-hidden hover:shadow-lg transition-shadow">
+                      {suggestedPost.cover_image_url && (
+                        <div className="relative h-48 w-full bg-gray-200 dark:bg-slate-800">
+                          <img
+                            src={suggestedPost.cover_image_url}
+                            alt={suggestedPost.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                            }}
+                          />
+                          <div className="absolute top-2 right-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              suggestedPost.type === 'poem'
+                                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                                : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            }`}>
+                              {suggestedPost.type === 'poem' ? '📝 Poem' : '📖 Blog'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                          {suggestedPost.title}
+                        </h3>
+                        {suggestedPost.excerpt && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                            {suggestedPost.excerpt}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                          <span className="flex items-center gap-1">
+                            <span>{suggestedPost.chronicles_creators.display_name || suggestedPost.chronicles_creators.pen_name}</span>
+                          </span>
+                          <span>{suggestedPost.likes_count} likes</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Copyright Footer */}
         <div className="mt-8">

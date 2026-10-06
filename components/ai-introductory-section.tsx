@@ -297,7 +297,7 @@ export function AIIntroductorySection() {
             <motion.div 
               className="absolute inset-0 rounded-3xl"
               style={{
-                background: `linear-gradient(90deg, transparent, ${textAccent}20, transparent)`,
+                backgroundImage: `linear-gradient(90deg, transparent, ${textAccent}20, transparent)`,
                 backgroundSize: '200% 100%',
               }}
               animate={{ 
@@ -420,7 +420,7 @@ export function AIIntroductorySection() {
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               className="absolute inset-0 opacity-10"
               style={{
-                background: `linear-gradient(90deg, transparent, ${textAccent}20, transparent)`,
+                backgroundImage: `linear-gradient(90deg, transparent, ${textAccent}20, transparent)`,
                 backgroundSize: '200% 100%',
               }}
             />

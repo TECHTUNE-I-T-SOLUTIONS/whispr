@@ -8,6 +8,7 @@ import { Reactions } from "@/components/reactions"
 import { Comments } from "@/components/comments"
 import { ShareButtons } from "@/components/share-buttons"
 import { BlogClientPage } from "./blog-client-page"
+import { SuggestedPosts } from "./suggested-posts"
 import { AppBanner } from "@/components/app-banner"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { generateCopyrightMetadata, generateJsonLd } from "@/components/copyright-metadata"
@@ -289,6 +290,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="border-t pt-6 mb-8">
             <AppBanner postId={post.id} postType="post" />
           </div>
+
+          {/* Suggested Posts */}
+          <SuggestedPosts postId={post.id} postType={post.type} />
 
           {/* Copyright Footer */}
           <div className="border-t pt-6">

@@ -1,27 +1,69 @@
 "use client"
 
-import { Suspense, useRef, useState } from "react"
+import { Suspense, useRef, useState, useEffect } from "react"
 import { Comments } from "@/components/comments"
 import { Reactions } from "@/components/reactions"
 import { ShareButtons } from "@/components/share-buttons"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, User, BookOpen } from "lucide-react"
+import { Calendar, Clock, User, BookOpen, Loader2 } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { SafeImage } from "@/components/SafeImage"
 import { MediaPlayer } from "@/components/media-player"
 import AdvancedFeaturesModal from "@/components/advanced-features-modal"
 import { AppBanner } from "@/components/app-banner"
 import { CopyrightFooter } from "@/components/copyright-footer"
+import Link from "next/link"
 
 interface PoemClientPageProps {
   poem: any
+}
+
+interface SuggestedPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  type: 'blog' | 'poem';
+  category: string;
+  tags: string[];
+  cover_image_url?: string;
+  created_at: string;
+  published_at: string;
+  reading_time: number;
+  admin: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url?: string;
+  };
 }
 
 export default function PoemClientPage({ poem }: PoemClientPageProps) {
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/poems/${poem.slug || poem.id}`
   const contentRef = useRef<HTMLDivElement>(null)
   const [autoScrollMode, setAutoScrollMode] = useState(false)
+  const [suggestedPosts, setSuggestedPosts] = useState<SuggestedPost[]>([]);
+  const [loadingSuggested, setLoadingSuggested] = useState(false);
+
+  useEffect(() => {
+    fetchSuggestedPosts();
+  }, [poem.id]);
+
+  const fetchSuggestedPosts = async () => {
+    setLoadingSuggested(true);
+    try {
+      const res = await fetch(`/api/posts/suggested-posts?postId=${poem.id}&type=poem&limit=6`);
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestedPosts(data.posts || []);
+      }
+    } catch (err) {
+      console.error('Error fetching suggested posts:', err);
+    } finally {
+      setLoadingSuggested(false);
+    }
+  };
 
   return (
     <div className="whispr-gradient min-h-screen">
@@ -161,6 +203,67 @@ export default function PoemClientPage({ poem }: PoemClientPageProps) {
           <div className="mt-12">
             <AppBanner postId={poem.id} postType="post" />
           </div>
+
+          {/* Suggested Posts */}
+          {suggestedPosts.length > 0 && (
+            <div className="mt-12 pt-12 border-t border-border">
+              <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
+              {loadingSuggested ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {suggestedPosts.map((post) => (
+                    <Link
+                      key={post.id}
+                      href={`/${post.type === 'poem' ? 'poems' : 'blog'}/${post.slug}`}
+                      className="group block"
+                    >
+                      <div className="bg-card/50 backdrop-blur rounded-lg border border-border overflow-hidden hover:shadow-lg transition-shadow">
+                        {post.cover_image_url && (
+                          <div className="relative h-48 w-full bg-muted">
+                            <img
+                              src={post.cover_image_url}
+                              alt={post.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const img = e.target as HTMLImageElement;
+                                img.style.display = 'none';
+                              }}
+                            />
+                            <div className="absolute top-2 right-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                post.type === 'poem'
+                                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              }`}>
+                                {post.type === 'poem' ? '📝 Poem' : '📖 Blog'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                            {post.title}
+                          </h3>
+                          {post.excerpt && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              {post.excerpt}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{post.admin.full_name || post.admin.username}</span>
+                            <span>{post.reading_time || 1} min read</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Copyright Footer */}
           <div className="mt-8">
