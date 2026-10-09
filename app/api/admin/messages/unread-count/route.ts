@@ -4,7 +4,8 @@ import { createSupabaseServer } from '@/lib/supabase-server'
 
 export async function GET(req: NextRequest) {
   const session = await getAdminFromRequest(req)
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Return 0 gracefully when not authenticated (same as notifications endpoint)
+  if (!session) return NextResponse.json({ count: 0 })
 
   const supabase = createSupabaseServer()
   try {

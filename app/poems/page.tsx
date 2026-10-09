@@ -16,7 +16,7 @@ async function getPoems() {
 
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("*, admin:admin_id(id, username, full_name, avatar_url)")
     .eq("status", "published")
     .eq("type", "poem")
     .order("created_at", { ascending: false })

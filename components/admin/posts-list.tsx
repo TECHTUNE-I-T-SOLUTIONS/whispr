@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { useState } from "react"
-import { AdminAvatarDisplay } from "./admin-avatar-display"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +40,22 @@ import DOMPurify from "dompurify"
 
 type Post = Database["public"]["Tables"]["posts"]["Row"]
 
+/**
+ * The avatar_url stored in the DB is a relative path like "avatars/file.jpg".
+ * Convert it to a full Supabase Storage public URL.
+ */
+function resolveAvatarUrl(avatarPath: string | null | undefined): string | null {
+  if (!avatarPath) return null
+  // If it's already a full URL, return as-is
+  if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) return avatarPath
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!supabaseUrl) return null
+  // Extract just the filename in case it's a nested path
+  const filename = avatarPath.split('/').pop() || avatarPath
+  // Try nested avatars/avatars/filename path first (how the upload stores it)
+  return `${supabaseUrl}/storage/v1/object/public/avatars/avatars/${filename}`
+}
+
 interface PostsListProps {
   data?: Post[]
   currentAdminId?: string | null
@@ -48,10 +64,6 @@ interface PostsListProps {
 export const PostsList = ({ data = [], currentAdminId = null }: PostsListProps) => {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
-
-  const deletePost = async ({ id }: { id: string }) => {
-    await fetch(`/api/admin/posts/${id}`, { method: "DELETE" })
-  }
 
   const columns: ColumnDef<Post>[] = [
     {
@@ -65,15 +77,18 @@ export const PostsList = ({ data = [], currentAdminId = null }: PostsListProps) 
         const post = row.original as any
         const admin = post.admin || {}
         const name = admin.full_name || admin.username || 'Unknown'
+        const initial = name.charAt(0).toUpperCase()
+        // Resolve the stored relative path into a full public storage URL
+        const avatarUrl = resolveAvatarUrl(admin.avatar_url)
 
         return (
           <div className="flex items-center gap-2">
-            <AdminAvatarDisplay
-              adminId={admin.id}
-              adminName={admin.full_name}
-              username={admin.username}
-              size="md"
-            />
+            <Avatar className="w-8 h-8">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+              <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
             <div className="text-sm">{name}</div>
           </div>
         )

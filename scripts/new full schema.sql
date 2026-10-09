@@ -2813,3 +2813,20 @@ CREATE TABLE public.chronicles_prompt_settings (
   CONSTRAINT chronicles_prompt_settings_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.admin(id),
   CONSTRAINT chronicles_prompt_settings_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.admin(id)
 );
+CREATE TABLE public.admin_emails (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  uid integer NOT NULL,
+  subject text NOT NULL,
+  from_name text NOT NULL,
+  from_address text NOT NULL,
+  to_addresses ARRAY NOT NULL,
+  date timestamp with time zone NOT NULL,
+  body_text text,
+  body_html text,
+  folder text NOT NULL DEFAULT 'INBOX'::text,
+  flags ARRAY DEFAULT '{}'::text[],
+  synced_at timestamp with time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_emails_pkey PRIMARY KEY (id)
+);

@@ -21,7 +21,8 @@ async function getPoem(slugOrId: string) {
       admin:admin_id (
         id,
         username,
-        full_name
+        full_name,
+        avatar_url
       )
     `)
     .eq("slug", slugOrId)
@@ -40,7 +41,8 @@ async function getPoem(slugOrId: string) {
           admin:admin_id (
             id,
             username,
-            full_name
+            full_name,
+            avatar_url
           )
         `)
         .eq("id", slugOrId)
