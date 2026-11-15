@@ -66,6 +66,13 @@ export default function HomePage() {
       {/* Creator Benefits Section */}
       <section className="container py-12">
         <CreatorBenefitsSection />
+        <div className="text-center pt-8">
+          <Button asChild className="w-fit bg-primary text-white shadow-lg">
+            <Link href="/why-publish">
+              Learn Why Creators Choose Whispr <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       </section>
 
       {/* Trending Feed */}

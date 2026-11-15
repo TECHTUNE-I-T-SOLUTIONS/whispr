@@ -37,6 +37,13 @@ export default function DailyPoemModal() {
   // For vivid backgrounds per request, ignore reduced motion for background layers
   const bgAnimEnabled = true
 
+  // Tracks the in-flight typewriter timeout so cleanup can cancel every nested
+  // step (not just the initial 250ms one). Without this, stale timeouts keep
+  // appending characters to a reset `typed` state, garbling the poem.
+  const typeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Generation counter aborts any step belonging to a previous poem/typewriter run.
+  const typeGenRef = useRef(0)
+
   // Load poems from a single JSON file in public folder
   useEffect(() => {
     let active = true
@@ -50,7 +57,7 @@ export default function DailyPoemModal() {
         if (res.ok) {
           const data = await res.json()
           console.log("Raw data type:", Array.isArray(data) ? 'array' : typeof data)
-          
+
           // Handle both array format and object format with poems array
           let list: Poem[] = []
           if (Array.isArray(data)) {
@@ -58,7 +65,7 @@ export default function DailyPoemModal() {
           } else if (data && Array.isArray(data.poems)) {
             list = data.poems
           }
-          
+
           console.log("Loaded poems count:", list.length)
           if (active && Array.isArray(list) && list.length > 0) {
             setPoems(list)
@@ -131,9 +138,9 @@ export default function DailyPoemModal() {
     const text = poem!.content
     let i = 0
     let cancelled = false
-    const reduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const gen = ++typeGenRef.current
 
-    if (reduced) {
+    if (reducedMotion) {
       setTyped(text)
       setDone(true)
       // Ensure scrolled to bottom once
@@ -146,7 +153,7 @@ export default function DailyPoemModal() {
     }
 
     function step() {
-      if (cancelled) return
+      if (cancelled || gen !== typeGenRef.current) return
       if (i >= text.length) {
         setDone(true)
         return
@@ -168,13 +175,13 @@ export default function DailyPoemModal() {
         if (viewport) viewport.scrollTop = viewport.scrollHeight
       })
 
-      setTimeout(step, delay)
+      typeTimeoutRef.current = setTimeout(step, delay)
     }
 
-    const t = setTimeout(step, 250)
+    typeTimeoutRef.current = setTimeout(step, 250)
     return () => {
       cancelled = true
-      clearTimeout(t)
+      if (typeTimeoutRef.current) clearTimeout(typeTimeoutRef.current)
     }
   }, [open, poem?.content])
 
@@ -210,7 +217,7 @@ export default function DailyPoemModal() {
     const audio = audioRef.current
     if (open && ambientOn) {
       // pick one ambient track randomly (user will add files named "ambient 1", "ambient 2", ...)
-  const idx = Math.floor(Math.random() * 15) + 1 // try up to 15 by default
+    const idx = Math.floor(Math.random() * 15) + 1 // try up to 15 by default
       audio.src = `/ambient ${idx}.mp3`
       audio.play().catch(() => {/* ignore autoplay restrictions */})
     } else {
