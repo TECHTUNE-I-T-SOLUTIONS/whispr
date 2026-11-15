@@ -13,7 +13,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: "Think Deeper",
-    description: "Use AI to explore ideas from different angles. Brainstorm, refine, and discover new perspectives on your creative work.",
+    detail: "Ask for a second reading of your own work. Whispr AI surfaces the questions a careful editor would ask — what a stanza is really saying, where the rhythm breaks, which image is doing the most work — and offers alternate angles instead of a rewrite.",
     color: "from-blue-500 to-cyan-500",
     bgColor: "rgba(59, 130, 246, 0.1)",
     borderColor: "rgba(59, 130, 246, 0.3)"
@@ -21,7 +21,7 @@ const FEATURES = [
   {
     icon: PenTool,
     title: "Write Better",
-    description: "Get real-time suggestions and feedback. Learn writing techniques while AI helps you articulate your thoughts more effectively.",
+    detail: "Line-level suggestions on clarity, cadence and word choice, explained as you go. You learn the technique behind each note, so the improvement stays with you after the session ends.",
     color: "from-red-500 to-pink-500",
     bgColor: "rgba(168, 85, 247, 0.1)",
     borderColor: "rgba(168, 85, 247, 0.3)"
@@ -29,7 +29,7 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: "Create With Intent",
-    description: "AI as your writing companion, not your replacement. Maintain your authentic voice while improving clarity and impact.",
+    detail: "Whispr AI works as a companion, never a substitute. It proposes alternatives and you decide what belongs in the poem — the voice on the page is always yours.",
     color: "from-amber-500 to-orange-500",
     bgColor: "rgba(245, 158, 11, 0.1)",
     borderColor: "rgba(245, 158, 11, 0.3)"
@@ -37,7 +37,7 @@ const FEATURES = [
   {
     icon: Lightbulb,
     title: "Generate Ideas",
-    description: "Overcome creative blocks with AI-powered brainstorming. Get unique concepts and directions tailored to your style.",
+    detail: "Stuck on a first line? Ask for openings, images or directions built around your own themes rather than generic prompts, then keep the ones that sound like you.",
     color: "from-emerald-500 to-teal-500",
     bgColor: "rgba(16, 185, 129, 0.1)",
     borderColor: "rgba(16, 185, 129, 0.3)"
@@ -45,7 +45,7 @@ const FEATURES = [
   {
     icon: Zap,
     title: "Draft Faster",
-    description: "Speed up your workflow without sacrificing quality. AI handles the mechanics while you focus on the creative vision.",
+    detail: "Formatting, titling, tags and reading-time estimates are handled for you, so the minutes you have for writing go into the writing.",
     color: "from-rose-500 to-red-500",
     bgColor: "rgba(244, 63, 94, 0.1)",
     borderColor: "rgba(244, 63, 94, 0.3)"
@@ -53,7 +53,7 @@ const FEATURES = [
   {
     icon: Target,
     title: "Publish Proudly",
-    description: "Our authenticity checker ensures your content remains truly yours. AI assists, but you always have the final say.",
+    detail: "Before anything goes live, the CONTROL authenticity check confirms the work is predominantly human-written. AI assists; you always have the final say.",
     color: "from-indigo-500 to-violet-500",
     bgColor: "rgba(99, 102, 241, 0.1)",
     borderColor: "rgba(99, 102, 241, 0.3)"
@@ -62,7 +62,10 @@ const FEATURES = [
 
 export function AIIntroductorySection() {
   const { theme } = useTheme()
-  const [hasMounted, setHasMounted] = useState(false)
+  // Start mounted so this section's copy is present in the server-rendered HTML.
+  // (Previously it was gated behind a mount effect, which meant search engines
+  // and AI crawlers that do not execute JS saw an empty section.)
+  const [hasMounted, setHasMounted] = useState(true)
   const [activeFeature, setActiveFeature] = useState(0)
   const [showDemoModal, setShowDemoModal] = useState(false)
 
@@ -99,33 +102,26 @@ export function AIIntroductorySection() {
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden max-w-full">
-      {/* Animated background */}
-      {hasMounted && (
-        <div className="absolute inset-0 -z-10">
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.2, 0.1]
-            }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
-            style={{
-              backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.2)' : 'rgba(145, 26, 27, 0.1)'
-            }}
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.08, 0.15, 0.08]
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
-            style={{
-              backgroundColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(168, 85, 247, 0.1)'
-            }}
-          />
-        </div>
-      )}
+      {/*
+        Ambient background. Static rather than infinitely animating: the two
+        blurred blobs used to run scale+opacity loops forever, which kept the
+        compositor busy for the whole time the homepage was open and hurt
+        Interaction to Next Paint on mobile.
+      */}
+      <div className="absolute inset-0 -z-10" aria-hidden="true">
+        <div
+          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
+          style={{
+            backgroundColor: theme === 'dark' ? 'rgba(241, 65, 68, 0.18)' : 'rgba(145, 26, 27, 0.1)'
+          }}
+        />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
+          style={{
+            backgroundColor: theme === 'dark' ? 'rgba(139, 92, 246, 0.16)' : 'rgba(168, 85, 247, 0.1)'
+          }}
+        />
+      </div>
 
       <div className="container">
         {hasMounted && (
@@ -159,16 +155,9 @@ export function AIIntroductorySection() {
 
             <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
               Elevate Your Creativity,{" "}
-              <motion.span 
-                style={{ color: textAccent }}
-                className="inline-block"
-                animate={{ 
-                  backgroundPosition: ["0%", "100%", "0%"]
-                }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                Don't Replace It
-              </motion.span>
+              <span style={{ color: textAccent }} className="inline-block">
+                Don&apos;t Replace It
+              </span>
             </h2>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -214,8 +203,7 @@ export function AIIntroductorySection() {
                     >
                       <Icon className="w-5 h-5" style={{ color: feature.borderColor.replace('0.3', '1') }} />
                     </div>
-                    <h3 className="text-sm font-bold font-serif mb-2 relative z-10">{feature.title}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 relative z-10">{feature.description}</p>
+                    <h3 className="text-sm font-bold font-serif relative z-10">{feature.title}</h3>
                     
                     {/* Active indicator */}
                     {isActive && (
@@ -249,15 +237,9 @@ export function AIIntroductorySection() {
                   borderColor: activeData.borderColor,
                 }}
               >
-                {/* Animated gradient background */}
-                <motion.div 
-                  className={`absolute inset-0 bg-gradient-to-br ${activeData.color} opacity-5`}
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 5, 0]
-                  }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                />
+                {/* Static gradient wash — re-animating this every frame repainted
+                    the whole panel for no visual gain. */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${activeData.color} opacity-5`} />
                 
                 <div className="relative z-10">
                   <motion.div 
@@ -270,8 +252,11 @@ export function AIIntroductorySection() {
                     <ActiveIcon className="w-8 h-8" style={{ color: activeData.borderColor.replace('0.3', '1') }} />
                   </motion.div>
                   
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: activeData.borderColor.replace('0.3', '1') }}>
+                    Selected feature
+                  </p>
                   <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4">{activeData.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed mb-6">{activeData.description}</p>
+                  <p className="text-muted-foreground leading-relaxed mb-6">{activeData.detail}</p>
                   
                   <div className="flex items-center gap-2 text-sm font-medium" style={{ color: activeData.borderColor.replace('0.3', '1') }}>
                     <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: activeData.borderColor.replace('0.3', '1') }} />
@@ -293,17 +278,12 @@ export function AIIntroductorySection() {
               borderColor: `${textAccent}40`,
             }}
           >
-            {/* Animated border gradient */}
-            <motion.div 
+            {/* Static top-edge highlight (was an infinitely sliding gradient) */}
+            <div
               className="absolute inset-0 rounded-3xl"
               style={{
-                backgroundImage: `linear-gradient(90deg, transparent, ${textAccent}20, transparent)`,
-                backgroundSize: '200% 100%',
+                backgroundImage: `linear-gradient(90deg, transparent, ${textAccent}14, transparent)`,
               }}
-              animate={{ 
-                backgroundPosition: ['0% 0%', '200% 0%', '0% 0%']
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             />
             
             <div className="relative z-10 space-y-8">

@@ -4,8 +4,9 @@ import { AboutStats } from "@/components/about-stats"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 
 // metadata here
-export const metadata = {
-  title: "About Whispr - Whispr | Know about Whispr",
+export const metadata = {  alternates: { canonical: "https://whisprwords.com/about" },
+
+  title: "About Whispr — a home for original poetry and stories",
   description:
     "Learn about Whispr, the innovative platform for sharing stories and experiences, and discover what makes it special.",
 }

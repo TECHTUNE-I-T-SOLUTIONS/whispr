@@ -62,8 +62,9 @@ function getGenreBadgeIcon(genre: string) {
   }
 }
 
-export const metadata = {
-  title: "Whispering Stories - Creative Reading Platform",
+export const metadata = {  alternates: { canonical: "https://whisprwords.com/stories" },
+
+  title: "Whisper Stories — Serialized Fiction to Read Online",
   description: "Explore immersive, community-written stories across fantasy, sci-fi, adventure, mystery, and more on Whispr. Strictly moderated, family-friendly high-quality literature.",
 }
 

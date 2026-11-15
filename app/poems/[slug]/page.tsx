@@ -3,6 +3,7 @@ import PoemClientPage from "./PoemClientPage"
 import { createSupabaseServer } from "@/lib/supabase-server"
 import { markdownToHtml } from "@/lib/utils"
 import { generateCopyrightMetadata, generateJsonLd } from "@/components/copyright-metadata"
+import { breadcrumbJsonLd } from "@/lib/seo"
 
 interface PoemPageProps {
   params: Promise<{
@@ -80,6 +81,9 @@ export async function generateMetadata({ params }: PoemPageProps) {
     modifiedDate,
     canonicalUrl,
     articleType: 'poem',
+    excerpt: poem.excerpt || poem.content,
+    image: (poem as any).cover_image_url || (poem as any).image_url || (poem as any).featured_image || null,
+    keywords: Array.isArray((poem as any).tags) ? (poem as any).tags : null,
   })
 }
 
@@ -105,6 +109,9 @@ export default async function PoemPage({ params }: PoemPageProps) {
     modifiedDate: poem.updated_at,
     canonicalUrl,
     articleType: 'poem',
+    excerpt: poem.excerpt || poem.content,
+    image: (poem as any).cover_image_url || (poem as any).image_url || (poem as any).featured_image || null,
+    keywords: Array.isArray((poem as any).tags) ? (poem as any).tags : null,
   })
 
   // Pass HTML content to client page
@@ -113,6 +120,18 @@ export default async function PoemPage({ params }: PoemPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            breadcrumbJsonLd([
+              { name: "Home", path: "/" },
+              { name: "Poems", path: "/poems" },
+              { name: poem.title, path: `/poems/${poem.slug || poem.id}` },
+            ]),
+          ).replace(/</g, "\\u003c"),
+        }}
       />
       <PoemClientPage poem={{ ...poem, content: htmlContent }} />
     </>

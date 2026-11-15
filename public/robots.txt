@@ -1,48 +1,116 @@
+# WhisprWords — https://whisprwords.com
+# AI policy: "gatekeeper", not "fortress".
+# Read-and-cite agents are welcome. Training-only crawlers are not.
+# Full policy: https://whisprwords.com/llms.txt
+
 User-agent: *
 Allow: /
+Allow: /poems
+Allow: /stories
+Allow: /blog
+Allow: /chronicles
+Allow: /community
+Allow: /about
+Allow: /why-publish
 
 Disallow: /admin/
 Disallow: /api/
+Disallow: /auth/
+Disallow: /verify/
 Disallow: /chronicles/dashboard
-Disallow: /chronicles/dashboard/
 Disallow: /chronicles/write
-Disallow: /chronicles/write/
 Disallow: /chronicles/analytics
-Disallow: /chronicles/analytics/
 Disallow: /chronicles/settings
-Disallow: /chronicles/settings/
 Disallow: /chronicles/posts
-Disallow: /chronicles/posts/
 Disallow: /chronicles/chains
-Disallow: /chronicles/chains/
+Disallow: /*?*preview=
+Disallow: /*/edit
 
-# AI Crawler Control
-# Creators retain copyright. AI training prohibited unless permission granted.
-User-agent: GPTBot
-Disallow: /
+# ---------------------------------------------------------------------------
+# Search engines — always welcome
+# ---------------------------------------------------------------------------
+User-agent: Googlebot
+Allow: /
 
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ---------------------------------------------------------------------------
+# AI assistants that read and cite at query time — WELCOME
+# These surface Whispr poems in ChatGPT, Perplexity, Claude and AI answer
+# engines without adding our content to a training corpus.
+# ---------------------------------------------------------------------------
 User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+# ---------------------------------------------------------------------------
+# Training-only crawlers — NOT permitted
+# Creators retain copyright. Whispr does not license poems for model training.
+# ---------------------------------------------------------------------------
+User-agent: GPTBot
 Disallow: /
 
 User-agent: CCBot
 Disallow: /
 
-User-agent: Google-Extended
-Disallow: /
-
 User-agent: anthropic-ai
 Disallow: /
 
-User-agent: Claude-Web
+User-agent: ClaudeBot
 Disallow: /
 
-User-agent: PerplexityBot
-Disallow: /
-
-User-agent: YouBot
+User-agent: Google-Extended
 Disallow: /
 
 User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: omgili
+Disallow: /
+
+User-agent: Scrapy
 Disallow: /
 
 Sitemap: https://whisprwords.com/sitemap.xml

@@ -49,14 +49,11 @@ export default function DailyPoemModal() {
     let active = true
     ;(async () => {
       try {
-        // Add timestamp to bust cache
-        const timestamp = Date.now()
-        console.log("Loading poems from /data/daily-poems.json with timestamp:", timestamp)
-        const res = await fetch(`/data/daily-poems.json?t=${timestamp}`, { cache: "no-store" })
-        console.log("Fetch response:", res.ok, res.status)
+        // Cached: the daily-poem set changes rarely, so a no-store refetch on
+        // every page view only cost a round trip.
+        const res = await fetch("/data/daily-poems.json")
         if (res.ok) {
           const data = await res.json()
-          console.log("Raw data type:", Array.isArray(data) ? 'array' : typeof data)
 
           // Handle both array format and object format with poems array
           let list: Poem[] = []
@@ -66,15 +63,9 @@ export default function DailyPoemModal() {
             list = data.poems
           }
 
-          console.log("Loaded poems count:", list.length)
           if (active && Array.isArray(list) && list.length > 0) {
             setPoems(list)
-            console.log("Poems loaded successfully")
-          } else {
-            console.error("Invalid poems data format")
           }
-        } else {
-          console.error("Failed to fetch poems:", res.status, res.statusText)
         }
       } catch (error) {
         // If JSON fails, show error but don't use fallback
@@ -130,59 +121,19 @@ export default function DailyPoemModal() {
     } catch {}
   }, [storageKey, offsetKey, loading, poem])
 
-  // Typewriter effect with gentle pacing and auto-scroll; respect prefers-reduced-motion
+  // Render the full poem immediately and reveal it with a soft CSS fade.
+  // The previous character-by-character typewriter was cancelled/re-started on
+  // every re-render, so the text was frequently captured mid-word — that is the
+  // garbled "Today's Whisper" text reported in the site audit.
   useEffect(() => {
     if (!open || !poem) return
-    setTyped("")
-    setDone(false)
-    const text = poem!.content
-    let i = 0
-    let cancelled = false
-    const gen = ++typeGenRef.current
-
-    if (reducedMotion) {
-      setTyped(text)
-      setDone(true)
-      // Ensure scrolled to bottom once
-      requestAnimationFrame(() => {
-        const root = scrollAreaRef.current
-        const viewport = root?.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement | null
-        if (viewport) viewport.scrollTop = viewport.scrollHeight
-      })
-      return
-    }
-
-    function step() {
-      if (cancelled || gen !== typeGenRef.current) return
-      if (i >= text.length) {
-        setDone(true)
-        return
-      }
-      setTyped((prev) => prev + text[i])
-      i += 1
-
-      // pacing: base speed + pauses on punctuation and line breaks
-      const ch = text[i - 1]
-      let delay = 28 // ms per char
-      if (ch === "\n") delay = 220
-      else if (",.;".includes(ch)) delay = 60
-      else if ("!?".includes(ch)) delay = 140
-
-      // auto-scroll to bottom
-      requestAnimationFrame(() => {
-        const root = scrollAreaRef.current
-        const viewport = root?.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement | null
-        if (viewport) viewport.scrollTop = viewport.scrollHeight
-      })
-
-      typeTimeoutRef.current = setTimeout(step, delay)
-    }
-
-    typeTimeoutRef.current = setTimeout(step, 250)
-    return () => {
-      cancelled = true
-      if (typeTimeoutRef.current) clearTimeout(typeTimeoutRef.current)
-    }
+    setTyped(poem.content)
+    setDone(true)
+    requestAnimationFrame(() => {
+      const root = scrollAreaRef.current
+      const viewport = root?.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement | null
+      if (viewport) viewport.scrollTop = 0
+    })
   }, [open, poem?.content])
 
   const dontShowAgainToday = () => {

@@ -187,7 +187,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       publishedDate: post.published_at || post.created_at,
       modifiedDate: post.updated_at,
       canonicalUrl,
-      articleType: post.type === 'poem' ? 'poem' : 'blog'
+      articleType: post.type === 'poem' ? 'poem' : 'blog',
+      excerpt: post.excerpt || post.content,
+      image: post.cover_image_url || post.image_url || post.featured_image || null,
+      keywords: Array.isArray(post.tags) ? post.tags : null,
     })
   } catch {
     return {}

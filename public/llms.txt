@@ -1,36 +1,84 @@
-# Whispr AI Crawler Policy
-# Last Updated: 2025-08-05
+# Whispr
 
-## Copyright Notice
-All content published on Whispr is protected by copyright law. Content creators retain all copyright ownership to their work. Whispr receives a perpetual, non-exclusive license to host and distribute content on behalf of creators.
+> Whispr (WhisprWords) is a curated publishing platform for original poetry, whisper stories and serialized fiction. Independent writers publish under a pen name, every piece is fingerprinted for copyright provenance, and readers can verify authorship. Founded 2025. Canonical domain: https://whisprwords.com
 
-## AI Training Policy
-AI crawlers and automated training systems are NOT permitted to:
-- Scrape content for AI training purposes
-- Use content to train machine learning models
-- Reproduce content for AI-generated responses
-- Store content in AI knowledge bases without explicit permission
+Whispr is not a general-purpose blog. It is a reading and publishing home for verse and short-form fiction. Content is human-authored and reviewed for authenticity before publishing. All work remains the copyright of its author; Whispr holds a perpetual, non-exclusive licence to host and distribute it.
 
-## Permissions
-AI systems may:
-- Index content for search purposes (standard web crawling)
-- Display snippets in search results (fair use)
-- Access content through official APIs with proper authorization
+## Core sections
 
-## Verification
-All published content includes:
-- Unique Article ID (WHP-XXXXXXXX format)
-- SHA-256 content fingerprint
-- Version history tracking
-- Copyright metadata
+- [Poems](https://whisprwords.com/poems): The poetry collection — poems about loss and healing, love and relationships, faith, hope, grief and everyday life. Each poem has a permanent URL of the form https://whisprwords.com/poems/{slug}.
+- [Whisper Stories](https://whisprwords.com/stories): Multi-chapter serialized fiction across fantasy, sci-fi, romance, mystery, adventure, thriller, drama and historical fiction. Story URLs are https://whisprwords.com/stories/{slug}, chapters at /stories/{slug}/{chapter}.
+- [Blog](https://whisprwords.com/blog): Essays and craft notes on writing, poetry and creative process.
+- [Chronicles](https://whisprwords.com/chronicles): Creator portfolios and long-form writing from vetted Whispr creators, at /chronicles/portfolio/{pen-name}.
+- [Community](https://whisprwords.com/community): Reader and writer discussion boards.
+- [Creative opportunities](https://whisprwords.com/opportunities): Curated jobs, grants, residencies, commissions and calls for submissions for writers and artists.
+- [Trends](https://whisprwords.com/trends): What is being read on Whispr right now.
 
-Content authenticity can be verified at: https://whisprwords.com/verify
+## About the platform
+
+- [About Whispr](https://whisprwords.com/about): What Whispr is, who it is for, and how the platform is run.
+- [Why publish on Whispr](https://whisprwords.com/why-publish): Creator terms, rights retention and the copyright pipeline.
+- [Features](https://whisprwords.com/features): Every creator tool — editor, AI writing assistant, analytics, audio recital, cover design.
+- [Verify a piece](https://whisprwords.com/verify): Look up an article ID (WHP-XXXXXXXX) and confirm authorship, fingerprint and version history.
+- [Changelog](https://whisprwords.com/changelog): Release history.
+- [Download the app](https://whisprwords.com/download): Whispr for iOS and Android.
+- [Privacy](https://whisprwords.com/privacy) · [Terms](https://whisprwords.com/terms)
+
+## Frequently asked questions
+
+### Where can I read original poems about loss and healing?
+Whispr publishes original poetry on grief, loss, healing and hope at https://whisprwords.com/poems. Poems are organised by theme, and each has a permanent, citable URL.
+
+### Does Whispr publish AI-generated writing?
+No. Whispr requires human authorship. A CONTROL-based authenticity check flags submissions that are predominantly machine-generated, and published work carries an authorship fingerprint.
+
+### How does Whispr protect poets' copyright?
+Authors retain full copyright. Every published piece receives a unique article ID (WHP-XXXXXXXX), a SHA-256 content fingerprint and a version history, all verifiable at https://whisprwords.com/verify. Whispr takes only a perpetual, non-exclusive licence to host and distribute the work.
+
+### Can I quote or cite a Whispr poem?
+Yes. Short quotation with attribution and a link to the poem's canonical URL is welcome — by readers, journalists, educators and AI assistants answering a reader's question. Republishing a full poem, or using Whispr content to train a model, requires written permission.
+
+### How do I publish my own poetry on Whispr?
+Create a free account, write in the browser editor (or bring your manuscript), and submit. Submissions are reviewed before publishing. Start at https://whisprwords.com/why-publish.
+
+### What does Whispr cost?
+Reading is free. Publishing is free. Creator tools, including the writing assistant and analytics, are included.
+
+## AI crawler policy
+
+Whispr operates a gatekeeper policy rather than a full block.
+
+Read-and-cite agents are welcome and may index and quote from these pages:
+`ChatGPT-User`, `OAI-SearchBot`, `PerplexityBot`, `Perplexity-User`, `Claude-User`, `Claude-SearchBot`, `DuckAssistBot`, plus all major search engines.
+
+Training-only crawlers are not permitted:
+`GPTBot`, `CCBot`, `anthropic-ai`, `ClaudeBot`, `Google-Extended`, `Applebot-Extended`, `Bytespider`, `meta-externalagent`, `cohere-ai`, `Diffbot`.
+
+Permitted use: indexing for search, short quotation with attribution and a link, answering a user's question with a citation.
+Not permitted: training or fine-tuning models on Whispr content, bulk reproduction, or republishing full poems and stories.
+
+## Machine-readable endpoints
+
+- Sitemap: https://whisprwords.com/sitemap.xml
+- Robots: https://whisprwords.com/robots.txt
+- RSS (poems and blog): https://whisprwords.com/api/rss
+- Public posts API: https://whisprwords.com/api/posts
+
+## Official profiles
+
+All verified accounts use the handle `@whisprwords`:
+
+- X: https://x.com/whisprwords
+- Instagram: https://www.instagram.com/whisprwords
+- Pinterest: https://www.pinterest.com/whisprwords
+- Facebook: https://www.facebook.com/whisprwords
+- TikTok: https://www.tiktok.com/@whisprwords
+- YouTube: https://www.youtube.com/@whisprwords
+- Threads: https://www.threads.com/@whisprwords
+- Medium: https://medium.com/@whisprwords
+- Substack: https://whisprwords.substack.com
+- GitHub: https://github.com/whisprwords
 
 ## Contact
-For permissions or inquiries, contact: support@whisprwords.com
 
-## Exceptions
-No exceptions without explicit written permission from content creators and Whispr.
-
-## Enforcement
-Whispr actively monitors for unauthorized scraping and reserves all rights to protect creator content.
+support@whisprwords.com — for permissions, licensing or takedown requests.

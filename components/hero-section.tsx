@@ -103,6 +103,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
+            <span className="sr-only">Original poetry, whisper stories and verse — </span>
             Welcome to Whispr
           </motion.h1>
           <motion.p
@@ -124,7 +125,7 @@ export function HeroSection() {
           <Button asChild size="lg" className="group shadow-md">
             <Link href="/poems">
               <BookOpen className="mr-2 h-4 w-4" />
-              Explore Poems
+              Read Today&apos;s Whisper
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
@@ -134,7 +135,7 @@ export function HeroSection() {
             size="lg"
             className="bg-background text-foreground shadow-md"
           >
-            <Link href="/blog">Read Blog</Link>
+            <Link href="/why-publish">Submit Your Poem</Link>
           </Button>
         </motion.div>
       </div>

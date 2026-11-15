@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Clock, User, ArrowRight } from "lucide-react"
 import { createSupabaseServer } from "@/lib/supabase-server"
+import { clampText, plainText } from "@/lib/seo"
 
 async function getRecentPosts() {
   try {
@@ -82,7 +83,9 @@ export async function RecentPosts() {
               </h3>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{post.excerpt}</p>
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                {clampText(plainText(post.excerpt), 140)}
+              </p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-xs text-muted-foreground">
                   <User className="h-3 w-3 mr-1" />

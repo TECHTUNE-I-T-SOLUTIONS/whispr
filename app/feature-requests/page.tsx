@@ -3,8 +3,9 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { FeatureRequestsClient } from "./feature-requests-client"
 
-export const metadata: Metadata = {
-  title: "Feature Requests — Whispr",
+export const metadata: Metadata = {  alternates: { canonical: "https://whisprwords.com/feature-requests" },
+
+  title: "Feature Requests — Help Shape Whispr",
   description:
     "Suggest a feature, request an improvement, or vote on ideas from the Whispr community. No account required — help shape what we build next.",
 }

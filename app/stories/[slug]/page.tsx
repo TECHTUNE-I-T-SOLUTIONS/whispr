@@ -42,6 +42,9 @@ export async function generateMetadata({ params }: StoryPageProps) {
     modifiedDate,
     canonicalUrl,
     articleType: 'story',
+    excerpt: story.description || story.synopsis || null,
+    image: story.cover_image_url || null,
+    keywords: Array.isArray(story.tags) ? story.tags : null,
   })
 }
 

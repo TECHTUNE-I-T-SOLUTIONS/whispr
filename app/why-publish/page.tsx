@@ -1,5 +1,20 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
+import { buildMetadata } from "@/lib/seo"
+
+export const metadata: Metadata = buildMetadata({
+  title: "Why Publish on Whispr — Keep Your Copyright",
+  description:
+    "Publish poetry and stories on Whispr and keep full copyright. Every piece gets a permanent article ID, a SHA-256 fingerprint and a verifiable version history — plus readers who are actually looking for verse.",
+  path: "/why-publish",
+  keywords: [
+    "publish poetry online",
+    "keep copyright as a writer",
+    "poetry publishing platform",
+    "where to publish poems",
+  ],
+})
 import {
   ArrowRight,
   Heart,

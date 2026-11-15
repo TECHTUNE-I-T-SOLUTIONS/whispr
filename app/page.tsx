@@ -1,24 +1,51 @@
 import { Suspense } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { CookieConsentModal } from "@/components/CookieConsentModal"
 import { FeaturedPosts } from "@/components/featured-posts"
 import { RecentPosts } from "@/components/recent-posts"
 import { HeroSection } from "@/components/hero-section"
-import DailyPoemModal from "@/components/daily-poem-modal"
-import { AdsterraBanner } from "@/components/AdsterraBanner"
 import { ChroniclesFeatureSection } from "@/components/chronicles-feature-section"
 import { AIIntroductorySection } from "@/components/ai-introductory-section"
 import { ControlSystemSection } from "@/components/control-system-section"
 import { CreatorBenefitsSection } from "@/components/creator-benefits-section"
+import { HomeSeoContent } from "@/components/home-seo-content"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, Wand2, Rocket, Search, Compass, Sparkles, LayoutGrid } from "lucide-react"
-import TrendingFeed from "@/components/ai/TrendingFeed"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { buildMetadata } from "@/lib/seo"
 
-export const revalidate = 300 // 5 minutes
+/*
+ * Below-the-fold client components are code-split so the first paint only
+ * carries the hero + copy. They hydrate from their own chunks once the page
+ * is interactive, which keeps LCP and TBT down on mobile.
+ */
+const DailyPoemModal = dynamic(() => import("@/components/daily-poem-modal"))
+const TrendingFeed = dynamic(() => import("@/components/ai/TrendingFeed"))
+const AdsterraBanner = dynamic(() =>
+  import("@/components/AdsterraBanner").then((m) => m.AdsterraBanner),
+)
+
+export const revalidate = 300 // 5 minutes — homepage is served as cached static HTML
+
+export const metadata = buildMetadata({
+  title: "Whispr — Original Poetry, Whisper Stories & Verse",
+  description:
+    "Read original poetry about love, loss and healing, plus serialized whisper stories from independent writers. Publish your own work with copyright protection built in.",
+  path: "/",
+  keywords: [
+    "original poetry",
+    "poems about loss and healing",
+    "daily original poetry online",
+    "read poems online free",
+    "whisper stories",
+    "serialized fiction",
+    "publish poetry online",
+    "poetry copyright protection",
+  ],
+})
 
 export default function HomePage() {
-
   return (
     <div className="whispr-gradient min-h-screen relative overflow-hidden">
       {/* Mesh/Grid Background combining with primary color */}
@@ -148,16 +175,19 @@ export default function HomePage() {
       </section>
 
       <section className="container py-16">
-        <Suspense fallback={<div>Loading featured content...</div>}>
+        <Suspense fallback={<FeaturedPostsSkeleton />}>
           <FeaturedPosts />
         </Suspense>
       </section>
 
       <section className="container py-16">
-        <Suspense fallback={<div>Loading recent posts...</div>}>
+        <Suspense fallback={<RecentPostsSkeleton />}>
           <RecentPosts />
         </Suspense>
       </section>
+
+      {/* Crawlable prose, internal links and FAQPage schema */}
+      <HomeSeoContent />
 
       {/* Adsterra banners below main content */}
       <ErrorBoundary fallback={null}>
@@ -165,4 +195,45 @@ export default function HomePage() {
       </ErrorBoundary>
     </div>
   );
+}
+
+function FeaturedPostsSkeleton() {
+  return (
+    <div className="space-y-8" aria-hidden="true">
+      <div className="text-center space-y-3">
+        <div className="mx-auto h-8 w-40 rounded bg-muted/50" />
+        <div className="mx-auto h-4 w-72 rounded bg-muted/40" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-border/20 p-6">
+            <div className="h-4 w-16 rounded bg-muted/50" />
+            <div className="mt-4 h-6 w-3/4 rounded bg-muted/50" />
+            <div className="mt-3 h-4 w-full rounded bg-muted/40" />
+            <div className="mt-2 h-4 w-5/6 rounded bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RecentPostsSkeleton() {
+  return (
+    <div className="space-y-8" aria-hidden="true">
+      <div className="text-center space-y-3">
+        <div className="mx-auto h-8 w-56 rounded bg-muted/50" />
+        <div className="mx-auto h-4 w-80 rounded bg-muted/40" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-border/20 p-6">
+            <div className="h-4 w-16 rounded bg-muted/50" />
+            <div className="mt-4 h-6 w-2/3 rounded bg-muted/50" />
+            <div className="mt-3 h-4 w-full rounded bg-muted/40" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

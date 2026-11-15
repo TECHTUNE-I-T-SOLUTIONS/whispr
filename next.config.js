@@ -3,7 +3,27 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Ship smaller client bundles: only the icons/modules actually imported get
+  // pulled in, instead of whole package barrels.
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "date-fns",
+      "recharts",
+      "@radix-ui/react-icons",
+      "sonner",
+      "cmdk",
+    ],
+  },
+  compress: true,
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2592000,
+    deviceSizes: [360, 420, 640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       // Localhost development
       {
@@ -67,6 +87,27 @@ const nextConfig = {
         hostname: '*.net',
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Let AI answer engines read and cite, but not train on, our pages.
+          { key: 'Content-Usage', value: 'search=yes, ai-train=no' },
+        ],
+      },
+      {
+        source: '/data/:file*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800' }],
+      },
+      {
+        source: '/:file(robots.txt|llms.txt|sitemap.xml)',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' }],
+      },
+    ]
   },
 }
 

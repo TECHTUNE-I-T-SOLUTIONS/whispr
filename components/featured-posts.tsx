@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, User } from "lucide-react"
 import { createSupabaseServer } from "@/lib/supabase-server"
+import { clampText, plainText } from "@/lib/seo"
 
 async function getFeaturedPosts() {
   try {
@@ -81,7 +82,9 @@ export async function FeaturedPosts() {
               </h3>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{post.excerpt}</p>
+              <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                {clampText(plainText(post.excerpt), 180)}
+              </p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-xs text-muted-foreground">
                   <User className="h-3 w-3 mr-1" />

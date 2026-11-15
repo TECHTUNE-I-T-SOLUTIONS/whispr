@@ -4,8 +4,9 @@ import { Lightbulb, ArrowRight } from "lucide-react"
 import { CommunityClient } from "./community-client"
 import { PinnedFeatureRequests } from "./pinned-feature-requests"
 
-export const metadata: Metadata = {
-  title: "Community — Whispr",
+export const metadata: Metadata = {  alternates: { canonical: "https://whisprwords.com/community" },
+
+  title: "Community — Reader & Writer Discussions",
   description:
     "Lodge a complaint, ask a question or share a suggestion. Search existing issues first — our team replies quickly. No account required.",
 }

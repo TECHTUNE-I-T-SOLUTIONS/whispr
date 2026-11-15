@@ -433,7 +433,7 @@ export default function ChroniclesWaitlist() {
                       required
                     />
                     <span className="text-[10px] text-slate-500 flex items-center gap-1.5 mt-2">
-                      <Lock className="h-3 w-3 text-red-400" /> Passwords are encrypted utilizing military-grade hashing.
+                      <Lock className="h-3 w-3 text-red-400" /> Passwords are protected with secure, industry-standard encryption.
                     </span>
                   </div>
                 </div>

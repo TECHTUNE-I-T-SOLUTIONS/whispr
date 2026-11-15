@@ -3,8 +3,9 @@ import { BlogList } from "@/components/blog-list"
 import { BlogHero } from "@/components/blog-hero"
 import { AdsterraBanner } from "@/components/AdsterraBanner"
 
-export const metadata = {
-  title: "Blog - Whispr | Whispr's Thoughts & Musings",
+export const metadata = {  alternates: { canonical: "https://whisprwords.com/blog" },
+
+  title: "Writing Craft Blog — Essays on Poetry & Creative Process",
   description:
     "Explore Whispr's collection of thoughtful blog posts about writing, creativity, and life's quiet moments.",
 }

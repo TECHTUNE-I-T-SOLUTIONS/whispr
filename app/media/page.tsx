@@ -1,8 +1,9 @@
 import { Suspense } from "react"
 import { SpokenWordsGallery } from "@/components/spoken-words-gallery"
 
-export const metadata = {
-  title: "Spoken Words - Whispr",
+export const metadata = {  alternates: { canonical: "https://whisprwords.com/media" },
+
+  title: "Spoken Words — Listen to Poems Read Aloud",
   description: "Browse and enjoy our collection of audio and video spoken words",
 }
 

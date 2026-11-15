@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import { Github, ExternalLink, Calendar, Tag, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export const metadata: Metadata = {
-  title: 'Changelog - Whispr',
+export const metadata: Metadata = {  alternates: { canonical: "https://whisprwords.com/changelog" },
+
+  title: "Changelog — What's New on Whispr",
   description: 'View the latest updates, features, and improvements to Whispr',
 };
 
