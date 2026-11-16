@@ -117,7 +117,8 @@
   },
   "resolutions": {
     "esbuild": "0.23.1",
-    "@esbuild/*": "0.23.1"
+    "@esbuild/*": "0.23.1",
+    "@firebase/database-compat": "2.1.7"
   },
   "packageManager": "yarn@4.12.0"
 }
