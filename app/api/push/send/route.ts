@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase-server';
+import { sendMobilePushToAll, sendMobilePushToUsers } from '@/lib/mobile-push';
 import webpush from 'web-push';
 
 // Prefer realtime VAPID keys when present, fall back to legacy envs
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-  console.info(`push/send: targeting ${subscriptions.length} subscriptions`);
+  console.info(`push/send: targeting ${subscriptions?.length ?? 0} subscriptions`);
 
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({
@@ -142,12 +143,36 @@ export async function POST(request: NextRequest) {
     const successful = results.filter(result => result.status === 'fulfilled' && result.value.success).length;
     const failed = results.length - successful;
 
+    // Mirror to mobile (FCM). Skipped for the single-endpoint welcome flow,
+    // which is a browser-only handshake and must not fan out to every phone.
+    let mobile: { sent: number; failed: number; pruned: number; error?: string } | null = null;
+    if (!targetEndpoint) {
+      const mobilePayload = {
+        title,
+        body,
+        link: url || '/',
+        image: image || '/logotype.png',
+        type: type || 'general',
+      };
+      const result =
+        targetUsers && targetUsers.length > 0
+          ? await sendMobilePushToUsers(targetUsers, mobilePayload)
+          : await sendMobilePushToAll(mobilePayload);
+      mobile = {
+        sent: result.sent,
+        failed: result.failed,
+        pruned: result.pruned,
+        ...(result.error ? { error: result.error } : {}),
+      };
+    }
+
     return NextResponse.json({
       success: true,
       message: `Push notifications sent: ${successful} successful, ${failed} failed`,
       sent: successful,
       failed,
-      total: subscriptions.length
+      total: subscriptions.length,
+      ...(mobile ? { mobile } : {}),
     });
 
   } catch (error) {

@@ -1,4 +1,8 @@
 import { createSupabaseServer } from '@/lib/supabase-server';
+import {
+  sendMobilePushToUser,
+  sendMobilePushMirroringWeb,
+} from '@/lib/mobile-push';
 
 export interface PushNotificationData {
   title: string;
@@ -109,12 +113,28 @@ export async function sendPushNotificationToSubscribers(notificationData: PushNo
     const successful = results.filter(result => result.status === 'fulfilled' && result.value.success).length;
     const failed = results.length - successful;
 
+    // Mirror the same announcement to mobile (FCM). Never throws: an FCM
+    // outage must not turn a successful web broadcast into an error.
+    const mobile = await sendMobilePushMirroringWeb({
+      title: notificationData.title,
+      body: notificationData.body,
+      url: notificationData.url,
+      image: notificationData.image,
+      type: notificationData.type,
+    });
+
     return {
       success: true,
       message: `Push notifications sent: ${successful} successful, ${failed} failed`,
       sent: successful,
       failed,
-      total: subscriptions.length
+      total: subscriptions.length,
+      mobile: {
+        sent: mobile.sent,
+        failed: mobile.failed,
+        pruned: mobile.pruned,
+        ...(mobile.error ? { error: mobile.error } : {}),
+      },
     };
 
   } catch (error) {
@@ -237,7 +257,15 @@ export async function notifyCreator(
       }
     }
 
-    return { success: true, sent };
+    // Same notification to the creator's phones.
+    const mobile = await sendMobilePushToUser(creatorUserId, {
+      title,
+      body,
+      link: url,
+      type: 'creator_notification',
+    });
+
+    return { success: true, sent, mobile: { sent: mobile.sent, failed: mobile.failed, pruned: mobile.pruned } };
   } catch (error) {
     console.error('Error notifying creator:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
