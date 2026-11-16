@@ -61,9 +61,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
     }
 
+    // The stored counters are only maintained by triggers, so they can lag
+    // behind (or stay at 0 for older accounts). Count the real rows instead.
+    const [{ data: posts }, { data: chains }] = await Promise.all([
+      supabase
+        .from('chronicles_posts')
+        .select('id, post_type, status, likes_count, comments_count, shares_count, views_count')
+        .eq('creator_id', creator.id),
+      supabase
+        .from('chronicles_writing_chains')
+        .select('id')
+        .eq('created_by', creator.id),
+    ]);
+
+    const allPosts = posts || [];
+    const published = allPosts.filter((p) => p.status === 'published');
+    const totalBlogs = published.filter((p) => p.post_type !== 'poem').length;
+    const totalPoems = published.filter((p) => p.post_type === 'poem').length;
+    const engagement = published.reduce(
+      (sum, p) =>
+        sum +
+        (p.likes_count || 0) +
+        (p.comments_count || 0) +
+        (p.shares_count || 0),
+      0
+    );
+
     return NextResponse.json({
-      totalPosts: creator.total_posts || 0,
-      totalEngagement: creator.total_engagement || 0,
+      // Keys the mobile profile screen reads.
+      postCount: published.length,
+      totalBlogs,
+      totalPoems,
+      totalChains: (chains || []).length,
+      totalPoints: creator.points || 0,
+      // Keys the web dashboard reads.
+      totalPosts: published.length || creator.total_posts || 0,
+      totalEngagement: engagement || creator.total_engagement || 0,
       currentStreak: creator.streak_count || 0,
       longestStreak: creator.longest_streak || 0,
       points: creator.points || 0,

@@ -140,7 +140,18 @@ export async function GET(request: NextRequest) {
 // Mark notifications as read or update
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    // Mobile app authenticates with a Bearer token; the web uses cookies.
+    const authHeader = request.headers.get('authorization');
+    const supabase =
+      authHeader && authHeader.startsWith('Bearer ')
+        ? createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+              global: { headers: { Authorization: authHeader } },
+            }
+          )
+        : await createSupabaseServerClient();
 
     // Get authenticated user
     const {
