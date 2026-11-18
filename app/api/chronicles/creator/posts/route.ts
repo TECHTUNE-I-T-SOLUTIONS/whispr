@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     const { data: creator, error: creatorError } = await accessClient
       .from('chronicles_creators')
-      .select('id')
+      .select('id, pen_name, profile_image_url')
       .eq('user_id', user.id)
       .single();
 
@@ -110,6 +110,18 @@ export async function GET(req: NextRequest) {
         flagStatus: flaggedReviewsMap.get(post.id)?.status || null,
         flagReason: flaggedReviewsMap.get(post.id)?.reason || null,
         is_challenge_entry: post.is_challenge_entry || false,
+        // The app renders `author.name` on every chronicle card. Without this
+        // the creator's own posts fell back to "Anonymous" — the row is the
+        // signed-in creator, so the author is always known here.
+        author: {
+          id: creator.id,
+          name: creator.pen_name || 'Whispr Creator',
+          username: creator.pen_name
+            ? creator.pen_name.toLowerCase().replace(/\s+/g, '')
+            : null,
+          avatar_url: creator.profile_image_url,
+          type: 'creator',
+        },
       })),
     });
   } catch (error) {

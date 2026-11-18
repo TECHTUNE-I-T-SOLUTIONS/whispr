@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { createSupabaseServerClient } from "@/lib/supabase-server-client"
 import { checkContentCompliance } from "@/lib/stories"
+import { createSupabaseRequestClient } from "@/lib/supabase-request-client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "storyId parameter is required" }, { status: 400 })
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     let query = supabase
       .from("chronicles_story_chapters")
       .select("*")
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -153,7 +153,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Missing chapterId parameter" }, { status: 400 })
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {

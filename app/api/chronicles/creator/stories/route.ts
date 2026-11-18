@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { createSupabaseServerClient } from "@/lib/supabase-server-client"
 import { checkContentCompliance, createOrLinkHashtags } from "@/lib/stories"
+import { createSupabaseRequestClient } from "@/lib/supabase-request-client"
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -218,7 +218,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Missing storyId parameter" }, { status: 400 })
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseRequestClient(request)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
