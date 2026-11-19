@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase-server-client';
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
+    const category = request.nextUrl.searchParams.get('category')?.trim();
 
-    const { data: posts, error } = await supabase
+    let query = supabase
       .from('chronicles_posts')
       .select(`
         id,
@@ -30,6 +31,11 @@ export async function GET(_request: NextRequest) {
       .order('published_at', { ascending: false })
       .limit(100);
 
+    // Categories are authored as display text, so compare case-insensitively.
+    if (category) query = query.ilike('category', category);
+
+    const { data: posts, error } = await query;
+
     if (error) {
       console.error('All chronicles error:', error);
       return NextResponse.json({ error: 'Failed to load chronicles' }, { status: 500 });
@@ -43,6 +49,7 @@ export async function GET(_request: NextRequest) {
       excerpt: post.excerpt,
       type: post.post_type,
       source: 'creator',
+      category: post.category,
       coverImageUrl: post.cover_image_url,
       tags: post.tags,
       viewCount: post.views_count,
@@ -61,7 +68,11 @@ export async function GET(_request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({ posts: data });
+    const categories = Array.from(
+      new Set((posts ?? []).map((post: any) => post.category).filter(Boolean)),
+    ).sort();
+
+    return NextResponse.json({ posts: data, categories });
   } catch (error) {
     console.error('All chronicles exception:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
