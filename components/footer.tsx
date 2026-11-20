@@ -17,11 +17,11 @@ import { PushNotificationManager } from "@/components/push-notification-manager"
  */
 const SOCIALS = [
   { label: "X (Twitter)", href: "https://x.com/whisprwords", Icon: XIcon },
-  { label: "Instagram", href: "https://www.instagram.com/whisprwords", Icon: Instagram },
+  { label: "Instagram", href: "https://www.instagram.com/_whisprwords", Icon: Instagram },
   { label: "Pinterest", href: "https://www.pinterest.com/whisprwords", Icon: PinterestIcon },
-  { label: "Facebook", href: "https://www.facebook.com/whisprwords", Icon: Facebook },
+  { label: "Facebook", href: "https://facebook.com/people/Whispr-Words/61596775979642/", Icon: Facebook },
   { label: "TikTok", href: "https://www.tiktok.com/@whisprwords", Icon: TikTokIcon },
-  { label: "YouTube", href: "https://www.youtube.com/@whisprwords", Icon: Youtube },
+  { label: "YouTube", href: "https://www.youtube.com/@whisprwrites", Icon: Youtube },
   { label: "Threads", href: "https://www.threads.com/@whisprwords", Icon: ThreadsIcon },
   { label: "Medium", href: "https://medium.com/@whisprwords", Icon: MediumIcon },
   { label: "Substack", href: "https://whisprwords.substack.com", Icon: Music2 },
