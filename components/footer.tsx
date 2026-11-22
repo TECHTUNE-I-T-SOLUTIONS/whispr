@@ -140,6 +140,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/contact" className="hover:text-primary transition-colors">
+                  Contact
+                </Link>
+              </li>
+              <li>
                 <Link href="/download" className="hover:text-primary transition-colors font-semibold text-[#911A1B] dark:text-red-100 dark:hover:text-red-500">
                   Download App
                 </Link>

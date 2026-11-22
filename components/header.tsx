@@ -89,6 +89,7 @@ export function Header() {
       items: [
         { name: "whispr Wall", href: "/whispr-wall" },
         { name: "Community", href: "/community" },
+        { name: "Contact", href: "/contact" },
       ]
     },
     { name: "About", href: "/about" },
