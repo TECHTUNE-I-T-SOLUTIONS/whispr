@@ -230,7 +230,10 @@ function buildMessage(
     data.payload = payload.link;
   }
   if (payload.type) data.type = payload.type;
-  if (payload.image) data.image = payload.image;
+  if (payload.image) {
+    data.image = payload.image;
+    data.imageUrl = payload.image;
+  }
 
   return {
     token,
